@@ -157,7 +157,8 @@ def render_dashboard(
 
     lines = [
         "[NEXUS SOVEREIGN: SAFE ML MONITOR]",
-        f"BOT: @FuzzysTodd | ML-PRECISION: {weights.bias:.0f}th Fractal",
+        "BOT: @FuzzysTodd | ML-PRECISION: "
+        f"{weights.fractal_precision:.0f}th Fractal",
         "---------------- READ-ONLY TRUTH ----------------",
     ]
 

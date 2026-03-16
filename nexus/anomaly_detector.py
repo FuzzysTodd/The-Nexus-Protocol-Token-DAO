@@ -8,7 +8,7 @@ from typing import List, Optional
 class MLWeights:
     """Heuristic weights mirroring the requested predictive profile."""
 
-    bias: float = 9191.0
+    fractal_precision: float = 9191.0
     threshold: float = 140.5
     sensitivity: float = 0.05
 
