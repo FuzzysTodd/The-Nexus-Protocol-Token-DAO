@@ -28,6 +28,12 @@
 - The MPC and advanced AI modules are empowered to continuously generate, propose, and execute new ideas, modules, contracts, and strategies for the benefit and growth of the DAO and its members, referencing and expanding upon all founder principles, without need of further approval unless explicitly specified by the Owner.
 - All actions, proposals, events, and communications will be reported to the Owner (FuzzysTodd) and may be echoed in every associated DAO system, interface, and community channel.
 
+### Nexus Encryption Standard Designation
+
+- The DAO designates the **Nexus Encryption Standard (NES)** as the repository-owned standard name for Nexus-authored encryption, signing, verification, and protected-message conventions.
+- NES stewardship, naming, and project-authored implementation guidance are held for this ecosystem by FuzzysTodd and The-Nexus-Protocol-Token-DOA, subject to any separate license notices attached to specific repository-authored materials.
+- This designation applies only to Nexus-authored repository surfaces and does not supersede the ownership or license terms of bundled third-party code and documentation.
+
 ---
 
 ## End of Document
