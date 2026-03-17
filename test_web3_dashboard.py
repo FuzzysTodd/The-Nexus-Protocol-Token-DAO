@@ -30,7 +30,9 @@ def test_dashboard_script_contains_verified_web_links_and_governance_targets():
         "./contracts/NexusGameTheoryToken.sol",
         "./Nouns-DAO/contracts/governance/NounsDAOLogicV3.sol",
         "./Nouns-DAO/contracts/test/NounsDAOLogicV3Harness.sol",
-        "Customized MCP/MPC assessment coverage now includes repository inventory, branch calculation, and DAO improvement priorities.",
+        "Customized MCP/MPC assessment coverage now includes "
+        "repository inventory, branch calculation, and DAO "
+        "improvement priorities.",
     ]
 
     for link in expected_links:
