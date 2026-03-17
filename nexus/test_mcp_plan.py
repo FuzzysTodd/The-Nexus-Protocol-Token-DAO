@@ -1,6 +1,7 @@
 """Tests for MCP task plan generation."""
 
 import json
+import os
 import subprocess
 import tempfile
 from pathlib import Path
@@ -55,17 +56,16 @@ def test_write_mcp_plan_and_provenance_records_agent_metadata(tmp_path):
 
 
 def test_collect_repository_files_only_returns_tracked_repo_files():
-    with tempfile.NamedTemporaryFile(
-        "w",
+    fd, name = tempfile.mkstemp(
         dir=REPO_ROOT / "nexus",
         prefix="_tmp_untracked_mcp_plan_",
         suffix=".tmp",
-        encoding="utf-8",
-        delete=False,
-    ) as handle:
-        handle.write("temporary = True\n")
-        untracked_path = Path(handle.name)
-        untracked_name = f"nexus/{untracked_path.name}"
+        text=True,
+    )
+    untracked_path = Path(name)
+    untracked_name = f"nexus/{untracked_path.name}"
+    os.close(fd)
+    untracked_path.write_text("temporary = True\n", encoding="utf-8")
 
     try:
         files = collect_repository_files(REPO_ROOT)
@@ -103,7 +103,7 @@ def test_collect_repository_files_falls_back_to_filtered_filesystem_scan(
     assert "node_modules/pkg.js" not in files
 
 
-def test_collect_repository_branches_reads_local_and_remote_refs(monkeypatch):
+def test_collect_repository_branches_excludes_origin_head(monkeypatch):
     def fake_run(*_args, **_kwargs):
         class CompletedProcess:
             stdout = "\n".join(
@@ -128,3 +128,14 @@ def test_collect_repository_branches_reads_local_and_remote_refs(monkeypatch):
         "origin/feature/mcp",
         "origin/main",
     ]
+
+
+def test_collect_repository_branches_returns_empty_list_when_git_fails(
+    monkeypatch,
+):
+    def raise_git_failure(*_args, **_kwargs):
+        raise subprocess.CalledProcessError(1, "git")
+
+    monkeypatch.setattr(subprocess, "run", raise_git_failure)
+
+    assert collect_repository_branches(REPO_ROOT) == []

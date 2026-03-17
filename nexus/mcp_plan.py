@@ -19,6 +19,23 @@ GIT_LS_FILES_TIMEOUT_SECONDS = 30
 GIT_BRANCH_LIST_TIMEOUT_SECONDS = 30
 
 
+def scan_repository_files_fallback(root: Path) -> List[str]:
+    """Collect repository files without git metadata."""
+
+    files = []
+    for path in root.rglob("*"):
+        if not path.is_file():
+            continue
+        relative_path = path.relative_to(root)
+        if any(
+            part in FALLBACK_IGNORED_DIRS
+            for part in relative_path.parts
+        ):
+            continue
+        files.append(str(relative_path).replace("\\", "/"))
+    return files
+
+
 def load_mcp_agents(
     config_path: Path = DEFAULT_CONFIG_PATH,
 ) -> List[Dict[str, object]]:
@@ -60,21 +77,7 @@ def collect_repository_files(root: Path = Path(".")) -> List[str]:
         subprocess.CalledProcessError,
         subprocess.TimeoutExpired,
     ):
-        def scan_repository_files() -> List[str]:
-            files = []
-            for path in root.rglob("*"):
-                if not path.is_file():
-                    continue
-                relative_path = path.relative_to(root)
-                if any(
-                    part in FALLBACK_IGNORED_DIRS
-                    for part in relative_path.parts
-                ):
-                    continue
-                files.append(str(relative_path).replace("\\", "/"))
-            return files
-
-        return sorted(scan_repository_files())
+        return sorted(scan_repository_files_fallback(root))
 
     return sorted(result.stdout.splitlines())
 
@@ -109,7 +112,7 @@ def collect_repository_branches(root: Path = Path(".")) -> List[str]:
         {
             line
             for line in result.stdout.splitlines()
-            if line and not line.endswith("/HEAD")
+            if line and line != "origin/HEAD"
         }
     )
 
