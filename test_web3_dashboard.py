@@ -2,6 +2,11 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parent
+MCP_ASSESSMENT_SUMMARY = (
+    "Customized MCP/MPC assessment coverage now includes "
+    "repository inventory, branch calculation, and DAO "
+    "improvement priorities."
+)
 
 
 def test_chimera_dashboard_references_dashboard_script_and_sections():
@@ -30,9 +35,7 @@ def test_dashboard_script_contains_verified_web_links_and_governance_targets():
         "./contracts/NexusGameTheoryToken.sol",
         "./Nouns-DAO/contracts/governance/NounsDAOLogicV3.sol",
         "./Nouns-DAO/contracts/test/NounsDAOLogicV3Harness.sol",
-        "Customized MCP/MPC assessment coverage now includes "
-        "repository inventory, branch calculation, and DAO "
-        "improvement priorities.",
+        MCP_ASSESSMENT_SUMMARY,
     ]
 
     for link in expected_links:
