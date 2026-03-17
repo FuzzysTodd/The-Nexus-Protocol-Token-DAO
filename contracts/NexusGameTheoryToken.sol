@@ -7,6 +7,11 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
+/// @title Nexus Game Theory Token
+/// @notice Nexus-authored protocol token surface tracked under the Nexus Encryption Standard (NES).
+/// @dev NES is the repository designation for Nexus-owned security, signing, and protected-message
+/// conventions documented in docs/NEXUS_ENCRYPTION_STANDARD.md. Third-party imports retain their
+/// original licensing and ownership terms.
 contract NexusGameTheoryToken is ERC20, Ownable, ReentrancyGuard {
     using Counters for Counters.Counter;
     
