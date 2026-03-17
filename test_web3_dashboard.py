@@ -1,11 +1,7 @@
 from pathlib import Path
 
 
-REPO_ROOT = Path(
-    "/home/runner/work/The-Nexus-Protocol-Token-DOA"
-) / Path(
-    "The-Nexus-Protocol-Token-DOA"
-)
+REPO_ROOT = Path(__file__).resolve().parent
 
 
 def test_chimera_dashboard_references_dashboard_script_and_sections():
