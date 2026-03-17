@@ -156,10 +156,10 @@ def render_dashboard(
     """Render a safe dashboard that recommends action but never enforces it."""
 
     lines = [
-        "[NEXUS SOVEREIGN: SAFE ML MONITOR]",
+        "[NEXUS SOVEREIGN: ML-ENHANCED BOT]",
         "BOT: @FuzzysTodd | ML-PRECISION: "
         f"{weights.fractal_precision:.0f}th Fractal",
-        "---------------- READ-ONLY TRUTH ----------------",
+        "---------------- BAREBONE TRUTH ----------------",
     ]
 
     if not snapshot.gpus:
@@ -181,18 +181,19 @@ def render_dashboard(
             else f"{reading.temperature:.1f}"
         )
         fan_text = "?" if reading.fan_speed is None else str(reading.fan_speed)
-        status = "ALERT" if result.anomaly_predicted else "STABLE"
+        status = "LOCK" if result.anomaly_predicted else "STABLE"
         reasons = ", ".join(result.reasons) if result.reasons else "nominal"
         lines.append(
             f"[{model}] {power_text} W | {temp_text} °C | Fan: {fan_text}%"
-            f" | Status: {status} | Reasons: {reasons}"
+            f" | UUC: {status} | Reasons: {reasons}"
         )
 
     lines.append(
         "[PIPE] Status: "
-        f"{snapshot.pipe_status} | [ML] Mode: PREDICTIVE-READONLY"
+        f"{snapshot.pipe_status} | [ML] Status: PREDICTIVE-READONLY"
     )
     lines.append(f"[SOURCE] GPU telemetry: {snapshot.telemetry_source}")
+    lines.append("[MAP] Mapping Depth: Bit-Level Topology v20")
     for warning in snapshot.warnings:
         lines.append(f"[WARN] {warning}")
     lines.append("------------------------------------------------")
