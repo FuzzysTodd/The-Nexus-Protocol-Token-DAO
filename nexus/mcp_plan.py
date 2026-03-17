@@ -12,6 +12,10 @@ from typing import Dict, List, Optional, Sequence, Tuple
 DEFAULT_CONFIG_PATH = Path("mcp/agents/mig-network-config.json")
 DEFAULT_PLAN_DIR = Path(".agent/plans")
 DEFAULT_PROVENANCE_DIR = Path(".agent/provenance")
+FALLBACK_IGNORED_DIRS = frozenset(
+    {".git", "__pycache__", ".pytest_cache", "node_modules"}
+)
+GIT_LS_FILES_TIMEOUT_SECONDS = 30
 
 
 def load_mcp_agents(
@@ -36,7 +40,11 @@ def build_mcp_plan(agents: Sequence[Dict[str, object]]) -> str:
 
 
 def collect_repository_files(root: Path = Path(".")) -> List[str]:
-    """Return a stable list of repository-tracked files for provenance."""
+    """Return a stable list of repository files for provenance.
+
+    When git is available, this returns tracked files so the provenance covers
+    the committed repository state instead of transient local artifacts.
+    """
 
     try:
         result = subprocess.run(
@@ -44,15 +52,30 @@ def collect_repository_files(root: Path = Path(".")) -> List[str]:
             check=True,
             capture_output=True,
             text=True,
+            timeout=GIT_LS_FILES_TIMEOUT_SECONDS,
         )
-    except (FileNotFoundError, subprocess.CalledProcessError):
-        return sorted(
-            str(path.relative_to(root)).replace("\\", "/")
-            for path in root.rglob("*")
-            if path.is_file()
-        )
+    except (
+        FileNotFoundError,
+        subprocess.CalledProcessError,
+        subprocess.TimeoutExpired,
+    ):
+        def scan_repository_files() -> List[str]:
+            files = []
+            for path in root.rglob("*"):
+                if not path.is_file():
+                    continue
+                relative_path = path.relative_to(root)
+                if any(
+                    part in FALLBACK_IGNORED_DIRS
+                    for part in relative_path.parts
+                ):
+                    continue
+                files.append(str(relative_path).replace("\\", "/"))
+            return files
 
-    return sorted(line for line in result.stdout.splitlines() if line)
+        return sorted(scan_repository_files())
+
+    return sorted(result.stdout.splitlines())
 
 
 def write_mcp_plan_and_provenance(

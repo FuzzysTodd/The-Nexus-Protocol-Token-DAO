@@ -1,6 +1,8 @@
 """Tests for MCP task plan generation."""
 
 import json
+import subprocess
+import tempfile
 from pathlib import Path
 
 from nexus.mcp_plan import (
@@ -51,14 +53,49 @@ def test_write_mcp_plan_and_provenance_records_agent_metadata(tmp_path):
 
 
 def test_collect_repository_files_only_returns_tracked_repo_files():
-    untracked_path = REPO_ROOT / "nexus" / "_tmp_untracked_mcp_plan_test.py"
-    untracked_path.write_text("temporary = True\n", encoding="utf-8")
+    with tempfile.NamedTemporaryFile(
+        "w",
+        dir=REPO_ROOT / "nexus",
+        prefix="_tmp_untracked_mcp_plan_",
+        suffix=".tmp",
+        encoding="utf-8",
+        delete=False,
+    ) as handle:
+        handle.write("temporary = True\n")
+        untracked_path = Path(handle.name)
+        untracked_name = f"nexus/{untracked_path.name}"
 
     try:
         files = collect_repository_files(REPO_ROOT)
     finally:
-        untracked_path.unlink()
+        untracked_path.unlink(missing_ok=True)
 
     assert ".gitignore" in files
     assert "mcp/agents/mig-network-config.json" in files
-    assert "nexus/_tmp_untracked_mcp_plan_test.py" not in files
+    assert untracked_name not in files
+
+
+def test_collect_repository_files_falls_back_to_filtered_filesystem_scan(
+    tmp_path, monkeypatch
+):
+    (tmp_path / ".gitignore").write_text("node_modules/\n", encoding="utf-8")
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs" / "guide.md").write_text("# Guide\n", encoding="utf-8")
+    (tmp_path / ".git").mkdir()
+    (tmp_path / ".git" / "config").write_text("[core]\n", encoding="utf-8")
+    (tmp_path / "node_modules").mkdir()
+    (tmp_path / "node_modules" / "pkg.js").write_text(
+        "module.exports = {}\n", encoding="utf-8"
+    )
+
+    def raise_git_unavailable(*_args, **_kwargs):
+        raise FileNotFoundError
+
+    monkeypatch.setattr(subprocess, "run", raise_git_unavailable)
+
+    files = collect_repository_files(tmp_path)
+
+    assert ".gitignore" in files
+    assert "docs/guide.md" in files
+    assert ".git/config" not in files
+    assert "node_modules/pkg.js" not in files
