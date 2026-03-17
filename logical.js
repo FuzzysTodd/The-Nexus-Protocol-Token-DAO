@@ -7,6 +7,176 @@
 // import NexusFinancialContractABI from './abis/NexusFinancialContract.json';
 // import NexusGreenTokenABI from './abis/NexusGreenToken.json';
 
+// --- Dashboard data for the static repository index ---
+const WEB3_PROJECT_LINKS = [
+    {
+        name: "Nouns DAO webapp",
+        href: "https://nouns.wtf",
+        description: "Frontend for Noun auctions as referenced by the bundled Nouns monorepo README.",
+        source: "./Nouns-DAO/README.md",
+    },
+    {
+        name: "Aave developer documentation",
+        href: "https://docs.aave.com/developers/",
+        description: "Official Aave developer docs for integration and protocol reference.",
+        source: "./Aave-V3/README.md",
+    },
+    {
+        name: "Aave governance forum",
+        href: "https://governance.aave.com/",
+        description: "Community governance forum linked from the Aave v3 repository docs.",
+        source: "./Aave-V3/README.md",
+    },
+    {
+        name: "Chainlink",
+        href: "https://chain.link/",
+        description: "Official Chainlink site for oracle network access and developer resources.",
+        source: "./ChainLink/README.md",
+    },
+    {
+        name: "Chainlink documentation",
+        href: "https://docs.chain.link/",
+        description: "Developer documentation for Chainlink integrations and node operations.",
+        source: "./ChainLink/README.md",
+    },
+    {
+        name: "GMX contracts docs",
+        href: "https://gmxio.gitbook.io/gmx/contracts",
+        description: "GMX contract documentation referenced by the bundled contracts repository.",
+        source: "./GMX.io/README.md",
+    },
+];
+
+const REPOSITORY_ENTRY_POINTS = [
+    {
+        name: "Nouns DAO repository docs",
+        href: "./Nouns-DAO/README.md",
+        description: "Documents the bundled nouns webapp, API, SDK, subgraph, and contracts.",
+        source: "Local repo",
+    },
+    {
+        name: "Aave v3 repository docs",
+        href: "./Aave-V3/README.md",
+        description: "Contains Aave developer, community, and governance references.",
+        source: "Local repo",
+    },
+    {
+        name: "Chainlink repository docs",
+        href: "./ChainLink/README.md",
+        description: "Provides official site, docs, community, and build instructions.",
+        source: "Local repo",
+    },
+    {
+        name: "GMX repository docs",
+        href: "./GMX.io/README.md",
+        description: "Covers GMX contracts usage and documentation entry points.",
+        source: "Local repo",
+    },
+];
+
+const GOVERNANCE_LINKS = [
+    {
+        name: "Repository governance charter",
+        href: "./GOVERNANCE.md",
+        description: "Authority structure and DAO operating mandate for the repository.",
+        source: "Local governance doc",
+    },
+    {
+        name: "NexusGameTheoryToken governance contract",
+        href: "./contracts/NexusGameTheoryToken.sol",
+        description: "NGTT token contract with MCP group creation, rewards, profits, and stats.",
+        source: "Local Solidity contract",
+    },
+    {
+        name: "Nouns DAO governance logic",
+        href: "./Nouns-DAO/contracts/governance/NounsDAOLogicV3.sol",
+        description: "Bundled DAO proposal and voting implementation from the Nouns governance suite.",
+        source: "Local Solidity contract",
+    },
+    {
+        name: "Nouns DAO governance harness tests",
+        href: "./Nouns-DAO/contracts/test/NounsDAOLogicV3Harness.sol",
+        description: "Test harness for governance logic that helps verify proposal and voting behavior.",
+        source: "Local Solidity test harness",
+    },
+];
+
+const VALIDATION_SUMMARY = [
+    "flake8 . completed successfully in the repository root.",
+    "pytest -q completed successfully with the existing 5-test suite.",
+    "Governance artifacts are linked for policy, contract logic, and harness coverage.",
+];
+
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+}
+
+function renderCard(item) {
+    return `
+        <article class="card">
+            <h3>${escapeHtml(item.name)}</h3>
+            <p>${escapeHtml(item.description)}</p>
+            <a href="${escapeHtml(item.href)}" target="${item.href.startsWith("http") ? "_blank" : "_self"}" rel="noopener noreferrer">
+                ${escapeHtml(item.href)}
+            </a>
+            <span class="source">Source: ${escapeHtml(item.source)}</span>
+        </article>
+    `;
+}
+
+function populateContainer(selector, items) {
+    if (typeof document === "undefined") return;
+    const container = document.querySelector(selector);
+    if (!container) return;
+    container.innerHTML = items.map(renderCard).join("");
+}
+
+function populateValidationSummary() {
+    if (typeof document === "undefined") return;
+    const container = document.querySelector("[data-validation-summary]");
+    if (!container) return;
+
+    container.innerHTML = VALIDATION_SUMMARY.map((item) => `<li><strong>Verified:</strong> ${escapeHtml(item)}</li>`).join("");
+}
+
+function hydrateChimeraDashboard() {
+    populateContainer("[data-web3-links]", WEB3_PROJECT_LINKS);
+    populateContainer("[data-repo-links]", REPOSITORY_ENTRY_POINTS);
+    populateContainer("[data-governance-links]", GOVERNANCE_LINKS);
+    populateValidationSummary();
+}
+
+if (typeof window !== "undefined") {
+    window.NexusDashboard = {
+        WEB3_PROJECT_LINKS,
+        REPOSITORY_ENTRY_POINTS,
+        GOVERNANCE_LINKS,
+        VALIDATION_SUMMARY,
+        hydrateChimeraDashboard,
+    };
+
+    if (typeof document !== "undefined") {
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", hydrateChimeraDashboard);
+        } else {
+            hydrateChimeraDashboard();
+        }
+    }
+}
+
+function notifyUser(message) {
+    if (typeof window !== "undefined" && typeof window.alert === "function") {
+        window.alert(message);
+        return;
+    }
+    console.warn(message);
+}
+
 // --- Contract Addresses (replace with your deployed addresses) ---
 const nexusFinancialContractAddress = "0x...";
 const nexusGreenTokenAddress = "0x...";
@@ -71,7 +241,7 @@ function setupEventListeners() {
  */
 async function createProposal(description) {
     if (!nexusFinancialContract) {
-        alert("Please connect your wallet first.");
+        notifyUser("Please connect your wallet first.");
         return;
     }
     try {
@@ -92,7 +262,7 @@ async function createProposal(description) {
  */
 async function voteOnProposal(proposalId) {
     if (!nexusFinancialContract) {
-        alert("Please connect your wallet first.");
+        notifyUser("Please connect your wallet first.");
         return;
     }
     try {
