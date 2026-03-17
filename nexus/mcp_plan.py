@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import time
 from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
@@ -34,13 +35,24 @@ def build_mcp_plan(agents: Sequence[Dict[str, object]]) -> str:
     return "\n".join(lines)
 
 
-def collect_python_files(root: Path = Path(".")) -> List[str]:
-    """Return a stable list of repository Python files for provenance."""
+def collect_repository_files(root: Path = Path(".")) -> List[str]:
+    """Return a stable list of repository-tracked files for provenance."""
 
-    return sorted(
-        str(path.relative_to(root)).replace("\\", "/")
-        for path in root.rglob("*.py")
-    )
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(root), "ls-files"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (FileNotFoundError, subprocess.CalledProcessError):
+        return sorted(
+            str(path.relative_to(root)).replace("\\", "/")
+            for path in root.rglob("*")
+            if path.is_file()
+        )
+
+    return sorted(line for line in result.stdout.splitlines() if line)
 
 
 def write_mcp_plan_and_provenance(
@@ -64,7 +76,7 @@ def write_mcp_plan_and_provenance(
 
     provenance = {
         "ts": ts,
-        "files": collect_python_files(root),
+        "files": collect_repository_files(root),
         "agents": [
             {
                 "id": agent["id"],

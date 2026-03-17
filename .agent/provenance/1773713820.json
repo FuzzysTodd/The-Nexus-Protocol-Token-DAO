@@ -1,0 +1,115 @@
+{
+  "agents": [
+    {
+      "id": "mcp-001",
+      "priority": "high",
+      "role": "Game Theory Coordinator",
+      "tasks": [
+        "coordinate game sessions",
+        "distribute rewards",
+        "monitor player activity"
+      ]
+    },
+    {
+      "id": "mcp-002",
+      "priority": "critical",
+      "role": "Token Economics Manager",
+      "tasks": [
+        "manage token distribution",
+        "calculate profit sharing",
+        "Bitcoin backing reconciliation"
+      ]
+    },
+    {
+      "id": "mcp-003",
+      "priority": "high",
+      "role": "DAO Governance Agent",
+      "tasks": [
+        "process proposals",
+        "vote counting",
+        "policy enforcement"
+      ]
+    },
+    {
+      "id": "mcp-004",
+      "priority": "high",
+      "role": "AI Data Pipeline Manager",
+      "tasks": [
+        "collect gameplay data",
+        "train models",
+        "optimize strategies"
+      ]
+    },
+    {
+      "id": "mcp-005",
+      "priority": "critical",
+      "role": "GPU Rendering Engine",
+      "tasks": [
+        "TRON-style graphics rendering",
+        "real-time game visuals",
+        "VR/AR support"
+      ]
+    },
+    {
+      "id": "mcp-006",
+      "priority": "high",
+      "role": "VPN Node Manager",
+      "tasks": [
+        "manage VPN nodes",
+        "security monitoring",
+        "traffic routing"
+      ]
+    },
+    {
+      "id": "mcp-007",
+      "priority": "medium",
+      "role": "NFT Minting & Trading Agent",
+      "tasks": [
+        "mint game NFTs",
+        "manage marketplace",
+        "track ownership"
+      ]
+    },
+    {
+      "id": "mcp-008",
+      "priority": "high",
+      "role": "Marketing & Promotion Agent",
+      "tasks": [
+        "social media campaigns",
+        "community engagement",
+        "partnership outreach"
+      ]
+    },
+    {
+      "id": "mcp-009",
+      "priority": "critical",
+      "role": "Cloud-Local Sync Manager",
+      "tasks": [
+        "sync cloud and local data",
+        "backup management",
+        "disaster recovery"
+      ]
+    },
+    {
+      "id": "mcp-010",
+      "priority": "high",
+      "role": "Financial Analytics Agent",
+      "tasks": [
+        "track revenue",
+        "optimize profit distribution",
+        "Bitcoin integration monitoring"
+      ]
+    }
+  ],
+  "files": [
+    ".github/agents/my-agent.agent.md.py",
+    "nexus/__init__.py",
+    "nexus/anomaly_detector.py",
+    "nexus/mcp_plan.py",
+    "nexus/telemetry_monitor.py",
+    "nexus/test_mcp_plan.py",
+    "nexus/test_telemetry.py",
+    "test_web3_dashboard.py"
+  ],
+  "ts": 1773713820
+}
