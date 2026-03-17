@@ -101,10 +101,32 @@ const GOVERNANCE_LINKS = [
     },
 ];
 
+const CUSTOM_MCP_SERVERS = [
+    {
+        name: "Repository Assessment Engine",
+        href: "./nexus/repo_assessment.py",
+        description: "Read-only MCP assessment helper that inventories the repository, branches, governance surfaces, and bundled web3 protocols.",
+        source: "./mcp/agents/mig-network-config.json",
+    },
+    {
+        name: "DAO Branch Calculation Server",
+        href: "./mcp/agents/mig-network-config.json",
+        description: "Customized MPC server entry for calculating branch coverage, DAO alignment, and real-world web3 application references.",
+        source: "./mcp/agents/mig-network-config.json",
+    },
+    {
+        name: "Governance charter",
+        href: "./GOVERNANCE.md",
+        description: "Keeps the new assessment services tied to the repository's DAO operating mandate and authority model.",
+        source: "Local governance doc",
+    },
+];
+
 const VALIDATION_SUMMARY = [
     "flake8 . completed successfully in the repository root.",
-    "pytest -q completed successfully with the existing 5-test suite.",
+    "pytest -q completed successfully with the existing repository test suite.",
     "Governance artifacts are linked for policy, contract logic, and harness coverage.",
+    "Customized MCP/MPC assessment coverage now includes repository inventory, branch calculation, and DAO improvement priorities.",
 ];
 
 function escapeHtml(value) {
@@ -148,6 +170,7 @@ function hydrateChimeraDashboard() {
     populateContainer("[data-web3-links]", WEB3_PROJECT_LINKS);
     populateContainer("[data-repo-links]", REPOSITORY_ENTRY_POINTS);
     populateContainer("[data-governance-links]", GOVERNANCE_LINKS);
+    populateContainer("[data-custom-mcp-servers]", CUSTOM_MCP_SERVERS);
     populateValidationSummary();
 }
 
@@ -156,6 +179,7 @@ if (typeof window !== "undefined") {
         WEB3_PROJECT_LINKS,
         REPOSITORY_ENTRY_POINTS,
         GOVERNANCE_LINKS,
+        CUSTOM_MCP_SERVERS,
         VALIDATION_SUMMARY,
         hydrateChimeraDashboard,
     };

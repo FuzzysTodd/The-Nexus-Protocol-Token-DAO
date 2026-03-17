@@ -9,6 +9,7 @@ def test_chimera_dashboard_references_dashboard_script_and_sections():
 
     assert "Nexus Protocol Web3 Directory" in dashboard
     assert "Verified public web links" in dashboard
+    assert "Customized MCP/MPC servers" in dashboard
     assert "Governance coverage" in dashboard
     assert '<script src="./logical.js"></script>' in dashboard
 
@@ -24,9 +25,12 @@ def test_dashboard_script_contains_verified_web_links_and_governance_targets():
         "https://docs.chain.link/",
         "https://gmxio.gitbook.io/gmx/contracts",
         "./GOVERNANCE.md",
+        "./nexus/repo_assessment.py",
+        "./mcp/agents/mig-network-config.json",
         "./contracts/NexusGameTheoryToken.sol",
         "./Nouns-DAO/contracts/governance/NounsDAOLogicV3.sol",
         "./Nouns-DAO/contracts/test/NounsDAOLogicV3Harness.sol",
+        "Customized MCP/MPC assessment coverage now includes repository inventory, branch calculation, and DAO improvement priorities.",
     ]
 
     for link in expected_links:
