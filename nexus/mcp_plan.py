@@ -16,6 +16,7 @@ FALLBACK_IGNORED_DIRS = frozenset(
     {".git", "__pycache__", ".pytest_cache", "node_modules"}
 )
 GIT_LS_FILES_TIMEOUT_SECONDS = 30
+GIT_BRANCH_LIST_TIMEOUT_SECONDS = 30
 
 
 def load_mcp_agents(
@@ -78,6 +79,41 @@ def collect_repository_files(root: Path = Path(".")) -> List[str]:
     return sorted(result.stdout.splitlines())
 
 
+def collect_repository_branches(root: Path = Path(".")) -> List[str]:
+    """Return a stable list of repository branch refs for provenance."""
+
+    try:
+        result = subprocess.run(
+            [
+                "git",
+                "-C",
+                str(root),
+                "for-each-ref",
+                "--format=%(refname:short)",
+                "refs/heads",
+                "refs/remotes/origin",
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=GIT_BRANCH_LIST_TIMEOUT_SECONDS,
+        )
+    except (
+        FileNotFoundError,
+        subprocess.CalledProcessError,
+        subprocess.TimeoutExpired,
+    ):
+        return []
+
+    return sorted(
+        {
+            line
+            for line in result.stdout.splitlines()
+            if line and not line.endswith("/HEAD")
+        }
+    )
+
+
 def write_mcp_plan_and_provenance(
     *,
     config_path: Path = DEFAULT_CONFIG_PATH,
@@ -100,6 +136,7 @@ def write_mcp_plan_and_provenance(
     provenance = {
         "ts": ts,
         "files": collect_repository_files(root),
+        "branches": collect_repository_branches(root),
         "agents": [
             {
                 "id": agent["id"],

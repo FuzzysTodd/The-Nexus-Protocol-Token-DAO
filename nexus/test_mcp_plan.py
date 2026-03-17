@@ -7,6 +7,7 @@ from pathlib import Path
 
 from nexus.mcp_plan import (
     build_mcp_plan,
+    collect_repository_branches,
     collect_repository_files,
     load_mcp_agents,
     write_mcp_plan_and_provenance,
@@ -45,6 +46,7 @@ def test_write_mcp_plan_and_provenance_records_agent_metadata(tmp_path):
 
     provenance = json.loads(provenance_path.read_text(encoding="utf-8"))
     assert provenance["ts"] == 1234567890
+    assert provenance["branches"]
     assert provenance["agents"][0]["id"] == "mcp-001"
     assert provenance["agents"][0]["role"] == "Game Theory Coordinator"
     assert ".gitignore" in provenance["files"]
@@ -99,3 +101,30 @@ def test_collect_repository_files_falls_back_to_filtered_filesystem_scan(
     assert "docs/guide.md" in files
     assert ".git/config" not in files
     assert "node_modules/pkg.js" not in files
+
+
+def test_collect_repository_branches_reads_local_and_remote_refs(monkeypatch):
+    def fake_run(*_args, **_kwargs):
+        class CompletedProcess:
+            stdout = "\n".join(
+                [
+                    "main",
+                    "feature/mcp",
+                    "origin/main",
+                    "origin/feature/mcp",
+                    "origin/HEAD",
+                ]
+            )
+
+        return CompletedProcess()
+
+    monkeypatch.setattr(subprocess, "run", fake_run)
+
+    branches = collect_repository_branches(REPO_ROOT)
+
+    assert branches == [
+        "feature/mcp",
+        "main",
+        "origin/feature/mcp",
+        "origin/main",
+    ]
