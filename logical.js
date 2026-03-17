@@ -124,7 +124,7 @@ const AUTHORITY_MAP = [
 
 const VALIDATION_SUMMARY = [
     "flake8 . completed successfully in the repository root.",
-    "pytest -q completed successfully with the existing 7-test suite.",
+    "pytest -q completed successfully with the existing 8-test suite.",
     "Governance artifacts are linked for policy, contract logic, and harness coverage.",
 ];
 
