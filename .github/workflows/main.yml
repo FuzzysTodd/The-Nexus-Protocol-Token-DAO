@@ -13,7 +13,7 @@ jobs:
   plan-implement-verify:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     env:
       AGENT_DIR: .github/agents
       PLAN_DIR: .agent/plans
@@ -51,52 +51,4 @@ PY
 
       - name: Run tests
         run: |
-          pytest -q || echo "TESTS_FAILED" > .agent/status
-
-      - name: Self-heal backoff attempt 1
-        if: ${{ hashFiles('.agent/status') != '' }}
-        run: |
-          echo "Attempt 1: Adding diagnostics and reducing scope."
-          # Example: add logging to simulator to catch failure causes
-          python - <<'PY'
-import fileinput, sys
-p="simulator/app.py"
-buf=open(p).read()
-if "LOG_DIAGNOSTICS" not in buf:
-    buf = buf.replace("app = Flask(__name__)", "app = Flask(__name__)\nLOG_DIAGNOSTICS=True")
-    open(p,"w").write(buf)
-print("Injected diagnostics flag.")
-PY
-          pytest -q || echo "TESTS_FAILED" > .agent/status
-
-      - name: Self-heal backoff attempt 2
-        if: ${{ hashFiles('.agent/status') != '' }}
-        run: |
-          echo "Attempt 2: Revert last risky chunk and re-run."
-          git checkout -- simulator/safe_core.py || true
-          pytest -q || echo "TESTS_FAILED" > .agent/status
-
-      - name: Self-heal backoff attempt 3
-        if: ${{ hashFiles('.agent/status') != '' }}
-        run: |
-          echo "Attempt 3: Split changes; isolate failing tests."
-          pytest -q -k "not slow" || echo "TESTS_FAILED" > .agent/status
-
-      - name: Create PR on success
-        if: ${{ hashFiles('.agent/status') == '' }}
-        run: |
-          BR="agent/iteration-$(date +%s)"
-          git checkout -b "$BR"
-          git add -A
-          git commit -m "Agent iteration: green tests and diagnostics"
-          git push origin "$BR"
-          echo "::notice title=PR::Created agent branch $BR"
-
-      - name: Attach logs
-        run: |
-          echo "Attaching CI logs for provenance."
-          mkdir -p .agent/logs
-          dmesg | tail -n 200 > .agent/logs/kernel_tail.txt || true
-          git add .agent
-          git commit -m "Agent: attach provenance/logs" || true
-          git push origin HEAD || true
+          pytest -q
