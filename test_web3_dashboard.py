@@ -32,7 +32,7 @@ def test_dashboard_script_contains_verified_web_links_and_governance_targets():
         "@FuzzysTodd",
         "Delegated AI + MPC creation scope",
         "Protected account + token controls",
-        "existing 8-test suite",
+        "149 tests across 9 modules",
     ]
 
     for link in expected_links:
