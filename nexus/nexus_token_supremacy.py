@@ -4,7 +4,7 @@ Runs all three Nexus prediction engines in sequence against the NGTT token
 profile across every relevant Bitcoin-era dimension:
 
   Engine 1 — MonsterBall Predictor  : binary DOMINANT/SUBDUED verdict
-  Engine 2 — Super Logical 64-dim   : confidence-tiered CRITICAL/HIGH/... verdict
+  Engine 2 — Super Logical 64-dim   : confidence-tiered CRITICAL/HIGH verdict
   Engine 3 — 3-Algebra              : Linear + Polynomial + Exponential proof
 
 The three results are fused into a ``SupremacyVerdict`` that carries a
@@ -215,6 +215,7 @@ SUPREME_BTC_TOKEN_PROFILE = BehaviorProfile(
 # Result & verdict dataclasses
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class SupremacyVerdict:
     """Fused output from all three prediction engines for NGTT.
@@ -263,7 +264,9 @@ def _btc_era_rank(score: float) -> str:
     return "STANDARD"
 
 
-def _normalize_monsterball(result: PredictionResult, threshold: float) -> float:
+def _normalize_monsterball(
+    result: PredictionResult, threshold: float
+) -> float:
     """Map MonsterBall score to 0–100 relative to threshold."""
     if threshold <= 0:
         return 0.0
@@ -325,7 +328,9 @@ def analyze_ngtt_supremacy(
     )
 
     # --- Fusion ---
-    n_mb = _normalize_monsterball(mb_result, NGTT_MONSTERBALL_WEIGHTS.threshold)
+    n_mb = _normalize_monsterball(
+        mb_result, NGTT_MONSTERBALL_WEIGHTS.threshold
+    )
     n_sl = _normalize_super_logical(sl_result)
     n_a3 = _normalize_algebra3(a3_result)
 

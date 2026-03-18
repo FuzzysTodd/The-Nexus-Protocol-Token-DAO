@@ -124,8 +124,119 @@ const AUTHORITY_MAP = [
 
 const VALIDATION_SUMMARY = [
     "flake8 . completed successfully in the repository root.",
-    "pytest -q completed successfully with the existing 8-test suite.",
+    "pytest -q completed successfully — 149 tests across 9 modules.",
     "Governance artifacts are linked for policy, contract logic, and harness coverage.",
+];
+
+const MONSTERBALL_LINKS = [
+    {
+        name: "MonsterBall module",
+        href: "./nexus/monsterball.py",
+        description: "PlayerStats dataclass, PredictorWeights, predict(), rank_players(), render_match_report(). Universal weighted predictor for any numeric domain.",
+        source: "nexus/monsterball.py",
+    },
+    {
+        name: "MonsterBall tests",
+        href: "./nexus/test_monsterball.py",
+        description: "11 focused tests: DOMINANT/SUBDUED verdicts, ranking, match reports, arbitrary-domain prediction.",
+        source: "nexus/test_monsterball.py",
+    },
+];
+
+const SUPER_LOGICAL_LINKS = [
+    {
+        name: "Super Logical module",
+        href: "./nexus/super_logical.py",
+        description: "64-dimension SuperLogicalWeights, LogicalReading, super_predict(), compose_super_predict(), render_super_logical_report(). CRITICAL/HIGH/MODERATE/LOW tiers.",
+        source: "nexus/super_logical.py",
+    },
+    {
+        name: "Super Logical tests",
+        href: "./nexus/test_super_logical.py",
+        description: "18 tests: confidence tiers, reasoning chain, domain presets, empty results, arbitrary-domain coverage.",
+        source: "nexus/test_super_logical.py",
+    },
+];
+
+const ALGEBRA3_LINKS = [
+    {
+        name: "3-Algebra module",
+        href: "./nexus/algebra3.py",
+        description: "Three algebraic layers (L1 linear, L2 polynomial, L3 exponential) blended by alpha/beta/gamma. Behavior library with 10 named profiles. apply_algebra3() works on any domain.",
+        source: "nexus/algebra3.py",
+    },
+    {
+        name: "3-Algebra tests",
+        href: "./nexus/test_algebra3.py",
+        description: "24 tests: layer arithmetic, behavior matching, domain presets, human-response and climate arbitrary domains.",
+        source: "nexus/test_algebra3.py",
+    },
+];
+
+const SUPREMACY_LINKS = [
+    {
+        name: "NGTT Supremacy module",
+        href: "./nexus/nexus_token_supremacy.py",
+        description: "Runs MonsterBall + Super Logical + 3-Algebra against the full NGTT stat profile. Produces a fused supremacy score, BTC-era rank, and a permanent eternal declaration.",
+        source: "nexus/nexus_token_supremacy.py",
+    },
+    {
+        name: "NGTT Supremacy tests",
+        href: "./nexus/test_nexus_token_supremacy.py",
+        description: "20 tests: DOMINANT verdict, CRITICAL/HIGH tier, GREATEST rank, eternal declaration, score bounds, three-engine outputs.",
+        source: "nexus/test_nexus_token_supremacy.py",
+    },
+    {
+        name: "NGTT contract",
+        href: "./contracts/NexusGameTheoryToken.sol",
+        description: "The on-chain NGTT token with BTC-backing ratio, MCP groups, skill rewards, and profit distribution.",
+        source: "contracts/NexusGameTheoryToken.sol",
+    },
+];
+
+const SIGNAL_REPAIR_LINKS = [
+    {
+        name: "Signal Repair module",
+        href: "./nexus/signal_repair.py",
+        description: "1 000 deterministic LCG particles. Each applies a unique L1+L2+L3 correction strategy. Median-aggregated consensus repair. Detects 10 degradation types for exchange feeds.",
+        source: "nexus/signal_repair.py",
+    },
+    {
+        name: "Signal Repair tests",
+        href: "./nexus/test_signal_repair.py",
+        description: "22 tests: particle count/determinism/bounds, clean/degraded signals, corrected values, degradation type detection, report rendering.",
+        source: "nexus/test_signal_repair.py",
+    },
+];
+
+const ATMOSPHERE_LINKS = [
+    {
+        name: "Atmosphere module",
+        href: "./nexus/atmosphere.py",
+        description: "Full Standard Model: 26 particle classes (quarks, leptons, bosons, composite, dark sector). Atmospheric layers + Sol metrics scored through 3-Algebra + Super Logical. GREATEST planet verdict.",
+        source: "nexus/atmosphere.py",
+    },
+    {
+        name: "Atmosphere tests",
+        href: "./nexus/test_atmosphere.py",
+        description: "22 tests: particle catalogue, ideal snapshot, degraded snapshot, three-engine scores, declaration content, report rendering.",
+        source: "nexus/test_atmosphere.py",
+    },
+];
+
+const FAMILY_LINKS = [
+    {
+        name: "Family Renaissance module",
+        href: "./nexus/family_renaissance.py",
+        description: "40-dimension family health model for Gen X (1965-1980) and Gen Z (1997-2012). 3-Algebra resilience score + Super Logical stressor pressure + MonsterBall intervention ranking. Full repair plan.",
+        source: "nexus/family_renaissance.py",
+    },
+    {
+        name: "Family Renaissance tests",
+        href: "./nexus/test_family_renaissance.py",
+        description: "34 tests: crisis index bounds, health tiers, root-cause ranking, repair plan ordering, domain coverage, declaration content, both-generations analysis.",
+        source: "nexus/test_family_renaissance.py",
+    },
 ];
 
 function escapeHtml(value) {
@@ -170,6 +281,13 @@ function hydrateChimeraDashboard() {
     populateContainer("[data-repo-links]", REPOSITORY_ENTRY_POINTS);
     populateContainer("[data-governance-links]", GOVERNANCE_LINKS);
     populateContainer("[data-authority-map]", AUTHORITY_MAP);
+    populateContainer("[data-monsterball-links]", MONSTERBALL_LINKS);
+    populateContainer("[data-super-logical-links]", SUPER_LOGICAL_LINKS);
+    populateContainer("[data-algebra3-links]", ALGEBRA3_LINKS);
+    populateContainer("[data-supremacy-links]", SUPREMACY_LINKS);
+    populateContainer("[data-signal-repair-links]", SIGNAL_REPAIR_LINKS);
+    populateContainer("[data-atmosphere-links]", ATMOSPHERE_LINKS);
+    populateContainer("[data-family-links]", FAMILY_LINKS);
     populateValidationSummary();
 }
 
@@ -179,6 +297,13 @@ if (typeof window !== "undefined") {
         REPOSITORY_ENTRY_POINTS,
         GOVERNANCE_LINKS,
         AUTHORITY_MAP,
+        MONSTERBALL_LINKS,
+        SUPER_LOGICAL_LINKS,
+        ALGEBRA3_LINKS,
+        SUPREMACY_LINKS,
+        SIGNAL_REPAIR_LINKS,
+        ATMOSPHERE_LINKS,
+        FAMILY_LINKS,
         VALIDATION_SUMMARY,
         hydrateChimeraDashboard,
     };

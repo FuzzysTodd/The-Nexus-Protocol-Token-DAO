@@ -45,6 +45,44 @@ from .algebra3 import (
     match_behavior,
     render_algebra3_report,
 )
+from .nexus_token_supremacy import (
+    NGTT_STATS,
+    SupremacyVerdict,
+    analyze_ngtt_supremacy,
+    render_supremacy_report,
+)
+from .signal_repair import (
+    EXCHANGE_SIGNAL_RANGES,
+    PARTICLE_COUNT,
+    DegradedSignal,
+    SignalRepairResult,
+    generate_particles,
+    repair_signal,
+    render_repair_report,
+)
+from .atmosphere import (
+    IDEAL_SNAPSHOT,
+    PARTICLE_CATALOGUE,
+    AtmosphericReading,
+    ParticleFluxReading,
+    PlanetaryHealthResult,
+    PlanetarySnapshot,
+    SolarReading,
+    analyze_planetary_health,
+    render_planetary_report,
+)
+from .family_renaissance import (
+    GENERATION_GEN_X,
+    GENERATION_GEN_Z,
+    HEALTHY_FAMILY_BASELINE,
+    SOCIETAL_STRESSORS,
+    FamilyProfile,
+    FamilyRenaissanceResult,
+    RepairAction,
+    analyze_both_generations,
+    analyze_family_crisis,
+    render_renaissance_report,
+)
 
 __all__ = [
     # anomaly_detector
@@ -88,4 +126,38 @@ __all__ = [
     "apply_algebra3",
     "match_behavior",
     "render_algebra3_report",
+    # nexus_token_supremacy
+    "NGTT_STATS",
+    "SupremacyVerdict",
+    "analyze_ngtt_supremacy",
+    "render_supremacy_report",
+    # signal_repair
+    "EXCHANGE_SIGNAL_RANGES",
+    "PARTICLE_COUNT",
+    "DegradedSignal",
+    "SignalRepairResult",
+    "generate_particles",
+    "repair_signal",
+    "render_repair_report",
+    # atmosphere
+    "IDEAL_SNAPSHOT",
+    "PARTICLE_CATALOGUE",
+    "AtmosphericReading",
+    "ParticleFluxReading",
+    "PlanetaryHealthResult",
+    "PlanetarySnapshot",
+    "SolarReading",
+    "analyze_planetary_health",
+    "render_planetary_report",
+    # family_renaissance
+    "GENERATION_GEN_X",
+    "GENERATION_GEN_Z",
+    "HEALTHY_FAMILY_BASELINE",
+    "SOCIETAL_STRESSORS",
+    "FamilyProfile",
+    "FamilyRenaissanceResult",
+    "RepairAction",
+    "analyze_both_generations",
+    "analyze_family_crisis",
+    "render_renaissance_report",
 ]

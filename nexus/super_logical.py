@@ -229,6 +229,7 @@ def _build_reasoning_chain(
     confidence: float,
     tier: str,
     answer: str,
+    weights: "SuperLogicalWeights",
 ) -> List[str]:
     """Produce an ordered human-readable derivation of the answer."""
 
@@ -261,8 +262,10 @@ def _build_reasoning_chain(
         f" | Confidence: {confidence:.2f}%"
     )
     chain.append(
-        f"[6] Tier thresholds — CRITICAL≥{TIER_CRITICAL}%"
-        f" HIGH≥{TIER_HIGH}% MODERATE≥{TIER_MODERATE}% LOW<{TIER_MODERATE}%"
+        f"[6] Tier thresholds — CRITICAL>={weights.tier_critical}%"
+        f" HIGH>={weights.tier_high}%"
+        f" MODERATE>={weights.tier_moderate}%"
+        f" LOW<{weights.tier_moderate}%"
     )
     chain.append(f"[7] Resolved tier: {tier}")
     chain.append(f"[8] SUPER-LOGICAL ANSWER: {answer}")
@@ -335,6 +338,7 @@ def super_predict(
     chain = _build_reasoning_chain(
         reading, capped, contributions,
         score, max_score, confidence, tier, answer,
+        weights=weights,
     )
 
     return SuperLogicalResult(
