@@ -120,6 +120,13 @@ def test_withdraw_js_has_withdraw_method_selectors():
     assert "0x19165587" in script   # release(address)
 
 
+def test_withdraw_js_encodes_release_with_connected_wallet_address():
+    script = (REPO_ROOT / "withdraw.js").read_text()
+    assert 'method === "release(address)"' in script
+    assert 'encodeFunctionData("release", [signerAddress])' in script
+    assert 'method === "release(address)" && customAbi' not in script
+
+
 def test_withdraw_js_defines_storage_key():
     script = (REPO_ROOT / "withdraw.js").read_text()
     assert "nexus_withdraw_contracts" in script
