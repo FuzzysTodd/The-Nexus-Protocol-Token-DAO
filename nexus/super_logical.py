@@ -18,7 +18,7 @@ Capacity: up to LOGICAL_CAPACITY (64) simultaneous dimensions per reading.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Dict, List, Sequence, Tuple
 
 # ---------------------------------------------------------------------------
 # Constants

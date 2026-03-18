@@ -35,22 +35,7 @@ def test_super_predict_returns_critical_for_near_perfect_stats():
 
 
 def test_super_predict_returns_low_for_minimal_stats():
-    weights = SuperLogicalWeights(
-        domain="Test",
-        weights={"a": 1.0, "b": 1.0},
-        tier_critical=90.0,
-        tier_high=75.0,
-        tier_moderate=50.0,
-    )
-    reading = LogicalReading(domain="Test", stats={"a": 1.0, "b": 99.0})
-    # score=100, max=100, conf=100% → CRITICAL
-    # Let's force LOW: only populate a small fraction
-    reading2 = LogicalReading(domain="Test", stats={"a": 1.0})
-    result = super_predict(reading2, weights)
-
-    # Only one of two dims active, max_score = a*1.0 = 1.0, score = 1.0
-    # confidence = 100% because score == max_score for active dims
-    # So let's test with actual low-contribution reading
+    # Confidence is 0% when score is zero → tier must be LOW
     w2 = SuperLogicalWeights(
         domain="Test",
         weights={"x": 1.0},
@@ -253,7 +238,9 @@ def test_render_super_logical_report_header_present():
 
 
 def test_render_super_logical_report_includes_answer_and_tier():
-    reading = LogicalReading(domain="Token Activity", stats={"liquidity": 200.0})
+    reading = LogicalReading(
+        domain="Token Activity", stats={"liquidity": 200.0}
+    )
     result = super_predict(reading, TOKEN_SUPER_WEIGHTS)
     output = render_super_logical_report([result])
 

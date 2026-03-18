@@ -76,7 +76,9 @@ def predict(
             reasons.append(f"{key}={value:.1f}x{w:.1f}")
 
     label = (
-        weights.label_above if score >= weights.threshold else weights.label_below
+        weights.label_above
+        if score >= weights.threshold
+        else weights.label_below
     )
     threshold_op = ">=" if score >= weights.threshold else "<"
     prediction_text = (
