@@ -122,9 +122,12 @@ def test_withdraw_js_has_withdraw_method_selectors():
 
 def test_withdraw_js_encodes_release_with_connected_wallet_address():
     script = (REPO_ROOT / "withdraw.js").read_text()
-    assert 'method === "release(address)"' in script
+    release_branch = 'if (method === "release(address)")'
+    custom_branch = 'else if (method === "custom" && customSelector)'
+    assert release_branch in script
+    assert custom_branch in script
+    assert script.index(release_branch) < script.index(custom_branch)
     assert 'encodeFunctionData("release", [signerAddress])' in script
-    assert 'method === "release(address)" && customAbi' not in script
 
 
 def test_withdraw_js_defines_storage_key():
