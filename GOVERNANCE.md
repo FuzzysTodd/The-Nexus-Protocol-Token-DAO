@@ -28,6 +28,13 @@
 - The MPC and advanced AI modules are empowered to continuously generate, propose, and execute new ideas, modules, contracts, and strategies for the benefit and growth of the DAO and its members, referencing and expanding upon all founder principles, without need of further approval unless explicitly specified by the Owner.
 - All actions, proposals, events, and communications will be reported to the Owner (FuzzysTodd) and may be echoed in every associated DAO system, interface, and community channel.
 
+### Nexus Owner Identity & Delegated Authority
+
+- The canonical Nexus owner, repository administrator reference, and public operator identity for repository-authored surfaces is **@FuzzysTodd**.
+- Repository-authored web pages, frontend experiences, backend orchestration, and governance references may present themselves as Nexus-managed surfaces on behalf of **@FuzzysTodd** and The-Nexus-Protocol-Token-DOA.
+- AI, MPC, and mapped automation may create drafts, write content, organize data, prepare token/governance workflows, and propose account or contract changes in service of the DAO mission.
+- Administrator grants, credential issuance, secret handling, wallet custody, spending, minting, transfers, and other irreversible account or token actions remain bound to explicit owner-controlled credentials, signatures, or on-chain permissions.
+
 ### Nexus Encryption Standard Designation
 
 - The DAO designates the **Nexus Encryption Standard (NES)** as the repository-owned standard name for Nexus-authored encryption, signing, verification, and protected-message conventions.
