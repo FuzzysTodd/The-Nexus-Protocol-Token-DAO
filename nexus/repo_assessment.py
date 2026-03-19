@@ -175,6 +175,47 @@ def collect_repo_assessment(
     """Collect a read-only repository assessment for MCP/MPC planning."""
 
     resolved_root = (repo_root or _default_repo_root()).resolve()
+    warnings: List[str] = []
+
+    # Validate the repository root before performing directory operations.
+    if not resolved_root.exists():
+        warnings.append(f"Repository root does not exist: {resolved_root}")
+    elif not resolved_root.is_dir():
+        warnings.append(f"Repository root is not a directory: {resolved_root}")
+
+    if warnings:
+        # Return an empty assessment with warnings rather than raising.
+        summary = RepoAssessmentSummary(
+            repo_root=str(resolved_root),
+            current_branch="unknown",
+            branches=[],
+            web3_protocol_count=0,
+            web3_protocols=[],
+            solidity_contract_count=0,
+            documentation_file_count=0,
+            governance_asset_count=0,
+            custom_mcp_agent_count=0,
+            custom_mpc_server_count=0,
+            warnings=warnings,
+        )
+
+        priorities = [
+            message
+            for message, predicate in DAO_IMPROVEMENT_RULES
+            if predicate(summary)
+        ]
+        if not priorities:
+            priorities.append(
+                "Maintain the current MCP/MPC coverage by reviewing "
+                "repository branches, governance artifacts, and "
+                "web3 protocol references together."
+            )
+
+        return replace(
+            summary,
+            dao_improvement_priorities=priorities,
+        )
+
     top_level_paths = list(resolved_root.iterdir())
     web3_protocols = sorted(
         path.name
@@ -199,9 +240,10 @@ def collect_repo_assessment(
     custom_mcp_agent_count, custom_mpc_server_count = _read_mcp_config(
         resolved_root
     )
-    current_branch, branches, warnings = _list_branches(
+    current_branch, branches, branch_warnings = _list_branches(
         resolved_root, command_runner=command_runner
     )
+    warnings.extend(branch_warnings)
 
     summary = RepoAssessmentSummary(
         repo_root=str(resolved_root),
