@@ -330,7 +330,7 @@ async function renderContracts() {
 
     // Async balance updates
     for (const c of list) {
-        const el = document.getElementById("bal-" + c.address);
+        const el = document.getElementById("bal-" + escapeHtml(c.address));
         if (el) {
             fetchBalance(c.address).then(bal => { el.textContent = bal; });
         }
