@@ -1,4 +1,0 @@
-[flake8]
-exclude =
-    .agent,
-    .github/agents
