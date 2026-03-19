@@ -205,15 +205,15 @@ async function withdrawFromContract(address, method, customSelector, customAbi) 
 
     let callData;
     try {
-        if (method === "custom" && customSelector) {
-            // User-supplied hex selector / call-data
-            callData = customSelector.startsWith("0x") ? customSelector : "0x" + customSelector;
-        } else if (method === "release(address)" && customAbi) {
+        if (method === "release(address)") {
             // release(address) needs a payee argument – use the connected wallet
             const iface = new ethers.utils.Interface([
                 "function release(address payee)"
             ]);
             callData = iface.encodeFunctionData("release", [signerAddress]);
+        } else if (method === "custom" && customSelector) {
+            // User-supplied hex selector / call-data
+            callData = customSelector.startsWith("0x") ? customSelector : "0x" + customSelector;
         } else if (method in WITHDRAW_METHODS) {
             callData = WITHDRAW_METHODS[method];
         } else {
