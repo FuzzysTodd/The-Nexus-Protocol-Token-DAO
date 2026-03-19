@@ -147,6 +147,12 @@ def test_withdraw_js_escape_html_helper_present():
     assert "escapeHtml" in script
 
 
+def test_withdraw_js_uses_escaped_balance_ids_for_render_and_lookup():
+    script = (REPO_ROOT / "withdraw.js").read_text()
+    assert 'id="bal-${escapeHtml(c.address)}"' in script
+    assert 'document.getElementById("bal-" + escapeHtml(c.address))' in script
+
+
 def test_withdraw_js_handles_custom_selector():
     script = (REPO_ROOT / "withdraw.js").read_text()
     assert (
