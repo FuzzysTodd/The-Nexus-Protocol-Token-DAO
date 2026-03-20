@@ -49,6 +49,18 @@ const WEB3_PROJECT_LINKS = [
 
 const REPOSITORY_ENTRY_POINTS = [
     {
+        name: "Nexus User Guide (Start Here!)",
+        href: "./user-guide.html",
+        description: "Friendly walkthrough for humans - explains how to use Nexus Protocol from beginner to advanced.",
+        source: "Local user guide",
+    },
+    {
+        name: "Contract Withdrawal Manager",
+        href: "./withdraw.html",
+        description: "Interactive interface to manage withdrawals from smart contracts using MetaMask.",
+        source: "Local web interface",
+    },
+    {
         name: "Nouns DAO repository docs",
         href: "./Nouns-DAO/README.md",
         description: "Documents the bundled nouns webapp, API, SDK, subgraph, and contracts.",
