@@ -28,6 +28,8 @@ jobs:
   mcp-gateway-initialization:
     name: MCP Gateway Initialization
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       mcp_status: ${{ steps.init.outputs.status }}
       agents_active: ${{ steps.init.outputs.agents }}
@@ -90,6 +92,8 @@ jobs:
   gpu-swarm-coordination:
     name: GPU Swarm & FPGA Coordination
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: mcp-gateway-initialization
     steps:
       - name: Checkout Repository
@@ -179,6 +183,8 @@ jobs:
   hive-mind-coordination:
     name: Hive Mind Swarm Coordination
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: [mcp-gateway-initialization, gpu-swarm-coordination]
     steps:
       - name: Checkout Repository
@@ -275,6 +281,8 @@ jobs:
   mcp-agent-orchestration:
     name: MCP Agent Task Orchestration
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: [mcp-gateway-initialization, gpu-swarm-coordination, hive-mind-coordination]
     steps:
       - name: Checkout Repository
@@ -357,7 +365,10 @@ jobs:
   workflow-integration-validation:
     name: Workflow Integration & Validation
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: [mcp-agent-orchestration]
+    steps:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -435,6 +446,8 @@ jobs:
   workflow-completion-summary:
     name: Workflow Completion Summary
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: [workflow-integration-validation]
     steps:
       - name: Checkout Repository
