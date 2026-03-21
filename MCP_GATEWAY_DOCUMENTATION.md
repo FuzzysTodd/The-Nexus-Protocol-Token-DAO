@@ -4,6 +4,12 @@
 
 This document provides comprehensive documentation for the MCP/MFC Gateway FPGA GPU Swarm Hive orchestration system integrated into The Nexus Protocol workflow infrastructure.
 
+**Terminology**:
+- **MCP** (Model Context Protocol): Protocol for coordinating AI agents and distributed computation
+- **MFC** (Media Foundation Classes): FPGA bridge layer for hardware acceleration and media processing
+- **MCP Gateway**: Primary coordination layer for all 10 MCP agents
+- **MFC Bridge**: FPGA acceleration layer that bridges GPU and MCP agent communication
+
 ## System Architecture
 
 ### Components
@@ -261,6 +267,8 @@ Error Rate: 0.0001%
 
 ### Test Results
 
+**Example results from initial implementation** (results may vary as tests evolve):
+
 ```
 ================================ test session starts =================================
 collected 254 items
@@ -271,6 +279,8 @@ Total: 254 passed in 1.19s
 
 OVERALL SUCCESS RATE: 100%
 ```
+
+*Note: Run `pytest nexus/test_mcp_gateway_orchestration.py -v` for current results.*
 
 ## Accuracy Metrics
 

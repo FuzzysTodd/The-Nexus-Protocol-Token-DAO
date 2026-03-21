@@ -1,5 +1,8 @@
 """
-Comprehensive tests for MCP/MFC Gateway FPGA GPU Swarm Hive Workflow Orchestration.
+Comprehensive tests for MCP/MFC Gateway FPGA GPU Swarm Hive Orchestration.
+
+MCP (Model Context Protocol) = AI agent coordination protocol
+MFC (Media Foundation Classes) = FPGA bridge for hardware acceleration
 
 Tests validate the integration of:
 - MCP Gateway initialization and coordination
