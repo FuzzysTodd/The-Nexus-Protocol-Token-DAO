@@ -213,6 +213,7 @@ All screenshots are saved to `screenshots/` directory:
 - ✅ You approve every transaction in MetaMask
 - ✅ Runs locally on your machine
 - ✅ No data sent to external servers
+- 🔒 MCP server stays sandboxed by default—keep `PLAYWRIGHT_MCP_ALLOW_UNRESTRICTED_FILE_ACCESS` **unset/0**. Only enable it intentionally if you need global `file://` access and fully trust the environment.
 
 ---
 
