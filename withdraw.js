@@ -115,6 +115,18 @@ function showStatus(msg, isError) {
     el._timer = setTimeout(() => { el.style.display = "none"; }, 6000);
 }
 
+function updateProgress(percent) {
+    const progressFill = document.getElementById("progress-fill");
+    if (progressFill) {
+        progressFill.style.width = percent + "%";
+        if (percent >= 100) {
+            setTimeout(() => {
+                progressFill.style.width = "0%";
+            }, 1000);
+        }
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Wallet connection
 // ---------------------------------------------------------------------------
@@ -124,19 +136,36 @@ async function connectWallet() {
         return;
     }
     try {
+        // Update progress bar
+        updateProgress(33);
+        
         provider = new ethers.providers.Web3Provider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
         signer = provider.getSigner();
         signerAddress = await signer.getAddress();
-        document.getElementById("wallet-address").textContent = signerAddress;
+        
+        // Update UI elements
+        const walletAddressEl = document.getElementById("wallet-address");
+        walletAddressEl.textContent = signerAddress;
+        walletAddressEl.style.display = "block";
+        
+        const connectionStatus = document.getElementById("connection-status");
+        connectionStatus.className = "connection-status connected";
+        connectionStatus.innerHTML = "<span>Connected</span>";
+        
         document.getElementById("wallet-section").classList.add("connected");
-        document.getElementById("connect-btn").textContent = "✔ Connected";
+        document.getElementById("connect-btn").innerHTML = '<span>✓</span><span>Connected</span>';
         document.getElementById("connect-btn").disabled = true;
+        document.getElementById("add-contract-form").classList.add("visible");
         document.getElementById("add-contract-form").style.display = "block";
-        showStatus("Wallet connected: " + signerAddress);
+        
+        updateProgress(66);
+        showStatus("✓ Wallet connected: " + shortAddr(signerAddress));
         await refreshAll();
+        updateProgress(100);
     } catch (err) {
-        showStatus("Wallet connection failed: " + err.message, true);
+        updateProgress(0);
+        showStatus("✗ Wallet connection failed: " + err.message, true);
     }
 }
 
@@ -152,13 +181,13 @@ function addContract(event) {
     const customSelector = document.getElementById("input-custom-selector").value.trim();
 
     if (!ethers.utils.isAddress(addr)) {
-        showStatus("Invalid Ethereum address.", true);
+        showStatus("✗ Invalid Ethereum address.", true);
         return;
     }
 
     const list = loadContracts();
     if (list.find(c => c.address.toLowerCase() === addr.toLowerCase())) {
-        showStatus("Contract already in the list.", true);
+        showStatus("✗ Contract already in the list.", true);
         return;
     }
 
@@ -168,8 +197,10 @@ function addContract(event) {
     document.getElementById("input-label").value = "";
     document.getElementById("input-custom-abi").value = "";
     document.getElementById("input-custom-selector").value = "";
+    updateProgress(50);
     renderContracts();
-    showStatus("Contract added: " + label);
+    updateProgress(100);
+    showStatus("✓ Contract added: " + label);
 }
 
 // ---------------------------------------------------------------------------
@@ -295,46 +326,54 @@ async function renderContracts() {
     if (!container) return;
 
     if (list.length === 0) {
-        container.innerHTML = '<p class="empty-state">No contracts added yet.</p>';
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <div class="empty-state-text">No contracts added yet</div>
+                <div class="empty-state-hint">Connect your wallet and add a contract above to get started</div>
+            </div>
+        `;
         return;
     }
 
     // Render placeholders first for speed
     container.innerHTML = list.map(c => `
-        <article class="card contract-card" data-address="${escapeHtml(c.address)}">
+        <article class="contract-card" data-address="${escapeHtml(c.address)}">
             <div class="card-header">
-                <div>
+                <div style="flex: 1;">
                     <h3 title="${escapeHtml(c.address)}">${escapeHtml(c.label)}</h3>
                     <code class="addr">${escapeHtml(c.address)}</code>
                 </div>
-                <button class="btn btn-danger btn-sm" data-action="remove">✕ Remove</button>
             </div>
             <div class="card-body">
                 <div class="balance-row">
-                    <span class="muted">Balance:</span>
-                    <span class="balance" id="bal-${escapeHtml(c.address)}">loading…</span>
+                    <span class="label">Balance</span>
+                    <span class="balance" id="bal-${escapeHtml(c.address)}">⏳ loading…</span>
                 </div>
                 <div class="method-row">
+                    <span class="muted" style="font-size: 0.8rem; text-transform: uppercase; font-weight: 600;">Method:</span>
                     <span class="pill">${escapeHtml(c.method === "custom" ? (c.customSelector || "custom") : c.method)}</span>
                 </div>
-                <button class="btn btn-accent" data-action="withdraw">
-                    ⬇ Withdraw
-                </button>
+                <div class="card-actions">
+                    <button class="btn btn-success" data-action="withdraw" title="Withdraw funds">
+                        <span>💰</span>
+                        <span>Withdraw</span>
+                    </button>
+                    <button class="btn btn-danger btn-sm" data-action="remove" title="Remove contract">
+                        <span>🗑</span>
+                    </button>
+                </div>
             </div>
         </article>
     `).join("");
 
-    // Attach event listeners via delegation (avoids inline JS injection risk)
-    // Note: the listener is attached once in initWithdrawDashboard; do not
-    // re-attach here to avoid duplicate handlers.
-
-    // Async balance updates
-    for (const c of list) {
+    // Fetch balances in parallel
+    const balancePromises = list.map(async c => {
+        const bal = await fetchBalance(c.address);
         const el = document.getElementById("bal-" + escapeHtml(c.address));
-        if (el) {
-            fetchBalance(c.address).then(bal => { el.textContent = bal; });
-        }
-    }
+        if (el) el.textContent = bal;
+    });
+    await Promise.all(balancePromises);
 }
 
 async function refreshAll() {
@@ -347,7 +386,15 @@ async function refreshAll() {
 function onMethodChange() {
     const sel = document.getElementById("input-method").value;
     const customRow = document.getElementById("custom-selector-row");
-    if (customRow) customRow.style.display = (sel === "custom") ? "block" : "none";
+    if (customRow) {
+        if (sel === "custom") {
+            customRow.style.display = "flex";
+            customRow.classList.add("visible");
+        } else {
+            customRow.style.display = "none";
+            customRow.classList.remove("visible");
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------
