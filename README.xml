@@ -1,4 +1,12 @@
 Project Chimera: An Autonomous Financial Bridge
+
+Nexus Encryption Standard (NES) v1.0
+This repository designates the Nexus Encryption Standard (NES) as the project-owned security, signing, and protected-message standard for Project Chimera and other Nexus Protocol surfaces maintained in this repository.
+
+Ownership and legal notice: Repository-authored NES specifications, naming, and implementation guidance are maintained for The-Nexus-Protocol-Token-DOA ecosystem by FuzzysTodd. Third-party code, dependencies, and marks bundled in this repository remain subject to their own licenses and ownership terms.
+
+Canonical specification: docs/NEXUS_ENCRYPTION_STANDARD.md
+
 Vision
 Project Chimera is a conceptual framework for a decentralized application (dApp) designed to create a seamless, autonomous bridge between the traditional financial (TradFi) system and decentralized finance (DeFi). The core objective is to eliminate the inefficiencies, costs, and delays inherent in the current financial infrastructure by leveraging a novel on-chain mechanism.
 
@@ -31,6 +39,8 @@ This repository contains the foundational smart contracts for Project Chimera.
 This is the central Multi-Function Contract (MFC) that orchestrates the entire process. It is a hybrid, combining characteristics of an NFT (representing the unique transaction agreement) and a DeFi protocol.
 
 MFC Standard: Each transaction is represented as a unique contract instance with a distinct ID, tracking its state from initiation to reconciliation.
+
+This MFC flow is designated as a Nexus Encryption Standard governed surface for Nexus-authored signing, verification, and protected transaction orchestration.
 
 DAO Governance: The contract incorporates a decentralized autonomous organization (DAO) mechanism, allowing token holders to vote on proposals to upgrade the system's logic, adjust risk parameters, and manage the treasury.
 
