@@ -109,8 +109,8 @@ def _count_files(paths: Iterable[Path], suffixes: Sequence[str]) -> int:
 def _read_mcp_config(repo_root: Path) -> tuple[int, int]:
     config_path = repo_root / "mcp" / "agents" / "mig-network-config.json"
     try:
-        data = json.loads(config_path.read_text())
-    except (OSError, json.JSONDecodeError):
+        data = json.loads(config_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
         return 0, 0
 
     network = data.get("migNetwork", {})
