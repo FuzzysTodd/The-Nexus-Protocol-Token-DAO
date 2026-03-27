@@ -397,29 +397,25 @@
         <!-- Quick Navigation -->
         <nav class="quick-nav" aria-label="Page sections">
             <div class="nav-card" role="button" tabindex="0"
-                 onclick="scrollToSection('getting-started')"
-                 onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();scrollToSection('getting-started');}">
+                 data-section="getting-started" onclick="scrollToSection('getting-started')">
                 <div class="icon" aria-hidden="true">🚀</div>
                 <h3>Getting Started</h3>
                 <p>Brand new? Start here!</p>
             </div>
             <div class="nav-card" role="button" tabindex="0"
-                 onclick="scrollToSection('what-is-nexus')"
-                 onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();scrollToSection('what-is-nexus');}">
+                 data-section="what-is-nexus" onclick="scrollToSection('what-is-nexus')">
                 <div class="icon" aria-hidden="true">💡</div>
                 <h3>What is Nexus?</h3>
                 <p>Understand the basics</p>
             </div>
             <div class="nav-card" role="button" tabindex="0"
-                 onclick="scrollToSection('user-paths')"
-                 onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();scrollToSection('user-paths');}">
+                 data-section="user-paths" onclick="scrollToSection('user-paths')">
                 <div class="icon" aria-hidden="true">🎯</div>
                 <h3>Choose Your Path</h3>
                 <p>Beginner to advanced</p>
             </div>
             <div class="nav-card" role="button" tabindex="0"
-                 onclick="scrollToSection('faq')"
-                 onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();scrollToSection('faq');}">
+                 data-section="faq" onclick="scrollToSection('faq')">
                 <div class="icon" aria-hidden="true">❓</div>
                 <h3>FAQ</h3>
                 <p>Common questions</p>
@@ -665,7 +661,7 @@
             <h2>❓ Frequently Asked Questions</h2>
 
             <div class="faq">
-                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFaq(this);}">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         What exactly is Nexus Protocol?
                         <span class="faq-toggle" aria-hidden="true">▼</span>
@@ -675,7 +671,7 @@
                     </div>
                 </div>
 
-                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFaq(this);}">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         Do I need to pay to use Nexus?
                         <span class="faq-toggle" aria-hidden="true">▼</span>
@@ -685,7 +681,7 @@
                     </div>
                 </div>
 
-                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFaq(this);}">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         Is my money safe with Nexus?
                         <span class="faq-toggle" aria-hidden="true">▼</span>
@@ -695,7 +691,7 @@
                     </div>
                 </div>
 
-                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFaq(this);}">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         What is NGTT?
                         <span class="faq-toggle" aria-hidden="true">▼</span>
@@ -705,7 +701,7 @@
                     </div>
                 </div>
 
-                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFaq(this);}">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         How do I get NGTT tokens?
                         <span class="faq-toggle" aria-hidden="true">▼</span>
@@ -715,7 +711,7 @@
                     </div>
                 </div>
 
-                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFaq(this);}">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         What's a DAO and how does it work here?
                         <span class="faq-toggle" aria-hidden="true">▼</span>
@@ -725,7 +721,7 @@
                     </div>
                 </div>
 
-                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFaq(this);}">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         Can I contribute to the project?
                         <span class="faq-toggle" aria-hidden="true">▼</span>
@@ -735,7 +731,7 @@
                     </div>
                 </div>
 
-                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFaq(this);}">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         What if I get stuck or need help?
                         <span class="faq-toggle" aria-hidden="true">▼</span>
@@ -745,7 +741,7 @@
                     </div>
                 </div>
 
-                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFaq(this);}">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         What's the difference between testnet and mainnet?
                         <span class="faq-toggle" aria-hidden="true">▼</span>
@@ -756,7 +752,7 @@
                     </div>
                 </div>
 
-                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleFaq(this);}">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         What are gas fees and why do I need to pay them?
                         <span class="faq-toggle" aria-hidden="true">▼</span>
@@ -830,6 +826,27 @@
             element.classList.toggle('active');
             element.setAttribute('aria-expanded', isExpanded ? 'false' : 'true');
         }
+
+        // Centralised keyboard activation for role="button" elements
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.nav-card[data-section]').forEach(function(card) {
+                card.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        scrollToSection(card.dataset.section);
+                    }
+                });
+            });
+
+            document.querySelectorAll('.faq-item').forEach(function(item) {
+                item.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleFaq(item);
+                    }
+                });
+            });
+        });
 
         // Add smooth reveal animations on scroll
         document.addEventListener('DOMContentLoaded', function() {
