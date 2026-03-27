@@ -465,10 +465,36 @@
             border-radius: 4px;
             font-weight: 600;
         }
+
+        /* Skip navigation link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 0 0 8px 0;
+            font-weight: bold;
+            z-index: 9999;
+            text-decoration: none;
+            transition: top 0.2s ease;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Focus-visible for buttons */
+        .btn:focus-visible {
+            outline: 3px solid var(--accent);
+            outline-offset: 3px;
+        }
     </style>
 </head>
 <body>
-<main>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<main id="main-content">
     <!-- Hero -->
     <section class="hero">
         <div class="hero-content">
