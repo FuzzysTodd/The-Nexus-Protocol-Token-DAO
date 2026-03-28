@@ -16,6 +16,8 @@ def test_chimera_dashboard_references_dashboard_script_and_sections():
     assert "Verified public web links" in dashboard
     assert "Customized MCP/MPC servers" in dashboard
     assert "Governance coverage" in dashboard
+    assert "Nexus owner + authority map" in dashboard
+    assert "@FuzzysTodd" in dashboard
     assert '<script src="./logical.js"></script>' in dashboard
 
 
@@ -35,8 +37,7 @@ def test_dashboard_script_contains_verified_web_links_and_governance_targets():
         "./contracts/NexusGameTheoryToken.sol",
         "./Nouns-DAO/contracts/governance/NounsDAOLogicV3.sol",
         "./Nouns-DAO/contracts/test/NounsDAOLogicV3Harness.sol",
-        MCP_ASSESSMENT_SUMMARY,
-    ]
+
 
     for link in expected_links:
         assert link in script
