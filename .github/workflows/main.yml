@@ -1,4 +1,3 @@
-
 name: Nexus Agent Runner
 
 on:
@@ -8,12 +7,23 @@ on:
     branches:
       - "agent/**"
   workflow_dispatch:
+    inputs:
+      allow_self_heal_writes:
+        description: "Allow self-heal to modify source files (dispatch only)"
+        required: false
+        default: "false"
+        type: boolean
+      push_branch_on_success:
+        description: "Push new agent/* branch on success (branch-only; no PR)"
+        required: false
+        default: "false"
+        type: boolean
 
 jobs:
   plan-implement-verify:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+
     env:
       AGENT_DIR: .github/agents
       PLAN_DIR: .agent/plans
@@ -27,28 +37,35 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
           pip install flask ecdsa pytest pytest-cov flake8
 
       - name: Lint code
-        run: |
-          flake8 .
+        run: flake8 .
 
       - name: Agent scan
         run: |
-          mkdir -p $PLAN_DIR $PROV_DIR
+          mkdir -p "$PLAN_DIR" "$PROV_DIR"
           python - <<'PY'
 import json, os, time, glob
 ts = int(time.time())
-plan_path = os.path.join(".agent","plans",f"plan-{ts}.md")
-open(plan_path,"w").write("# Plan\n- Scan repo\n- Propose changes\n")
+plan_path = os.path.join(".agent", "plans", f"plan-{ts}.md")
+open(plan_path, "w").write("# Plan\n- Scan repo\n- Propose changes\n")
 prov = {"ts": ts, "files": glob.glob("**/*.py", recursive=True)}
-open(os.path.join(".agent","provenance",f"{ts}.json"),"w").write(json.dumps(prov))
+open(os.path.join(".agent", "provenance", f"{ts}.json"), "w").write(json.dumps(prov))
 print("Generated plan and provenance.")
 PY
 
       - name: Run tests
         run: |
-          pytest -q
+

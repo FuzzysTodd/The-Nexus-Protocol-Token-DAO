@@ -42,6 +42,18 @@ const WEB3_PROJECT_LINKS = [
 
 const REPOSITORY_ENTRY_POINTS = [
     {
+        name: "Nexus User Guide (Start Here!)",
+        href: "./user-guide.html",
+        description: "Friendly walkthrough for humans - explains how to use Nexus Protocol from beginner to advanced.",
+        source: "Local user guide",
+    },
+    {
+        name: "Contract Withdrawal Manager",
+        href: "./withdraw.html",
+        description: "Interactive interface to manage withdrawals from smart contracts using MetaMask.",
+        source: "Local web interface",
+    },
+    {
         name: "Nouns DAO repository docs",
         href: "./Nouns-DAO/README.md",
         description: "Documents the bundled nouns webapp, API, SDK, subgraph, and contracts.",
@@ -94,32 +106,76 @@ const GOVERNANCE_LINKS = [
     },
 ];
 
-const AUTHORITY_MAP = [
+
+    },
+
+const MONSTERBALL_LINKS = [
     {
-        name: "Nexus owner profile",
-        href: "./GOVERNANCE.md",
-        description: "Canonical owner/admin identity for repository-authored Nexus surfaces is @FuzzysTodd.",
-        source: "Local governance doc",
+        name: "MonsterBall module",
+        href: "./nexus/monsterball.py",
+        description: "PlayerStats dataclass, PredictorWeights, predict(), rank_players(), render_match_report(). Universal weighted predictor for any numeric domain.",
+        source: "nexus/monsterball.py",
     },
     {
-        name: "Delegated AI + MPC creation scope",
-        href: "./GOVERNANCE.md",
-        description: "Automation may draft, write, organize data, and prepare token or governance workflows on behalf of the Nexus mission.",
-        source: "Local governance doc",
-    },
-    {
-        name: "Protected account + token controls",
-        href: "./GOVERNANCE.md",
-        description: "Spending, minting, secret handling, credential grants, and irreversible account actions still require owner-controlled permissions or signatures.",
-        source: "Local governance doc",
+        name: "MonsterBall tests",
+        href: "./nexus/test_monsterball.py",
+        description: "11 focused tests: DOMINANT/SUBDUED verdicts, ranking, match reports, arbitrary-domain prediction.",
+        source: "nexus/test_monsterball.py",
     },
 ];
 
-const VALIDATION_SUMMARY = [
-    "flake8 . completed successfully in the repository root.",
-    "pytest -q completed successfully with the current repository test suite.",
-    "Governance artifacts are linked for policy, contract logic, and harness coverage.",
+const SUPER_LOGICAL_LINKS = [
+    {
+        name: "Super Logical module",
+        href: "./nexus/super_logical.py",
+        description: "64-dimension SuperLogicalWeights, LogicalReading, super_predict(), compose_super_predict(), render_super_logical_report(). CRITICAL/HIGH/MODERATE/LOW tiers.",
+        source: "nexus/super_logical.py",
+    },
+    {
+        name: "Super Logical tests",
+        href: "./nexus/test_super_logical.py",
+        description: "18 tests: confidence tiers, reasoning chain, domain presets, empty results, arbitrary-domain coverage.",
+        source: "nexus/test_super_logical.py",
+    },
 ];
+
+const ALGEBRA3_LINKS = [
+    {
+        name: "3-Algebra module",
+        href: "./nexus/algebra3.py",
+        description: "Three algebraic layers (L1 linear, L2 polynomial, L3 exponential) blended by alpha/beta/gamma. Behavior library with 10 named profiles. apply_algebra3() works on any domain.",
+        source: "nexus/algebra3.py",
+    },
+    {
+        name: "3-Algebra tests",
+        href: "./nexus/test_algebra3.py",
+        description: "24 tests: layer arithmetic, behavior matching, domain presets, human-response and climate arbitrary domains.",
+        source: "nexus/test_algebra3.py",
+    },
+];
+
+const SUPREMACY_LINKS = [
+    {
+        name: "NGTT Supremacy module",
+        href: "./nexus/nexus_token_supremacy.py",
+        description: "Runs MonsterBall + Super Logical + 3-Algebra against the full NGTT stat profile. Produces a fused supremacy score, BTC-era rank, and a permanent eternal declaration.",
+        source: "nexus/nexus_token_supremacy.py",
+    },
+    {
+        name: "NGTT Supremacy tests",
+        href: "./nexus/test_nexus_token_supremacy.py",
+        description: "20 tests: DOMINANT verdict, CRITICAL/HIGH tier, GREATEST rank, eternal declaration, score bounds, three-engine outputs.",
+        source: "nexus/test_nexus_token_supremacy.py",
+    },
+    {
+        name: "NGTT contract",
+        href: "./contracts/NexusGameTheoryToken.sol",
+        description: "The on-chain NGTT token with BTC-backing ratio, MCP groups, skill rewards, and profit distribution.",
+        source: "contracts/NexusGameTheoryToken.sol",
+    },
+];
+
+\
 
 function escapeHtml(value) {
     return String(value)
@@ -162,7 +218,7 @@ function hydrateChimeraDashboard() {
     populateContainer("[data-web3-links]", WEB3_PROJECT_LINKS);
     populateContainer("[data-repo-links]", REPOSITORY_ENTRY_POINTS);
     populateContainer("[data-governance-links]", GOVERNANCE_LINKS);
-    populateContainer("[data-authority-map]", AUTHORITY_MAP);
+
     populateValidationSummary();
 }
 
@@ -171,9 +227,7 @@ if (typeof window !== "undefined") {
         WEB3_PROJECT_LINKS,
         REPOSITORY_ENTRY_POINTS,
         GOVERNANCE_LINKS,
-        AUTHORITY_MAP,
-        VALIDATION_SUMMARY,
-        hydrateChimeraDashboard,
+
     };
 
     if (typeof document !== "undefined") {
