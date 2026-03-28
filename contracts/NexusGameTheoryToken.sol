@@ -7,6 +7,11 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
+/// @title Nexus Game Theory Token
+/// @notice Nexus-authored protocol token surface tracked under the Nexus Encryption Standard (NES).
+/// @dev NES is the repository designation for Nexus-owned security, signing, and protected-message
+/// conventions documented in docs/NEXUS_ENCRYPTION_STANDARD.md. Third-party imports retain their
+/// original licensing and ownership terms.
 contract NexusGameTheoryToken is ERC20, Ownable, ReentrancyGuard {
     using Counters for Counters.Counter;
     
@@ -44,6 +49,11 @@ contract NexusGameTheoryToken is ERC20, Ownable, ReentrancyGuard {
     }
     
     function createMCPGroup(string memory _name, address[] memory _members) external onlyOwner returns (uint256) {
+        require(_members.length > 0, "Members list cannot be empty");
+        for (uint256 i = 0; i < _members.length; i++) {
+            require(_members[i] != address(0), "Member address cannot be zero");
+        }
+
         groupIdCounter.increment();
         uint256 newGroupId = groupIdCounter.current();
         
@@ -61,6 +71,7 @@ contract NexusGameTheoryToken is ERC20, Ownable, ReentrancyGuard {
     }
     
     function completeGame(address _player, uint256 _baseReward, uint256 _ageGroupId) external onlyOwner nonReentrant {
+        require(_player != address(0), "Player address cannot be zero");
         require(_baseReward > 0, "Reward must be positive");
         
         uint256 skillMultiplier = 100 + (skillLevel[_player] / 10);
@@ -129,6 +140,7 @@ contract NexusGameTheoryToken is ERC20, Ownable, ReentrancyGuard {
     }
     
     function activateBoost(address _user, uint256 _multiplier) external onlyOwner {
+        require(_user != address(0), "User address cannot be zero");
         require(_multiplier >= 100 && _multiplier <= 500, "Invalid multiplier");
         skillLevel[_user] += (_multiplier - 100);
         emit BoostActivated(_user, _multiplier);
