@@ -113,32 +113,8 @@ const GOVERNANCE_LINKS = [
     },
 ];
 
-const AUTHORITY_MAP = [
-    {
-        name: "Nexus owner profile",
-        href: "./GOVERNANCE.md",
-        description: "Canonical owner/admin identity for repository-authored Nexus surfaces is @FuzzysTodd.",
-        source: "Local governance doc",
-    },
-    {
-        name: "Delegated AI + MPC creation scope",
-        href: "./GOVERNANCE.md",
-        description: "Automation may draft, write, organize data, and prepare token or governance workflows on behalf of the Nexus mission.",
-        source: "Local governance doc",
-    },
-    {
-        name: "Protected account + token controls",
-        href: "./GOVERNANCE.md",
-        description: "Spending, minting, secret handling, credential grants, and irreversible account actions still require owner-controlled permissions or signatures.",
-        source: "Local governance doc",
-    },
-];
 
-const VALIDATION_SUMMARY = [
-    "flake8 . completed successfully in the repository root.",
-    "pytest -q completed successfully — 149 tests across 9 modules.",
-    "Governance artifacts are linked for policy, contract logic, and harness coverage.",
-];
+    },
 
 const MONSTERBALL_LINKS = [
     {
@@ -292,14 +268,7 @@ function hydrateChimeraDashboard() {
     populateContainer("[data-web3-links]", WEB3_PROJECT_LINKS);
     populateContainer("[data-repo-links]", REPOSITORY_ENTRY_POINTS);
     populateContainer("[data-governance-links]", GOVERNANCE_LINKS);
-    populateContainer("[data-authority-map]", AUTHORITY_MAP);
-    populateContainer("[data-monsterball-links]", MONSTERBALL_LINKS);
-    populateContainer("[data-super-logical-links]", SUPER_LOGICAL_LINKS);
-    populateContainer("[data-algebra3-links]", ALGEBRA3_LINKS);
-    populateContainer("[data-supremacy-links]", SUPREMACY_LINKS);
-    populateContainer("[data-signal-repair-links]", SIGNAL_REPAIR_LINKS);
-    populateContainer("[data-atmosphere-links]", ATMOSPHERE_LINKS);
-    populateContainer("[data-family-links]", FAMILY_LINKS);
+
     populateValidationSummary();
 }
 
@@ -308,16 +277,7 @@ if (typeof window !== "undefined") {
         WEB3_PROJECT_LINKS,
         REPOSITORY_ENTRY_POINTS,
         GOVERNANCE_LINKS,
-        AUTHORITY_MAP,
-        MONSTERBALL_LINKS,
-        SUPER_LOGICAL_LINKS,
-        ALGEBRA3_LINKS,
-        SUPREMACY_LINKS,
-        SIGNAL_REPAIR_LINKS,
-        ATMOSPHERE_LINKS,
-        FAMILY_LINKS,
-        VALIDATION_SUMMARY,
-        hydrateChimeraDashboard,
+
     };
 
     if (typeof document !== "undefined") {
