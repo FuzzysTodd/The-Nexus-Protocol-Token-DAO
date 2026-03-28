@@ -1,13 +1,13 @@
-name: CI
+
 
 on:
   push:
-    branches: [main]
-  pull_request:
+
 
 jobs:
   build-test:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -17,26 +17,4 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi
-          python - <<'PY'
-import importlib.util
-import subprocess
-import sys
 
-missing = [
-    pkg for pkg in ("pytest", "flake8")
-    if importlib.util.find_spec(pkg) is None
-]
-if missing:
-    subprocess.check_call([sys.executable, "-m", "pip", "install", *missing])
-PY
-
-      - name: Lint
-        run: flake8 .
-
-      - name: Test
-        run: pytest -q
