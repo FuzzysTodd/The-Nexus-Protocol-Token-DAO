@@ -87,6 +87,13 @@
         "tasks": ["track revenue", "optimize profit distribution", "Bitcoin integration monitoring"],
         "priority": "high",
         "computational_load": "medium"
+      },
+      {
+        "id": "mcp-011",
+        "role": "Repository Assessment Engine",
+        "tasks": ["inventory bundled web3 protocols", "calculate branch coverage", "map local assets to real-world web3 applications", "prioritize DAO improvements"],
+        "priority": "high",
+        "computational_load": "medium"
       }
     ],
     "mpcServers": [
@@ -102,6 +109,13 @@
         "role": "Backup MPC Node",
         "capabilities": ["failover support", "load balancing", "redundancy"],
         "uptime": "99.99%",
+        "location": "distributed"
+      },
+      {
+        "id": "mpc-server-003",
+        "role": "DAO Branch Calculation Server",
+        "capabilities": ["branch-aware repository assessment", "DAO alignment scoring", "web3 protocol benchmark aggregation"],
+        "uptime": "99.95%",
         "location": "distributed"
       }
     ],
