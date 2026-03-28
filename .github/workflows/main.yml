@@ -23,9 +23,7 @@ jobs:
   plan-implement-verify:
     runs-on: ubuntu-latest
     permissions:
-      contents: read   # least-privilege; write only in push-branch job
-    outputs:
-      tests_passed: ${{ steps.outcome.outputs.passed }}
+
     env:
       AGENT_DIR: .github/agents
       PLAN_DIR: .agent/plans
@@ -70,84 +68,4 @@ PY
 
       - name: Run tests
         run: |
-          rm -f .agent/status
-          pytest -q || echo "TESTS_FAILED" > .agent/status
-
-      - name: Self-heal backoff attempt 1
-        if: hashFiles('.agent/status') != ''
-        run: |
-          echo "Attempt 1: Adding diagnostics and reducing scope."
-          # Source mutations require explicit opt-in via workflow_dispatch
-          if [[ "${{ inputs.allow_self_heal_writes }}" == "true" ]]; then
-            python - <<'PY'
-import os
-p = "simulator/app.py"
-buf = open(p).read()
-if "LOG_DIAGNOSTICS" not in buf:
-    patch = "\nLOG_DIAGNOSTICS=True"
-    buf = buf.replace("app = Flask(__name__)", "app = Flask(__name__)" + patch)
-    open(p, "w").write(buf)
-print("Injected diagnostics flag.")
-PY
-          else
-            echo "Source mutation skipped; set allow_self_heal_writes=true."
-          fi
-          rm -f .agent/status
-          pytest -q || echo "TESTS_FAILED" > .agent/status
-
-      - name: Self-heal backoff attempt 2
-        if: hashFiles('.agent/status') != ''
-        run: |
-          echo "Attempt 2: Revert last risky chunk and re-run."
-          git checkout -- simulator/safe_core.py || true
-          rm -f .agent/status
-          pytest -q || echo "TESTS_FAILED" > .agent/status
-
-      - name: Self-heal backoff attempt 3
-        if: hashFiles('.agent/status') != ''
-        run: |
-          echo "Attempt 3: Split changes; isolate failing tests."
-          rm -f .agent/status
-          pytest -q -k "not slow" || echo "TESTS_FAILED" > .agent/status
-
-      - name: Set outcome output
-        id: outcome
-        if: always()
-        run: |
-          if [[ -f .agent/status ]]; then
-            echo "passed=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "passed=true" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Upload agent artifacts
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: agent-logs-${{ github.run_id }}
-          path: .agent/
-          if-no-files-found: ignore
-
-  push-branch:
-    needs: plan-implement-verify
-    # Branch-only push; no PR opened; requires workflow_dispatch opt-in
-    if: |
-      needs.plan-implement-verify.outputs.tests_passed == 'true' &&
-      github.event_name == 'workflow_dispatch' &&
-      inputs.push_branch_on_success == 'true'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write   # required only for this job to push the branch
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Push agent branch
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          BR="agent/iteration-$(date +%s)"
-          git checkout -b "$BR"
-          git commit --allow-empty -m "Agent run ${GITHUB_RUN_ID}: tests passed"
-          git push origin "$BR"
 
