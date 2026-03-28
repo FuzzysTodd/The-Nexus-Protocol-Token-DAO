@@ -150,4 +150,4 @@ PY
           git checkout -b "$BR"
           git commit --allow-empty -m "Agent run ${GITHUB_RUN_ID}: tests passed"
           git push origin "$BR"
-          echo "::notice title=Branch::Pushed $BR (branch only; no PR opened)"
+
