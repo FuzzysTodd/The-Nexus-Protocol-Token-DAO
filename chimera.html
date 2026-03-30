@@ -149,10 +149,30 @@
             color: var(--accent);
             text-decoration: none;
         }
+
+        /* Skip navigation link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 0 0 8px 0;
+            font-weight: bold;
+            z-index: 9999;
+            text-decoration: none;
+            transition: top 0.2s ease;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
     </style>
 </head>
 <body>
-<main>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<main id="main-content">
     <section class="hero">
         <h1>Nexus Protocol Web3 Directory</h1>
         <p>
