@@ -3,6 +3,7 @@ name: CI
 
 on:
   push:
+  pull_request:
 
 permissions:
   contents: read
@@ -21,11 +22,55 @@ jobs:
           python-version: "3.11"
 
       - name: Install dependencies
-        run: pip install flake8 pytest
+        run: pip install flake8 pytest pyyaml
 
       - name: Lint
         run: flake8 .
 
       - name: Test
         run: pytest -q
+
+      - name: Validate MCP agent configuration
+        run: |
+          python - <<'PYTHON'
+          import json
+          with open('mcp/agents/mig-network-config.json') as f:
+              cfg = json.load(f)
+          agents = cfg['migNetwork']['mcpAgents']
+          assert len(agents) == 10, f"Expected 10 MCP agents, got {len(agents)}"
+          ids = [a['id'] for a in agents]
+          assert len(ids) == len(set(ids)), "Duplicate agent IDs detected"
+          roles = [a['role'] for a in agents]
+          assert len(roles) == len(set(roles)), "Duplicate agent roles detected"
+          print(f"MCP config OK — {len(agents)} agents, all IDs and roles unique")
+          PYTHON
+
+      - name: Validate workflow YAML files
+        run: |
+          python - <<'PYTHON'
+          import yaml, pathlib
+          workflows = list(pathlib.Path('.github/workflows').glob('*.yml'))
+          assert workflows, "No workflow files found"
+          for wf in workflows:
+              with open(wf) as f:
+                  doc = yaml.safe_load(f)
+              assert doc is not None, f"{wf} parsed as empty"
+          print(f"Workflow YAML OK — {len(workflows)} files validated: {[w.name for w in workflows]}")
+          PYTHON
+
+      - name: Run repo assessment
+        run: |
+          python - <<'PYTHON'
+          import sys
+          sys.path.insert(0, '.')
+          from nexus.repo_assessment import collect_repo_assessment, render_repo_assessment
+          summary = collect_repo_assessment()
+          report = render_repo_assessment(summary)
+          assert len(summary.branches) > 0, "No branches found in assessment"
+          assert summary.custom_mcp_agent_count == 10, \
+              f"Expected 10 MCP agents, got {summary.custom_mcp_agent_count}"
+          assert summary.web3_protocol_count > 0, "No web3 protocols found"
+          print(report[:500])  # first 500 chars are enough for CI log confirmation
+          print("Repo assessment OK")
+          PYTHON
 
