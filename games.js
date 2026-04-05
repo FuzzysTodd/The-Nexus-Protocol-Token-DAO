@@ -345,7 +345,8 @@ function renderGroupDetails() {
     const demo = FEATURED_GAMES[group.recommendedGame];
 
     elements.groupName.textContent = group.name;
-    elements.groupMeta.textContent = `${group.games.length} game concepts • ${group.tokenAllocation} tokens • ${group.developmentHours} dev hour`;
+    const hourLabel = group.developmentHours === 1 ? 'hour' : 'hours';
+    elements.groupMeta.textContent = `${group.games.length} game concepts • ${group.tokenAllocation} tokens • ${group.developmentHours} dev ${hourLabel}`;
     elements.recommendedLaunch.textContent = `Launch ${demo.name}`;
 
     elements.groupHighlights.replaceChildren();
@@ -503,7 +504,8 @@ function resetTraderGame() {
 }
 
 function getCurrentTraderPrice(round = state.trader.round) {
-    return TRADER_PRICES[Math.min(round, TRADER_PRICES.length - 1)];
+    const safeRound = Math.max(0, Math.min(round, TRADER_PRICES.length - 1));
+    return TRADER_PRICES[safeRound];
 }
 
 function renderTraderGame() {
