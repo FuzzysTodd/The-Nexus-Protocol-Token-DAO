@@ -503,13 +503,13 @@ function resetTraderGame() {
     renderTraderGame();
 }
 
-function getCurrentTraderPrice(round = state.trader.round) {
+function getTraderPriceForRound(round = state.trader.round) {
     const safeRound = Math.max(0, Math.min(round, TRADER_PRICES.length - 1));
     return TRADER_PRICES[safeRound];
 }
 
 function renderTraderGame() {
-    const price = getCurrentTraderPrice();
+    const price = getTraderPriceForRound();
     const netWorth = state.trader.cash + state.trader.tokens * price;
 
     elements.traderRound.textContent = `Round ${Math.min(state.trader.round + 1, TRADER_PRICES.length)} of ${TRADER_PRICES.length}`;
@@ -536,7 +536,7 @@ function handleTraderAction(action) {
         return;
     }
 
-    const price = getCurrentTraderPrice();
+    const price = getTraderPriceForRound();
     let message = '';
 
     if (action === 'buy') {
