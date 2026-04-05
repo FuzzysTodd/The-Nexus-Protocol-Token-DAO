@@ -38,7 +38,7 @@ def test_dashboard_script_contains_verified_web_links_and_governance_targets():
         "./contracts/NexusGameTheoryToken.sol",
         "./Nouns-DAO/contracts/governance/NounsDAOLogicV3.sol",
         "./Nouns-DAO/contracts/test/NounsDAOLogicV3Harness.sol",
-
+    ]
 
     for link in expected_links:
         assert link in script

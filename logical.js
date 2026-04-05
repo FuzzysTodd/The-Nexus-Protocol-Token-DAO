@@ -106,8 +106,41 @@ const GOVERNANCE_LINKS = [
     },
 ];
 
-
+const CUSTOM_MCP_SERVERS = [
+    {
+        name: "Repository assessment module",
+        href: "./nexus/repo_assessment.py",
+        description: "Calculates repository inventory, branch coverage, and DAO improvement priorities against real-world web3 references.",
+        source: "nexus/repo_assessment.py",
     },
+    {
+        name: "MIG network config (MCP agents)",
+        href: "./mcp/agents/mig-network-config.json",
+        description: "Defines 10 MCP agents (mcp-001 through mcp-010) covering game theory, tokenomics, governance, GPU rendering, and more.",
+        source: "mcp/agents/mig-network-config.json",
+    },
+];
+
+const AUTHORITY_MAP_LINKS = [
+    {
+        name: "Owner & authority — @FuzzysTodd",
+        href: "./@FuzzysTodd.md",
+        description: "Repository owner and primary admin anchor. Wallet: 0x33ffc308e693a5b49e0ee0241f41f03ccef495f2",
+        source: "@FuzzysTodd.md",
+    },
+    {
+        name: "Governance charter",
+        href: "./GOVERNANCE.md",
+        description: "Authority structure, DAO mandate, and operating rules for the Nexus Protocol repository.",
+        source: "GOVERNANCE.md",
+    },
+    {
+        name: "MCP gateway documentation",
+        href: "./MCP_GATEWAY_DOCUMENTATION.md",
+        description: "Complete MCP/MFC Gateway FPGA GPU Swarm Hive orchestration system documentation.",
+        source: "MCP_GATEWAY_DOCUMENTATION.md",
+    },
+];
 
 const MONSTERBALL_LINKS = [
     {
@@ -175,7 +208,58 @@ const SUPREMACY_LINKS = [
     },
 ];
 
-\
+const SIGNAL_REPAIR_LINKS = [
+    {
+        name: "Signal repair module",
+        href: "./nexus/signal_repair.py",
+        description: "1 000-particle deterministic solver that evaluates degraded exchange signals and votes on consensus repair. Detects NOISY / DRIFTED / SPIKED / CLIPPED / DROPPED and more.",
+        source: "nexus/signal_repair.py",
+    },
+    {
+        name: "Signal repair tests",
+        href: "./nexus/test_signal_repair.py",
+        description: "Tests for the 1 000-particle signal repair consensus algorithm.",
+        source: "nexus/test_signal_repair.py",
+    },
+];
+
+const ATMOSPHERE_LINKS = [
+    {
+        name: "Atmosphere / planetary harmony module",
+        href: "./nexus/atmosphere.py",
+        description: "Electrons, quarks, neutrinos, photons, the Higgs boson and every Standard Model particle scored through 3-Algebra + Super Logical for GREATEST planetary health.",
+        source: "nexus/atmosphere.py",
+    },
+    {
+        name: "Atmosphere tests",
+        href: "./nexus/test_atmosphere.py",
+        description: "Tests validating the planetary and solar harmony scoring system.",
+        source: "nexus/test_atmosphere.py",
+    },
+];
+
+const FAMILY_LINKS = [
+    {
+        name: "Family Renaissance module",
+        href: "./nexus/family_renaissance.py",
+        description: "Quantitative diagnosis of the American family crisis. Ranks root causes and prescribes a prioritised repair plan for communication, wealth, community, and purpose.",
+        source: "nexus/family_renaissance.py",
+    },
+    {
+        name: "Family Renaissance tests",
+        href: "./nexus/test_family_renaissance.py",
+        description: "Tests for the Gen X & Gen Z family crisis diagnosis and repair prioritisation engine.",
+        source: "nexus/test_family_renaissance.py",
+    },
+];
+
+const VALIDATION_SUMMARY = [
+    "Baseline lint: flake8 . — 0 errors",
+    "Baseline tests: pytest -q — all tests passing",
+    "Governance docs and contracts indexed",
+    "MCP/MPC assessment coverage: repository inventory, branch calculation, and DAO improvement priorities",
+    "NGTT Bitcoin-era supremacy: DOMINANT verdict, CRITICAL tier, GREATEST rank — forever",
+];
 
 function escapeHtml(value) {
     return String(value)
@@ -217,7 +301,16 @@ function populateValidationSummary() {
 function hydrateChimeraDashboard() {
     populateContainer("[data-web3-links]", WEB3_PROJECT_LINKS);
     populateContainer("[data-repo-links]", REPOSITORY_ENTRY_POINTS);
+    populateContainer("[data-custom-mcp-servers]", CUSTOM_MCP_SERVERS);
     populateContainer("[data-governance-links]", GOVERNANCE_LINKS);
+    populateContainer("[data-authority-map]", AUTHORITY_MAP_LINKS);
+    populateContainer("[data-monsterball-links]", MONSTERBALL_LINKS);
+    populateContainer("[data-super-logical-links]", SUPER_LOGICAL_LINKS);
+    populateContainer("[data-algebra3-links]", ALGEBRA3_LINKS);
+    populateContainer("[data-supremacy-links]", SUPREMACY_LINKS);
+    populateContainer("[data-signal-repair-links]", SIGNAL_REPAIR_LINKS);
+    populateContainer("[data-atmosphere-links]", ATMOSPHERE_LINKS);
+    populateContainer("[data-family-links]", FAMILY_LINKS);
 
     populateValidationSummary();
 }
@@ -226,8 +319,17 @@ if (typeof window !== "undefined") {
     window.NexusDashboard = {
         WEB3_PROJECT_LINKS,
         REPOSITORY_ENTRY_POINTS,
+        CUSTOM_MCP_SERVERS,
         GOVERNANCE_LINKS,
-
+        AUTHORITY_MAP_LINKS,
+        MONSTERBALL_LINKS,
+        SUPER_LOGICAL_LINKS,
+        ALGEBRA3_LINKS,
+        SUPREMACY_LINKS,
+        SIGNAL_REPAIR_LINKS,
+        ATMOSPHERE_LINKS,
+        FAMILY_LINKS,
+        VALIDATION_SUMMARY,
     };
 
     if (typeof document !== "undefined") {

@@ -1,8 +1,11 @@
 
+name: CI
 
 on:
   push:
 
+permissions:
+  contents: read
 
 jobs:
   build-test:
@@ -17,4 +20,12 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Install dependencies
+        run: pip install flake8 pytest
+
+      - name: Lint
+        run: flake8 .
+
+      - name: Test
+        run: pytest -q
 
