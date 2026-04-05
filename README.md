@@ -12,6 +12,7 @@ The User Guide is your friendly, no-jargon walkthrough of everything Nexus Proto
 
 ### For Users
 - **[User Guide](user-guide.html)** - Start here! Beginner-friendly walkthrough
+- **[Games Arcade](games.html)** - Play Nexus browser games and browse the age-group catalog
 - **[Web3 Directory](chimera.html)** - Dashboard for Web3 ecosystems and governance
 - **[Withdrawal Manager](withdraw.html)** - Manage smart contract withdrawals
 
@@ -35,6 +36,9 @@ Think of it as a Swiss Army knife for Web3 - your gateway to managing crypto ass
 ### 🎯 NGTT Token
 The Nexus Game Theory Token is the ecosystem's utility token with governance rights, reward distribution, and staking capabilities.
 
+### 🎮 Games Arcade
+A polished browser arcade for playable Nexus mini-games, strategy drills, and the age-group game catalog.
+
 ### 💼 Withdrawal Manager
 A simple web interface to manage withdrawals from your smart contracts using MetaMask.
 
@@ -48,7 +52,7 @@ Structured authority with Owner (FuzzysTodd), Master Project Controller (MPC), a
 
 1. **Install MetaMask** - Download from [metamask.io](https://metamask.io)
 2. **Get Test ETH** - Use testnets (Sepolia/Goerli) with free faucets
-3. **Explore** - Open the [User Guide](user-guide.html) or [Web3 Directory](chimera.html)
+3. **Explore** - Open the [User Guide](user-guide.html), [Games Arcade](games.html), or [Web3 Directory](chimera.html)
 
 ## Important Notes
 
@@ -63,6 +67,8 @@ Structured authority with Owner (FuzzysTodd), Master Project Controller (MPC), a
 
 ```
 ├── user-guide.html          # Start here! User-friendly walkthrough
+├── games.html               # Browser arcade and game catalog
+├── games.js                 # Arcade gameplay logic
 ├── chimera.html             # Web3 directory dashboard
 ├── withdraw.html            # Contract withdrawal manager
 ├── logical.js               # Frontend helper library
