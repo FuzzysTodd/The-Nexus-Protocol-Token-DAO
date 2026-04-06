@@ -1,9 +1,9 @@
 # Financial Ops Automation Report
 
-- Generated at: 2026-04-06T18:26:17+00:00
-- Files scanned: 3726
-- Pre-error findings: 65
-- Withdrawal signals: 2026
+- Generated at: 2026-04-06T18:30:58+00:00
+- Files scanned: 3720
+- Pre-error findings: 64
+- Withdrawal signals: 2028
 - Placement signals: 2826
 - Approval gate: required for any fund movement or treasury action
 
