@@ -21,7 +21,7 @@ on:
       - "copilot/**"
       - "agent/**"
   workflow_run:
-    workflows: ["Nexus Agent Runner", "Progress Report Email - Gantt Chart"]
+    workflows: ["Progress Report Email - Gantt Chart"]
     types: [completed]
 
 jobs:
@@ -178,6 +178,7 @@ jobs:
         with:
           name: gpu-fpga-status
           path: .mcp/**/*.json
+          if-no-files-found: warn
           retention-days: 30
 
   hive-mind-coordination:
@@ -369,7 +370,6 @@ jobs:
       contents: read
     needs: [mcp-agent-orchestration]
     steps:
-    steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -455,7 +455,7 @@ jobs:
 
       - name: Generate Completion Summary
         run: |
-          cat << 'EOF' > workflow_summary.md
+          cat << EOF > workflow_summary.md
           # 🚀 MCP/MFC Gateway FPGA GPU Swarm Hive Workflow - COMPLETE
           
           ## Execution Summary

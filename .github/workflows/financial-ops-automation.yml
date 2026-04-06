@@ -3,7 +3,7 @@ name: Financial Ops Automation
 "on":
   workflow_dispatch:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "0 * * * *"
   push:
     branches:
       - "main"
