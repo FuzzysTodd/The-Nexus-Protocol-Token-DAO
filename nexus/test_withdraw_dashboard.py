@@ -222,7 +222,14 @@ def test_withdraw_js_runtime_helpers_cover_formatting_and_parsing():
         const withdraw = require('./withdraw.js');
         const validPayload = withdraw.parseImportedPayload(JSON.stringify({
           wallet_address: '0xabc',
-          balances: [{ chain: 'ethereum', address: 'native', amount: '1500000000000000000', symbol: 'ETH', decimals: 18, value_usd: 3200 }]
+          balances: [{
+            chain: 'ethereum',
+            address: 'native',
+            amount: '1500000000000000000',
+            symbol: 'ETH',
+            decimals: 18,
+            value_usd: 3200
+          }]
         }));
         const invalidJson = (() => {
           try { withdraw.parseImportedPayload('{'); } catch (error) { return error.message; }
@@ -231,7 +238,11 @@ def test_withdraw_js_runtime_helpers_cover_formatting_and_parsing():
           try { withdraw.parseImportedPayload('[]'); } catch (error) { return error.message; }
         })();
         const emptyPayload = (() => {
-          try { withdraw.parseImportedPayload(JSON.stringify({ balances: [], transactions: [] })); } catch (error) { return error.message; }
+          try {
+            withdraw.parseImportedPayload(JSON.stringify({ balances: [], transactions: [] }));
+          } catch (error) {
+            return error.message;
+          }
         })();
         console.log(JSON.stringify({
           large: withdraw.formatTokenAmount('1000000000000', 6),
@@ -252,7 +263,7 @@ def test_withdraw_js_runtime_helpers_cover_formatting_and_parsing():
     assert parsed["wallet"] == "0xabc"
     assert parsed["balances"] == 1
     assert parsed["invalidJson"] == "Invalid JSON format."
-    assert parsed["nonObject"] == "JSON import must contain an object."
+    assert parsed["nonObject"] == "JSON must include a balances array or a transactions array."
     assert parsed["emptyPayload"] == "JSON must include a balances array or a transactions array."
 
 
