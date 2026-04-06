@@ -64,6 +64,7 @@ def test_withdraw_html_has_json_import_and_settlement_controls():
     assert "Coinbase settlement destination" in html
     assert "Enter your own Coinbase deposit address" in html
     assert "collectibles" in html
+    assert "Send to Coinbase" in html or "Transfer" in html
 
 
 def test_withdraw_html_loads_money_flow_helpers():
@@ -273,6 +274,92 @@ def test_withdraw_js_runtime_helpers_cover_formatting_and_parsing():
     )
     assert parsed["nonObject"] == expected_error
     assert parsed["emptyPayload"] == expected_error
+
+
+def test_withdraw_js_runtime_builds_imported_balance_transfer_requests():
+    output = run_node(
+        """
+        const withdraw = require('./withdraw.js');
+        const readyBalance = {
+          assetType: 'balance',
+          chain: 'base',
+          chainId: 8453,
+          address: '0x1234',
+          rawAmount: '2500000',
+          offRamp: {
+            status: 'ready',
+            settlement: {
+              network: 'Base',
+              supportsDirectTransfer: true
+            }
+          }
+        };
+        const nativeBalance = {
+          assetType: 'balance',
+          chain: 'ethereum',
+          chainId: 1,
+          address: 'native',
+          rawAmount: '1000000000000000000',
+          offRamp: {
+            status: 'ready',
+            settlement: {
+              network: 'Ethereum',
+              supportsDirectTransfer: true
+            }
+          }
+        };
+        const reviewBalance = {
+          assetType: 'balance',
+          chain: 'base',
+          chainId: 8453,
+          address: '0x9999',
+          rawAmount: '1',
+          offRamp: {
+            status: 'review',
+            settlement: {
+              network: 'Base',
+              supportsDirectTransfer: true
+            }
+          }
+        };
+        const tokenRequest = withdraw.buildImportedBalanceTransferRequest(
+          readyBalance,
+          '0x1EF9950fc2d9433Ab9d253881fd461f8e2098Eac'
+        );
+        const nativeRequest = withdraw.buildImportedBalanceTransferRequest(
+          nativeBalance,
+          '0x1EF9950fc2d9433Ab9d253881fd461f8e2098Eac'
+        );
+        const invalidStatus = withdraw.validateImportedBalanceTransfer(
+          reviewBalance,
+          '0x1EF9950fc2d9433Ab9d253881fd461f8e2098Eac',
+          8453
+        );
+        const wrongChain = withdraw.validateImportedBalanceTransfer(
+          readyBalance,
+          '0x1EF9950fc2d9433Ab9d253881fd461f8e2098Eac',
+          1
+        );
+        console.log(JSON.stringify({
+          canSendReady: withdraw.canSendImportedBalance(readyBalance),
+          canSendReview: withdraw.canSendImportedBalance(reviewBalance),
+          tokenRequest,
+          nativeRequest,
+          invalidStatus,
+          wrongChain
+        }));
+        """
+    )
+    parsed = json.loads(output)
+    assert parsed["canSendReady"] is True
+    assert parsed["canSendReview"] is False
+    assert parsed["tokenRequest"]["kind"] == "erc20"
+    assert parsed["tokenRequest"]["tokenAddress"] == "0x1234"
+    assert parsed["tokenRequest"]["amount"] == "2500000"
+    assert parsed["nativeRequest"]["kind"] == "native"
+    assert parsed["nativeRequest"]["transaction"]["value"] == "1000000000000000000"
+    assert parsed["invalidStatus"] == "This asset is not eligible for a direct Coinbase transfer."
+    assert parsed["wrongChain"] == "Switch your wallet to Base before sending this asset."
 
 
 def test_withdraw_js_runtime_can_normalize_dune_collectibles_payload():

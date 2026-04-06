@@ -49,6 +49,10 @@ const PROXY_ABI = [
     {"stateMutability": "payable", "type": "receive"}
 ];
 
+const ERC20_ABI = [
+    "function transfer(address to, uint256 amount) returns (bool)"
+];
+
 // ---------------------------------------------------------------------------
 // Common implementation withdraw selectors that can be called through the
 // proxy fallback.  The proxy delegates everything it receives to the
@@ -312,6 +316,47 @@ function getSettlementDestination() {
 
 function getSettlementDestinationLabel() {
     return getSettlementDestination() || "No destination configured";
+}
+
+function canSendImportedBalance(balance) {
+    if (!balance || !balance.offRamp || !balance.offRamp.settlement) return false;
+    if (String(balance.assetType || "balance").toLowerCase() !== "balance") return false;
+    if (balance.offRamp.status !== "ready") return false;
+    if (!balance.offRamp.settlement.supportsDirectTransfer) return false;
+    if (String(balance.address || "").trim() === "") return false;
+    return String(balance.rawAmount || "0") !== "0";
+}
+
+function validateImportedBalanceTransfer(balance, destination, connectedChainId) {
+    if (!canSendImportedBalance(balance)) {
+        return "This asset is not eligible for a direct Coinbase transfer.";
+    }
+    if (!destination) {
+        return "Configure and verify a destination address before sending funds to Coinbase.";
+    }
+    if (balance.chainId && Number(connectedChainId) !== Number(balance.chainId)) {
+        return `Switch your wallet to ${balance.offRamp.settlement.network} before sending this asset.`;
+    }
+    return null;
+}
+
+function buildImportedBalanceTransferRequest(balance, destination) {
+    if (String(balance.address || "").toLowerCase() === "native") {
+        return {
+            kind: "native",
+            transaction: {
+                to: destination,
+                value: balance.rawAmount
+            }
+        };
+    }
+
+    return {
+        kind: "erc20",
+        tokenAddress: balance.address,
+        amount: balance.rawAmount,
+        destination
+    };
 }
 
 function parseHexAmount(value) {
@@ -809,7 +854,7 @@ function renderImportedBalances(imported) {
     count.textContent = `${imported.balances.length} assets`;
     empty.style.display = "none";
     container.innerHTML = topBalances.map(balance => `
-        <tr>
+        <tr data-balance-key="${escapeHtml(balance.address)}" data-balance-chain="${escapeHtml(String(balance.chainId || ""))}">
             <td>${escapeHtml(balance.chain)}</td>
             <td>
                 <div><strong>${escapeHtml(balance.symbol)}</strong></div>
@@ -819,6 +864,19 @@ function renderImportedBalances(imported) {
             <td>${escapeHtml(formatUsd(balance.valueUsd))}</td>
             <td>${escapeHtml(balance.lowLiquidity ? "Low liquidity" : (balance.poolSize ? `Pool ${formatUsd(balance.poolSize)}` : "No pool data"))}</td>
             <td><span class="status-chip status-${escapeHtml(balance.offRamp.status)}">${escapeHtml(balance.offRamp.label)}</span></td>
+            <td>
+                ${canSendImportedBalance(balance) ? `
+                    <button
+                        type="button"
+                        class="btn btn-accent"
+                        data-action="send-imported-balance"
+                        data-balance-address="${escapeHtml(balance.address)}"
+                        data-balance-chain-id="${escapeHtml(String(balance.chainId || ""))}"
+                    >
+                        Send to Coinbase
+                    </button>
+                ` : `<span class="table-subtext">${escapeHtml(balance.offRamp.reason || "Review route first.")}</span>`}
+            </td>
         </tr>
     `).join("");
 }
@@ -1022,6 +1080,55 @@ function clearJsonImportView() {
     showStatus("Imported wallet JSON cleared.");
 }
 
+function findImportedBalance(balanceAddress, chainId) {
+    const imported = loadImportedData();
+    if (!imported || !Array.isArray(imported.balances)) return null;
+    return imported.balances.find(balance =>
+        String(balance.address || "").toLowerCase() === String(balanceAddress || "").toLowerCase() &&
+        String(balance.chainId || "") === String(chainId || "")
+    ) || null;
+}
+
+async function sendImportedBalanceToSettlement(balanceAddress, chainId) {
+    if (!signer || !provider || typeof ethers === "undefined") {
+        showStatus("Connect your wallet before sending imported balances.", true);
+        return;
+    }
+
+    const balance = findImportedBalance(balanceAddress, chainId);
+    if (!balance) {
+        showStatus("Imported balance not found. Re-import the wallet payload and try again.", true);
+        return;
+    }
+
+    const destination = getSettlementDestination();
+    const network = await provider.getNetwork();
+    const validationError = validateImportedBalanceTransfer(balance, destination, network.chainId);
+    if (validationError) {
+        showStatus(validationError, true);
+        return;
+    }
+
+    const request = buildImportedBalanceTransferRequest(balance, destination);
+
+    try {
+        showStatus(`Sending ${balance.symbol} to Coinbase on ${balance.offRamp.settlement.network}…`);
+        let tx;
+        if (request.kind === "native") {
+            tx = await signer.sendTransaction(request.transaction);
+        } else {
+            const token = new ethers.Contract(request.tokenAddress, ERC20_ABI, signer);
+            tx = await token.transfer(request.destination, request.amount);
+        }
+        showStatus("Transfer sent – hash: " + tx.hash);
+        await tx.wait();
+        showStatus(`✅ ${balance.symbol} sent to ${shortAddr(destination)}`);
+        await refreshAll();
+    } catch (err) {
+        showStatus("Token transfer failed: " + (err.reason || err.message), true);
+    }
+}
+
 function saveSettlementDestinationFromInput() {
     const input = document.getElementById("settlement-destination");
     if (!input) return;
@@ -1033,6 +1140,15 @@ function saveSettlementDestinationFromInput() {
     saveSettlementDestination(address);
     renderImportedData();
     showStatus(`✓ Settlement destination saved: ${shortAddr(address)}`);
+}
+
+function handleImportedBalanceActions(event) {
+    const button = event.target.closest("[data-action='send-imported-balance']");
+    if (!button) return;
+    sendImportedBalanceToSettlement(
+        button.dataset.balanceAddress || "",
+        button.dataset.balanceChainId || ""
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -1065,6 +1181,9 @@ function initWithdrawDashboard() {
     const destinationBtn = document.getElementById("save-settlement-destination");
     if (destinationBtn) destinationBtn.addEventListener("click", saveSettlementDestinationFromInput);
 
+    const importedBalanceTable = document.getElementById("import-balance-table");
+    if (importedBalanceTable) importedBalanceTable.addEventListener("click", handleImportedBalanceActions);
+
     // Single delegation listener for all contract card buttons
     const contractList = document.getElementById("contract-list");
     if (contractList) contractList.addEventListener("click", _handleContainerClick);
@@ -1085,6 +1204,10 @@ if (typeof window !== "undefined") {
         renderImportedData,
         clearJsonImportView,
         normalizeImportedCollectible,
+        canSendImportedBalance,
+        validateImportedBalanceTransfer,
+        buildImportedBalanceTransferRequest,
+        sendImportedBalanceToSettlement,
     };
 
     if (typeof document !== "undefined") {
@@ -1106,5 +1229,8 @@ if (typeof module !== "undefined" && module.exports) {
         normalizeImportedBalance,
         normalizeImportedCollectible,
         normalizeImportedTransaction,
+        canSendImportedBalance,
+        validateImportedBalanceTransfer,
+        buildImportedBalanceTransferRequest,
     };
 }
