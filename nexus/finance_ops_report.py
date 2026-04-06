@@ -393,7 +393,8 @@ def build_report(root: Path, manifest_path: Path) -> dict[str, Any]:
         "recommendedActions": [
             "Review the pre-error queue and clear malformed or duplicate repository-owned files first.",
             "Use the Withdrawal Placement Scanner findings to rank payout and treasury code for human review.",
-            "Treat Ethereum and Base connectivity assumptions as separate operational checks before extending automation.",
+            "Treat Ethereum and Base connectivity assumptions as separate operational checks"
+            " before extending automation.",
         ],
     }
     return report
