@@ -211,9 +211,9 @@ function classifySettlementRail(entry) {
     const chainLabel = chain === "base"
         ? "Base"
         : (chain === "ethereum" ? "Ethereum" : (chain.charAt(0).toUpperCase() + chain.slice(1)));
-    const collectible = String(entry.asset_type || "").toLowerCase() === "collectible" || entry.token_standard;
+    const isCollectible = String(entry.asset_type || "").toLowerCase() === "collectible" || entry.token_standard;
 
-    if (collectible) {
+    if (isCollectible) {
         return {
             network: chainLabel,
             destination: chain === "base" ? "Base wallet review" : "Manual NFT review",

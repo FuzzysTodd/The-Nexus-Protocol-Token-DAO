@@ -171,9 +171,19 @@ function formatChainLabel(chain) {
     return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
+function determineAssetType(asset) {
+    if (asset && String(asset.asset_type || "").trim()) {
+        return String(asset.asset_type).toLowerCase();
+    }
+    if (asset && asset.token_standard) {
+        return "collectible";
+    }
+    return "balance";
+}
+
 function classifySettlementRail(asset) {
     const chain = String(asset.chain || "").toLowerCase();
-    const assetType = String(asset.asset_type || (asset.token_standard ? "collectible" : "balance")).toLowerCase();
+    const assetType = determineAssetType(asset);
     const chainLabel = formatChainLabel(chain);
     const supportedChain = COINBASE_DESTINATION_CHAINS.has(chain);
 
