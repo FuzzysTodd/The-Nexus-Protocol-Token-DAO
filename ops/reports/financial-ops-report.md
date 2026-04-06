@@ -1,8 +1,9 @@
 # Financial Ops Automation Report
 
-- Generated at: 2026-04-06T18:30:58+00:00
+- Generated at: 2026-04-06T18:45:30+00:00
 - Files scanned: 3720
-- Pre-error findings: 64
+- Pre-error findings: 0
+- Pre-error scope: first-party automation, docs, mcp, nexus, ops, and top-level repo files
 - Withdrawal signals: 2028
 - Placement signals: 2826
 - Approval gate: required for any fund movement or treasury action
@@ -15,16 +16,7 @@
 
 ## Top Findings
 
-- [low] ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/access/Ownable.sol: Suspicious filename pattern can make automation and review harder.
-- [low] ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC20/ERC20.sol: Suspicious filename pattern can make automation and review harder.
-- [low] ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC20/IERC20.sol: Suspicious filename pattern can make automation and review harder.
-- [low] ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol: Suspicious filename pattern can make automation and review harder.
-- [low] ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC721/ERC721.sol: Suspicious filename pattern can make automation and review harder.
-- [low] ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC721/IERC721.sol: Suspicious filename pattern can make automation and review harder.
-- [low] ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol: Suspicious filename pattern can make automation and review harder.
-- [low] ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol: Suspicious filename pattern can make automation and review harder.
-- [low] ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol: Suspicious filename pattern can make automation and review harder.
-- [low] ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol: Suspicious filename pattern can make automation and review harder.
+- No high-confidence pre-errors were detected by the static scan.
 
 ## Recommended Actions
 

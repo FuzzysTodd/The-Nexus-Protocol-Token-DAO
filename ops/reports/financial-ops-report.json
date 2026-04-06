@@ -1,8 +1,9 @@
 {
-  "generatedAt": "2026-04-06T18:30:58+00:00",
+  "generatedAt": "2026-04-06T18:45:30+00:00",
   "summary": {
     "filesScanned": 3720,
-    "preErrorCount": 64,
+    "preErrorCount": 0,
+    "preErrorScope": "first-party automation, docs, mcp, nexus, ops, and top-level repo files",
     "withdrawSignalCount": 2028,
     "placementSignalCount": 2826,
     "successDocsGenerated": 2,
@@ -40,158 +41,7 @@
       ]
     }
   ],
-  "preErrorFindings": [
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/access/Ownable.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC20/ERC20.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC20/IERC20.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC721/ERC721.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC721/IERC721.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC721/extensions/IERC721Enumerable.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC721/extensions/IERC721Metadata.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/utils/Address.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/utils/Context.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/utils/Strings.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/utils/introspection/ERC165.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/utils/introspection/IERC165.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/DistributedRoyalties/contracts/DsitributedRoylatiesUSDC.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)/@openzeppelin/contracts/access/Ownable.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)/@openzeppelin/contracts/token/ERC20/ERC20.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)/@openzeppelin/contracts/token/ERC20/IERC20.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)/@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)/@openzeppelin/contracts/token/ERC721/ERC721.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)/@openzeppelin/contracts/token/ERC721/IERC721.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)/@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    },
-    {
-      "severity": "low",
-      "category": "naming-drift",
-      "file": "ERC20-NFT-Sale-with-Distributed-Royalties(copy)/@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol",
-      "message": "Suspicious filename pattern can make automation and review harder."
-    }
-  ],
+  "preErrorFindings": [],
   "withdrawSignals": [
     {
       "file": "Eigenlayer/src/contracts/core/StrategyManager.sol",
@@ -574,13 +424,13 @@
   ],
   "successLog": [
     {
-      "time": "2026-04-06T18:30:58+00:00",
+      "time": "2026-04-06T18:45:30+00:00",
       "title": "Financial ops scan completed",
       "details": "Static repo scan finished and refreshed markdown plus dashboard payloads.",
       "status": "success"
     },
     {
-      "time": "2026-04-06T18:30:58+00:00",
+      "time": "2026-04-06T18:45:30+00:00",
       "title": "Approval gate enforced",
       "details": "Automation remains advisory for withdrawals, treasury routing, and settlement changes.",
       "status": "success"
