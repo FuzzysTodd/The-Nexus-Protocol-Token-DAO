@@ -173,6 +173,7 @@ def test_withdraw_js_defines_import_and_destination_storage_keys():
     script = (REPO_ROOT / "withdraw.js").read_text()
     assert "nexus_imported_wallet_data" in script
     assert "nexus_settlement_destination" in script
+    assert "DEFAULT_SETTLEMENT_DESTINATION" in script
     assert "MAX_DISPLAYED_BALANCES" in script
     assert "MAX_DISPLAYED_COLLECTIBLES" in script
     assert "No destination configured" in script
@@ -426,14 +427,19 @@ def test_withdraw_js_runtime_settlement_destination_validation():
         const withdraw = require('./withdraw.js');
         const valid = withdraw.getSettlementDestination();
         global.document = {
+          getElementById: () => ({ value: '   ' })
+        };
+        const blank = withdraw.getSettlementDestination();
+        global.document = {
           getElementById: () => ({ value: 'not-an-address' })
         };
         const invalid = withdraw.getSettlementDestination();
-        console.log(JSON.stringify({ valid, invalid }));
+        console.log(JSON.stringify({ valid, blank, invalid }));
         """
     )
     parsed = json.loads(output)
     assert parsed["valid"] == "0x1EF9950fc2d9433Ab9d253881fd461f8e2098Eac"
+    assert parsed["blank"] == "0x1EF9950fc2d9433Ab9d253881fd461f8e2098Eac"
     assert parsed["invalid"] is None
 
 
