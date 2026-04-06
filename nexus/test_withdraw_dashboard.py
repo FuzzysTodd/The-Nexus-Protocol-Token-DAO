@@ -59,9 +59,11 @@ def test_withdraw_html_has_json_import_and_settlement_controls():
     assert 'id="json-import-input"' in html
     assert 'id="json-import-file"' in html
     assert 'id="import-summary"' in html
+    assert 'id="import-collectible-table"' in html
     assert 'id="settlement-destination"' in html
     assert "Coinbase settlement destination" in html
     assert "Enter your own Coinbase deposit address" in html
+    assert "collectibles" in html
 
 
 def test_withdraw_html_loads_money_flow_helpers():
@@ -171,6 +173,7 @@ def test_withdraw_js_defines_import_and_destination_storage_keys():
     assert "nexus_imported_wallet_data" in script
     assert "nexus_settlement_destination" in script
     assert "MAX_DISPLAYED_BALANCES" in script
+    assert "MAX_DISPLAYED_COLLECTIBLES" in script
     assert "No destination configured" in script
 
 
@@ -206,6 +209,7 @@ def test_withdraw_js_can_parse_balances_and_transactions_payloads():
     assert "parseImportedPayload" in script
     assert "payload.balances" in script
     assert "payload.transactions" in script
+    assert "payload.entries" in script
     assert "renderImportedData" in script
 
 
@@ -263,8 +267,58 @@ def test_withdraw_js_runtime_helpers_cover_formatting_and_parsing():
     assert parsed["wallet"] == "0xabc"
     assert parsed["balances"] == 1
     assert parsed["invalidJson"] == "Invalid JSON format."
-    assert parsed["nonObject"] == "JSON must include a balances array or a transactions array."
-    assert parsed["emptyPayload"] == "JSON must include a balances array or a transactions array."
+    assert parsed["nonObject"] == "JSON must include a balances array, a transactions array, or a collectibles entries array."
+    assert parsed["emptyPayload"] == "JSON must include a balances array, a transactions array, or a collectibles entries array."
+
+
+def test_withdraw_js_runtime_can_normalize_dune_collectibles_payload():
+    output = run_node(
+        """
+        const withdraw = require('./withdraw.js');
+        const imported = withdraw.parseImportedPayload(JSON.stringify({
+          address: '0xd8da6bf26964af9d7eed9e03e53415d37aa96045',
+          entries: [{
+            contract_address: '0x1234',
+            token_standard: 'ERC721',
+            token_id: '1',
+            chain: 'base',
+            chain_id: 8453,
+            name: 'Base Genesis',
+            symbol: 'BG',
+            balance: '1',
+            is_spam: false,
+            last_acquired: '2026-04-06T18:15:47+00:00'
+          }, {
+            contract_address: '0xabcd',
+            token_standard: 'ERC1155',
+            token_id: '9',
+            chain: 'ethereum',
+            chain_id: 1,
+            name: 'Spam Drop',
+            symbol: 'DROP',
+            balance: '2',
+            is_spam: true
+          }]
+        }));
+        console.log(JSON.stringify({
+          wallet: imported.walletAddress,
+          source: imported.source,
+          balances: imported.balances.length,
+          collectibles: imported.collectibles.length,
+          baseNetwork: imported.collectibles[0].offRamp.settlement.network,
+          baseDestination: imported.collectibles[0].offRamp.settlement.destination,
+          spamStatus: imported.collectibles[1].offRamp.status
+        }));
+        """
+    )
+    parsed = json.loads(output)
+    assert parsed["wallet"] == "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
+    assert parsed["source"] == "dune-collectibles"
+    assert parsed["balances"] == 0
+    assert parsed["collectibles"] == 2
+    assert parsed["baseNetwork"] == "Base"
+    assert parsed["baseDestination"] == "Base wallet review"
+    assert parsed["spamStatus"] == "blocked"
 
 
 def test_withdraw_js_runtime_settlement_destination_validation():
@@ -303,7 +357,8 @@ def test_money_flow_runtime_import_classification_and_summary():
           ready: moneyFlow.classifyOffRamp({ chain: 'ethereum', symbol: 'ETH', value_usd: 10, address: 'native' }),
           blocked: moneyFlow.classifyOffRamp({ chain: 'sepolia', symbol: 'ETH', value_usd: 10, address: 'native' }),
           review: moneyFlow.classifyOffRamp({ chain: 'ethereum', symbol: 'TEST', value_usd: 10, low_liquidity: true }),
-          swap: moneyFlow.classifyOffRamp({ chain: 'ethereum', symbol: 'ABC', value_usd: 10, pool_size: 250000 })
+          swap: moneyFlow.classifyOffRamp({ chain: 'ethereum', symbol: 'ABC', value_usd: 10, pool_size: 250000 }),
+          collectible: moneyFlow.classifyOffRamp({ chain: 'base', asset_type: 'collectible', token_standard: 'ERC721', symbol: 'NFT', is_spam: false })
         };
         const summary = moneyFlow.summarizeImportedBalances([
           { chain: 'ethereum', address: 'native', symbol: 'ETH', value_usd: 100 },
@@ -323,12 +378,17 @@ def test_money_flow_runtime_import_classification_and_summary():
     assert parsed["parsed"]["blocked"]["status"] == "blocked"
     assert parsed["parsed"]["review"]["status"] == "review"
     assert parsed["parsed"]["swap"]["status"] == "swap"
+    assert parsed["parsed"]["ready"]["settlement"]["destination"] == "Coinbase Ethereum deposit"
+    assert parsed["parsed"]["collectible"]["status"] == "review"
+    assert parsed["parsed"]["collectible"]["settlement"]["destination"] == "Base wallet review"
     assert parsed["summary"]["totalValueUsd"] == 185
     assert parsed["summary"]["readyValueUsd"] == 100
     assert parsed["summary"]["swapValueUsd"] == 50
     assert parsed["summary"]["blockedValueUsd"] == 25
     assert parsed["summary"]["reviewValueUsd"] == 10
     assert parsed["summary"]["nativeAssetCount"] == 2
+    assert parsed["summary"]["coinbaseReadyCount"] == 2
+    assert parsed["summary"]["baseReadyCount"] == 0
     assert parsed["summary"]["unpricedAssetCount"] == 1
 
 

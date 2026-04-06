@@ -920,14 +920,15 @@
         <div class="import-layout">
             <div class="import-stack">
                 <p class="muted" style="margin:0;">
-                    Paste or upload a wallet <strong>balances</strong> payload or a
-                    <strong>transactions</strong> feed. The dashboard keeps the data
+                    Paste or upload a wallet <strong>balances</strong> payload, a
+                    <strong>transactions</strong> feed, or a Dune SIM
+                    <strong>collectibles</strong> response. The dashboard keeps the data
                     local, extracts off-chain settlement fields, and estimates what is
                     ready for a mainnet off-ramp.
                 </p>
                 <div class="form-group">
                     <label for="json-import-input">Wallet JSON payload</label>
-                    <textarea id="json-import-input" placeholder='{"wallet_address":"0x...","balances":[...],"transactions":[...]}'></textarea>
+                    <textarea id="json-import-input" placeholder='{"wallet_address":"0x...","balances":[...],"transactions":[...]} or {"address":"0x...","entries":[...]}'></textarea>
                 </div>
                 <div class="form-group">
                     <label for="json-import-file">Upload JSON file</label>
@@ -992,6 +993,31 @@
                     </div>
                     <div class="empty-state compact" id="import-balance-empty">
                         <div class="empty-state-text">No balances imported</div>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <h3>Imported collectibles</h3>
+                        <span class="table-subtext" id="import-collectible-count">0 collectibles</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="import-table">
+                            <thead>
+                                <tr>
+                                    <th>Chain</th>
+                                    <th>Collectible</th>
+                                    <th>Balance</th>
+                                    <th>Network</th>
+                                    <th>Destination</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="import-collectible-table"></tbody>
+                        </table>
+                    </div>
+                    <div class="empty-state compact" id="import-collectible-empty">
+                        <div class="empty-state-text">No collectibles imported</div>
                     </div>
                 </div>
 

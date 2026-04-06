@@ -71,6 +71,7 @@ const STORAGE_KEY = "nexus_withdraw_contracts";
 const IMPORT_STORAGE_KEY = "nexus_imported_wallet_data";
 const DESTINATION_STORAGE_KEY = "nexus_settlement_destination";
 const MAX_DISPLAYED_BALANCES = 25;
+const MAX_DISPLAYED_COLLECTIBLES = 25;
 const MAX_DISPLAYED_TRANSACTIONS = 25;
 
 // ---------------------------------------------------------------------------
@@ -575,6 +576,34 @@ function normalizeImportedTransaction(entry) {
     };
 }
 
+function normalizeImportedCollectible(entry) {
+    const balance = Number(entry.balance);
+    const offRamp = classifyOffRamp({
+        chain: entry.chain,
+        chain_id: entry.chain_id,
+        symbol: entry.symbol,
+        asset_type: "collectible",
+        token_standard: entry.token_standard,
+        is_spam: entry.is_spam
+    });
+
+    return {
+        chain: entry.chain || "unknown",
+        chainId: entry.chain_id || null,
+        contractAddress: entry.contract_address || "",
+        tokenId: String(entry.token_id || ""),
+        tokenStandard: entry.token_standard || "Collectible",
+        name: entry.name || entry.symbol || "Collectible",
+        symbol: entry.symbol || "NFT",
+        balance: Number.isFinite(balance) ? balance : 0,
+        imageUrl: entry.image_url || "",
+        description: entry.description || "",
+        isSpam: Boolean(entry.is_spam),
+        lastAcquired: entry.last_acquired || "",
+        offRamp
+    };
+}
+
 function isNativeTransfer(entry) {
     return Boolean(
         entry &&
@@ -582,6 +611,16 @@ function isNativeTransfer(entry) {
         entry.data === "0x" &&
         Array.isArray(entry.logs) &&
         entry.logs.length === 0
+    );
+}
+
+function isDuneCollectiblesPayload(payload) {
+    return Boolean(
+        payload &&
+        typeof payload === "object" &&
+        Array.isArray(payload.entries) &&
+        !Array.isArray(payload.balances) &&
+        !Array.isArray(payload.transactions)
     );
 }
 
@@ -602,9 +641,12 @@ function parseImportedPayload(rawText) {
     const transactions = Array.isArray(payload.transactions)
         ? payload.transactions.map(normalizeImportedTransaction)
         : [];
+    const collectibles = isDuneCollectiblesPayload(payload)
+        ? payload.entries.map(normalizeImportedCollectible)
+        : (Array.isArray(payload.collectibles) ? payload.collectibles.map(normalizeImportedCollectible) : []);
 
-    if (balances.length === 0 && transactions.length === 0) {
-        throw new Error("JSON must include a balances array or a transactions array.");
+    if (balances.length === 0 && transactions.length === 0 && collectibles.length === 0) {
+        throw new Error("JSON must include a balances array, a transactions array, or a collectibles entries array.");
     }
 
     return {
@@ -612,14 +654,39 @@ function parseImportedPayload(rawText) {
         requestTime: payload.request_time || "",
         responseTime: payload.response_time || "",
         nextOffset: payload.next_offset || "",
+        source: isDuneCollectiblesPayload(payload) ? "dune-collectibles" : "wallet-json",
         balances,
+        collectibles,
         transactions,
         importedAt: new Date().toISOString()
     };
 }
 
-function buildSummaryCards(summary, imported) {
-    return [
+function summarizeImportedCollectibles(collectibles) {
+    return (collectibles || []).reduce((summary, collectible) => {
+        const chain = String(collectible.chain || "unknown").toLowerCase();
+        summary.totalCount += 1;
+        if (!summary.chains[chain]) {
+            summary.chains[chain] = 0;
+        }
+        summary.chains[chain] += 1;
+        if (chain === "base") {
+            summary.baseCount += 1;
+        }
+        if (collectible.isSpam) {
+            summary.spamCount += 1;
+        }
+        return summary;
+    }, {
+        totalCount: 0,
+        baseCount: 0,
+        spamCount: 0,
+        chains: {}
+    });
+}
+
+function buildSummaryCards(summary, imported, collectibleSummary) {
+    const cards = [
         {
             label: "Priced portfolio",
             value: formatUsd(summary.totalValueUsd),
@@ -641,6 +708,16 @@ function buildSummaryCards(summary, imported) {
             note: `${summary.lowLiquidityCount} low-liquidity assets, ${summary.unpricedAssetCount} unpriced`
         }
     ];
+
+    if (collectibleSummary.totalCount > 0) {
+        cards.push({
+            label: "Collectibles / NFTs",
+            value: collectibleSummary.totalCount.toLocaleString(),
+            note: `${collectibleSummary.baseCount} on Base, ${collectibleSummary.spamCount} flagged as spam`
+        });
+    }
+
+    return cards;
 }
 
 function renderImportedBalances(imported) {
@@ -673,6 +750,41 @@ function renderImportedBalances(imported) {
             <td>${escapeHtml(formatUsd(balance.valueUsd))}</td>
             <td>${escapeHtml(balance.lowLiquidity ? "Low liquidity" : (balance.poolSize ? `Pool ${formatUsd(balance.poolSize)}` : "No pool data"))}</td>
             <td><span class="status-chip status-${escapeHtml(balance.offRamp.status)}">${escapeHtml(balance.offRamp.label)}</span></td>
+        </tr>
+    `).join("");
+}
+
+function renderImportedCollectibles(imported) {
+    const container = document.getElementById("import-collectible-table");
+    const empty = document.getElementById("import-collectible-empty");
+    const count = document.getElementById("import-collectible-count");
+    const importedCollectibles = Array.isArray(imported && imported.collectibles) ? imported.collectibles : [];
+    if (!container || !empty || !count) return;
+
+    if (!imported || importedCollectibles.length === 0) {
+        container.innerHTML = "";
+        empty.style.display = "block";
+        count.textContent = "0 collectibles";
+        return;
+    }
+
+    const collectibles = [...importedCollectibles]
+        .sort((left, right) => String(right.lastAcquired).localeCompare(String(left.lastAcquired)))
+        .slice(0, MAX_DISPLAYED_COLLECTIBLES);
+
+    count.textContent = `${importedCollectibles.length} collectibles`;
+    empty.style.display = "none";
+    container.innerHTML = collectibles.map(collectible => `
+        <tr>
+            <td>${escapeHtml(collectible.chain)}</td>
+            <td>
+                <div><strong>${escapeHtml(collectible.name)}</strong></div>
+                <div class="table-subtext">${escapeHtml(`${collectible.tokenStandard} #${collectible.tokenId || "—"}`)}</div>
+            </td>
+            <td>${escapeHtml(collectible.balance ? String(collectible.balance) : "1")}</td>
+            <td>${escapeHtml(collectible.offRamp.settlement.network)}</td>
+            <td>${escapeHtml(collectible.offRamp.settlement.destination)}</td>
+            <td><span class="status-chip status-${escapeHtml(collectible.offRamp.status)}">${escapeHtml(collectible.offRamp.label)}</span></td>
         </tr>
     `).join("");
 }
@@ -729,19 +841,21 @@ function renderImportedData() {
         summaryEl.innerHTML = `
             <div class="empty-state compact">
                 <div class="empty-state-text">No wallet JSON imported yet</div>
-                <div class="empty-state-hint">Paste or upload a balances or transactions payload to build a local settlement view.</div>
+                <div class="empty-state-hint">Paste or upload a balances, transactions, or collectibles payload to build a local settlement view.</div>
             </div>
         `;
         alertEl.innerHTML = "";
         metaEl.textContent = "Local-only import storage is empty.";
         walletEl.textContent = "No wallet loaded";
-        renderImportedBalances({ balances: [], transactions: [] });
-        renderImportedTransactions({ balances: [], transactions: [] });
+        renderImportedBalances({ balances: [], collectibles: [], transactions: [] });
+        renderImportedCollectibles({ balances: [], collectibles: [], transactions: [] });
+        renderImportedTransactions({ balances: [], collectibles: [], transactions: [] });
         return;
     }
 
     const summary = summarizeImportedBalances(imported.balances);
-    const cards = buildSummaryCards(summary, imported);
+    const collectibleSummary = summarizeImportedCollectibles(imported.collectibles);
+    const cards = buildSummaryCards(summary, imported, collectibleSummary);
     const alerts = [];
 
     if (summary.blockedValueUsd > 0) {
@@ -753,6 +867,18 @@ function renderImportedData() {
     if (summary.unpricedAssetCount > 0) {
         alerts.push(`${summary.unpricedAssetCount} assets have no USD price and cannot be included in a fiat estimate.`);
     }
+    if (summary.baseReadyCount > 0) {
+        alerts.push(`${summary.baseReadyCount} fungible assets are already on Base and can use a Base-compatible Coinbase deposit route after verification.`);
+    }
+    if (collectibleSummary.totalCount > 0) {
+        alerts.push(`${collectibleSummary.totalCount} collectibles were imported. NFTs are excluded from fiat estimates and require manual Coinbase/Base destination review.`);
+    }
+    if (collectibleSummary.baseCount > 0) {
+        alerts.push(`${collectibleSummary.baseCount} collectibles are on Base. Verify Base wallet and NFT deposit support before sending any collection item.`);
+    }
+    if (collectibleSummary.spamCount > 0) {
+        alerts.push(`${collectibleSummary.spamCount} collectibles are flagged as spam and should be ignored for settlement planning.`);
+    }
     if (imported.transactions.length > 0) {
         alerts.push("Transaction history is informational only; settlement and fiat routing remain off-chain.");
     }
@@ -760,6 +886,7 @@ function renderImportedData() {
 
     walletEl.textContent = imported.walletAddress || "Wallet address unavailable";
     metaEl.textContent = [
+        imported.source === "dune-collectibles" ? "Source Dune SIM collectibles" : "",
         imported.requestTime ? `Requested ${imported.requestTime}` : "",
         imported.responseTime ? `Responded ${imported.responseTime}` : "",
         imported.nextOffset ? `Next offset ${imported.nextOffset}` : ""
@@ -778,6 +905,7 @@ function renderImportedData() {
     `).join("");
 
     renderImportedBalances(imported);
+    renderImportedCollectibles(imported);
     renderImportedTransactions(imported);
 }
 
@@ -887,6 +1015,7 @@ if (typeof window !== "undefined") {
         parseImportedPayload,
         renderImportedData,
         clearJsonImportView,
+        normalizeImportedCollectible,
     };
 
     if (typeof document !== "undefined") {
@@ -906,6 +1035,7 @@ if (typeof module !== "undefined" && module.exports) {
         parseImportedPayload,
         isNativeTransfer,
         normalizeImportedBalance,
+        normalizeImportedCollectible,
         normalizeImportedTransaction,
     };
 }
