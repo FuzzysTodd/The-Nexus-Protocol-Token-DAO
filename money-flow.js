@@ -338,7 +338,7 @@ function summarizeImportedBalances(balances) {
         if (String(balance.address || "").toLowerCase() === "native") {
             summary.nativeAssetCount += 1;
         }
-        if (offRamp.settlement && offRamp.settlement.supportsDirectTransfer) {
+        if (priced && offRamp.status === "ready" && offRamp.settlement && offRamp.settlement.supportsDirectTransfer) {
             summary.coinbaseReadyCount += 1;
             if (offRamp.settlement.network === "Base") {
                 summary.baseReadyCount += 1;

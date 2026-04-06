@@ -192,15 +192,74 @@ function parseDecimalAmount(amount, decimals) {
     return numeric / (10 ** precision);
 }
 
+function classifySettlementRail(entry) {
+    const classifier = getMoneyFlowHelper("classifySettlementRail");
+    if (classifier) {
+        return classifier(entry);
+    }
+    const chain = String(entry.chain || "unknown").toLowerCase();
+    const chainLabel = chain === "base"
+        ? "Base"
+        : (chain === "ethereum" ? "Ethereum" : (chain.charAt(0).toUpperCase() + chain.slice(1)));
+    const collectible = String(entry.asset_type || "").toLowerCase() === "collectible" || entry.token_standard;
+
+    if (collectible) {
+        return {
+            network: chainLabel,
+            destination: chain === "base" ? "Base wallet review" : "Manual NFT review",
+            supportsDirectTransfer: false,
+            reason: chain === "base"
+                ? "Collectibles on Base require manual Coinbase or wallet support checks before transfer."
+                : `Collectibles on ${chainLabel} require manual destination review before transfer.`
+        };
+    }
+
+    if (chain === "base") {
+        return {
+            network: "Base",
+            destination: "Coinbase Base deposit",
+            supportsDirectTransfer: true,
+            reason: "Use a Base-compatible Coinbase deposit address for direct routing."
+        };
+    }
+
+    if (chain === "ethereum") {
+        return {
+            network: "Ethereum",
+            destination: "Coinbase Ethereum deposit",
+            supportsDirectTransfer: true,
+            reason: "Use an Ethereum-compatible Coinbase deposit address for direct routing."
+        };
+    }
+
+    return {
+        network: chainLabel,
+        destination: "Manual bridge review",
+        supportsDirectTransfer: false,
+        reason: `Verify bridge and destination support before sending funds from ${chainLabel}.`
+    };
+}
+
 function classifyOffRamp(balance) {
     const classifier = getMoneyFlowHelper("classifyOffRamp");
     if (classifier) {
         return classifier(balance);
     }
-    if (balance.low_liquidity) {
-        return { status: "review", label: "Low liquidity", reason: "Review route before cash-out." };
+    const settlement = classifySettlementRail(balance);
+    if (String(balance.asset_type || "").toLowerCase() === "collectible" || balance.token_standard) {
+        return {
+            status: balance.is_spam ? "blocked" : "review",
+            label: balance.is_spam ? "Spam / ignore" : "Collectible review",
+            reason: balance.is_spam
+                ? "Spam collectibles should be ignored and never routed."
+                : "Collectibles are excluded from fiat routing and need manual Coinbase/Base transfer review.",
+            settlement
+        };
     }
-    return { status: "swap", label: "Swap first", reason: "Swap into a supported asset first." };
+    if (balance.low_liquidity) {
+        return { status: "review", label: "Low liquidity", reason: "Review route before cash-out.", settlement };
+    }
+    return { status: "swap", label: "Swap first", reason: "Swap into a supported asset first.", settlement };
 }
 
 function summarizeImportedBalances(balances) {

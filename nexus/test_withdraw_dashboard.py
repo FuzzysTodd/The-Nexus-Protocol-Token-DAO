@@ -267,8 +267,12 @@ def test_withdraw_js_runtime_helpers_cover_formatting_and_parsing():
     assert parsed["wallet"] == "0xabc"
     assert parsed["balances"] == 1
     assert parsed["invalidJson"] == "Invalid JSON format."
-    assert parsed["nonObject"] == "JSON must include a balances array, a transactions array, or a collectibles entries array."
-    assert parsed["emptyPayload"] == "JSON must include a balances array, a transactions array, or a collectibles entries array."
+    expected_error = (
+        "JSON must include a balances array, a transactions array, "
+        "or a collectibles entries array."
+    )
+    assert parsed["nonObject"] == expected_error
+    assert parsed["emptyPayload"] == expected_error
 
 
 def test_withdraw_js_runtime_can_normalize_dune_collectibles_payload():
@@ -358,7 +362,13 @@ def test_money_flow_runtime_import_classification_and_summary():
           blocked: moneyFlow.classifyOffRamp({ chain: 'sepolia', symbol: 'ETH', value_usd: 10, address: 'native' }),
           review: moneyFlow.classifyOffRamp({ chain: 'ethereum', symbol: 'TEST', value_usd: 10, low_liquidity: true }),
           swap: moneyFlow.classifyOffRamp({ chain: 'ethereum', symbol: 'ABC', value_usd: 10, pool_size: 250000 }),
-          collectible: moneyFlow.classifyOffRamp({ chain: 'base', asset_type: 'collectible', token_standard: 'ERC721', symbol: 'NFT', is_spam: false })
+          collectible: moneyFlow.classifyOffRamp({
+            chain: 'base',
+            asset_type: 'collectible',
+            token_standard: 'ERC721',
+            symbol: 'NFT',
+            is_spam: false
+          })
         };
         const summary = moneyFlow.summarizeImportedBalances([
           { chain: 'ethereum', address: 'native', symbol: 'ETH', value_usd: 100 },
@@ -387,7 +397,7 @@ def test_money_flow_runtime_import_classification_and_summary():
     assert parsed["summary"]["blockedValueUsd"] == 25
     assert parsed["summary"]["reviewValueUsd"] == 10
     assert parsed["summary"]["nativeAssetCount"] == 2
-    assert parsed["summary"]["coinbaseReadyCount"] == 2
+    assert parsed["summary"]["coinbaseReadyCount"] == 1
     assert parsed["summary"]["baseReadyCount"] == 0
     assert parsed["summary"]["unpricedAssetCount"] == 1
 
