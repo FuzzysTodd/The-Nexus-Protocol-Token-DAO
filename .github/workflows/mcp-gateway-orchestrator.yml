@@ -455,6 +455,7 @@ jobs:
 
       - name: Generate Completion Summary
         run: |
+          # Unquoted EOF allows $(date) timestamp expansion in the heredoc
           cat << EOF > workflow_summary.md
           # 🚀 MCP/MFC Gateway FPGA GPU Swarm Hive Workflow - COMPLETE
           

@@ -34,7 +34,7 @@ jobs:
           echo "| PR # | Title | Status | Author | Updated |" >> report.md
           echo "|------|-------|--------|--------|---------|" >> report.md
           gh pr list --state all --limit 10 --json number,title,state,author,updatedAt \
-            --jq '.[] | "| #\(.number) | \(.title | gsub("\\|"; "\\|")) | \(.state) | \(.author.login) | \(.updatedAt[:10]) |"' \
+            --jq '.[] | "| #\(.number) | \(.title | gsub("\\|"; "/")) | \(.state) | \(.author.login) | \(.updatedAt[:10]) |"' \
             >> report.md 2>/dev/null || echo "| — | No PR data available | — | — | — |" >> report.md
           
           # Get commit activity
@@ -86,7 +86,7 @@ jobs:
           echo "**Contact**: fuzzystodd@gmail.com" >> report.md
           
       - name: Send Email Report
-        if: ${{ secrets.EMAIL_USERNAME != '' }}
+        if: secrets.EMAIL_USERNAME != ''
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: smtp.gmail.com
