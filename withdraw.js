@@ -74,10 +74,12 @@ const WITHDRAW_METHODS = {
 const STORAGE_KEY = "nexus_withdraw_contracts";
 const IMPORT_STORAGE_KEY = "nexus_imported_wallet_data";
 const DESTINATION_STORAGE_KEY = "nexus_settlement_destination";
+const LOCAL_TRANSFER_HISTORY_KEY = "nexus_local_transfer_history";
 const DEFAULT_SETTLEMENT_DESTINATION = "0x1EF9950fc2d9433Ab9d253881fd461f8e2098Eac";
 const MAX_DISPLAYED_BALANCES = 25;
 const MAX_DISPLAYED_COLLECTIBLES = 25;
 const MAX_DISPLAYED_TRANSACTIONS = 25;
+const MAX_STORED_LOCAL_TRANSFERS = 100;
 
 // ---------------------------------------------------------------------------
 // App state
@@ -125,6 +127,34 @@ function loadImportedData() {
 
 function saveImportedData(payload) {
     localStorage.setItem(IMPORT_STORAGE_KEY, JSON.stringify(payload));
+}
+
+function loadLocalTransferHistory() {
+    try {
+        const stored = JSON.parse(localStorage.getItem(LOCAL_TRANSFER_HISTORY_KEY) || "[]");
+        return Array.isArray(stored) ? stored : [];
+    } catch (_) {
+        return [];
+    }
+}
+
+function saveLocalTransferHistory(list) {
+    localStorage.setItem(
+        LOCAL_TRANSFER_HISTORY_KEY,
+        JSON.stringify(list.slice(0, MAX_STORED_LOCAL_TRANSFERS))
+    );
+}
+
+function upsertLocalTransferHistory(entry) {
+    const list = loadLocalTransferHistory();
+    const index = list.findIndex(item => item.hash && entry.hash && item.hash === entry.hash);
+    if (index >= 0) {
+        list[index] = { ...list[index], ...entry };
+    } else {
+        list.unshift(entry);
+    }
+    list.sort((left, right) => String(right.timestamp || "").localeCompare(String(left.timestamp || "")));
+    saveLocalTransferHistory(list);
 }
 
 function clearImportedData() {
@@ -373,6 +403,35 @@ function parseHexAmount(value) {
     return 0;
 }
 
+function buildLocalTransferHistoryEntry({
+    chain,
+    chainId,
+    hash,
+    timestamp,
+    transactionType,
+    from,
+    to,
+    amountLabel,
+    assetLabel,
+    status,
+    success
+}) {
+    return {
+        chain: chain || "unknown",
+        chainId: chainId || null,
+        hash: hash || "",
+        timestamp: timestamp || new Date().toISOString(),
+        transactionType: transactionType || "Transfer",
+        from: from || "",
+        to: to || "",
+        amount: null,
+        amountLabel: amountLabel || "—",
+        assetLabel: assetLabel || "Transfer",
+        status: status || "confirmed",
+        success: typeof success === "boolean" ? success : status !== "failed"
+    };
+}
+
 // ---------------------------------------------------------------------------
 // Wallet connection
 // ---------------------------------------------------------------------------
@@ -481,6 +540,7 @@ async function withdrawFromContract(address, method, customSelector, customAbi) 
     }
 
     let callData;
+    let tx;
     try {
         if (method === "release(address)") {
             // release(address) needs a payee argument – use the configured destination
@@ -531,12 +591,43 @@ async function withdrawFromContract(address, method, customSelector, customAbi) 
         }
 
         showStatus("Sending withdrawal transaction…");
-        const tx = await signer.sendTransaction({ to: address, data: callData });
+        const network = await provider.getNetwork();
+        tx = await signer.sendTransaction({ to: address, data: callData });
+        upsertLocalTransferHistory(buildLocalTransferHistoryEntry({
+            chain: network.name || "unknown",
+            chainId: Number(network.chainId),
+            hash: tx.hash,
+            transactionType: method === "custom" ? "Custom withdrawal call" : method,
+            from: signerAddress || "",
+            to: address,
+            amountLabel: "Contract withdrawal",
+            assetLabel: "Contract balance",
+            status: "pending"
+        }));
         showStatus("Transaction sent – hash: " + tx.hash);
         await tx.wait();
+        upsertLocalTransferHistory(buildLocalTransferHistoryEntry({
+            chain: network.name || "unknown",
+            chainId: Number(network.chainId),
+            hash: tx.hash,
+            transactionType: method === "custom" ? "Custom withdrawal call" : method,
+            from: signerAddress || "",
+            to: address,
+            amountLabel: "Contract withdrawal",
+            assetLabel: "Contract balance",
+            status: "confirmed",
+            success: true
+        }));
         showStatus("✅ Withdrawal confirmed: " + tx.hash);
         await refreshAll();
     } catch (err) {
+        if (tx && tx.hash) {
+            upsertLocalTransferHistory(buildLocalTransferHistoryEntry({
+                hash: tx.hash,
+                status: "failed",
+                success: false
+            }));
+        }
         showStatus("Withdrawal failed: " + (err.reason || err.message), true);
     }
 }
@@ -924,18 +1015,22 @@ function renderImportedTransactions(imported) {
     const count = document.getElementById("import-transaction-count");
     if (!container || !empty || !count) return;
 
-    if (!imported || imported.transactions.length === 0) {
+    const importedTransactions = imported && Array.isArray(imported.transactions) ? imported.transactions : [];
+    const localTransactions = loadLocalTransferHistory();
+    const allTransactions = [...localTransactions, ...importedTransactions];
+
+    if (allTransactions.length === 0) {
         container.innerHTML = "";
         empty.style.display = "block";
         count.textContent = "0 transactions";
         return;
     }
 
-    const recentTransactions = [...imported.transactions]
+    const recentTransactions = [...allTransactions]
         .sort((left, right) => String(right.timestamp).localeCompare(String(left.timestamp)))
         .slice(0, MAX_DISPLAYED_TRANSACTIONS);
 
-    count.textContent = `${imported.transactions.length} transactions`;
+    count.textContent = `${allTransactions.length} transactions`;
     empty.style.display = "none";
     container.innerHTML = recentTransactions.map(tx => `
         <tr>
@@ -946,8 +1041,8 @@ function renderImportedTransactions(imported) {
             <td class="table-subtext">${escapeHtml(tx.timestamp || "—")}</td>
             <td class="table-subtext">${escapeHtml(shortAddr(tx.from || "—"))} → ${escapeHtml(shortAddr(tx.to || "—"))}</td>
             <td>
-                <span class="status-chip status-${tx.success ? "ready" : "blocked"}">
-                    ${tx.success ? "Confirmed" : "Failed"}
+                <span class="status-chip status-${tx.status === "pending" ? "pending" : (tx.success ? "ready" : "blocked")}">
+                    ${tx.status === "pending" ? "Pending" : (tx.success ? "Confirmed" : "Failed")}
                 </span>
             </td>
         </tr>
@@ -1113,20 +1208,50 @@ async function sendImportedBalanceToSettlement(balanceAddress, chainId) {
 
     const request = buildImportedBalanceTransferRequest(balance, destination);
 
+    let tx;
     try {
         showStatus(`Sending ${balance.symbol} to Coinbase on ${balance.offRamp.settlement.network}…`);
-        let tx;
         if (request.kind === "native") {
             tx = await signer.sendTransaction(request.transaction);
         } else {
             const token = new ethers.Contract(request.tokenAddress, ERC20_ABI, signer);
             tx = await token.transfer(request.destination, request.amount);
         }
+        upsertLocalTransferHistory(buildLocalTransferHistoryEntry({
+            chain: balance.chain || balance.offRamp.settlement.network || network.name || "unknown",
+            chainId: Number(balance.chainId || network.chainId),
+            hash: tx.hash,
+            transactionType: "Settlement transfer",
+            from: signerAddress || "",
+            to: request.destination,
+            amountLabel: `${balance.displayAmount} ${balance.symbol}`,
+            assetLabel: balance.symbol,
+            status: "pending"
+        }));
         showStatus("Transfer sent – hash: " + tx.hash);
         await tx.wait();
+        upsertLocalTransferHistory(buildLocalTransferHistoryEntry({
+            chain: balance.chain || balance.offRamp.settlement.network || network.name || "unknown",
+            chainId: Number(balance.chainId || network.chainId),
+            hash: tx.hash,
+            transactionType: "Settlement transfer",
+            from: signerAddress || "",
+            to: request.destination,
+            amountLabel: `${balance.displayAmount} ${balance.symbol}`,
+            assetLabel: balance.symbol,
+            status: "confirmed",
+            success: true
+        }));
         showStatus(`✅ ${balance.symbol} sent to ${shortAddr(destination)}`);
         await refreshAll();
     } catch (err) {
+        if (tx && tx.hash) {
+            upsertLocalTransferHistory(buildLocalTransferHistoryEntry({
+                hash: tx.hash,
+                status: "failed",
+                success: false
+            }));
+        }
         showStatus("Token transfer failed: " + (err.reason || err.message), true);
     }
 }

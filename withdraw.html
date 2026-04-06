@@ -758,6 +758,12 @@
             border: 1px solid rgba(74, 222, 128, 0.25);
         }
 
+        .status-pending {
+            background: rgba(250, 204, 21, 0.16);
+            color: #fde68a;
+            border: 1px solid rgba(250, 204, 21, 0.28);
+        }
+
         .status-swap {
             background: rgba(56, 189, 248, 0.14);
             color: var(--accent);
@@ -1024,7 +1030,7 @@
 
                 <div class="table-card">
                     <div class="table-card-header">
-                        <h3>Imported transaction history</h3>
+                        <h3>Transaction history</h3>
                         <span class="table-subtext" id="import-transaction-count">0 transactions</span>
                     </div>
                     <div class="table-wrap">
@@ -1044,7 +1050,7 @@
                         </table>
                     </div>
                     <div class="empty-state compact" id="import-transaction-empty">
-                        <div class="empty-state-text">No transactions imported</div>
+                        <div class="empty-state-text">No imported or local transactions yet</div>
                     </div>
                 </div>
             </div>
