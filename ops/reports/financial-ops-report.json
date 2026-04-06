@@ -1,9 +1,9 @@
 {
-  "generatedAt": "2026-04-06T18:26:17+00:00",
+  "generatedAt": "2026-04-06T18:30:58+00:00",
   "summary": {
-    "filesScanned": 3726,
-    "preErrorCount": 65,
-    "withdrawSignalCount": 2026,
+    "filesScanned": 3720,
+    "preErrorCount": 64,
+    "withdrawSignalCount": 2028,
     "placementSignalCount": 2826,
     "successDocsGenerated": 2,
     "approvalGate": "required for any fund movement or treasury action"
@@ -321,22 +321,22 @@
       ]
     },
     {
-      "file": "Synthetix/contracts/Issuer.sol",
-      "count": 53,
-      "matches": [
-        "claim",
-        "redeem"
-      ]
-    },
-    {
       "file": "ops/reports/financial-ops-report.json",
-      "count": 53,
+      "count": 55,
       "matches": [
         "withdraw",
         "release(",
         "claim",
         "redeem",
         "payout"
+      ]
+    },
+    {
+      "file": "Synthetix/contracts/Issuer.sol",
+      "count": 53,
+      "matches": [
+        "claim",
+        "redeem"
       ]
     },
     {
@@ -574,13 +574,13 @@
   ],
   "successLog": [
     {
-      "time": "2026-04-06T18:26:17+00:00",
+      "time": "2026-04-06T18:30:58+00:00",
       "title": "Financial ops scan completed",
       "details": "Static repo scan finished and refreshed markdown plus dashboard payloads.",
       "status": "success"
     },
     {
-      "time": "2026-04-06T18:26:17+00:00",
+      "time": "2026-04-06T18:30:58+00:00",
       "title": "Approval gate enforced",
       "details": "Automation remains advisory for withdrawals, treasury routing, and settlement changes.",
       "status": "success"
