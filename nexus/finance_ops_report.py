@@ -31,6 +31,13 @@ EXCLUDED_DIRS = {
     "venv",
     ".pytest_cache",
 }
+FIRST_PARTY_PREERROR_ROOTS = {
+    ".github",
+    "docs",
+    "mcp",
+    "nexus",
+    "ops",
+}
 KEYWORD_GROUPS = {
     "withdraw": [
         "withdraw",
@@ -93,6 +100,13 @@ def iso_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
 
+def is_first_party_preerror_path(root: Path, path: Path) -> bool:
+    relative = path.relative_to(root)
+    if len(relative.parts) == 1:
+        return True
+    return relative.parts[0] in FIRST_PARTY_PREERROR_ROOTS
+
+
 def iter_repo_files(root: Path):
     for path in root.rglob("*"):
         if any(part in EXCLUDED_DIRS for part in path.parts):
@@ -126,6 +140,8 @@ def collect_python_findings(root: Path) -> list[Finding]:
     for path in root.rglob("*.py"):
         if any(part in EXCLUDED_DIRS for part in path.parts):
             continue
+        if not is_first_party_preerror_path(root, path):
+            continue
         text = read_text(path)
         if text is None:
             continue
@@ -146,12 +162,27 @@ def collect_python_findings(root: Path) -> list[Finding]:
 def collect_json_findings(root: Path) -> list[Finding]:
     findings: list[Finding] = []
     scan_roots = {
-        root,
         root / ".github",
         root / "mcp",
         root / "docs",
         root / "nexus",
+        root / "ops",
     }
+    for path in root.glob("*.json"):
+        text = read_text(path)
+        if text is None:
+            continue
+        try:
+            json.loads(text)
+        except json.JSONDecodeError as error:
+            findings.append(
+                Finding(
+                    severity="medium",
+                    category="json-parse",
+                    file=str(path.relative_to(root)),
+                    message=f"JSON parse error at line {error.lineno}: {error.msg}",
+                )
+            )
     for base in scan_roots:
         if not base.exists():
             continue
@@ -209,6 +240,8 @@ def collect_agent_findings(root: Path) -> list[Finding]:
 def collect_filename_findings(root: Path) -> list[Finding]:
     findings: list[Finding] = []
     for path in iter_repo_files(root):
+        if not is_first_party_preerror_path(root, path):
+            continue
         rel = str(path.relative_to(root))
         if "(copy)" in rel or "`" in rel:
             findings.append(
@@ -289,6 +322,7 @@ def write_outputs(report: dict[str, Any], json_path: Path, md_path: Path) -> Non
         f"- Generated at: {report['generatedAt']}",
         f"- Files scanned: {summary['filesScanned']}",
         f"- Pre-error findings: {summary['preErrorCount']}",
+        f"- Pre-error scope: {summary['preErrorScope']}",
         f"- Withdrawal signals: {summary['withdrawSignalCount']}",
         f"- Placement signals: {summary['placementSignalCount']}",
         f"- Approval gate: {summary['approvalGate']}",
@@ -331,6 +365,7 @@ def build_report(root: Path, manifest_path: Path) -> dict[str, Any]:
         "summary": {
             "filesScanned": files_scanned,
             "preErrorCount": len(pre_errors),
+            "preErrorScope": "first-party automation, docs, mcp, nexus, ops, and top-level repo files",
             "withdrawSignalCount": sum(item["count"] for item in withdraw_signals),
             "placementSignalCount": sum(item["count"] for item in placement_signals),
             "successDocsGenerated": 2,
