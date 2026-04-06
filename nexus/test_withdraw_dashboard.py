@@ -39,6 +39,20 @@ def test_withdraw_html_has_contract_list_section():
     assert "My Contracts" in html
 
 
+def test_withdraw_html_has_json_import_and_settlement_controls():
+    html = (REPO_ROOT / "withdraw.html").read_text()
+    assert 'id="json-import-input"' in html
+    assert 'id="json-import-file"' in html
+    assert 'id="import-summary"' in html
+    assert 'id="settlement-destination"' in html
+    assert "Coinbase settlement destination" in html
+
+
+def test_withdraw_html_loads_money_flow_helpers():
+    html = (REPO_ROOT / "withdraw.html").read_text()
+    assert '<script src="./money-flow.js"></script>' in html
+
+
 def test_withdraw_html_has_withdraw_methods_in_select():
     html = (REPO_ROOT / "withdraw.html").read_text()
     for method in [
@@ -120,19 +134,26 @@ def test_withdraw_js_has_withdraw_method_selectors():
     assert "0x19165587" in script   # release(address)
 
 
-def test_withdraw_js_encodes_release_with_connected_wallet_address():
+def test_withdraw_js_encodes_release_with_saved_destination_address():
     script = (REPO_ROOT / "withdraw.js").read_text()
     release_branch = 'if (method === "release(address)")'
     custom_branch = 'else if (method === "custom" && customSelector)'
     assert release_branch in script
     assert custom_branch in script
     assert script.index(release_branch) < script.index(custom_branch)
-    assert 'encodeFunctionData("release", [signerAddress])' in script
+    assert 'encodeFunctionData("release", [getSettlementDestination()])' in script
 
 
 def test_withdraw_js_defines_storage_key():
     script = (REPO_ROOT / "withdraw.js").read_text()
     assert "nexus_withdraw_contracts" in script
+
+
+def test_withdraw_js_defines_import_and_destination_storage_keys():
+    script = (REPO_ROOT / "withdraw.js").read_text()
+    assert "nexus_imported_wallet_data" in script
+    assert "nexus_settlement_destination" in script
+    assert "0x1EF9950fc2d9433Ab9d253881fd461f8e2098Eac" in script
 
 
 def test_withdraw_js_exports_nexus_withdraw_namespace():
@@ -160,6 +181,21 @@ def test_withdraw_js_handles_custom_selector():
         or "custom-selector" in script
         or "custom_selector" in script
     )
+
+
+def test_withdraw_js_can_parse_balances_and_transactions_payloads():
+    script = (REPO_ROOT / "withdraw.js").read_text()
+    assert "parseImportedPayload" in script
+    assert "payload.balances" in script
+    assert "payload.transactions" in script
+    assert "renderImportedData" in script
+
+
+def test_money_flow_js_exports_import_helpers():
+    script = (REPO_ROOT / "money-flow.js").read_text()
+    assert "summarizeImportedBalances" in script
+    assert "classifyOffRamp" in script
+    assert "window.NexusMoneyFlow" in script
 
 
 def test_withdraw_js_no_private_key_literals():

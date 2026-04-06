@@ -68,6 +68,9 @@ const WITHDRAW_METHODS = {
 // Storage key
 // ---------------------------------------------------------------------------
 const STORAGE_KEY = "nexus_withdraw_contracts";
+const IMPORT_STORAGE_KEY = "nexus_imported_wallet_data";
+const DESTINATION_STORAGE_KEY = "nexus_settlement_destination";
+const DEFAULT_SETTLEMENT_ADDRESS = "0x1EF9950fc2d9433Ab9d253881fd461f8e2098Eac";
 
 // ---------------------------------------------------------------------------
 // App state
@@ -105,6 +108,34 @@ function saveContracts(list) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
 }
 
+function loadImportedData() {
+    try {
+        return JSON.parse(localStorage.getItem(IMPORT_STORAGE_KEY) || "null");
+    } catch (_) {
+        return null;
+    }
+}
+
+function saveImportedData(payload) {
+    localStorage.setItem(IMPORT_STORAGE_KEY, JSON.stringify(payload));
+}
+
+function clearImportedData() {
+    localStorage.removeItem(IMPORT_STORAGE_KEY);
+}
+
+function loadSettlementDestination() {
+    try {
+        return localStorage.getItem(DESTINATION_STORAGE_KEY) || DEFAULT_SETTLEMENT_ADDRESS;
+    } catch (_) {
+        return DEFAULT_SETTLEMENT_ADDRESS;
+    }
+}
+
+function saveSettlementDestination(address) {
+    localStorage.setItem(DESTINATION_STORAGE_KEY, address);
+}
+
 function showStatus(msg, isError) {
     const el = document.getElementById("status-bar");
     if (!el) return;
@@ -125,6 +156,101 @@ function updateProgress(percent) {
             }, 1000);
         }
     }
+}
+
+function getMoneyFlowHelper(name) {
+    if (
+        typeof window !== "undefined" &&
+        window.NexusMoneyFlow &&
+        typeof window.NexusMoneyFlow[name] === "function"
+    ) {
+        return window.NexusMoneyFlow[name];
+    }
+    return null;
+}
+
+function formatUsd(value) {
+    const formatter = getMoneyFlowHelper("formatUsd");
+    if (formatter) {
+        return formatter(value);
+    }
+    const amount = Number(value);
+    if (!Number.isFinite(amount)) return "—";
+    return `$${amount.toFixed(amount >= 1000 ? 0 : 2)}`;
+}
+
+function parseDecimalAmount(amount, decimals) {
+    const parser = getMoneyFlowHelper("parseDecimalAmount");
+    if (parser) {
+        return parser(amount, decimals);
+    }
+    const raw = String(amount ?? "0").trim();
+    const precision = Number.isFinite(Number(decimals)) ? Math.max(0, Number(decimals)) : 0;
+    if (!/^\d+$/.test(raw)) return 0;
+    if (precision === 0) return Number(raw);
+    const padded = raw.padStart(precision + 1, "0");
+    const whole = padded.slice(0, -precision) || "0";
+    const fraction = padded.slice(-precision).replace(/0+$/, "");
+    return Number(fraction ? `${whole}.${fraction}` : whole);
+}
+
+function classifyOffRamp(balance) {
+    const classifier = getMoneyFlowHelper("classifyOffRamp");
+    if (classifier) {
+        return classifier(balance);
+    }
+    if (balance.low_liquidity) {
+        return { status: "review", label: "Low liquidity", reason: "Review route before cash-out." };
+    }
+    return { status: "swap", label: "Swap first", reason: "Swap into a supported asset first." };
+}
+
+function summarizeImportedBalances(balances) {
+    const summarizer = getMoneyFlowHelper("summarizeImportedBalances");
+    if (summarizer) {
+        return summarizer(balances);
+    }
+    return {
+        totalValueUsd: (balances || []).reduce((sum, balance) => sum + (Number(balance.value_usd) || 0), 0),
+        readyValueUsd: 0,
+        swapValueUsd: 0,
+        reviewValueUsd: 0,
+        blockedValueUsd: 0,
+        lowLiquidityCount: (balances || []).filter(balance => balance.low_liquidity).length,
+        lowLiquidityValueUsd: 0,
+        unpricedAssetCount: (balances || []).filter(balance => !Number.isFinite(Number(balance.value_usd))).length,
+        nativeAssetCount: (balances || []).filter(balance => String(balance.address).toLowerCase() === "native").length,
+        chains: {}
+    };
+}
+
+function formatTokenAmount(amount, decimals) {
+    const normalized = parseDecimalAmount(amount, decimals);
+    if (!Number.isFinite(normalized)) return "—";
+    if (normalized >= 1000000) return normalized.toLocaleString(undefined, { maximumFractionDigits: 2 });
+    if (normalized >= 1) return normalized.toLocaleString(undefined, { maximumFractionDigits: 6 });
+    return normalized.toLocaleString(undefined, { maximumSignificantDigits: 6 });
+}
+
+function getSettlementDestination() {
+    const input = document.getElementById("settlement-destination");
+    const value = input ? input.value.trim() : loadSettlementDestination();
+    if (typeof ethers !== "undefined" && ethers.utils.isAddress(value)) {
+        return value;
+    }
+    return DEFAULT_SETTLEMENT_ADDRESS;
+}
+
+function parseHexAmount(value) {
+    if (!value) return 0;
+    try {
+        if (typeof ethers !== "undefined") {
+            return Number(ethers.utils.formatEther(value));
+        }
+    } catch (_) {
+        return 0;
+    }
+    return 0;
 }
 
 // ---------------------------------------------------------------------------
@@ -237,11 +363,11 @@ async function withdrawFromContract(address, method, customSelector, customAbi) 
     let callData;
     try {
         if (method === "release(address)") {
-            // release(address) needs a payee argument – use the connected wallet
+            // release(address) needs a payee argument – use the configured destination
             const iface = new ethers.utils.Interface([
                 "function release(address payee)"
             ]);
-            callData = iface.encodeFunctionData("release", [signerAddress]);
+            callData = iface.encodeFunctionData("release", [getSettlementDestination()]);
         } else if (method === "custom" && customSelector) {
             // User-supplied hex selector / call-data
             callData = customSelector.startsWith("0x") ? customSelector : "0x" + customSelector;
@@ -378,6 +504,7 @@ async function renderContracts() {
 
 async function refreshAll() {
     await renderContracts();
+    renderImportedData();
 }
 
 // ---------------------------------------------------------------------------
@@ -397,6 +524,297 @@ function onMethodChange() {
     }
 }
 
+function normalizeImportedBalance(entry) {
+    const symbol = entry.symbol || (String(entry.address || "").toLowerCase() === "native" ? "NATIVE" : "TOKEN");
+    const valueUsd = Number(entry.value_usd);
+    const priceUsd = Number(entry.price_usd);
+    const offRamp = classifyOffRamp(entry);
+
+    return {
+        chain: entry.chain || "unknown",
+        chainId: entry.chain_id || null,
+        address: entry.address || "",
+        symbol,
+        name: entry.name || symbol,
+        decimals: Number.isFinite(Number(entry.decimals)) ? Number(entry.decimals) : 18,
+        rawAmount: String(entry.amount || "0"),
+        displayAmount: formatTokenAmount(entry.amount || "0", entry.decimals),
+        priceUsd: Number.isFinite(priceUsd) ? priceUsd : null,
+        valueUsd: Number.isFinite(valueUsd) ? valueUsd : null,
+        poolSize: Number.isFinite(Number(entry.pool_size)) ? Number(entry.pool_size) : null,
+        lowLiquidity: Boolean(entry.low_liquidity),
+        offRamp
+    };
+}
+
+function normalizeImportedTransaction(entry) {
+    const time = entry.block_time || entry.timestamp || "";
+    const amount = entry.value ? parseHexAmount(entry.value) : parseDecimalAmount(entry.amount || "0", entry.decimals || 18);
+    const nativeTransfer = entry.value && entry.data === "0x" && Array.isArray(entry.logs) && entry.logs.length === 0;
+
+    return {
+        chain: entry.chain || "unknown",
+        chainId: entry.chain_id || null,
+        hash: entry.hash || "",
+        timestamp: time,
+        transactionType: entry.transaction_type || "Unknown",
+        from: entry.from || "",
+        to: entry.to || "",
+        amount,
+        amountLabel: amount ? `${amount.toLocaleString(undefined, { maximumFractionDigits: 6 })} ${nativeTransfer ? "ETH" : (entry.symbol || "units")}` : "—",
+        assetLabel: entry.symbol || (nativeTransfer ? "Native" : "Token"),
+        success: entry.success !== false
+    };
+}
+
+function parseImportedPayload(rawText) {
+    const payload = JSON.parse(rawText);
+    if (!payload || typeof payload !== "object") {
+        throw new Error("JSON import must contain an object.");
+    }
+
+    const balances = Array.isArray(payload.balances)
+        ? payload.balances.map(normalizeImportedBalance)
+        : [];
+    const transactions = Array.isArray(payload.transactions)
+        ? payload.transactions.map(normalizeImportedTransaction)
+        : [];
+
+    if (balances.length === 0 && transactions.length === 0) {
+        throw new Error("JSON must include a balances array or a transactions array.");
+    }
+
+    return {
+        walletAddress: payload.wallet_address || payload.address || "",
+        requestTime: payload.request_time || "",
+        responseTime: payload.response_time || "",
+        nextOffset: payload.next_offset || "",
+        balances,
+        transactions,
+        importedAt: new Date().toISOString()
+    };
+}
+
+function buildSummaryCards(summary, imported) {
+    return [
+        {
+            label: "Priced portfolio",
+            value: formatUsd(summary.totalValueUsd),
+            note: `${imported.balances.length} assets across ${Object.keys(summary.chains).length || 1} chains`
+        },
+        {
+            label: "Ready to off-ramp",
+            value: formatUsd(summary.readyValueUsd),
+            note: "Native assets and common cash-out pairs"
+        },
+        {
+            label: "Swap before fiat",
+            value: formatUsd(summary.swapValueUsd),
+            note: "Likely route through ETH, USDC, or another liquid pair"
+        },
+        {
+            label: "Manual review / blocked",
+            value: formatUsd(summary.reviewValueUsd + summary.blockedValueUsd),
+            note: `${summary.lowLiquidityCount} low-liquidity assets, ${summary.unpricedAssetCount} unpriced`
+        }
+    ];
+}
+
+function renderImportedBalances(imported) {
+    const container = document.getElementById("import-balance-table");
+    const empty = document.getElementById("import-balance-empty");
+    const count = document.getElementById("import-balance-count");
+    if (!container || !empty || !count) return;
+
+    if (!imported || imported.balances.length === 0) {
+        container.innerHTML = "";
+        empty.style.display = "block";
+        count.textContent = "0 assets";
+        return;
+    }
+
+    const topBalances = [...imported.balances]
+        .sort((left, right) => (right.valueUsd || 0) - (left.valueUsd || 0))
+        .slice(0, 25);
+
+    count.textContent = `${imported.balances.length} assets`;
+    empty.style.display = "none";
+    container.innerHTML = topBalances.map(balance => `
+        <tr>
+            <td>${escapeHtml(balance.chain)}</td>
+            <td>
+                <div><strong>${escapeHtml(balance.symbol)}</strong></div>
+                <div class="table-subtext">${escapeHtml(balance.name)}</div>
+            </td>
+            <td>${escapeHtml(balance.displayAmount)}</td>
+            <td>${escapeHtml(formatUsd(balance.valueUsd))}</td>
+            <td>${escapeHtml(balance.lowLiquidity ? "Low liquidity" : (balance.poolSize ? `Pool ${formatUsd(balance.poolSize)}` : "No pool data"))}</td>
+            <td><span class="status-chip status-${escapeHtml(balance.offRamp.status)}">${escapeHtml(balance.offRamp.label)}</span></td>
+        </tr>
+    `).join("");
+}
+
+function renderImportedTransactions(imported) {
+    const container = document.getElementById("import-transaction-table");
+    const empty = document.getElementById("import-transaction-empty");
+    const count = document.getElementById("import-transaction-count");
+    if (!container || !empty || !count) return;
+
+    if (!imported || imported.transactions.length === 0) {
+        container.innerHTML = "";
+        empty.style.display = "block";
+        count.textContent = "0 transactions";
+        return;
+    }
+
+    const recentTransactions = [...imported.transactions]
+        .sort((left, right) => String(right.timestamp).localeCompare(String(left.timestamp)))
+        .slice(0, 25);
+
+    count.textContent = `${imported.transactions.length} transactions`;
+    empty.style.display = "none";
+    container.innerHTML = recentTransactions.map(tx => `
+        <tr>
+            <td>${escapeHtml(tx.chain)}</td>
+            <td>${escapeHtml(tx.assetLabel)}</td>
+            <td>${escapeHtml(tx.amountLabel)}</td>
+            <td>${escapeHtml(tx.transactionType)}</td>
+            <td class="table-subtext">${escapeHtml(tx.timestamp || "—")}</td>
+            <td class="table-subtext">${escapeHtml(shortAddr(tx.from || "—"))} → ${escapeHtml(shortAddr(tx.to || "—"))}</td>
+            <td>
+                <span class="status-chip status-${tx.success ? "ready" : "blocked"}">
+                    ${tx.success ? "Confirmed" : "Failed"}
+                </span>
+            </td>
+        </tr>
+    `).join("");
+}
+
+function renderImportedData() {
+    const imported = loadImportedData();
+    const summaryEl = document.getElementById("import-summary");
+    const alertEl = document.getElementById("import-alerts");
+    const metaEl = document.getElementById("import-meta");
+    const walletEl = document.getElementById("import-wallet-address");
+    const destinationEl = document.getElementById("settlement-destination-display");
+
+    if (!summaryEl || !alertEl || !metaEl || !walletEl || !destinationEl) return;
+
+    destinationEl.textContent = getSettlementDestination();
+
+    if (!imported) {
+        summaryEl.innerHTML = `
+            <div class="empty-state compact">
+                <div class="empty-state-text">No wallet JSON imported yet</div>
+                <div class="empty-state-hint">Paste or upload a balances or transactions payload to build a local settlement view.</div>
+            </div>
+        `;
+        alertEl.innerHTML = "";
+        metaEl.textContent = "Local-only import storage is empty.";
+        walletEl.textContent = "No wallet loaded";
+        renderImportedBalances({ balances: [], transactions: [] });
+        renderImportedTransactions({ balances: [], transactions: [] });
+        return;
+    }
+
+    const summary = summarizeImportedBalances(imported.balances);
+    const cards = buildSummaryCards(summary, imported);
+    const alerts = [];
+
+    if (summary.blockedValueUsd > 0) {
+        alerts.push("Testnet balances are blocked from fiat redemption and must stay off-ramp excluded.");
+    }
+    if (summary.lowLiquidityCount > 0) {
+        alerts.push(`${summary.lowLiquidityCount} assets are flagged as low liquidity and should be reviewed before any swap.`);
+    }
+    if (summary.unpricedAssetCount > 0) {
+        alerts.push(`${summary.unpricedAssetCount} assets have no USD price and cannot be included in a fiat estimate.`);
+    }
+    if (imported.transactions.length > 0) {
+        alerts.push("Transaction history is informational only; settlement and fiat routing remain off-chain.");
+    }
+    alerts.push(`Configured settlement destination: ${getSettlementDestination()}`);
+
+    walletEl.textContent = imported.walletAddress || "Wallet address unavailable";
+    metaEl.textContent = [
+        imported.requestTime ? `Requested ${imported.requestTime}` : "",
+        imported.responseTime ? `Responded ${imported.responseTime}` : "",
+        imported.nextOffset ? `Next offset ${imported.nextOffset}` : ""
+    ].filter(Boolean).join(" • ") || "Imported locally";
+
+    summaryEl.innerHTML = cards.map(card => `
+        <article class="summary-card">
+            <div class="summary-label">${escapeHtml(card.label)}</div>
+            <div class="summary-value">${escapeHtml(card.value)}</div>
+            <div class="summary-note">${escapeHtml(card.note)}</div>
+        </article>
+    `).join("");
+
+    alertEl.innerHTML = alerts.map(alert => `
+        <div class="import-alert">${escapeHtml(alert)}</div>
+    `).join("");
+
+    renderImportedBalances(imported);
+    renderImportedTransactions(imported);
+}
+
+function importJsonFromText(rawText) {
+    const parsed = parseImportedPayload(rawText);
+    saveImportedData(parsed);
+    renderImportedData();
+    showStatus("✓ Wallet JSON imported locally.");
+}
+
+function handleJsonImport(event) {
+    event.preventDefault();
+    const input = document.getElementById("json-import-input");
+    if (!input || !input.value.trim()) {
+        showStatus("Paste a balances or transactions JSON payload first.", true);
+        return;
+    }
+
+    try {
+        importJsonFromText(input.value.trim());
+    } catch (err) {
+        showStatus(`JSON import failed: ${err.message}`, true);
+    }
+}
+
+async function handleJsonFileImport(event) {
+    const [file] = Array.from(event.target.files || []);
+    if (!file) return;
+    try {
+        importJsonFromText(await file.text());
+        const input = document.getElementById("json-import-input");
+        if (input) input.value = "";
+    } catch (err) {
+        showStatus(`JSON file import failed: ${err.message}`, true);
+    } finally {
+        event.target.value = "";
+    }
+}
+
+function clearJsonImportView() {
+    clearImportedData();
+    const input = document.getElementById("json-import-input");
+    if (input) input.value = "";
+    renderImportedData();
+    showStatus("Imported wallet JSON cleared.");
+}
+
+function saveSettlementDestinationFromInput() {
+    const input = document.getElementById("settlement-destination");
+    if (!input) return;
+    const address = input.value.trim();
+    if (typeof ethers === "undefined" || !ethers.utils.isAddress(address)) {
+        showStatus("Settlement destination must be a valid EVM address.", true);
+        return;
+    }
+    saveSettlementDestination(address);
+    renderImportedData();
+    showStatus(`✓ Settlement destination saved: ${shortAddr(address)}`);
+}
+
 // ---------------------------------------------------------------------------
 // Boot
 // ---------------------------------------------------------------------------
@@ -410,11 +828,28 @@ function initWithdrawDashboard() {
     const connectBtn = document.getElementById("connect-btn");
     if (connectBtn) connectBtn.addEventListener("click", connectWallet);
 
+    const importBtn = document.getElementById("import-json-btn");
+    if (importBtn) importBtn.addEventListener("click", handleJsonImport);
+
+    const clearImportBtn = document.getElementById("clear-json-btn");
+    if (clearImportBtn) clearImportBtn.addEventListener("click", clearJsonImportView);
+
+    const importFile = document.getElementById("json-import-file");
+    if (importFile) importFile.addEventListener("change", handleJsonFileImport);
+
+    const destinationInput = document.getElementById("settlement-destination");
+    if (destinationInput) {
+        destinationInput.value = loadSettlementDestination();
+    }
+
+    const destinationBtn = document.getElementById("save-settlement-destination");
+    if (destinationBtn) destinationBtn.addEventListener("click", saveSettlementDestinationFromInput);
+
     // Single delegation listener for all contract card buttons
     const contractList = document.getElementById("contract-list");
     if (contractList) contractList.addEventListener("click", _handleContainerClick);
 
-    renderContracts();
+    refreshAll();
 }
 
 if (typeof window !== "undefined") {
@@ -426,6 +861,9 @@ if (typeof window !== "undefined") {
         removeContract,
         withdrawFromContract,
         refreshAll,
+        parseImportedPayload,
+        renderImportedData,
+        clearJsonImportView,
     };
 
     if (typeof document !== "undefined") {
