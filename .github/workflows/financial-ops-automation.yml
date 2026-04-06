@@ -1,0 +1,53 @@
+name: Financial Ops Automation
+
+"on":
+  workflow_dispatch:
+  schedule:
+    - cron: "*/30 * * * *"
+  push:
+    branches:
+      - "main"
+      - "copilot/**"
+      - "agent/**"
+    paths:
+      - ".github/agents/**"
+      - ".github/workflows/**"
+      - "mcp/**"
+      - "nexus/**"
+      - "docs/**"
+      - "*.html"
+
+permissions:
+  contents: read
+
+jobs:
+  finance-ops-scan:
+    name: Finance Ops Scan And Report
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate Financial Ops Reports
+        run: |
+          python nexus/finance_ops_report.py \
+            --root . \
+            --manifest mcp/agents/financial-ops-bots.json \
+            --output-json ops/reports/financial-ops-report.json \
+            --output-md ops/reports/financial-ops-report.md
+
+      - name: Publish Job Summary
+        run: cat ops/reports/financial-ops-report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Financial Ops Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: financial-ops-report
+          path: ops/reports/*
+          retention-days: 30
