@@ -230,7 +230,9 @@ function formatTokenAmount(amount, decimals) {
 }
 
 function getSettlementDestination() {
-    const input = document.getElementById("settlement-destination");
+    const input = typeof document !== "undefined"
+        ? document.getElementById("settlement-destination")
+        : null;
     const value = input ? input.value.trim() : loadSettlementDestination();
     if (typeof ethers !== "undefined" && ethers.utils.isAddress(value)) {
         return value;
@@ -894,4 +896,16 @@ if (typeof window !== "undefined") {
             initWithdrawDashboard();
         }
     }
+}
+
+if (typeof module !== "undefined" && module.exports) {
+    module.exports = {
+        formatTokenAmount,
+        getSettlementDestination,
+        getSettlementDestinationLabel,
+        parseImportedPayload,
+        isNativeTransfer,
+        normalizeImportedBalance,
+        normalizeImportedTransaction,
+    };
 }
