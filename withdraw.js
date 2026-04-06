@@ -70,7 +70,7 @@ const WITHDRAW_METHODS = {
 const STORAGE_KEY = "nexus_withdraw_contracts";
 const IMPORT_STORAGE_KEY = "nexus_imported_wallet_data";
 const DESTINATION_STORAGE_KEY = "nexus_settlement_destination";
-const DEFAULT_SETTLEMENT_ADDRESS = "0x1EF9950fc2d9433Ab9d253881fd461f8e2098Eac";
+const DEFAULT_COINBASE_DESTINATION_ADDRESS = "0x1EF9950fc2d9433Ab9d253881fd461f8e2098Eac";
 
 // ---------------------------------------------------------------------------
 // App state
@@ -126,9 +126,9 @@ function clearImportedData() {
 
 function loadSettlementDestination() {
     try {
-        return localStorage.getItem(DESTINATION_STORAGE_KEY) || DEFAULT_SETTLEMENT_ADDRESS;
+        return localStorage.getItem(DESTINATION_STORAGE_KEY) || DEFAULT_COINBASE_DESTINATION_ADDRESS;
     } catch (_) {
-        return DEFAULT_SETTLEMENT_ADDRESS;
+        return DEFAULT_COINBASE_DESTINATION_ADDRESS;
     }
 }
 
@@ -184,14 +184,10 @@ function parseDecimalAmount(amount, decimals) {
     if (parser) {
         return parser(amount, decimals);
     }
-    const raw = String(amount ?? "0").trim();
-    const precision = Number.isFinite(Number(decimals)) ? Math.max(0, Number(decimals)) : 0;
-    if (!/^\d+$/.test(raw)) return 0;
-    if (precision === 0) return Number(raw);
-    const padded = raw.padStart(precision + 1, "0");
-    const whole = padded.slice(0, -precision) || "0";
-    const fraction = padded.slice(-precision).replace(/0+$/, "");
-    return Number(fraction ? `${whole}.${fraction}` : whole);
+    const numeric = Number(amount);
+    if (!Number.isFinite(numeric)) return Number.NaN;
+    const precision = Number.isFinite(Number(decimals)) ? Number(decimals) : 0;
+    return numeric / (10 ** precision);
 }
 
 function classifyOffRamp(balance) {
@@ -238,7 +234,7 @@ function getSettlementDestination() {
     if (typeof ethers !== "undefined" && ethers.utils.isAddress(value)) {
         return value;
     }
-    return DEFAULT_SETTLEMENT_ADDRESS;
+    return DEFAULT_COINBASE_DESTINATION_ADDRESS;
 }
 
 function parseHexAmount(value) {
@@ -568,7 +564,12 @@ function normalizeImportedTransaction(entry) {
 }
 
 function parseImportedPayload(rawText) {
-    const payload = JSON.parse(rawText);
+    let payload;
+    try {
+        payload = JSON.parse(rawText);
+    } catch (_) {
+        throw new Error("Invalid JSON format.");
+    }
     if (!payload || typeof payload !== "object") {
         throw new Error("JSON import must contain an object.");
     }
@@ -776,7 +777,7 @@ function handleJsonImport(event) {
     try {
         importJsonFromText(input.value.trim());
     } catch (err) {
-        showStatus(`JSON import failed: ${err.message}`, true);
+        showStatus(err instanceof SyntaxError ? "JSON import failed: Invalid JSON format." : `JSON import failed: ${err.message}`, true);
     }
 }
 
@@ -788,7 +789,7 @@ async function handleJsonFileImport(event) {
         const input = document.getElementById("json-import-input");
         if (input) input.value = "";
     } catch (err) {
-        showStatus(`JSON file import failed: ${err.message}`, true);
+        showStatus(err instanceof SyntaxError ? "JSON file import failed: Invalid JSON format." : `JSON file import failed: ${err.message}`, true);
     } finally {
         event.target.value = "";
     }

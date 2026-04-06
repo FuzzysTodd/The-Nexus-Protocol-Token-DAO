@@ -162,7 +162,7 @@ function parseDecimalAmount(amount, decimals) {
     const raw = String(amount ?? "0").trim();
     const precision = Number.isFinite(Number(decimals)) ? Math.max(0, Number(decimals)) : 0;
     if (!/^\d+$/.test(raw)) {
-        return 0;
+        return Number.NaN;
     }
     if (precision === 0) {
         return Number(raw);
