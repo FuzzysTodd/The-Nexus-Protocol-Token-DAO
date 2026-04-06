@@ -70,7 +70,8 @@ const WITHDRAW_METHODS = {
 const STORAGE_KEY = "nexus_withdraw_contracts";
 const IMPORT_STORAGE_KEY = "nexus_imported_wallet_data";
 const DESTINATION_STORAGE_KEY = "nexus_settlement_destination";
-const DEFAULT_COINBASE_DESTINATION_ADDRESS = "0x1EF9950fc2d9433Ab9d253881fd461f8e2098Eac";
+const MAX_DISPLAYED_BALANCES = 25;
+const MAX_DISPLAYED_TRANSACTIONS = 25;
 
 // ---------------------------------------------------------------------------
 // App state
@@ -126,9 +127,9 @@ function clearImportedData() {
 
 function loadSettlementDestination() {
     try {
-        return localStorage.getItem(DESTINATION_STORAGE_KEY) || DEFAULT_COINBASE_DESTINATION_ADDRESS;
+        return localStorage.getItem(DESTINATION_STORAGE_KEY) || "";
     } catch (_) {
-        return DEFAULT_COINBASE_DESTINATION_ADDRESS;
+        return "";
     }
 }
 
@@ -234,7 +235,11 @@ function getSettlementDestination() {
     if (typeof ethers !== "undefined" && ethers.utils.isAddress(value)) {
         return value;
     }
-    return DEFAULT_COINBASE_DESTINATION_ADDRESS;
+    return null;
+}
+
+function getSettlementDestinationLabel() {
+    return getSettlementDestination() || "No destination configured";
 }
 
 function parseHexAmount(value) {
@@ -360,10 +365,15 @@ async function withdrawFromContract(address, method, customSelector, customAbi) 
     try {
         if (method === "release(address)") {
             // release(address) needs a payee argument – use the configured destination
+            const settlementDestination = getSettlementDestination();
+            if (!settlementDestination) {
+                showStatus("Configure and verify a destination address before using release(address).", true);
+                return;
+            }
             const iface = new ethers.utils.Interface([
                 "function release(address payee)"
             ]);
-            callData = iface.encodeFunctionData("release", [getSettlementDestination()]);
+            callData = iface.encodeFunctionData("release", [settlementDestination]);
         } else if (method === "custom" && customSelector) {
             // User-supplied hex selector / call-data
             callData = customSelector.startsWith("0x") ? customSelector : "0x" + customSelector;
@@ -546,7 +556,7 @@ function normalizeImportedBalance(entry) {
 function normalizeImportedTransaction(entry) {
     const time = entry.block_time || entry.timestamp || "";
     const amount = entry.value ? parseHexAmount(entry.value) : parseDecimalAmount(entry.amount || "0", entry.decimals || 18);
-    const nativeTransfer = entry.value && entry.data === "0x" && Array.isArray(entry.logs) && entry.logs.length === 0;
+    const nativeTransfer = isNativeTransfer(entry);
 
     return {
         chain: entry.chain || "unknown",
@@ -561,6 +571,16 @@ function normalizeImportedTransaction(entry) {
         assetLabel: entry.symbol || (nativeTransfer ? "Native" : "Token"),
         success: entry.success !== false
     };
+}
+
+function isNativeTransfer(entry) {
+    return Boolean(
+        entry &&
+        entry.value &&
+        entry.data === "0x" &&
+        Array.isArray(entry.logs) &&
+        entry.logs.length === 0
+    );
 }
 
 function parseImportedPayload(rawText) {
@@ -601,7 +621,7 @@ function buildSummaryCards(summary, imported) {
         {
             label: "Priced portfolio",
             value: formatUsd(summary.totalValueUsd),
-            note: `${imported.balances.length} assets across ${Object.keys(summary.chains).length || 1} chains`
+            note: `${imported.balances.length} assets across ${Object.keys(summary.chains).length} chains`
         },
         {
             label: "Ready to off-ramp",
@@ -636,7 +656,7 @@ function renderImportedBalances(imported) {
 
     const topBalances = [...imported.balances]
         .sort((left, right) => (right.valueUsd || 0) - (left.valueUsd || 0))
-        .slice(0, 25);
+        .slice(0, MAX_DISPLAYED_BALANCES);
 
     count.textContent = `${imported.balances.length} assets`;
     empty.style.display = "none";
@@ -670,7 +690,7 @@ function renderImportedTransactions(imported) {
 
     const recentTransactions = [...imported.transactions]
         .sort((left, right) => String(right.timestamp).localeCompare(String(left.timestamp)))
-        .slice(0, 25);
+        .slice(0, MAX_DISPLAYED_TRANSACTIONS);
 
     count.textContent = `${imported.transactions.length} transactions`;
     empty.style.display = "none";
@@ -701,7 +721,7 @@ function renderImportedData() {
 
     if (!summaryEl || !alertEl || !metaEl || !walletEl || !destinationEl) return;
 
-    destinationEl.textContent = getSettlementDestination();
+    destinationEl.textContent = getSettlementDestinationLabel();
 
     if (!imported) {
         summaryEl.innerHTML = `
@@ -734,7 +754,7 @@ function renderImportedData() {
     if (imported.transactions.length > 0) {
         alerts.push("Transaction history is informational only; settlement and fiat routing remain off-chain.");
     }
-    alerts.push(`Configured settlement destination: ${getSettlementDestination()}`);
+    alerts.push(`Configured settlement destination: ${getSettlementDestinationLabel()}`);
 
     walletEl.textContent = imported.walletAddress || "Wallet address unavailable";
     metaEl.textContent = [

@@ -46,6 +46,7 @@ def test_withdraw_html_has_json_import_and_settlement_controls():
     assert 'id="import-summary"' in html
     assert 'id="settlement-destination"' in html
     assert "Coinbase settlement destination" in html
+    assert "Enter your own Coinbase deposit address" in html
 
 
 def test_withdraw_html_loads_money_flow_helpers():
@@ -141,7 +142,8 @@ def test_withdraw_js_encodes_release_with_saved_destination_address():
     assert release_branch in script
     assert custom_branch in script
     assert script.index(release_branch) < script.index(custom_branch)
-    assert 'encodeFunctionData("release", [getSettlementDestination()])' in script
+    assert 'encodeFunctionData("release", [settlementDestination])' in script
+    assert "Configure and verify a destination address before using release(address)." in script
 
 
 def test_withdraw_js_defines_storage_key():
@@ -153,7 +155,8 @@ def test_withdraw_js_defines_import_and_destination_storage_keys():
     script = (REPO_ROOT / "withdraw.js").read_text()
     assert "nexus_imported_wallet_data" in script
     assert "nexus_settlement_destination" in script
-    assert "0x1EF9950fc2d9433Ab9d253881fd461f8e2098Eac" in script
+    assert "MAX_DISPLAYED_BALANCES" in script
+    assert "No destination configured" in script
 
 
 def test_withdraw_js_exports_nexus_withdraw_namespace():
