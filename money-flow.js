@@ -164,7 +164,7 @@ const COINBASE_DESTINATION_CHAINS = new Set([
 ]);
 
 function formatChainLabel(chain) {
-    const value = String(chain || "unknown").trim();
+    const value = String(chain ?? "").trim();
     if (!value) return "Unknown";
     if (value.toLowerCase() === "base") return "Base";
     if (value.toLowerCase() === "ethereum") return "Ethereum";

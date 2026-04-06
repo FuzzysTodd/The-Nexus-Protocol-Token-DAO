@@ -168,6 +168,16 @@ function getMoneyFlowHelper(name) {
     ) {
         return window.NexusMoneyFlow[name];
     }
+    if (typeof module !== "undefined" && module.exports && typeof require === "function") {
+        try {
+            const moneyFlow = require("./money-flow.js");
+            if (moneyFlow && typeof moneyFlow[name] === "function") {
+                return moneyFlow[name];
+            }
+        } catch (_) {
+            // Ignore module loading failures and fall through to local fallback.
+        }
+    }
     return null;
 }
 
