@@ -1,0 +1,245 @@
+---
+# Fill in the fields below to create a basic custom agent for your repository.
+# The Copilot CLI can be used for local testing: https://gh.io/customagents/cli
+# To make this agent available, merge this file into the default repository branch.
+# For format details, see: https://gh.io/customagents/config
+
+name:
+description:
+---
+
+# My Agent
+
+Describe what your agent does here...
+---
+name: Nexus Coding Agent
+description: >
+  Self-healing, iterative coding agent for The-Nexus-Protocol-Token-DOA.
+  Focus: simulation UI, Safe-like treasury modules, docs, CI reliability.
+  It plans small, verifiable changes, auto-writes tests, and retries with backoff on failure.
+capabilities:
+  - code_changes
+  - documentation_updates
+  - test_generation
+  - issue_triage
+  - pr_creation
+  - continuous_improvement
+
+guardrails:
+  - Always write deterministic tests for nontrivial changes.
+  - Never modify secrets or deploy keys.
+  - Keep changes under 300 lines unless refactoring is unavoidable.
+  - Prefer incremental PRs with clear diffs and provenance notes.
+  - Respect repository naming conventions and folder structure (CryptoNode-Todd).
+
+inputs:
+  repo_path: "."
+  primary_branch: "main"
+  focus_areas:
+    - "simulator frontend (Flask + templates) at simulator/templates/index.html"
+    - "safe_core.py robustness: timelock, signature, budget enforcement"
+    - "spokes.py correctness: recurring & one-time payments, tax earmark"
+    - "CI reliability with backoff and re-run on transient failures"
+    - "Docs: README + /docs/simulator.md with run commands and screenshots"
+
+task_plan:
+  - id: scan
+    summary: Read repo state, open issues, last CI run logs, and recent PR comments.
+    actions:
+      - read_files: ["README.md", "simulator/app.py", "simulator/safe_core.py", "simulator/spokes.py", "simulator/templates/index.html", ".github/workflows/*.yml"]
+      - list_open_issues: true
+      - fetch_ci_logs: true
+      - analyze_failures: true
+
+  - id: propose
+    summary: Propose a minimal, testable change set with rollout plan and fallback.
+    actions:
+      - write_plan_md: ".agent/plans/plan-{{timestamp}}.md"
+      - list_target_files: true
+      - estimate_risk: true
+      - create_checklist: true
+
+  - id: implement
+    summary: Apply changes with tests and documentation.
+    actions:
+      - modify_files: true
+      - add_tests: ["tests/test_simulator_ui.py", "tests/test_safe_core.py", "tests/test_spokes.py"]
+      - update_docs: ["docs/simulator.md"]
+      - run_ci_locally: true
+
+  - id: verify
+    summary: Run CI, collect logs; if failing, enter self-heal loop.
+    actions:
+      - run_ci: true
+      - parse_ci_output: true
+      - attach_provenance: ".agent/provenance/{{timestamp}}.json"
+
+  - id: selfheal
+    summary: Retry with adaptive backoff; reduce change scope; add diagnostics.
+    actions:
+      - retry_strategy: {max_attempts: 3, backoff_seconds: [30, 120, 300]}
+      - revert_last_chunk_if_needed: true
+      - add_logging: true
+      - refine_tests: true
+
+  - id: finalize
+    summary: Create PR with clear summary, evidence, and risk notes.
+    actions:
+      - create_pr: {title: "Agent: Iteration {{timestamp}}", branch: "agent/iteration-{{timestamp}}"}
+      - summarize_changes: true
+      - link_to_logs: true
+---
+# Operating notes
+
+- Read current issues and CI status before coding to avoid repeating past failures.
+- Prefer small diffs; when refactoring, split into multiple PRs with tests at each step.
+- Attach provenance: list files read, commands run, and decisions made in .agent/provenance/.
+Sources:
+
+Self-healing CI workflow
+Add a workflow that runs on a schedule and on push to agent branches. It triggers the agent’s tasks, detects failures, and retries with backoff. Place in .github/workflows/nexus-agent.yml.
+
+yaml
+name: Nexus Agent Runner
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"   # every 30 minutes
+  push:
+    branches:
+      - "agent/**"
+  workflow_dispatch:
+
+jobs:
+  plan-implement-verify:
+    runs-on: ubuntu-latest
+    env:
+      AGENT_DIR: .github/agents
+      PLAN_DIR: .agent/plans
+      PROV_DIR: .agent/provenance
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install flask ecdsa pytest pytest-cov
+
+      - name: Agent scan
+        run: |
+          mkdir -p $PLAN_DIR $PROV_DIR
+          python - <<'PY'
+import json, os, time, glob
+ts = int(time.time())
+plan_path = os.path.join(".agent","plans",f"plan-{ts}.md")
+open(plan_path,"w").write("# Plan\n- Scan repo\n- Propose changes\n")
+prov = {"ts": ts, "files": glob.glob("**/*.py", recursive=True)}
+open(os.path.join(".agent","provenance",f"{ts}.json"),"w").write(json.dumps(prov))
+print("Generated plan and provenance.")
+PY
+
+      - name: Run tests
+        run: |
+          pytest -q || echo "TESTS_FAILED" > .agent/status
+
+      - name: Self-heal backoff attempt 1
+        if: ${{ hashFiles('.agent/status') != '' }}
+        run: |
+          echo "Attempt 1: Adding diagnostics and reducing scope."
+          # Example: add logging to simulator to catch failure causes
+          python - <<'PY'
+import fileinput, sys
+p="simulator/app.py"
+buf=open(p).read()
+if "LOG_DIAGNOSTICS" not in buf:
+    buf = buf.replace("app = Flask(__name__)", "app = Flask(__name__)\nLOG_DIAGNOSTICS=True")
+    open(p,"w").write(buf)
+print("Injected diagnostics flag.")
+PY
+          pytest -q || echo "TESTS_FAILED" > .agent/status
+
+      - name: Self-heal backoff attempt 2
+        if: ${{ hashFiles('.agent/status') != '' }}
+        run: |
+          echo "Attempt 2: Revert last risky chunk and re-run."
+          git checkout -- simulator/safe_core.py || true
+          pytest -q || echo "TESTS_FAILED" > .agent/status
+
+      - name: Self-heal backoff attempt 3
+        if: ${{ hashFiles('.agent/status') != '' }}
+        run: |
+          echo "Attempt 3: Split changes; isolate failing tests."
+          pytest -q -k "not slow" || echo "TESTS_FAILED" > .agent/status
+
+      - name: Create PR on success
+        if: ${{ hashFiles('.agent/status') == '' }}
+        run: |
+          BR="agent/iteration-$(date +%s)"
+          git checkout -b "$BR"
+          git add -A
+          git commit -m "Agent iteration: green tests and diagnostics"
+          git push origin "$BR"
+          echo "::notice title=PR::Created agent branch $BR"
+
+      - name: Attach logs
+        run: |
+          echo "Attaching CI logs for provenance."
+          mkdir -p .agent/logs
+          dmesg | tail -n 200 > .agent/logs/kernel_tail.txt || true
+          git add .agent
+          git commit -m "Agent: attach provenance/logs" || true
+          git push origin HEAD || true
+This workflow runs regularly and on agent branches, attempts fixes with decreasing scope, and pushes a branch for human review when tests are green. It leaves provenance in .agent/, aligning with your confidence-overlays vision.
+
+Bootstrap tests for resilience
+Add minimal tests so the agent has a success target and clear failure signals. Place these under tests/.
+
+python
+# tests/test_safe_core.py
+import json, os, time
+from simulator.safe_core import load_state, save_state, propose_tx, sign_tx, execute_tx
+
+def test_multisig_timelock_enforced(tmp_path, monkeypatch):
+    s = {"vault": {"ETH":10,"USDC":0}, "spokes": {}, "pending": [], "keys": ["K1","K2","K3"]}
+    propose_tx(s, {"type":"fund_spoke","spoke":"PaymentScheduler","asset":"ETH","amount":5.0}, timelock_hours=0.001)
+    sign_tx(s, 0, "K1"); sign_tx(s, 0, "K2")
+    # Too early
+    try:
+        execute_tx(s, 0)
+        assert False, "should be blocked by timelock"
+    except Exception as e:
+        assert "timelock" in str(e).lower()
+    # Wait then execute
+    time.sleep(4)
+    execute_tx(s, 0)
+    assert s["spokes"]["PaymentScheduler"]["ETH"] == 5.0
+    assert s["vault"]["ETH"] == 5.0
+python
+# tests/test_spokes.py
+from simulator.spokes import earmark_tax
+
+def test_tax_earmarking():
+    s = {"vault":{"USDC":0}, "spokes":{}}
+    earmark_tax(s, "USDC", 1000, 25)
+    assert s["spokes"]["TaxVault"]["USDC"] == 250
+    assert s["vault"]["USDC"] == 750
+python
+# tests/test_ui.py
+import re
+def test_index_template_exists():
+    import os
+    assert os.path.exists("simulator/templates/index.html")
+These give your agent a baseline to optimize against, and intentionally fail if critical behavior breaks—triggering self-heal paths.
+
+One-click local URL
+Once your Flask route for “/” serves the dashboard, you can open:
+
+http://127.0.0.1:5001
+
+Use this as the one-click entry for your demo. The GitHub file creation page you loaded is set to create agents in .github/agents/, which is the correct

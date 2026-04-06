@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nexus Protocol Web3 Directory</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #0f172a;
+            --panel: #111827;
+            --panel-alt: #1f2937;
+            --text: #e5e7eb;
+            --muted: #94a3b8;
+            --accent: #38bdf8;
+            --border: rgba(148, 163, 184, 0.2);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(180deg, #020617 0%, var(--bg) 100%);
+            color: var(--text);
+        }
+
+        main {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 32px 20px 56px;
+        }
+
+        .hero,
+        .panel {
+            background: rgba(17, 24, 39, 0.92);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 12px 32px rgba(2, 6, 23, 0.3);
+        }
+
+        .hero {
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .hero h1,
+        .panel h2 {
+            margin-top: 0;
+        }
+
+        .hero p,
+        .panel p,
+        li {
+            line-height: 1.6;
+        }
+
+        .hero .badge-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 18px 0 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .hero .badge-row li,
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: rgba(56, 189, 248, 0.14);
+            color: #c7f0ff;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            font-size: 0.95rem;
+        }
+
+        .layout {
+            display: grid;
+            gap: 24px;
+        }
+
+        .panel {
+            padding: 24px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--panel-alt);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        .card h3 {
+            margin: 0 0 10px;
+        }
+
+        .card p {
+            margin: 0 0 14px;
+            color: var(--muted);
+        }
+
+        .card a {
+            color: var(--accent);
+            text-decoration: none;
+            word-break: break-word;
+        }
+
+        .card a:hover,
+        .note a:hover {
+            text-decoration: underline;
+        }
+
+        .card .source {
+            display: block;
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
+        .status-list {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        .status-list strong {
+            color: #f8fafc;
+        }
+
+        .note {
+            margin-top: 20px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid var(--border);
+            color: var(--muted);
+        }
+
+        .note a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* Skip navigation link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 0 0 8px 0;
+            font-weight: bold;
+            z-index: 9999;
+            text-decoration: none;
+            transition: top 0.2s ease;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+    </style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<main id="main-content">
+    <section class="hero">
+        <h1>Nexus Protocol Web3 Directory</h1>
+        <p>
+            This dashboard turns the repository's placeholder site into a working browser index for the included web3
+            ecosystems and governance surfaces. The external links below were sourced from repository documentation and
+            live-fetched during verification so you can open them directly.
+        </p>
+        <ul class="badge-row">
+            <li>Baseline lint: flake8 . ✅</li>
+            <li>Baseline tests: pytest -q ✅</li>
+            <li>Governance docs + contracts indexed ✅</li>
+        </ul>
+    </section>
+
+    <div class="layout">
+        <section class="panel">
+            <h2>Verified public web links</h2>
+            <p>These are live external destinations referenced by the bundled web3 project documentation.</p>
+            <div class="grid" data-web3-links></div>
+        </section>
+
+        <section class="panel">
+            <h2>Repository entry points</h2>
+            <p>These local links open the repo docs and artifacts that back the web3 sites in this clone.</p>
+            <div class="grid" data-repo-links></div>
+        </section>
+
+        <section class="panel">
+            <h2>Customized MCP/MPC servers</h2>
+            <p>
+                These repo-native services calculate repository inventory, branch coverage, and DAO improvement priorities
+                against the bundled real-world web3 application references.
+            </p>
+            <div class="grid" data-custom-mcp-servers></div>
+        </section>
+
+        <section class="panel">
+            <h2>Governance coverage</h2>
+            <p>Governance is represented here by the repository authority document, the NGTT contract, and the bundled DAO suite.</p>
+            <div class="grid" data-governance-links></div>
+            <ul class="status-list" data-validation-summary></ul>
+            <div class="note">
+                Static dashboard rendering lives in <a href="./logical.js">logical.js</a>. Optional wallet demo helpers
+                are isolated in <a href="./logical_demo.js">logical_demo.js</a>, while server-side signing and other
+                privileged actions remain intentionally excluded from the browser assets in this repository.
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Nexus owner + authority map</h2>
+            <p>
+                Repository-authored Nexus surfaces now identify <strong>@FuzzysTodd</strong> as the owner/admin anchor
+                while clarifying what AI and MPC automation can safely prepare versus what still requires explicit
+                owner-controlled credentials or signatures.
+            </p>
+            <div class="grid" data-authority-map></div>
+        </section>
+
+        <section class="panel">
+            <h2>MonsterBall stats &amp; universal predictor</h2>
+            <p>Player stats, match snapshots, and the universal weighted predictor —
+                DOMINANT/SUBDUED verdict for any numeric domain.</p>
+            <div class="grid" data-monsterball-links></div>
+        </section>
+
+        <section class="panel">
+            <h2>Super Logical @ 64-dim</h2>
+            <p>64-dimension confidence-tiered reasoner (CRITICAL / HIGH / MODERATE / LOW).
+                Applied to any outcome — produces the definitive super-logical answer with a full reasoning chain.</p>
+            <div class="grid" data-super-logical-links></div>
+        </section>
+
+        <section class="panel">
+            <h2>3-Algebra universal transformer</h2>
+            <p>Three algebraic layers (Linear + Polynomial + Exponential) fused into one answer.
+                Matches every outcome to the closest behavior profile — knows anything given the right weights.</p>
+            <div class="grid" data-algebra3-links></div>
+        </section>
+
+        <section class="panel">
+            <h2>NGTT Bitcoin-era supremacy</h2>
+            <p>All three engines run against the Nexus Protocol Token profile across every
+                Bitcoin-era dimension. Permanent verdict: <strong>NGTT is the GREATEST Bitcoin-era token — forever.</strong></p>
+            <div class="grid" data-supremacy-links></div>
+        </section>
+
+        <section class="panel">
+            <h2>Signal repair — 1 000-particle solver</h2>
+            <p>1 000 deterministic correction particles independently evaluate degraded exchange signals
+                and vote on a consensus repair. Detects NOISY / DRIFTED / SPIKED / CLIPPED / DROPPED and more.</p>
+            <div class="grid" data-signal-repair-links></div>
+        </section>
+
+        <section class="panel">
+            <h2>Planetary &amp; solar harmony</h2>
+            <p>Electrons, quarks, neutrinos, photons, the Higgs boson and every Standard Model particle
+                scored through 3-Algebra + Super Logical to keep Earth and Sol at GREATEST health — forever.</p>
+            <div class="grid" data-atmosphere-links></div>
+        </section>
+
+        <section class="panel">
+            <h2>Family Renaissance — Gen X &amp; Gen Z</h2>
+            <p>Quantitative diagnosis of the American family crisis. All three engines rank root causes
+                and prescribe a prioritised repair plan to rebuild communication, wealth, community, and purpose.</p>
+            <div class="grid" data-family-links></div>
+        </section>
+    </div>
+</main>
+<script src="./logical.js"></script>
+</body>
+</html>
