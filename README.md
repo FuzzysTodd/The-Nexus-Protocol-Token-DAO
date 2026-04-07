@@ -23,7 +23,7 @@ The User Guide is your friendly, no-jargon walkthrough of everything Nexus Proto
 
 ## What is Nexus Protocol?
 
-Nexus Protocol is a conceptual framework combining:
+Nexus Protocol is a real project combining:
 - **Decentralized Finance (DeFi)** tools and protocols
 - **Smart Contract** management interfaces
 - **DAO Governance** structures
@@ -56,7 +56,7 @@ Structured authority with Owner (FuzzysTodd), Master Project Controller (MPC), a
 
 ## Important Notes
 
-⚠️ **Educational Project** - This is a conceptual/educational framework. It has NOT been audited for production use.
+⚠️ **Audit Status** - This is a real project, but repository components and on-chain flows may not all be audited for production use.
 
 - Always do your own research (DYOR)
 - Start with testnets for learning
