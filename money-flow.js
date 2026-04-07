@@ -158,6 +158,72 @@ const STABLE_SYMBOLS = new Set([
     "XDAI"
 ]);
 
+const COINBASE_DESTINATION_CHAINS = new Set([
+    "ethereum",
+    "base"
+]);
+
+function formatChainLabel(chain) {
+    const value = String(chain ?? "").trim();
+    if (!value) return "Unknown";
+    if (value.toLowerCase() === "base") return "Base";
+    if (value.toLowerCase() === "ethereum") return "Ethereum";
+    return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function determineAssetType(asset) {
+    if (asset && String(asset.asset_type || "").trim()) {
+        return String(asset.asset_type).toLowerCase();
+    }
+    if (asset && asset.token_standard) {
+        return "collectible";
+    }
+    return "balance";
+}
+
+function classifySettlementRail(asset) {
+    const chain = String(asset.chain || "").toLowerCase();
+    const assetType = determineAssetType(asset);
+    const chainLabel = formatChainLabel(chain);
+    const supportedChain = COINBASE_DESTINATION_CHAINS.has(chain);
+
+    if (assetType === "collectible") {
+        return {
+            network: chainLabel,
+            destination: chain === "base" ? "Base wallet review" : "Manual NFT review",
+            supportsDirectTransfer: false,
+            reason: supportedChain
+                ? `Collectibles on ${chainLabel} require manual Coinbase or wallet support checks before transfer.`
+                : `Collectibles on ${chainLabel} require manual bridge and destination review before transfer.`
+        };
+    }
+
+    if (chain === "base") {
+        return {
+            network: "Base",
+            destination: "Coinbase Base deposit",
+            supportsDirectTransfer: true,
+            reason: "Use a Base-compatible Coinbase deposit address for direct routing."
+        };
+    }
+
+    if (chain === "ethereum") {
+        return {
+            network: "Ethereum",
+            destination: "Coinbase Ethereum deposit",
+            supportsDirectTransfer: true,
+            reason: "Use an Ethereum-compatible Coinbase deposit address for direct routing."
+        };
+    }
+
+    return {
+        network: chainLabel,
+        destination: "Manual bridge review",
+        supportsDirectTransfer: false,
+        reason: `Verify bridge and destination support before sending funds from ${chainLabel}.`
+    };
+}
+
 function parseDecimalAmount(amount, decimals) {
     const raw = String(amount ?? "0").trim();
     const precision = Number.isFinite(Number(decimals)) ? Math.max(0, Number(decimals)) : 0;
@@ -190,46 +256,64 @@ function classifyOffRamp(balance) {
     const symbol = String(balance.symbol || "").toUpperCase();
     const valueUsd = Number(balance.value_usd);
     const poolSize = Number(balance.pool_size);
+    const settlement = classifySettlementRail(balance);
+
+    if (String(balance.asset_type || "").toLowerCase() === "collectible" || balance.token_standard) {
+        return {
+            status: balance.is_spam ? "blocked" : "review",
+            label: balance.is_spam ? "Spam / ignore" : "Collectible review",
+            reason: balance.is_spam
+                ? "Spam collectibles should be ignored and never routed."
+                : "Collectibles are excluded from fiat routing and need manual Coinbase/Base transfer review.",
+            settlement
+        };
+    }
 
     if (TESTNET_CHAINS.has(chain)) {
         return {
             status: "blocked",
             label: "Testnet only",
-            reason: "Testnet assets cannot be redeemed for fiat."
+            reason: "Testnet assets cannot be redeemed for fiat.",
+            settlement
         };
     }
     if (!Number.isFinite(valueUsd) || valueUsd <= 0) {
         return {
             status: "review",
             label: "Unpriced",
-            reason: "No USD valuation is available yet."
+            reason: "No USD valuation is available yet.",
+            settlement
         };
     }
     if (balance.low_liquidity) {
         return {
             status: "review",
             label: "Low liquidity",
-            reason: "Swap impact may be too high for a clean off-ramp."
+            reason: "Swap impact may be too high for a clean off-ramp.",
+            settlement
         };
     }
     if (symbol === "ETH" || symbol === "WETH" || STABLE_SYMBOLS.has(symbol)) {
         return {
             status: "ready",
             label: "Off-ramp ready",
-            reason: "Asset is already a common swap or withdrawal asset."
+            reason: "Asset is already a common swap or withdrawal asset.",
+            settlement
         };
     }
     if (Number.isFinite(poolSize) && poolSize >= 100000) {
         return {
             status: "swap",
             label: "Swap first",
-            reason: "Swap into a stablecoin or native asset before off-ramping."
+            reason: "Swap into a stablecoin or native asset before off-ramping.",
+            settlement
         };
     }
     return {
         status: "review",
         label: "Manual review",
-        reason: "Verify liquidity and routing before attempting fiat conversion."
+        reason: "Verify liquidity and routing before attempting fiat conversion.",
+        settlement
     };
 }
 
@@ -245,6 +329,8 @@ function summarizeImportedBalances(balances) {
         reviewValueUsd: 0,
         blockedValueUsd: 0,
         nativeAssetCount: 0,
+        coinbaseReadyCount: 0,
+        baseReadyCount: 0,
         chains: {}
     };
 
@@ -261,6 +347,12 @@ function summarizeImportedBalances(balances) {
 
         if (String(balance.address || "").toLowerCase() === "native") {
             summary.nativeAssetCount += 1;
+        }
+        if (priced && offRamp.status === "ready" && offRamp.settlement && offRamp.settlement.supportsDirectTransfer) {
+            summary.coinbaseReadyCount += 1;
+            if (offRamp.settlement.network === "Base") {
+                summary.baseReadyCount += 1;
+            }
         }
 
         if (!priced) {
@@ -567,6 +659,7 @@ if (typeof module !== 'undefined' && module.exports) {
         TIMEFRAMES,
         parseDecimalAmount,
         formatUsd,
+        classifySettlementRail,
         classifyOffRamp,
         summarizeImportedBalances,
         calculateReturns,
@@ -582,6 +675,7 @@ if (typeof window !== 'undefined') {
     window.NexusMoneyFlow = {
         parseDecimalAmount,
         formatUsd,
+        classifySettlementRail,
         classifyOffRamp,
         summarizeImportedBalances,
         formatCurrency,

@@ -49,6 +49,10 @@ const PROXY_ABI = [
     {"stateMutability": "payable", "type": "receive"}
 ];
 
+const ERC20_ABI = [
+    "function transfer(address to, uint256 amount) returns (bool)"
+];
+
 // ---------------------------------------------------------------------------
 // Common implementation withdraw selectors that can be called through the
 // proxy fallback.  The proxy delegates everything it receives to the
@@ -70,8 +74,12 @@ const WITHDRAW_METHODS = {
 const STORAGE_KEY = "nexus_withdraw_contracts";
 const IMPORT_STORAGE_KEY = "nexus_imported_wallet_data";
 const DESTINATION_STORAGE_KEY = "nexus_settlement_destination";
+const LOCAL_TRANSFER_HISTORY_KEY = "nexus_local_transfer_history";
+const DEFAULT_SETTLEMENT_DESTINATION = "0x1EF9950fc2d9433Ab9d253881fd461f8e2098Eac";
 const MAX_DISPLAYED_BALANCES = 25;
+const MAX_DISPLAYED_COLLECTIBLES = 25;
 const MAX_DISPLAYED_TRANSACTIONS = 25;
+const MAX_STORED_LOCAL_TRANSFERS = 100;
 
 // ---------------------------------------------------------------------------
 // App state
@@ -121,15 +129,43 @@ function saveImportedData(payload) {
     localStorage.setItem(IMPORT_STORAGE_KEY, JSON.stringify(payload));
 }
 
+function loadLocalTransferHistory() {
+    try {
+        const stored = JSON.parse(localStorage.getItem(LOCAL_TRANSFER_HISTORY_KEY) || "[]");
+        return Array.isArray(stored) ? stored : [];
+    } catch (_) {
+        return [];
+    }
+}
+
+function saveLocalTransferHistory(list) {
+    localStorage.setItem(
+        LOCAL_TRANSFER_HISTORY_KEY,
+        JSON.stringify(list.slice(0, MAX_STORED_LOCAL_TRANSFERS))
+    );
+}
+
+function upsertLocalTransferHistory(entry) {
+    const list = loadLocalTransferHistory();
+    const index = list.findIndex(item => item.hash && entry.hash && item.hash === entry.hash);
+    if (index >= 0) {
+        list[index] = { ...list[index], ...entry };
+    } else {
+        list.unshift(entry);
+    }
+    list.sort((left, right) => String(right.timestamp || "").localeCompare(String(left.timestamp || "")));
+    saveLocalTransferHistory(list);
+}
+
 function clearImportedData() {
     localStorage.removeItem(IMPORT_STORAGE_KEY);
 }
 
 function loadSettlementDestination() {
     try {
-        return localStorage.getItem(DESTINATION_STORAGE_KEY) || "";
+        return localStorage.getItem(DESTINATION_STORAGE_KEY) || DEFAULT_SETTLEMENT_DESTINATION;
     } catch (_) {
-        return "";
+        return DEFAULT_SETTLEMENT_DESTINATION;
     }
 }
 
@@ -167,6 +203,16 @@ function getMoneyFlowHelper(name) {
     ) {
         return window.NexusMoneyFlow[name];
     }
+    if (typeof module !== "undefined" && module.exports && typeof require === "function") {
+        try {
+            const moneyFlow = require("./money-flow.js");
+            if (moneyFlow && typeof moneyFlow[name] === "function") {
+                return moneyFlow[name];
+            }
+        } catch (_) {
+            // Ignore module loading failures and fall through to local fallback.
+        }
+    }
     return null;
 }
 
@@ -191,15 +237,74 @@ function parseDecimalAmount(amount, decimals) {
     return numeric / (10 ** precision);
 }
 
+function classifySettlementRail(entry) {
+    const classifier = getMoneyFlowHelper("classifySettlementRail");
+    if (classifier) {
+        return classifier(entry);
+    }
+    const chain = String(entry.chain || "unknown").toLowerCase();
+    const chainLabel = chain === "base"
+        ? "Base"
+        : (chain === "ethereum" ? "Ethereum" : (chain.charAt(0).toUpperCase() + chain.slice(1)));
+    const isCollectible = String(entry.asset_type || "").toLowerCase() === "collectible" || entry.token_standard;
+
+    if (isCollectible) {
+        return {
+            network: chainLabel,
+            destination: chain === "base" ? "Base wallet review" : "Manual NFT review",
+            supportsDirectTransfer: false,
+            reason: chain === "base"
+                ? "Collectibles on Base require manual Coinbase or wallet support checks before transfer."
+                : `Collectibles on ${chainLabel} require manual destination review before transfer.`
+        };
+    }
+
+    if (chain === "base") {
+        return {
+            network: "Base",
+            destination: "Coinbase Base deposit",
+            supportsDirectTransfer: true,
+            reason: "Use a Base-compatible Coinbase deposit address for direct routing."
+        };
+    }
+
+    if (chain === "ethereum") {
+        return {
+            network: "Ethereum",
+            destination: "Coinbase Ethereum deposit",
+            supportsDirectTransfer: true,
+            reason: "Use an Ethereum-compatible Coinbase deposit address for direct routing."
+        };
+    }
+
+    return {
+        network: chainLabel,
+        destination: "Manual bridge review",
+        supportsDirectTransfer: false,
+        reason: `Verify bridge and destination support before sending funds from ${chainLabel}.`
+    };
+}
+
 function classifyOffRamp(balance) {
     const classifier = getMoneyFlowHelper("classifyOffRamp");
     if (classifier) {
         return classifier(balance);
     }
-    if (balance.low_liquidity) {
-        return { status: "review", label: "Low liquidity", reason: "Review route before cash-out." };
+    const settlement = classifySettlementRail(balance);
+    if (String(balance.asset_type || "").toLowerCase() === "collectible" || balance.token_standard) {
+        return {
+            status: balance.is_spam ? "blocked" : "review",
+            label: balance.is_spam ? "Spam / ignore" : "Collectible review",
+            reason: balance.is_spam
+                ? "Spam collectibles should be ignored and never routed."
+                : "Collectibles are excluded from fiat routing and need manual Coinbase/Base transfer review.",
+            settlement
+        };
     }
-    return { status: "swap", label: "Swap first", reason: "Swap into a supported asset first." };
+    if (balance.low_liquidity) {
+        return { status: "review", label: "Low liquidity", reason: "Review route before cash-out.", settlement };
+    }
+    return { status: "swap", label: "Swap first", reason: "Swap into a supported asset first.", settlement };
 }
 
 function summarizeImportedBalances(balances) {
@@ -233,7 +338,8 @@ function getSettlementDestination() {
     const input = typeof document !== "undefined"
         ? document.getElementById("settlement-destination")
         : null;
-    const value = input ? input.value.trim() : loadSettlementDestination();
+    const typedValue = input ? input.value.trim() : "";
+    const value = typedValue || loadSettlementDestination();
     if (typeof ethers !== "undefined" && ethers.utils.isAddress(value)) {
         return value;
     }
@@ -242,6 +348,47 @@ function getSettlementDestination() {
 
 function getSettlementDestinationLabel() {
     return getSettlementDestination() || "No destination configured";
+}
+
+function canSendImportedBalance(balance) {
+    if (!balance || !balance.offRamp || !balance.offRamp.settlement) return false;
+    if (String(balance.assetType || "balance").toLowerCase() !== "balance") return false;
+    if (balance.offRamp.status !== "ready") return false;
+    if (!balance.offRamp.settlement.supportsDirectTransfer) return false;
+    if (String(balance.address || "").trim() === "") return false;
+    return String(balance.rawAmount || "0") !== "0";
+}
+
+function validateImportedBalanceTransfer(balance, destination, connectedChainId) {
+    if (!canSendImportedBalance(balance)) {
+        return "This asset is not eligible for a direct Coinbase transfer.";
+    }
+    if (!destination) {
+        return "Configure and verify a destination address before sending funds to Coinbase.";
+    }
+    if (balance.chainId && Number(connectedChainId) !== Number(balance.chainId)) {
+        return `Switch your wallet to ${balance.offRamp.settlement.network} before sending this asset.`;
+    }
+    return null;
+}
+
+function buildImportedBalanceTransferRequest(balance, destination) {
+    if (String(balance.address || "").toLowerCase() === "native") {
+        return {
+            kind: "native",
+            transaction: {
+                to: destination,
+                value: balance.rawAmount
+            }
+        };
+    }
+
+    return {
+        kind: "erc20",
+        tokenAddress: balance.address,
+        amount: balance.rawAmount,
+        destination
+    };
 }
 
 function parseHexAmount(value) {
@@ -254,6 +401,35 @@ function parseHexAmount(value) {
         return 0;
     }
     return 0;
+}
+
+function buildLocalTransferHistoryEntry({
+    chain,
+    chainId,
+    hash,
+    timestamp,
+    transactionType,
+    from,
+    to,
+    amountLabel,
+    assetLabel,
+    status,
+    success
+}) {
+    return {
+        chain: chain || "unknown",
+        chainId: chainId || null,
+        hash: hash || "",
+        timestamp: timestamp || new Date().toISOString(),
+        transactionType: transactionType || "Transfer",
+        from: from || "",
+        to: to || "",
+        amount: null,
+        amountLabel: amountLabel || "—",
+        assetLabel: assetLabel || "Transfer",
+        status: status || "confirmed",
+        success: typeof success === "boolean" ? success : status !== "failed"
+    };
 }
 
 // ---------------------------------------------------------------------------
@@ -364,6 +540,7 @@ async function withdrawFromContract(address, method, customSelector, customAbi) 
     }
 
     let callData;
+    let tx;
     try {
         if (method === "release(address)") {
             // release(address) needs a payee argument – use the configured destination
@@ -414,12 +591,43 @@ async function withdrawFromContract(address, method, customSelector, customAbi) 
         }
 
         showStatus("Sending withdrawal transaction…");
-        const tx = await signer.sendTransaction({ to: address, data: callData });
+        const network = await provider.getNetwork();
+        tx = await signer.sendTransaction({ to: address, data: callData });
+        upsertLocalTransferHistory(buildLocalTransferHistoryEntry({
+            chain: network.name || "unknown",
+            chainId: Number(network.chainId),
+            hash: tx.hash,
+            transactionType: method === "custom" ? "Custom withdrawal call" : method,
+            from: signerAddress || "",
+            to: address,
+            amountLabel: "Contract withdrawal",
+            assetLabel: "Contract balance",
+            status: "pending"
+        }));
         showStatus("Transaction sent – hash: " + tx.hash);
         await tx.wait();
+        upsertLocalTransferHistory(buildLocalTransferHistoryEntry({
+            chain: network.name || "unknown",
+            chainId: Number(network.chainId),
+            hash: tx.hash,
+            transactionType: method === "custom" ? "Custom withdrawal call" : method,
+            from: signerAddress || "",
+            to: address,
+            amountLabel: "Contract withdrawal",
+            assetLabel: "Contract balance",
+            status: "confirmed",
+            success: true
+        }));
         showStatus("✅ Withdrawal confirmed: " + tx.hash);
         await refreshAll();
     } catch (err) {
+        if (tx && tx.hash) {
+            upsertLocalTransferHistory(buildLocalTransferHistoryEntry({
+                hash: tx.hash,
+                status: "failed",
+                success: false
+            }));
+        }
         showStatus("Withdrawal failed: " + (err.reason || err.message), true);
     }
 }
@@ -575,6 +783,34 @@ function normalizeImportedTransaction(entry) {
     };
 }
 
+function normalizeImportedCollectible(entry) {
+    const balance = Number(entry.balance);
+    const offRamp = classifyOffRamp({
+        chain: entry.chain,
+        chain_id: entry.chain_id,
+        symbol: entry.symbol,
+        asset_type: "collectible",
+        token_standard: entry.token_standard,
+        is_spam: entry.is_spam
+    });
+
+    return {
+        chain: entry.chain || "unknown",
+        chainId: entry.chain_id || null,
+        contractAddress: entry.contract_address || "",
+        tokenId: String(entry.token_id || ""),
+        tokenStandard: entry.token_standard || "Collectible",
+        name: entry.name || entry.symbol || "Collectible",
+        symbol: entry.symbol || "NFT",
+        balance: Number.isFinite(balance) ? balance : 0,
+        imageUrl: entry.image_url || "",
+        description: entry.description || "",
+        isSpam: Boolean(entry.is_spam),
+        lastAcquired: entry.last_acquired || "",
+        offRamp
+    };
+}
+
 function isNativeTransfer(entry) {
     return Boolean(
         entry &&
@@ -582,6 +818,16 @@ function isNativeTransfer(entry) {
         entry.data === "0x" &&
         Array.isArray(entry.logs) &&
         entry.logs.length === 0
+    );
+}
+
+function isDuneCollectiblesPayload(payload) {
+    return Boolean(
+        payload &&
+        typeof payload === "object" &&
+        Array.isArray(payload.entries) &&
+        !Array.isArray(payload.balances) &&
+        !Array.isArray(payload.transactions)
     );
 }
 
@@ -602,9 +848,12 @@ function parseImportedPayload(rawText) {
     const transactions = Array.isArray(payload.transactions)
         ? payload.transactions.map(normalizeImportedTransaction)
         : [];
+    const collectibles = isDuneCollectiblesPayload(payload)
+        ? payload.entries.map(normalizeImportedCollectible)
+        : (Array.isArray(payload.collectibles) ? payload.collectibles.map(normalizeImportedCollectible) : []);
 
-    if (balances.length === 0 && transactions.length === 0) {
-        throw new Error("JSON must include a balances array or a transactions array.");
+    if (balances.length === 0 && transactions.length === 0 && collectibles.length === 0) {
+        throw new Error("JSON must include a balances array, a transactions array, or a collectibles entries array.");
     }
 
     return {
@@ -612,14 +861,39 @@ function parseImportedPayload(rawText) {
         requestTime: payload.request_time || "",
         responseTime: payload.response_time || "",
         nextOffset: payload.next_offset || "",
+        source: isDuneCollectiblesPayload(payload) ? "dune-collectibles" : "wallet-json",
         balances,
+        collectibles,
         transactions,
         importedAt: new Date().toISOString()
     };
 }
 
-function buildSummaryCards(summary, imported) {
-    return [
+function summarizeImportedCollectibles(collectibles) {
+    return (collectibles || []).reduce((summary, collectible) => {
+        const chain = String(collectible.chain || "unknown").toLowerCase();
+        summary.totalCount += 1;
+        if (!summary.chains[chain]) {
+            summary.chains[chain] = 0;
+        }
+        summary.chains[chain] += 1;
+        if (chain === "base") {
+            summary.baseCount += 1;
+        }
+        if (collectible.isSpam) {
+            summary.spamCount += 1;
+        }
+        return summary;
+    }, {
+        totalCount: 0,
+        baseCount: 0,
+        spamCount: 0,
+        chains: {}
+    });
+}
+
+function buildSummaryCards(summary, imported, collectibleSummary) {
+    const cards = [
         {
             label: "Priced portfolio",
             value: formatUsd(summary.totalValueUsd),
@@ -641,6 +915,16 @@ function buildSummaryCards(summary, imported) {
             note: `${summary.lowLiquidityCount} low-liquidity assets, ${summary.unpricedAssetCount} unpriced`
         }
     ];
+
+    if (collectibleSummary.totalCount > 0) {
+        cards.push({
+            label: "Collectibles / NFTs",
+            value: collectibleSummary.totalCount.toLocaleString(),
+            note: `${collectibleSummary.baseCount} on Base, ${collectibleSummary.spamCount} flagged as spam`
+        });
+    }
+
+    return cards;
 }
 
 function renderImportedBalances(imported) {
@@ -663,7 +947,7 @@ function renderImportedBalances(imported) {
     count.textContent = `${imported.balances.length} assets`;
     empty.style.display = "none";
     container.innerHTML = topBalances.map(balance => `
-        <tr>
+        <tr data-balance-key="${escapeHtml(balance.address)}" data-balance-chain="${escapeHtml(String(balance.chainId || ""))}">
             <td>${escapeHtml(balance.chain)}</td>
             <td>
                 <div><strong>${escapeHtml(balance.symbol)}</strong></div>
@@ -673,6 +957,54 @@ function renderImportedBalances(imported) {
             <td>${escapeHtml(formatUsd(balance.valueUsd))}</td>
             <td>${escapeHtml(balance.lowLiquidity ? "Low liquidity" : (balance.poolSize ? `Pool ${formatUsd(balance.poolSize)}` : "No pool data"))}</td>
             <td><span class="status-chip status-${escapeHtml(balance.offRamp.status)}">${escapeHtml(balance.offRamp.label)}</span></td>
+            <td>
+                ${canSendImportedBalance(balance) ? `
+                    <button
+                        type="button"
+                        class="btn btn-accent"
+                        data-action="send-imported-balance"
+                        data-balance-address="${escapeHtml(balance.address)}"
+                        data-balance-chain-id="${escapeHtml(String(balance.chainId || ""))}"
+                    >
+                        Send to Coinbase
+                    </button>
+                ` : `<span class="table-subtext">${escapeHtml(balance.offRamp.reason || "Review route first.")}</span>`}
+            </td>
+        </tr>
+    `).join("");
+}
+
+function renderImportedCollectibles(imported) {
+    const container = document.getElementById("import-collectible-table");
+    const empty = document.getElementById("import-collectible-empty");
+    const count = document.getElementById("import-collectible-count");
+    const importedCollectibles = Array.isArray(imported && imported.collectibles) ? imported.collectibles : [];
+    if (!container || !empty || !count) return;
+
+    if (!imported || importedCollectibles.length === 0) {
+        container.innerHTML = "";
+        empty.style.display = "block";
+        count.textContent = "0 collectibles";
+        return;
+    }
+
+    const collectibles = [...importedCollectibles]
+        .sort((left, right) => String(right.lastAcquired).localeCompare(String(left.lastAcquired)))
+        .slice(0, MAX_DISPLAYED_COLLECTIBLES);
+
+    count.textContent = `${importedCollectibles.length} collectibles`;
+    empty.style.display = "none";
+    container.innerHTML = collectibles.map(collectible => `
+        <tr>
+            <td>${escapeHtml(collectible.chain)}</td>
+            <td>
+                <div><strong>${escapeHtml(collectible.name)}</strong></div>
+                <div class="table-subtext">${escapeHtml(`${collectible.tokenStandard} #${collectible.tokenId || "—"}`)}</div>
+            </td>
+            <td>${escapeHtml(collectible.balance ? String(collectible.balance) : "1")}</td>
+            <td>${escapeHtml(collectible.offRamp.settlement.network)}</td>
+            <td>${escapeHtml(collectible.offRamp.settlement.destination)}</td>
+            <td><span class="status-chip status-${escapeHtml(collectible.offRamp.status)}">${escapeHtml(collectible.offRamp.label)}</span></td>
         </tr>
     `).join("");
 }
@@ -683,18 +1015,22 @@ function renderImportedTransactions(imported) {
     const count = document.getElementById("import-transaction-count");
     if (!container || !empty || !count) return;
 
-    if (!imported || imported.transactions.length === 0) {
+    const importedTransactions = imported && Array.isArray(imported.transactions) ? imported.transactions : [];
+    const localTransactions = loadLocalTransferHistory();
+    const allTransactions = [...localTransactions, ...importedTransactions];
+
+    if (allTransactions.length === 0) {
         container.innerHTML = "";
         empty.style.display = "block";
         count.textContent = "0 transactions";
         return;
     }
 
-    const recentTransactions = [...imported.transactions]
+    const recentTransactions = [...allTransactions]
         .sort((left, right) => String(right.timestamp).localeCompare(String(left.timestamp)))
         .slice(0, MAX_DISPLAYED_TRANSACTIONS);
 
-    count.textContent = `${imported.transactions.length} transactions`;
+    count.textContent = `${allTransactions.length} transactions`;
     empty.style.display = "none";
     container.innerHTML = recentTransactions.map(tx => `
         <tr>
@@ -705,8 +1041,8 @@ function renderImportedTransactions(imported) {
             <td class="table-subtext">${escapeHtml(tx.timestamp || "—")}</td>
             <td class="table-subtext">${escapeHtml(shortAddr(tx.from || "—"))} → ${escapeHtml(shortAddr(tx.to || "—"))}</td>
             <td>
-                <span class="status-chip status-${tx.success ? "ready" : "blocked"}">
-                    ${tx.success ? "Confirmed" : "Failed"}
+                <span class="status-chip status-${tx.status === "pending" ? "pending" : (tx.success ? "ready" : "blocked")}">
+                    ${tx.status === "pending" ? "Pending" : (tx.success ? "Confirmed" : "Failed")}
                 </span>
             </td>
         </tr>
@@ -729,19 +1065,21 @@ function renderImportedData() {
         summaryEl.innerHTML = `
             <div class="empty-state compact">
                 <div class="empty-state-text">No wallet JSON imported yet</div>
-                <div class="empty-state-hint">Paste or upload a balances or transactions payload to build a local settlement view.</div>
+                <div class="empty-state-hint">Paste or upload a balances, transactions, or collectibles payload to build a local settlement view.</div>
             </div>
         `;
         alertEl.innerHTML = "";
         metaEl.textContent = "Local-only import storage is empty.";
         walletEl.textContent = "No wallet loaded";
-        renderImportedBalances({ balances: [], transactions: [] });
-        renderImportedTransactions({ balances: [], transactions: [] });
+        renderImportedBalances({ balances: [], collectibles: [], transactions: [] });
+        renderImportedCollectibles({ balances: [], collectibles: [], transactions: [] });
+        renderImportedTransactions({ balances: [], collectibles: [], transactions: [] });
         return;
     }
 
     const summary = summarizeImportedBalances(imported.balances);
-    const cards = buildSummaryCards(summary, imported);
+    const collectibleSummary = summarizeImportedCollectibles(imported.collectibles);
+    const cards = buildSummaryCards(summary, imported, collectibleSummary);
     const alerts = [];
 
     if (summary.blockedValueUsd > 0) {
@@ -753,6 +1091,18 @@ function renderImportedData() {
     if (summary.unpricedAssetCount > 0) {
         alerts.push(`${summary.unpricedAssetCount} assets have no USD price and cannot be included in a fiat estimate.`);
     }
+    if (summary.baseReadyCount > 0) {
+        alerts.push(`${summary.baseReadyCount} fungible assets are already on Base and can use a Base-compatible Coinbase deposit route after verification.`);
+    }
+    if (collectibleSummary.totalCount > 0) {
+        alerts.push(`${collectibleSummary.totalCount} collectibles were imported. NFTs are excluded from fiat estimates and require manual Coinbase/Base destination review.`);
+    }
+    if (collectibleSummary.baseCount > 0) {
+        alerts.push(`${collectibleSummary.baseCount} collectibles are on Base. Verify Base wallet and NFT deposit support before sending any collection item.`);
+    }
+    if (collectibleSummary.spamCount > 0) {
+        alerts.push(`${collectibleSummary.spamCount} collectibles are flagged as spam and should be ignored for settlement planning.`);
+    }
     if (imported.transactions.length > 0) {
         alerts.push("Transaction history is informational only; settlement and fiat routing remain off-chain.");
     }
@@ -760,6 +1110,7 @@ function renderImportedData() {
 
     walletEl.textContent = imported.walletAddress || "Wallet address unavailable";
     metaEl.textContent = [
+        imported.source === "dune-collectibles" ? "Source Dune SIM collectibles" : "",
         imported.requestTime ? `Requested ${imported.requestTime}` : "",
         imported.responseTime ? `Responded ${imported.responseTime}` : "",
         imported.nextOffset ? `Next offset ${imported.nextOffset}` : ""
@@ -778,6 +1129,7 @@ function renderImportedData() {
     `).join("");
 
     renderImportedBalances(imported);
+    renderImportedCollectibles(imported);
     renderImportedTransactions(imported);
 }
 
@@ -825,6 +1177,85 @@ function clearJsonImportView() {
     showStatus("Imported wallet JSON cleared.");
 }
 
+function findImportedBalance(balanceAddress, chainId) {
+    const imported = loadImportedData();
+    if (!imported || !Array.isArray(imported.balances)) return null;
+    return imported.balances.find(balance =>
+        String(balance.address || "").toLowerCase() === String(balanceAddress || "").toLowerCase() &&
+        String(balance.chainId || "") === String(chainId || "")
+    ) || null;
+}
+
+async function sendImportedBalanceToSettlement(balanceAddress, chainId) {
+    if (!signer || !provider || typeof ethers === "undefined") {
+        showStatus("Connect your wallet before sending imported balances.", true);
+        return;
+    }
+
+    const balance = findImportedBalance(balanceAddress, chainId);
+    if (!balance) {
+        showStatus("Imported balance not found. Re-import the wallet payload and try again.", true);
+        return;
+    }
+
+    const destination = getSettlementDestination();
+    const network = await provider.getNetwork();
+    const validationError = validateImportedBalanceTransfer(balance, destination, network.chainId);
+    if (validationError) {
+        showStatus(validationError, true);
+        return;
+    }
+
+    const request = buildImportedBalanceTransferRequest(balance, destination);
+
+    let tx;
+    try {
+        showStatus(`Sending ${balance.symbol} to Coinbase on ${balance.offRamp.settlement.network}…`);
+        if (request.kind === "native") {
+            tx = await signer.sendTransaction(request.transaction);
+        } else {
+            const token = new ethers.Contract(request.tokenAddress, ERC20_ABI, signer);
+            tx = await token.transfer(request.destination, request.amount);
+        }
+        upsertLocalTransferHistory(buildLocalTransferHistoryEntry({
+            chain: balance.chain || balance.offRamp.settlement.network || network.name || "unknown",
+            chainId: Number(balance.chainId || network.chainId),
+            hash: tx.hash,
+            transactionType: "Settlement transfer",
+            from: signerAddress || "",
+            to: request.destination,
+            amountLabel: `${balance.displayAmount} ${balance.symbol}`,
+            assetLabel: balance.symbol,
+            status: "pending"
+        }));
+        showStatus("Transfer sent – hash: " + tx.hash);
+        await tx.wait();
+        upsertLocalTransferHistory(buildLocalTransferHistoryEntry({
+            chain: balance.chain || balance.offRamp.settlement.network || network.name || "unknown",
+            chainId: Number(balance.chainId || network.chainId),
+            hash: tx.hash,
+            transactionType: "Settlement transfer",
+            from: signerAddress || "",
+            to: request.destination,
+            amountLabel: `${balance.displayAmount} ${balance.symbol}`,
+            assetLabel: balance.symbol,
+            status: "confirmed",
+            success: true
+        }));
+        showStatus(`✅ ${balance.symbol} sent to ${shortAddr(destination)}`);
+        await refreshAll();
+    } catch (err) {
+        if (tx && tx.hash) {
+            upsertLocalTransferHistory(buildLocalTransferHistoryEntry({
+                hash: tx.hash,
+                status: "failed",
+                success: false
+            }));
+        }
+        showStatus("Token transfer failed: " + (err.reason || err.message), true);
+    }
+}
+
 function saveSettlementDestinationFromInput() {
     const input = document.getElementById("settlement-destination");
     if (!input) return;
@@ -836,6 +1267,15 @@ function saveSettlementDestinationFromInput() {
     saveSettlementDestination(address);
     renderImportedData();
     showStatus(`✓ Settlement destination saved: ${shortAddr(address)}`);
+}
+
+function handleImportedBalanceActions(event) {
+    const button = event.target.closest("[data-action='send-imported-balance']");
+    if (!button) return;
+    sendImportedBalanceToSettlement(
+        button.dataset.balanceAddress || "",
+        button.dataset.balanceChainId || ""
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -868,6 +1308,9 @@ function initWithdrawDashboard() {
     const destinationBtn = document.getElementById("save-settlement-destination");
     if (destinationBtn) destinationBtn.addEventListener("click", saveSettlementDestinationFromInput);
 
+    const importedBalanceTable = document.getElementById("import-balance-table");
+    if (importedBalanceTable) importedBalanceTable.addEventListener("click", handleImportedBalanceActions);
+
     // Single delegation listener for all contract card buttons
     const contractList = document.getElementById("contract-list");
     if (contractList) contractList.addEventListener("click", _handleContainerClick);
@@ -887,6 +1330,11 @@ if (typeof window !== "undefined") {
         parseImportedPayload,
         renderImportedData,
         clearJsonImportView,
+        normalizeImportedCollectible,
+        canSendImportedBalance,
+        validateImportedBalanceTransfer,
+        buildImportedBalanceTransferRequest,
+        sendImportedBalanceToSettlement,
     };
 
     if (typeof document !== "undefined") {
@@ -906,6 +1354,10 @@ if (typeof module !== "undefined" && module.exports) {
         parseImportedPayload,
         isNativeTransfer,
         normalizeImportedBalance,
+        normalizeImportedCollectible,
         normalizeImportedTransaction,
+        canSendImportedBalance,
+        validateImportedBalanceTransfer,
+        buildImportedBalanceTransferRequest,
     };
 }
