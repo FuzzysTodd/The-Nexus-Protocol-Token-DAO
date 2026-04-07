@@ -105,6 +105,13 @@ Current status: ✅ **193 tests passing**
 
 See [GOVERNANCE.md](GOVERNANCE.md) for complete authority structure.
 
+## Public Addresses
+
+- **Owner wallet:** `0x33ffc308e693a5b49e0ee0241f41f03ccef495f2` ([Etherscan](https://etherscan.io/address/0x33ffc308e693a5b49e0ee0241f41f03ccef495f2))
+- **GitHub owner:** [@FuzzysTodd](https://github.com/FuzzysTodd)
+- **Canonical repository:** [FuzzysTodd/The-Nexus-Protocol-Token-DOA](https://github.com/FuzzysTodd/The-Nexus-Protocol-Token-DOA)
+- **Official deployed contract addresses:** No additional official deployed contract addresses are published in this repository at this time.
+
 ## Contributing
 
 Contributions are welcome! 
