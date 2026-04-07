@@ -46,6 +46,8 @@ DAO Governance: The contract incorporates a decentralized autonomous organizatio
 
 Core Functions: Logic for initiating transactions, managing the "bridge" state, interacting with other DeFi protocols, and distributing profits.
 
+Repository-authored web interfaces also include a withdrawal dashboard that lets you connect your wallet, add any contracts you own, and withdraw ETH proceeds through the transparent proxy flow.
+
 2. NexusGreenToken.sol
 This is an ERC-20 utility token designed to incentivize positive real-world impact.
 

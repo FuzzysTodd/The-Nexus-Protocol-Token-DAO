@@ -14,7 +14,7 @@ The User Guide is your friendly, no-jargon walkthrough of everything Nexus Proto
 - **[User Guide](user-guide.html)** - Start here! Beginner-friendly walkthrough
 - **[Games Arcade](games.html)** - Play Nexus browser games and browse the age-group catalog
 - **[Web3 Directory](chimera.html)** - Dashboard for Web3 ecosystems and governance
-- **[Withdrawal Manager](withdraw.html)** - Manage smart contract withdrawals
+- **[Withdrawal Manager](withdraw.html)** - Connect your wallet, add any contracts you own, and withdraw ETH proceeds
 
 ### For Developers
 - **[Technical Documentation](README.xml)** - Architecture and smart contract details
