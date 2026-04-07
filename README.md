@@ -14,7 +14,7 @@ The User Guide is your friendly, no-jargon walkthrough of everything Nexus Proto
 - **[User Guide](user-guide.html)** - Start here! Beginner-friendly walkthrough
 - **[Games Arcade](games.html)** - Play Nexus browser games and browse the age-group catalog
 - **[Web3 Directory](chimera.html)** - Dashboard for Web3 ecosystems and governance
-- **[Withdrawal Manager](withdraw.html)** - Manage smart contract withdrawals
+- **[Withdrawal Manager](withdraw.html)** - Connect your wallet, add any contracts you own, and withdraw ETH proceeds
 
 ### For Developers
 - **[Technical Documentation](README.xml)** - Architecture and smart contract details
@@ -23,7 +23,7 @@ The User Guide is your friendly, no-jargon walkthrough of everything Nexus Proto
 
 ## What is Nexus Protocol?
 
-Nexus Protocol is a conceptual framework combining:
+Nexus Protocol is a real project combining:
 - **Decentralized Finance (DeFi)** tools and protocols
 - **Smart Contract** management interfaces
 - **DAO Governance** structures
@@ -56,7 +56,7 @@ Structured authority with Owner (FuzzysTodd), Master Project Controller (MPC), a
 
 ## Important Notes
 
-⚠️ **Educational Project** - This is a conceptual/educational framework. It has NOT been audited for production use.
+⚠️ **Audit Status** - This is a real project, but repository components and on-chain flows may not all be audited for production use.
 
 - Always do your own research (DYOR)
 - Start with testnets for learning
@@ -104,6 +104,13 @@ Current status: ✅ **193 tests passing**
 **GitHub:** [@FuzzysTodd](https://github.com/FuzzysTodd)
 
 See [GOVERNANCE.md](GOVERNANCE.md) for complete authority structure.
+
+## Public Addresses
+
+- **Owner wallet:** `0x33ffc308e693a5b49e0ee0241f41f03ccef495f2` ([Etherscan](https://etherscan.io/address/0x33ffc308e693a5b49e0ee0241f41f03ccef495f2))
+- **GitHub owner:** [@FuzzysTodd](https://github.com/FuzzysTodd)
+- **Canonical repository:** [FuzzysTodd/The-Nexus-Protocol-Token-DOA](https://github.com/FuzzysTodd/The-Nexus-Protocol-Token-DOA)
+- **Official deployed contract addresses:** No additional official deployed contract addresses are published in this repository at this time.
 
 ## Contributing
 
