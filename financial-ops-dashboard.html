@@ -456,12 +456,16 @@ async function loadReport() {
       `${formatCheckedAt(checkedAt)} • Auto-refresh every ${REFRESH_INTERVAL_MS / 1000}s`
     );
   } catch (error) {
-    if (!latestRenderedTimestamp) {
+    const showingFallbackData = !latestRenderedTimestamp;
+
+    if (showingFallbackData) {
       render(fallbackReport);
     }
 
     setLiveStatus(
-      'Live monitoring degraded — showing latest available snapshot',
+      showingFallbackData
+        ? 'Live monitoring degraded — showing fallback data'
+        : 'Live monitoring degraded — showing latest available snapshot',
       `${formatCheckedAt(checkedAt)} • Refresh failed`
     );
   }
