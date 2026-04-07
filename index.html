@@ -3,77 +3,792 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>The Nexus Protocol — Token DAO</title>
+    <title>Nexus – Contract Withdrawal Manager</title>
     <style>
         :root {
             color-scheme: dark;
-            --bg: #0f172a;
+            --bg: #0a0e1a;
             --panel: #111827;
             --panel-alt: #1f2937;
             --text: #e5e7eb;
             --muted: #94a3b8;
             --accent: #38bdf8;
-            --accent2: #818cf8;
-            --accent3: #34d399;
+            --accent-glow: rgba(56, 189, 248, 0.3);
+            --danger: #f87171;
+            --success: #4ade80;
+            --success-glow: rgba(74, 222, 128, 0.3);
+            --warning: #fbbf24;
             --border: rgba(148, 163, 184, 0.2);
+            --shadow: 0 20px 60px rgba(2, 6, 23, 0.5);
         }
 
         * { box-sizing: border-box; }
 
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(160deg, #020617 0%, #0f172a 60%, #1e1b4b 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background: linear-gradient(180deg, #020617 0%, var(--bg) 50%, #0f172a 100%);
+            background-attachment: fixed;
             color: var(--text);
             min-height: 100vh;
         }
 
-        /* ---- nav ---- */
-        nav {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(2, 6, 23, 0.92);
-            border-bottom: 1px solid var(--border);
-            backdrop-filter: blur(8px);
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 20px 80px;
         }
 
-        nav .nav-inner {
-            max-width: 1120px;
-            margin: 0 auto;
-            padding: 0 20px;
+        /* Progress bar at top */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--panel);
+            z-index: 10000;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        /* ---- Hero ---- */
+        .hero {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.08) 0%, rgba(74, 222, 128, 0.08) 100%);
+            border: 2px solid var(--accent);
+            border-radius: 20px;
+            box-shadow: var(--shadow), 0 0 40px var(--accent-glow);
+            padding: 40px;
+            margin-bottom: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            opacity: 0.3;
+            animation: pulse-glow 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.5; }
+        }
+
+        .hero-content { position: relative; z-index: 1; }
+
+        .hero h1 { 
+            margin-top: 0; 
+            font-size: 2rem; 
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+
+        .hero p { 
+            color: var(--text); 
+            line-height: 1.7; 
+            margin: 0 0 20px;
+            font-size: 1.05rem;
+        }
+
+        .hero .badge-row {
+            display: flex; gap: 12px; flex-wrap: wrap;
+            margin: 20px 0 0; padding: 0; list-style: none;
+        }
+
+        .hero .badge-row li {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 16px; border-radius: 999px;
+            background: rgba(56, 189, 248, 0.15);
+            color: var(--accent);
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .hero .badge-row li:hover {
+            background: rgba(56, 189, 248, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        /* ---- Panel ---- */
+        .panel {
+            background: rgba(17, 24, 39, 0.95);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            padding: 32px;
+            margin-bottom: 28px;
+            transition: all 0.3s ease;
+        }
+
+        .panel:hover {
+            border-color: rgba(56, 189, 248, 0.3);
+            box-shadow: var(--shadow), 0 0 30px rgba(56, 189, 248, 0.1);
+        }
+
+        .panel h2 { 
+            margin-top: 0; 
+            font-size: 1.4rem;
+            font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 8px;
-            height: 56px;
+            gap: 12px;
+            color: var(--accent);
+        }
+
+        .panel h2::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: linear-gradient(180deg, var(--accent), var(--success));
+            border-radius: 2px;
+        }
+
+        /* Step indicators */
+        .step-indicator {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            color: var(--bg);
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-right: 8px;
+        }
+
+        /* ---- Wallet section ---- */
+        #wallet-section .wallet-row {
+            display: flex; 
+            align-items: center; 
+            gap: 16px; 
             flex-wrap: wrap;
         }
 
-        nav .brand {
-            font-weight: bold;
-            font-size: 1.05rem;
+        #wallet-address {
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 0.95rem;
             color: var(--accent);
-            text-decoration: none;
-            margin-right: auto;
-            white-space: nowrap;
+            word-break: break-all;
+            padding: 12px 16px;
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 10px;
+            flex: 1;
+            min-width: 200px;
         }
 
-        nav a.nav-link {
+        .connection-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .connection-status.connected {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+        }
+
+        .connection-status.connected::before {
+            content: '●';
+            font-size: 1.2rem;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .connection-status.disconnected {
+            background: rgba(148, 163, 184, 0.15);
             color: var(--muted);
-            text-decoration: none;
-            font-size: 0.92rem;
-            padding: 6px 10px;
-            border-radius: 8px;
-            transition: color 0.15s, background 0.15s;
-            white-space: nowrap;
+            border: 1px solid rgba(148, 163, 184, 0.3);
         }
 
-        nav a.nav-link:hover {
+        /* ---- Form ---- */
+        #add-contract-form { 
+            display: none; 
+            margin-top: 24px;
+            background: rgba(31, 41, 55, 0.5);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        #add-contract-form.visible { display: block; }
+
+        #add-contract-form h3 { 
+            margin: 0 0 20px; 
+            font-size: 1.1rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 8px; 
+        }
+
+        .form-group.full { grid-column: 1 / -1; }
+
+        label {
+            font-size: 0.85rem;
             color: var(--text);
-            background: rgba(148, 163, 184, 0.1);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        /* ---- skip link ---- */
+        label::before {
+            content: '▸';
+            color: var(--accent);
+            font-size: 0.9rem;
+        }
+
+        input[type="text"],
+        select,
+        textarea {
+            background: var(--panel);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            width: 100%;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        input[type="text"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--accent);
+            background: rgba(56, 189, 248, 0.05);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+        }
+
+        textarea { 
+            resize: vertical; 
+            min-height: 100px; 
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace; 
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        #custom-selector-row { display: none; }
+        #custom-selector-row.visible { display: flex; }
+
+        /* ---- Buttons ---- */
+        .btn {
+            display: inline-flex; 
+            align-items: center; 
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 24px; 
+            border-radius: 12px; 
+            border: none;
+            font-size: 1rem; 
+            font-weight: 600; 
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn > * { position: relative; z-index: 1; }
+
+        .btn:hover:not(:disabled) { 
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active:not(:disabled) { 
+            transform: translateY(0); 
+        }
+
+        .btn:disabled { 
+            opacity: 0.5; 
+            cursor: not-allowed; 
+        }
+
+        .btn-accent { 
+            background: linear-gradient(135deg, var(--accent), #0ea5e9); 
+            color: var(--bg);
+            box-shadow: 0 4px 14px rgba(56, 189, 248, 0.4);
+        }
+
+        .btn-accent:hover:not(:disabled) {
+            box-shadow: 0 6px 20px rgba(56, 189, 248, 0.6);
+        }
+
+        .btn-danger { 
+            background: rgba(248, 113, 113, 0.2); 
+            color: var(--danger); 
+            border: 2px solid rgba(248, 113, 113, 0.4);
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: rgba(248, 113, 113, 0.3);
+            border-color: var(--danger);
+        }
+
+        .btn-primary { 
+            background: rgba(56, 189, 248, 0.2); 
+            color: var(--accent); 
+            border: 2px solid rgba(56, 189, 248, 0.4);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: rgba(56, 189, 248, 0.3);
+            border-color: var(--accent);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #22c55e);
+            color: var(--bg);
+            box-shadow: 0 4px 14px rgba(74, 222, 128, 0.4);
+        }
+
+        .btn-success:hover:not(:disabled) {
+            box-shadow: 0 6px 20px rgba(74, 222, 128, 0.6);
+        }
+
+        .btn-sm { 
+            padding: 8px 16px; 
+            font-size: 0.875rem; 
+            border-radius: 8px; 
+        }
+
+        .btn-icon {
+            width: 36px;
+            height: 36px;
+            padding: 0;
+            border-radius: 50%;
+        }
+
+        /* ---- Status bar ---- */
+        .status-bar {
+            display: none;
+            position: fixed; 
+            bottom: 30px; 
+            left: 50%; 
+            transform: translateX(-50%);
+            padding: 16px 28px; 
+            border-radius: 16px;
+            font-size: 0.95rem; 
+            font-weight: 600;
+            z-index: 9999; 
+            max-width: 90vw; 
+            text-align: center;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { bottom: 0; opacity: 0; }
+            to { bottom: 30px; opacity: 1; }
+        }
+
+        .status-ok { 
+            background: rgba(74, 222, 128, 0.2); 
+            color: var(--success); 
+            border: 2px solid rgba(74, 222, 128, 0.5);
+        }
+
+        .status-error { 
+            background: rgba(248, 113, 113, 0.2); 
+            color: var(--danger); 
+            border: 2px solid rgba(248, 113, 113, 0.5);
+        }
+
+        /* ---- Contract cards ---- */
+        .contract-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .contract-card {
+            background: linear-gradient(135deg, rgba(31, 41, 55, 0.8), rgba(17, 24, 39, 0.9));
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex; 
+            flex-direction: column; 
+            gap: 16px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contract-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .contract-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(56, 189, 248, 0.2);
+        }
+
+        .contract-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .card-header {
+            display: flex; 
+            justify-content: space-between; 
+            align-items: flex-start; 
+            gap: 12px;
+        }
+
+        .card-header h3 { 
+            margin: 0 0 6px; 
+            font-size: 1.1rem;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        code.addr {
+            font-size: 0.8rem;
+            color: var(--muted);
+            word-break: break-all;
+            background: rgba(148, 163, 184, 0.1);
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .card-body { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 12px; 
+        }
+
+        .balance-row {
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            padding: 12px;
+            background: rgba(74, 222, 128, 0.08);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+            border-radius: 10px;
+            font-size: 0.95rem;
+        }
+
+        .balance-row .label {
+            color: var(--muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+
+        .balance { 
+            color: var(--success); 
+            font-weight: 700; 
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-size: 1.1rem;
+        }
+
+        .method-row { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+        }
+
+        .pill {
+            display: inline-flex; 
+            align-items: center;
+            padding: 6px 12px; 
+            border-radius: 999px;
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--accent);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            font-size: 0.82rem; 
+            font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+            font-weight: 600;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .card-actions .btn {
+            flex: 1;
+        }
+
+        .muted { color: var(--muted); }
+        
+        .empty-state { 
+            color: var(--muted); 
+            font-style: italic;
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(31, 41, 55, 0.3);
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .empty-state-hint {
+            font-size: 0.9rem;
+            color: var(--muted);
+        }
+
+        .empty-state.compact {
+            padding: 24px 20px;
+        }
+
+        .import-layout {
+            display: grid;
+            grid-template-columns: minmax(280px, 1fr) minmax(280px, 1.3fr);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .import-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 14px;
+        }
+
+        .summary-card {
+            background: rgba(31, 41, 55, 0.6);
+            border: 1px solid rgba(56, 189, 248, 0.18);
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        .summary-label {
+            color: var(--muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 10px;
+        }
+
+        .summary-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .summary-note,
+        .table-subtext {
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .import-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: rgba(56, 189, 248, 0.08);
+            border: 1px solid rgba(56, 189, 248, 0.18);
+        }
+
+        .import-alerts {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .import-alert {
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(251, 191, 36, 0.12);
+            border: 1px solid rgba(251, 191, 36, 0.28);
+            color: #fde68a;
+            font-size: 0.92rem;
+        }
+
+        .table-card {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            background: rgba(2, 6, 23, 0.25);
+        }
+
+        .table-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-card-header h3 {
+            margin: 0;
+            font-size: 1rem;
+            color: var(--text);
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table.import-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table.import-table th,
+        table.import-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        table.import-table th {
+            color: var(--muted);
+            font-size: 0.78rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            background: rgba(148, 163, 184, 0.04);
+        }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .status-ready {
+            background: rgba(74, 222, 128, 0.14);
+            color: var(--success);
+            border: 1px solid rgba(74, 222, 128, 0.25);
+        }
+
+        .status-pending {
+            background: rgba(250, 204, 21, 0.16);
+            color: #fde68a;
+            border: 1px solid rgba(250, 204, 21, 0.28);
+        }
+
+        .status-swap {
+            background: rgba(56, 189, 248, 0.14);
+            color: var(--accent);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+        }
+
+        .status-review,
+        .status-blocked {
+            background: rgba(248, 113, 113, 0.14);
+            color: #fca5a5;
+            border: 1px solid rgba(248, 113, 113, 0.25);
+        }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 900px) {
+            .import-layout { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 540px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full { grid-column: 1; }
+            .summary-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Skip navigation link */
         .skip-link {
             position: absolute;
             top: -40px;
@@ -87,636 +802,304 @@
             text-decoration: none;
             transition: top 0.2s ease;
         }
-        .skip-link:focus { top: 0; }
 
-        /* ---- main ---- */
-        main {
-            max-width: 1120px;
-            margin: 0 auto;
-            padding: 40px 20px 72px;
+        .skip-link:focus {
+            top: 0;
         }
 
-        /* ---- hero ---- */
-        .hero {
-            text-align: center;
-            padding: 64px 24px 48px;
-        }
-
-        .hero .eyebrow {
-            display: inline-block;
-            padding: 4px 14px;
-            border-radius: 999px;
-            background: rgba(56, 189, 248, 0.14);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            color: var(--accent);
-            font-size: 0.85rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            margin-bottom: 20px;
-        }
-
-        .hero h1 {
-            margin: 0 0 20px;
-            font-size: clamp(2rem, 5vw, 3.2rem);
-            line-height: 1.15;
-            background: linear-gradient(135deg, #e2e8f0 20%, var(--accent) 80%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero p {
-            max-width: 640px;
-            margin: 0 auto 32px;
-            color: var(--muted);
-            line-height: 1.7;
-            font-size: 1.05rem;
-        }
-
-        .hero-actions {
-            display: flex;
-            gap: 14px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 12px 24px;
-            border-radius: 12px;
-            font-size: 0.97rem;
-            font-weight: bold;
-            text-decoration: none;
-            transition: transform 0.15s, box-shadow 0.15s;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent), var(--accent2));
-            color: #0f172a;
-        }
-
-        .btn-secondary {
-            background: rgba(56, 189, 248, 0.1);
-            border: 1px solid rgba(56, 189, 248, 0.35);
-            color: var(--accent);
-        }
-
-        /* ---- stats bar ---- */
-        .stats-bar {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 40px 0 56px;
-        }
-
-        .stat-pill {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 16px 28px;
-            border-radius: 16px;
-            background: rgba(17, 24, 39, 0.8);
-            border: 1px solid var(--border);
-            min-width: 120px;
-        }
-
-        .stat-pill .stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--accent);
-        }
-
-        .stat-pill .stat-label {
-            font-size: 0.8rem;
-            color: var(--muted);
-            margin-top: 4px;
-            text-align: center;
-        }
-
-        /* ---- section headings ---- */
-        .section-heading {
-            text-align: center;
-            margin-bottom: 32px;
-        }
-
-        .section-heading h2 {
-            margin: 0 0 8px;
-            font-size: 1.7rem;
-        }
-
-        .section-heading p {
-            color: var(--muted);
-            margin: 0;
-        }
-
-        /* ---- cards grid ---- */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 56px;
-        }
-
-        .card {
-            background: rgba(17, 24, 39, 0.9);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 28px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-        }
-
-        .card:hover {
-            border-color: rgba(56, 189, 248, 0.4);
-            transform: translateY(-3px);
-            box-shadow: 0 12px 32px rgba(2, 6, 23, 0.5);
-        }
-
-        .card-icon {
-            font-size: 2rem;
-            line-height: 1;
-        }
-
-        .card h3 {
-            margin: 0;
-            font-size: 1.1rem;
-            color: var(--text);
-        }
-
-        .card p {
-            margin: 0;
-            color: var(--muted);
-            font-size: 0.92rem;
-            line-height: 1.6;
-            flex: 1;
-        }
-
-        .card a.card-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--accent);
-            text-decoration: none;
-            font-size: 0.92rem;
-            font-weight: bold;
-            padding: 8px 16px;
-            border-radius: 8px;
-            background: rgba(56, 189, 248, 0.08);
-            border: 1px solid rgba(56, 189, 248, 0.2);
-            align-self: flex-start;
-            transition: background 0.15s, border-color 0.15s;
-        }
-
-        .card a.card-link:hover {
-            background: rgba(56, 189, 248, 0.18);
-            border-color: rgba(56, 189, 248, 0.5);
-        }
-
-        .card-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 3px 10px;
-            border-radius: 999px;
-            font-size: 0.78rem;
-            font-weight: bold;
-        }
-
-        .badge-user    { background: rgba(52, 211, 153, 0.14); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.3); }
-        .badge-dev     { background: rgba(129, 140, 248, 0.14); color: #818cf8; border: 1px solid rgba(129, 140, 248, 0.3); }
-        .badge-gov     { background: rgba(251, 191, 36, 0.14); color: #fbbf24; border: 1px solid rgba(251, 191, 36, 0.3); }
-        .badge-system  { background: rgba(56, 189, 248, 0.14); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
-
-        /* ---- protocol features ---- */
-        .features-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 16px;
-            margin-bottom: 56px;
-        }
-
-        .feature-item {
-            display: flex;
-            gap: 14px;
-            align-items: flex-start;
-            padding: 20px;
-            background: rgba(17, 24, 39, 0.7);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-        }
-
-        .feature-item .feat-icon {
-            font-size: 1.4rem;
-            line-height: 1;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .feature-item h4 {
-            margin: 0 0 4px;
-            font-size: 0.97rem;
-            color: var(--text);
-        }
-
-        .feature-item p {
-            margin: 0;
-            font-size: 0.88rem;
-            color: var(--muted);
-            line-height: 1.55;
-        }
-
-        /* ---- status panel ---- */
-        .status-panel {
-            background: rgba(17, 24, 39, 0.9);
-            border: 1px solid var(--border);
-            border-radius: 18px;
-            padding: 28px;
-            margin-bottom: 56px;
-            display: flex;
-            gap: 24px;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .status-panel h3 {
-            margin: 0 0 12px;
-            font-size: 1.05rem;
-            color: var(--text);
-        }
-
-        .status-checks {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .status-checks li {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.92rem;
-            color: var(--muted);
-        }
-
-        .status-checks li .check {
-            color: #34d399;
-            font-size: 1rem;
-        }
-
-        /* ---- owner panel ---- */
-        .owner-panel {
-            background: rgba(17, 24, 39, 0.9);
-            border: 1px solid rgba(56, 189, 248, 0.25);
-            border-radius: 18px;
-            padding: 28px;
-            margin-bottom: 56px;
-            display: flex;
-            gap: 20px;
-            align-items: flex-start;
-            flex-wrap: wrap;
-        }
-
-        .owner-panel .owner-avatar {
-            font-size: 3rem;
-            line-height: 1;
-            flex-shrink: 0;
-        }
-
-        .owner-panel h3 {
-            margin: 0 0 6px;
-            font-size: 1.1rem;
-        }
-
-        .owner-panel p {
-            margin: 0 0 12px;
-            color: var(--muted);
-            font-size: 0.92rem;
-            line-height: 1.6;
-        }
-
-        .owner-panel .wallet-addr {
-            font-family: monospace;
-            font-size: 0.82rem;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 4px 10px;
-            border-radius: 6px;
-            color: var(--accent);
-            word-break: break-all;
-        }
-
-        /* ---- footer ---- */
-        footer {
-            border-top: 1px solid var(--border);
-            text-align: center;
-            padding: 28px 20px;
-            color: var(--muted);
-            font-size: 0.88rem;
-        }
-
-        footer a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
+        /* Focus-visible for buttons */
+        .btn:focus-visible {
+            outline: 3px solid var(--accent);
+            outline-offset: 3px;
         }
     </style>
 </head>
 <body>
 <a class="skip-link" href="#main-content">Skip to main content</a>
+<main id="main-content">
 
-<nav>
-    <div class="nav-inner">
-        <a class="brand" href="./index.html">⬡ Nexus Protocol</a>
-        <a class="nav-link" href="./user-guide.html">User Guide</a>
-        <a class="nav-link" href="./games.html">Play Games</a>
-        <a class="nav-link" href="./chimera.html">Web3 Directory</a>
-        <a class="nav-link" href="./withdraw.html">Withdraw</a>
-        <a class="nav-link" href="./crypto-expert-guide.html">Crypto Expert</a>
-        <a class="nav-link" href="./GOVERNANCE.md">Governance</a>
+    <!-- Progress bar -->
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
     </div>
-</nav>
 
-<main id="main-content" role="main">
+    <!-- Status bar (fixed, floating) -->
+    <div id="status-bar" class="status-bar" role="status" aria-live="polite"></div>
 
     <!-- Hero -->
     <section class="hero">
-        <span class="eyebrow">The Nexus Protocol Token DAO</span>
-        <h1>Your Gateway to<br>Web3 &amp; DeFi</h1>
-        <p>
-            A unified dashboard for smart-contract withdrawals, DAO governance, NGTT tokenomics,
-            DeFi protocol exploration, and the full MCP/MPC orchestration system — all operating together.
-        </p>
-        <div class="hero-actions">
-            <a class="btn btn-primary" href="./games.html">🎮 Play Games</a>
-            <a class="btn btn-secondary" href="./user-guide.html">📖 Start with the User Guide</a>
-            <a class="btn btn-secondary" href="./chimera.html">🌐 Open Web3 Directory</a>
-            <a class="btn btn-secondary" href="./financial-ops-dashboard.html">📈 Open Financial Ops</a>
+        <div class="hero-content">
+            <h1>⚡ Nexus Contract Withdrawal Manager</h1>
+            <p>
+                Connect your wallet, add any contracts you own, and withdraw ETH proceeds
+                directly through the transparent proxy interface.  All contract data is
+                stored locally in your browser – nothing is sent to any server.
+            </p>
+            <ul class="badge-row">
+                <li>🔒 Local-only storage</li>
+                <li>🔑 MetaMask / EIP-1193 wallets</li>
+                <li>🔄 Transparent proxy (EIP-1967)</li>
+                <li>⚙ Custom ABI &amp; selectors</li>
+            </ul>
         </div>
     </section>
 
-    <!-- Stats bar -->
-    <div class="stats-bar" aria-label="Repository statistics">
-        <div class="stat-pill">
-            <span class="stat-value">201+</span>
-            <span class="stat-label">Tests passing</span>
-        </div>
-        <div class="stat-pill">
-            <span class="stat-value">10</span>
-            <span class="stat-label">MCP agents</span>
-        </div>
-        <div class="stat-pill">
-            <span class="stat-value">NGTT</span>
-            <span class="stat-label">Token ecosystem</span>
-        </div>
-        <div class="stat-pill">
-            <span class="stat-value">500%</span>
-            <span class="stat-label">Max APY (flash loan)</span>
-        </div>
-        <div class="stat-pill">
-            <span class="stat-value">✅</span>
-            <span class="stat-label">lint + tests green</span>
-        </div>
-    </div>
-
-    <!-- Main navigation cards -->
-    <div class="section-heading">
-        <h2>All Surfaces — Operating Now</h2>
-        <p>Every page in the Nexus Protocol web presentation, ready to open.</p>
-    </div>
-
-    <div class="cards-grid">
-
-        <div class="card">
-            <div class="card-icon">📖</div>
-            <span class="card-badge badge-user">For Everyone</span>
-            <h3>User Guide</h3>
-            <p>
-                Beginner-friendly, no-jargon walkthrough of Nexus Protocol —
-                from installing MetaMask through advanced DeFi strategies.
-                Step-by-step instructions, FAQ, and safety warnings included.
-            </p>
-            <a class="card-link" href="./user-guide.html">Open User Guide →</a>
+    <!-- Wallet -->
+    <section class="panel" id="wallet-section">
+        <h2><span class="step-indicator">1</span> Connect Wallet</h2>
+        <div class="wallet-row">
+            <button class="btn btn-accent" id="connect-btn">
+                <span>🔌</span>
+                <span>Connect Wallet</span>
+            </button>
+            <div class="connection-status disconnected" id="connection-status">
+                <span>Disconnected</span>
+            </div>
+            <span id="wallet-address" class="muted" style="display: none;">not connected</span>
         </div>
 
-        <div class="card">
-            <div class="card-icon">🎮</div>
-            <span class="card-badge badge-user">Play Now</span>
-            <h3>Games Arcade</h3>
-            <p>
-                A polished browser arcade with live playable Nexus mini-games —
-                Memory Match MCP, Token Trading Academy, and DAO Governance Sprint —
-                plus the full 70-game age-group catalog.
-            </p>
-            <a class="card-link" href="./games.html">Open Games Arcade →</a>
-        </div>
+        <!-- Add-contract form (shown after connection) -->
+        <form id="add-contract-form" autocomplete="off">
+            <h3>➕ Add a contract</h3>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label for="input-address">Contract address *</label>
+                    <input type="text" id="input-address" placeholder="0x…" required>
+                </div>
 
-        <div class="card">
-            <div class="card-icon">🌐</div>
-            <span class="card-badge badge-dev">Web3 Directory</span>
-            <h3>Chimera Web3 Directory</h3>
-            <p>
-                The full repository browser index — verified external DeFi links,
-                governance surfaces, MCP/MPC servers, NGTT supremacy scores,
-                MonsterBall predictor, 3-Algebra transformer, and more.
-            </p>
-            <a class="card-link" href="./chimera.html">Open Directory →</a>
-        </div>
+                <div class="form-group">
+                    <label for="input-label">Label (optional)</label>
+                    <input type="text" id="input-label" placeholder="My staking contract">
+                </div>
 
-        <div class="card">
-            <div class="card-icon">💸</div>
-            <span class="card-badge badge-user">Withdraw</span>
-            <h3>Contract Withdrawal Manager</h3>
-            <p>
-                Connect MetaMask and withdraw funds from any EIP-1967 transparent-proxy
-                smart contract. Live status badges, step indicators, and progress bar.
-            </p>
-            <a class="card-link" href="./withdraw.html">Open Withdraw →</a>
-        </div>
+                <div class="form-group">
+                    <label for="input-method">Withdraw method</label>
+                    <select id="input-method">
+                        <option value="withdraw()">withdraw()</option>
+                        <option value="withdrawAll()">withdrawAll()</option>
+                        <option value="withdrawEth()">withdrawEth()</option>
+                        <option value="release(address)">release(address payee)</option>
+                        <option value="claimRewards()">claimRewards()</option>
+                        <option value="collectProceeds()">collectProceeds()</option>
+                        <option value="custom">Custom selector / call-data</option>
+                    </select>
+                </div>
 
-        <div class="card">
-            <div class="card-icon">📈</div>
-            <span class="card-badge badge-dev">Ops</span>
-            <h3>Financial Ops Dashboard</h3>
-            <p>
-                A browser surface for pre-error monitoring, withdrawal and placement scan results,
-                automation success logs, and approval-gated operator actions generated by the new bots.
-            </p>
-            <a class="card-link" href="./financial-ops-dashboard.html">Open Financial Ops →</a>
-        </div>
+                <div class="form-group full" id="custom-selector-row">
+                    <label for="input-custom-selector">Custom selector or call-data (hex)</label>
+                    <input type="text" id="input-custom-selector" placeholder="0x3ccfd60b  or full call-data">
+                </div>
 
-        <div class="card">
-            <div class="card-icon">📊</div>
-            <span class="card-badge badge-dev">Expert</span>
-            <h3>Crypto Expert Revenue Guide</h3>
-            <p>
-                Comprehensive revenue analysis dashboard covering 10+ NGTT revenue streams —
-                dividends (5–20% APY), game-to-earn, NFT staking, liquidity provision,
-                flash loan arbitrage (up to 500% APY), and more with real-time calculations.
-            </p>
-            <a class="card-link" href="./crypto-expert-guide.html">Open Expert Guide →</a>
-        </div>
+                <div class="form-group full">
+                    <label for="input-custom-abi">Implementation ABI (optional JSON – overrides selector)</label>
+                    <textarea id="input-custom-abi" placeholder='[{"name":"withdraw","type":"function","inputs":[],"outputs":[],"stateMutability":"nonpayable"}]'></textarea>
+                </div>
+            </div>
 
-        <div class="card">
-            <div class="card-icon">⚖️</div>
-            <span class="card-badge badge-gov">Governance</span>
-            <h3>Governance Charter</h3>
-            <p>
-                The DAO authority structure and operating mandate for the repository —
-                Owner (FuzzysTodd), MPC, and Super Delegates; proposal lifecycle and voting rules.
-            </p>
-            <a class="card-link" href="./GOVERNANCE.md">Read Charter →</a>
-        </div>
+            <div style="margin-top: 18px; display: flex; gap: 12px;">
+                <button type="submit" class="btn btn-success">
+                    <span>✓</span>
+                    <span>Add Contract</span>
+                </button>
+            </div>
+        </form>
+    </section>
 
-        <div class="card">
-            <div class="card-icon">🤖</div>
-            <span class="card-badge badge-system">MCP / MPC</span>
-            <h3>MCP Gateway Orchestration</h3>
-            <p>
-                10 MCP agents (mcp-001 → mcp-010), 2 MPC servers, FPGA GPU Swarm,
-                Hive Mind protocol, and GPU monitoring. Full documentation and quick-reference guide.
-            </p>
-            <a class="card-link" href="./MCP_GATEWAY_DOCUMENTATION.md">MCP Docs →</a>
-        </div>
-
-    </div>
-
-    <!-- Protocol features -->
-    <div class="section-heading">
-        <h2>Protocol Capabilities</h2>
-        <p>What is running inside Nexus Protocol right now.</p>
-    </div>
-
-    <div class="features-list">
-        <div class="feature-item">
-            <span class="feat-icon">🎮</span>
-            <div>
-                <h4>Game Theory Engine</h4>
-                <p>NGTT token backed by game-theory mechanics — skill rewards, group MCP creation, profit distribution.</p>
+    <!-- Contract list -->
+    <section class="panel">
+        <h2><span class="step-indicator">2</span> My Contracts</h2>
+        <p class="muted" style="margin:0 0 16px; font-size:0.95rem;">
+            Click <strong style="color: var(--success);">Withdraw</strong> to send the configured method call through the proxy
+            to the implementation contract.  Balances refresh automatically after each transaction.
+        </p>
+        <div class="contract-grid" id="contract-list">
+            <div class="empty-state">
+                <div class="empty-state-icon">📋</div>
+                <div class="empty-state-text">No contracts added yet</div>
+                <div class="empty-state-hint">Connect your wallet and add a contract above to get started</div>
             </div>
         </div>
-        <div class="feature-item">
-            <span class="feat-icon">🧠</span>
-            <div>
-                <h4>Super Logical @ 64-dim</h4>
-                <p>64-dimension confidence-tiered reasoner — CRITICAL / HIGH / MODERATE / LOW output for any domain.</p>
-            </div>
-        </div>
-        <div class="feature-item">
-            <span class="feat-icon">🔢</span>
-            <div>
-                <h4>3-Algebra Transformer</h4>
-                <p>Linear + Polynomial + Exponential layers fused into one answer. Matches any outcome to the closest behavior profile.</p>
-            </div>
-        </div>
-        <div class="feature-item">
-            <span class="feat-icon">⚽</span>
-            <div>
-                <h4>MonsterBall Universal Predictor</h4>
-                <p>Player stats, match snapshots, and weighted prediction — DOMINANT / SUBDUED verdict for any numeric domain.</p>
-            </div>
-        </div>
-        <div class="feature-item">
-            <span class="feat-icon">📡</span>
-            <div>
-                <h4>1 000-Particle Signal Repair</h4>
-                <p>Deterministic consensus repair for degraded exchange signals — detects NOISY, DRIFTED, SPIKED, CLIPPED, and DROPPED.</p>
-            </div>
-        </div>
-        <div class="feature-item">
-            <span class="feat-icon">🌍</span>
-            <div>
-                <h4>Planetary &amp; Solar Harmony</h4>
-                <p>Every Standard Model particle scored through 3-Algebra + Super Logical to keep Earth and Sol at GREATEST health.</p>
-            </div>
-        </div>
-        <div class="feature-item">
-            <span class="feat-icon">👨‍👩‍👧‍👦</span>
-            <div>
-                <h4>Family Renaissance Engine</h4>
-                <p>Quantitative diagnosis of the American family crisis with a prioritised Gen X &amp; Gen Z repair plan.</p>
-            </div>
-        </div>
-        <div class="feature-item">
-            <span class="feat-icon">🔐</span>
-            <div>
-                <h4>Nexus Encryption Standard (NES)</h4>
-                <p>Project-owned security and signing standard. Server-side actions remain outside browser assets.</p>
-            </div>
-        </div>
-    </div>
+    </section>
 
-    <!-- Status panel -->
-    <div class="status-panel" aria-label="System status">
-        <div>
-            <h3>System Status</h3>
-            <ul class="status-checks">
-                <li><span class="check">✓</span> Lint: <code>flake8 .</code> — 0 errors</li>
-                <li><span class="check">✓</span> Tests: <code>pytest -q</code> — all passing</li>
-                <li><span class="check">✓</span> Governance docs &amp; contracts indexed</li>
-                <li><span class="check">✓</span> MCP/MPC orchestration active (10 agents)</li>
-                <li><span class="check">✓</span> NGTT supremacy: DOMINANT · CRITICAL · GREATEST</li>
-            </ul>
-        </div>
-        <div>
-            <h3>Quick Links</h3>
-            <ul class="status-checks">
-                <li><span class="check">→</span> <a href="./contracts/NexusGameTheoryToken.sol" style="color:var(--accent)">NexusGameTheoryToken.sol</a></li>
-                <li><span class="check">→</span> <a href="./nexus/repo_assessment.py" style="color:var(--accent)">nexus/repo_assessment.py</a></li>
-                <li><span class="check">→</span> <a href="./mcp/agents/mig-network-config.json" style="color:var(--accent)">mcp/agents/mig-network-config.json</a></li>
-                <li><span class="check">→</span> <a href="./README.xml" style="color:var(--accent)">README.xml (technical docs)</a></li>
-                <li><span class="check">→</span> <a href="./playwright-tool/README.md" style="color:var(--accent)">Playwright automation tool</a></li>
-            </ul>
-        </div>
-    </div>
+    <section class="panel">
+        <h2><span class="step-indicator">3</span> Import Wallet JSON</h2>
+        <div class="import-layout">
+            <div class="import-stack">
+                <p class="muted" style="margin:0;">
+                    Paste or upload a wallet <strong>balances</strong> payload, a
+                    <strong>transactions</strong> feed, or a Dune SIM
+                    <strong>collectibles</strong> response. The dashboard keeps the data
+                    local, extracts off-chain settlement fields, and estimates what is
+                    ready for a mainnet off-ramp.
+                </p>
+                <div class="form-group">
+                    <label for="json-import-input">Wallet JSON payload</label>
+                    <textarea id="json-import-input" placeholder='{"wallet_address":"0x...","balances":[...],"transactions":[...]} or {"address":"0x...","entries":[...]}'></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="json-import-file">Upload JSON file</label>
+                    <input type="file" id="json-import-file" accept=".json,application/json">
+                </div>
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-primary" id="import-json-btn">
+                        <span>📥</span>
+                        <span>Import JSON</span>
+                    </button>
+                    <button type="button" class="btn btn-danger" id="clear-json-btn">
+                        <span>🧹</span>
+                        <span>Clear import</span>
+                    </button>
+                </div>
+                <div class="import-meta">
+                    <strong id="import-wallet-address">No wallet loaded</strong>
+                    <span id="import-meta" class="table-subtext">Local-only import storage is empty.</span>
+                </div>
+                <div class="form-group">
+                    <label for="settlement-destination">Coinbase settlement destination</label>
+                    <input type="text" id="settlement-destination" placeholder="Enter your verified Coinbase deposit address">
+                    <span class="table-subtext">Enter your own Coinbase deposit address and verify Coinbase supports the asset and network before saving or sending funds.</span>
+                </div>
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-accent" id="save-settlement-destination">
+                        <span>🏦</span>
+                        <span>Save destination</span>
+                    </button>
+                    <span class="table-subtext" style="align-self:center;">Current target: <strong id="settlement-destination-display">No destination configured</strong></span>
+                </div>
+                <div class="import-alerts" id="import-alerts"></div>
+            </div>
 
-    <!-- Owner panel -->
-    <div class="owner-panel" aria-label="Repository owner">
-        <div class="owner-avatar">👤</div>
-        <div>
-            <h3>Owner &amp; Primary Authority — <a href="https://github.com/FuzzysTodd" target="_blank" rel="noopener noreferrer" aria-label="@FuzzysTodd on GitHub (opens in new tab)" style="color:var(--accent)">@FuzzysTodd</a></h3>
-            <p>
-                FuzzysTodd is the owner and admin anchor for The Nexus Protocol Token DAO.
-                AI and MPC automation can prepare assets, but privileged on-chain actions and
-                credential signing always require explicit owner approval.
-            </p>
-            <p>Wallet address:</p>
-            <span class="wallet-addr">0x33ffc308e693a5b49e0ee0241f41f03ccef495f2</span>
+            <div class="import-stack">
+                <div class="summary-grid" id="import-summary">
+                    <div class="empty-state compact">
+                        <div class="empty-state-text">No wallet JSON imported yet</div>
+                        <div class="empty-state-hint">Import a payload to build a local portfolio and settlement view.</div>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <h3>Portfolio / settlement view</h3>
+                        <span class="table-subtext" id="import-balance-count">0 assets</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="import-table">
+                            <thead>
+                                <tr>
+                                    <th>Chain</th>
+                                    <th>Asset</th>
+                                    <th>Amount</th>
+                                    <th>Value</th>
+                                    <th>Liquidity</th>
+                                    <th>Fiat path</th>
+                                    <th>Transfer</th>
+                                </tr>
+                            </thead>
+                            <tbody id="import-balance-table"></tbody>
+                        </table>
+                    </div>
+                    <div class="empty-state compact" id="import-balance-empty">
+                        <div class="empty-state-text">No balances imported</div>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <h3>Imported collectibles</h3>
+                        <span class="table-subtext" id="import-collectible-count">0 collectibles</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="import-table">
+                            <thead>
+                                <tr>
+                                    <th>Chain</th>
+                                    <th>Collectible</th>
+                                    <th>Balance</th>
+                                    <th>Network</th>
+                                    <th>Destination</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="import-collectible-table"></tbody>
+                        </table>
+                    </div>
+                    <div class="empty-state compact" id="import-collectible-empty">
+                        <div class="empty-state-text">No collectibles imported</div>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <h3>Transaction history</h3>
+                        <span class="table-subtext" id="import-transaction-count">0 transactions</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="import-table">
+                            <thead>
+                                <tr>
+                                    <th>Chain</th>
+                                    <th>Asset</th>
+                                    <th>Amount</th>
+                                    <th>Type</th>
+                                    <th>Time</th>
+                                    <th>Route</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="import-transaction-table"></tbody>
+                        </table>
+                    </div>
+                    <div class="empty-state compact" id="import-transaction-empty">
+                        <div class="empty-state-text">No imported or local transactions yet</div>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="panel">
+        <h2>❓ How it works</h2>
+        <p>
+            Every contract in this dashboard is treated as a
+            <strong style="color: var(--accent);">transparent upgradeable proxy</strong> (EIP-1967).  The proxy itself
+            exposes only a <code style="color: var(--warning); background: rgba(251, 191, 36, 0.1); padding: 2px 6px; border-radius: 4px;">fallback</code> and a <code style="color: var(--warning); background: rgba(251, 191, 36, 0.1); padding: 2px 6px; border-radius: 4px;">receive</code> function; all
+            other calls are forwarded by the proxy to the implementation contract.
+        </p>
+        <p>
+            When you click <em style="color: var(--success); font-weight: 600;">Withdraw</em> this interface encodes the selected function
+            selector and sends it as the <code style="color: var(--warning); background: rgba(251, 191, 36, 0.1); padding: 2px 6px; border-radius: 4px;">data</code> payload of an ETH transaction
+            addressed to the proxy.  The proxy's fallback delegates the call to the
+            implementation, which executes the withdrawal logic and transfers ETH (or
+            tokens) to you.
+        </p>
+        <p style="color:var(--muted); font-size:0.9rem;">
+            The ABI embedded in this dashboard matches exactly the proxy ABI you provided
+            (<code>AdminChanged</code>, <code>BeaconUpgraded</code>, <code>Upgraded</code>
+            events + payable fallback/receive).
+        </p>
+    </section>
+
+    <section class="panel">
+        <h2>📈 Financial Ops Oversight</h2>
+        <p>
+            For repo-wide monitoring, pre-error checks, withdrawal-path inventory, and placement-opportunity reporting,
+            use the dedicated financial operations dashboard.
+        </p>
+        <p style="margin-top: 14px;">
+            <a class="btn btn-accent" href="./financial-ops-dashboard.html">
+                <span>Open Financial Ops Dashboard</span>
+            </a>
+        </p>
+    </section>
 
 </main>
-
-<footer>
-    <p>
-        The Nexus Protocol Token DAO &mdash; maintained by
-        <a href="https://github.com/FuzzysTodd" target="_blank" rel="noopener noreferrer" aria-label="@FuzzysTodd on GitHub (opens in new tab)">@FuzzysTodd</a>.
-        Educational project &mdash; always do your own research.
-        &nbsp;|&nbsp;
-        <a href="./GOVERNANCE.md">Governance</a>
-        &nbsp;|&nbsp;
-        <a href="./README.md">README</a>
-        &nbsp;|&nbsp;
-        <a href="./games.html">Play Games</a>
-        &nbsp;|&nbsp;
-        <a href="./chimera.html">Web3 Directory</a>
-    </p>
-</footer>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"
+        integrity="sha512-FDcVY+g7vc5CXANbrTSg1K5qLyriCsGDYCE02Li1tXEYdNQPvLPHNE+rT2Mjei8N7fZbe0WLhw27j2SrGRpdMg=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+        ></script>
+<script src="./money-flow.js"></script>
+<script src="./withdraw.js"></script>
 </body>
 </html>
