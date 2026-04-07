@@ -99,6 +99,11 @@
             background: rgba(15, 23, 42, 0.62);
         }
 
+        button.chip-link {
+            cursor: pointer;
+            font: inherit;
+        }
+
         .hero-note {
             padding: 18px;
             border-radius: 18px;
@@ -111,6 +116,21 @@
         .hero-note strong {
             color: #86efac;
             font-size: 1.1rem;
+        }
+
+        .hero-note .status {
+            display: grid;
+            gap: 8px;
+            padding-top: 10px;
+            border-top: 1px solid var(--line);
+        }
+
+        .hero-note .status strong {
+            font-size: 0.95rem;
+        }
+
+        .hero-note .status p {
+            margin: 0;
         }
 
         .grid {
@@ -240,12 +260,17 @@
                 <a class="chip-link" href="./docs/FINANCIAL_AUTOMATION_OPERATIONS.md">Open Operations Runbook</a>
                 <a class="chip-link" href="./docs/AUTOMATION_AUTHORITY.md">Open Authority Policy</a>
                 <a class="chip-link" href="./withdraw.html">Open Withdraw Interface</a>
+                <button class="chip-link" id="refresh-report" type="button">Refresh now</button>
             </div>
         </div>
         <aside class="hero-note">
             <strong id="approval-gate">Approval gate active</strong>
             <p id="generated-at">Report timestamp loading…</p>
             <p>Automation can code, scan, document, and prepare repo changes. It does not execute fund movement without review.</p>
+            <div class="status" aria-live="polite">
+                <strong id="live-status">Live monitoring offline</strong>
+                <p id="last-checked">Waiting for first refresh…</p>
+            </div>
         </aside>
     </section>
 
@@ -352,6 +377,11 @@ const fallbackReport = {
   ]
 };
 
+const REPORT_URL = './ops/reports/financial-ops-report.json';
+const REFRESH_INTERVAL_MS = 15000;
+
+let latestRenderedTimestamp = null;
+
 function renderItem(container, html) {
   const node = document.createElement('div');
   node.className = 'item';
@@ -373,6 +403,12 @@ function render(report) {
   const logList = document.getElementById('log-list');
   const actionList = document.getElementById('action-list');
 
+  botList.innerHTML = '';
+  findingList.innerHTML = '';
+  signalList.innerHTML = '';
+  logList.innerHTML = '';
+  actionList.innerHTML = '';
+
   report.bots.forEach((bot) => {
     renderItem(botList, `<span class="pill success">${bot.id}</span><h3>${bot.name}</h3><p>${bot.role}</p>`);
   });
@@ -393,12 +429,51 @@ function render(report) {
   report.recommendedActions.forEach((action) => {
     renderItem(actionList, `<h3>Operator action</h3><p>${action}</p>`);
   });
+
+  latestRenderedTimestamp = report.generatedAt || null;
 }
 
-fetch('./ops/reports/financial-ops-report.json', { cache: 'no-store' })
-  .then((response) => response.ok ? response.json() : fallbackReport)
-  .then((report) => render(report))
-  .catch(() => render(fallbackReport));
+function setLiveStatus(message, detail) {
+  document.getElementById('live-status').textContent = message;
+  document.getElementById('last-checked').textContent = detail;
+}
+
+function formatCheckedAt(date) {
+  return `Last checked at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+}
+
+async function loadReport() {
+  const checkedAt = new Date();
+
+  try {
+    const response = await fetch(REPORT_URL, { cache: 'no-store' });
+    const report = response.ok ? await response.json() : fallbackReport;
+    const hasNewSnapshot = latestRenderedTimestamp && report.generatedAt && report.generatedAt !== latestRenderedTimestamp;
+
+    render(report);
+    setLiveStatus(
+      hasNewSnapshot ? 'Live monitoring active — new report detected' : 'Live monitoring active',
+      `${formatCheckedAt(checkedAt)} • Auto-refresh every ${REFRESH_INTERVAL_MS / 1000}s`
+    );
+  } catch (error) {
+    if (!latestRenderedTimestamp) {
+      render(fallbackReport);
+    }
+
+    setLiveStatus(
+      'Live monitoring degraded — showing latest available snapshot',
+      `${formatCheckedAt(checkedAt)} • Refresh failed`
+    );
+  }
+}
+
+document.getElementById('refresh-report').addEventListener('click', () => {
+  setLiveStatus('Refreshing report…', 'Checking for the latest dashboard data now.');
+  loadReport();
+});
+
+loadReport();
+window.setInterval(loadReport, REFRESH_INTERVAL_MS);
 </script>
 </body>
 </html>
