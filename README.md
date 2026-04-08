@@ -11,6 +11,7 @@ The User Guide is your friendly, no-jargon walkthrough of everything Nexus Proto
 ## Quick Links
 
 ### For Users
+- **[🚀 Marketing & Campaign Page](marketing.html)** - Official digital campaign landing page for NGTT
 - **[User Guide](user-guide.html)** - Start here! Beginner-friendly walkthrough
 - **[Games Arcade](games.html)** - Play Nexus browser games and browse the age-group catalog
 - **[Web3 Directory](chimera.html)** - Dashboard for Web3 ecosystems and governance
@@ -19,6 +20,7 @@ The User Guide is your friendly, no-jargon walkthrough of everything Nexus Proto
 ### For Developers
 - **[Technical Documentation](README.xml)** - Architecture and smart contract details
 - **[Governance Structure](GOVERNANCE.md)** - Authority and DAO operating mandate
+- **[Marketing Strategy](MARKETING_STRATEGY.md)** - Comprehensive Harvard-level digital marketing & legal strategy
 - **[Smart Contracts](contracts/)** - Solidity contracts including NGTT token
 
 ## What is Nexus Protocol?
