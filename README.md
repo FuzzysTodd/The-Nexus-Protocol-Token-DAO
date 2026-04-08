@@ -11,19 +11,25 @@ The User Guide is your friendly, no-jargon walkthrough of everything Nexus Proto
 ## Quick Links
 
 ### For Users
+- **[🚀 Marketing & Campaign Page](marketing.html)** - Official digital campaign landing page for NGTT
 - **[User Guide](user-guide.html)** - Start here! Beginner-friendly walkthrough
 - **[Games Arcade](games.html)** - Play Nexus browser games and browse the age-group catalog
 - **[Web3 Directory](chimera.html)** - Dashboard for Web3 ecosystems and governance
-- **[Withdrawal Manager](withdraw.html)** - Manage smart contract withdrawals
+- **[Withdrawal Manager](withdraw.html)** - Connect your wallet, add any contracts you own, and withdraw ETH proceeds
 
 ### For Developers
 - **[Technical Documentation](README.xml)** - Architecture and smart contract details
 - **[Governance Structure](GOVERNANCE.md)** - Authority and DAO operating mandate
+- **[Marketing Strategy](MARKETING_STRATEGY.md)** - Comprehensive Harvard-level digital marketing & legal strategy
 - **[Smart Contracts](contracts/)** - Solidity contracts including NGTT token
+
+### For Marketing & Growth
+- **[📣 Marketing Path](MARKETING_PATH.md)** - Canonical go-to-market strategy, brand guide, launch roadmap, and phase-by-phase conclusions
+- **[💎 Revenue Guide](CRYPTO_REVENUE_GUIDE.md)** - Complete documentation of all 10 NGTT revenue streams
 
 ## What is Nexus Protocol?
 
-Nexus Protocol is a conceptual framework combining:
+Nexus Protocol is a real project combining:
 - **Decentralized Finance (DeFi)** tools and protocols
 - **Smart Contract** management interfaces
 - **DAO Governance** structures
@@ -48,6 +54,22 @@ Your dashboard to navigate various DeFi protocols including Uniswap, Aave, Chain
 ### 📋 Governance System
 Structured authority with Owner (FuzzysTodd), Master Project Controller (MPC), and Super Delegates.
 
+## Marketing Path
+
+The Nexus Protocol's marketing strategy is fully documented in **[MARKETING_PATH.md](MARKETING_PATH.md)**.
+
+The marketing path moves participants through five phases:
+
+| Phase | Goal |
+|---|---|
+| **Awareness** | Discovery via social media, content, influencers, GitHub |
+| **Acquisition** | DEX listing, airdrop, onboarding funnel, token purchase |
+| **Activation** | First game played, first NGTT earned, wallet connected |
+| **Retention** | DAO governance, MCP groups, boost events, dividend cycles |
+| **Revenue** | All 10 streams from `CRYPTO_REVENUE_GUIDE.md` — passive + active |
+
+See [`MARKETING_PATH.md`](MARKETING_PATH.md) for the complete go-to-market strategy, launch roadmap, brand guide, KPIs, and phase-by-phase conclusions.
+
 ## Getting Started (Quick Version)
 
 1. **Install MetaMask** - Download from [metamask.io](https://metamask.io)
@@ -56,7 +78,7 @@ Structured authority with Owner (FuzzysTodd), Master Project Controller (MPC), a
 
 ## Important Notes
 
-⚠️ **Educational Project** - This is a conceptual/educational framework. It has NOT been audited for production use.
+⚠️ **Audit Status** - This is a real project, but repository components and on-chain flows may not all be audited for production use.
 
 - Always do your own research (DYOR)
 - Start with testnets for learning
@@ -72,6 +94,8 @@ Structured authority with Owner (FuzzysTodd), Master Project Controller (MPC), a
 ├── chimera.html             # Web3 directory dashboard
 ├── withdraw.html            # Contract withdrawal manager
 ├── logical.js               # Frontend helper library
+├── MARKETING_PATH.md        # 📣 Canonical marketing strategy & conclusions
+├── CRYPTO_REVENUE_GUIDE.md  # 💎 Complete revenue stream documentation
 ├── GOVERNANCE.md            # Authority structure
 ├── README.xml               # Technical documentation
 ├── contracts/               # Smart contracts (Solidity)
@@ -104,6 +128,13 @@ Current status: ✅ **193 tests passing**
 **GitHub:** [@FuzzysTodd](https://github.com/FuzzysTodd)
 
 See [GOVERNANCE.md](GOVERNANCE.md) for complete authority structure.
+
+## Public Addresses
+
+- **Owner wallet:** `0x33ffc308e693a5b49e0ee0241f41f03ccef495f2` ([Etherscan](https://etherscan.io/address/0x33ffc308e693a5b49e0ee0241f41f03ccef495f2))
+- **GitHub owner:** [@FuzzysTodd](https://github.com/FuzzysTodd)
+- **Canonical repository:** [FuzzysTodd/The-Nexus-Protocol-Token-DOA](https://github.com/FuzzysTodd/The-Nexus-Protocol-Token-DOA)
+- **Official deployed contract addresses:** No additional official deployed contract addresses are published in this repository at this time.
 
 ## Contributing
 
