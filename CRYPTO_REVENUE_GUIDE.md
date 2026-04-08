@@ -5,6 +5,8 @@
 **Repository**: The-Nexus-Protocol-Token-DOA  
 **Standard**: Nexus Encryption Standard (NES) v1.0  
 
+> 📣 **New here?** This document covers Revenue (Phase 5 of the marketing path — how to earn once you're in the ecosystem). For the complete go-to-market strategy, community building, token listing, and launch roadmap, see **[MARKETING_PATH.md](MARKETING_PATH.md)**.
+
 ---
 
 ## 🎯 Executive Summary
@@ -750,10 +752,13 @@ contract NexusArbitrage {
 
 ### Community Resources
 
-1. **DAO Forum**: Governance discussions
-2. **Discord**: Real-time community chat
-3. **Telegram**: Announcements and updates
-4. **Twitter**: Follow @FuzzysTodd for official updates
+1. **DAO Forum**: Governance discussions — join via Discord `#governance` channel
+2. **Discord**: Real-time community chat — launch setup documented in [`MARKETING_PATH.md`](MARKETING_PATH.md)
+3. **Telegram**: Announcements and updates — official channel launch per marketing roadmap
+4. **Twitter/X**: Follow @FuzzysTodd for official updates — `@NexusProtocolDAO` planned for official protocol account
+5. **Snapshot**: On-chain governance votes — [snapshot.org](https://snapshot.org) (DAO space setup per `GOVERNANCE.md`)
+
+> See [`MARKETING_PATH.md → Phase 1 Awareness`](MARKETING_PATH.md) for the complete community setup plan, ambassador program, and channel launch sequence.
 
 ---
 
