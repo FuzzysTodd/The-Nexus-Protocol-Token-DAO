@@ -16,7 +16,7 @@ on:
       pr_description:
         description: Pull request description
         required: true
-        default: This pull request was created from Copilot chat.
+        default: This pull request was created from Copilot Chat.
         type: string
 
 jobs:
