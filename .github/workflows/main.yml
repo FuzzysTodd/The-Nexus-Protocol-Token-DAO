@@ -8,12 +8,24 @@ on:
     branches:
       - "agent/**"
   workflow_dispatch:
+    inputs:
+      original_prompt:
+        description: Original prompt
+        required: true
+        type: string
+      pr_description:
+        description: Pull request description
+        required: true
+        default: This pull request was created from Copilot chat.
+        type: string
 
 jobs:
   plan-implement-verify:
     runs-on: ubuntu-latest
+    outputs:
+      outcome: ${{ steps.set-outcome.outputs.outcome }}
     permissions:
-      contents: write
+      contents: read
     env:
       AGENT_DIR: .github/agents
       PLAN_DIR: .agent/plans
@@ -28,6 +40,14 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+
+      - name: Cache pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-3.11-${{ hashFiles('.github/workflows/main.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-3.11-
 
       - name: Install deps
         run: |
@@ -80,21 +100,48 @@ jobs:
           rm -f .agent/status
           pytest -q -k "not slow" || echo "TESTS_FAILED" > .agent/status
 
-      - name: Create PR on success
-        if: ${{ hashFiles('.agent/status') == '' }}
+      - name: Collect logs
+        if: ${{ always() }}
         run: |
-          BR="agent/iteration-$(date +%s)"
-          git checkout -b "$BR"
-          git add -A
-          git commit -m "Agent iteration: green tests and diagnostics"
-          git push origin "$BR"
-          echo "::notice title=PR::Created agent branch $BR"
-
-      - name: Attach logs
-        run: |
-          echo "Attaching CI logs for provenance."
           mkdir -p .agent/logs
           dmesg | tail -n 200 > .agent/logs/kernel_tail.txt || true
-          git add .agent
-          git commit -m "Agent: attach provenance/logs" || true
-          git push origin HEAD || true
+
+      - name: Set outcome
+        id: set-outcome
+        if: ${{ always() }}
+        run: |
+          if [ -f .agent/status ]; then
+            echo "outcome=failure" >> "$GITHUB_OUTPUT"
+          else
+            echo "outcome=success" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload agent artifacts
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: agent-${{ github.run_id }}
+          path: .agent/**
+          if-no-files-found: ignore
+
+  push-branch:
+    needs: plan-implement-verify
+    if: ${{ github.event_name == 'workflow_dispatch' && needs.plan-implement-verify.outputs.outcome == 'success' && github.event.inputs.original_prompt != '' && github.event.inputs.pr_description != '' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push agent branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          BR="agent/iteration-$(date +%s)"
+          git checkout -b "$BR"
+          git commit --allow-empty -m "Agent iteration: green tests and diagnostics"
+          git push origin "$BR"
+          echo "::notice title=Branch::Created agent branch $BR"
