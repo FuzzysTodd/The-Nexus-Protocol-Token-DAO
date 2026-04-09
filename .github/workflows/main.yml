@@ -45,7 +45,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-3.11-${{ hashFiles('.github/workflows/main.yml') }}
+          key: ${{ runner.os }}-pip-3.11-${{ hashFiles('**/requirements*.txt', '**/pyproject.toml', '**/setup.py', '**/setup.cfg', '**/Pipfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-pip-3.11-
 
@@ -126,7 +126,7 @@ jobs:
 
   push-branch:
     needs: plan-implement-verify
-    if: ${{ github.event_name == 'workflow_dispatch' && needs.plan-implement-verify.outputs.outcome == 'success' && github.event.inputs.original_prompt != '' && github.event.inputs.pr_description != '' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && needs.plan-implement-verify.outputs.outcome == 'success' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -142,6 +142,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           BR="agent/iteration-$(date +%s)"
           git checkout -b "$BR"
+          git add -A
           git commit --allow-empty -m "Agent iteration: green tests and diagnostics"
           git push origin "$BR"
           echo "::notice title=Branch::Created agent branch $BR"
