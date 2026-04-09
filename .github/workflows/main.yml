@@ -126,7 +126,7 @@ jobs:
 
   push-branch:
     needs: plan-implement-verify
-    if: ${{ github.event_name == 'workflow_dispatch' && needs.plan-implement-verify.outputs.outcome == 'success' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && needs.plan-implement-verify.outputs.outcome == 'success' && github.event.inputs.original_prompt != '' && github.event.inputs.pr_description != '' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
