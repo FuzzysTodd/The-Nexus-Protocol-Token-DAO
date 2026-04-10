@@ -209,6 +209,10 @@
       "database": "PostgreSQL + Redis + IPFS",
       "ai": "PyTorch + CUDA + cuDNN",
       "graphics": "Unreal Engine 5 + Unity + Custom CUDA kernels"
+    },
+    "rpcConfig": {
+      "primaryRpc": "https://tod-29e783f1.gateway.tatum.io/",
+      "provider": "Tatum Gateway"
     }
   }
 }

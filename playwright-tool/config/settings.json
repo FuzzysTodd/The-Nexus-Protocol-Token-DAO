@@ -3,6 +3,9 @@
     "baseURL": "http://localhost:3000",
     "port": 3000
   },
+  "web3": {
+    "rpcUrl": "https://tod-29e783f1.gateway.tatum.io/"
+  },
   "automation": {
     "slowMo": 1000,
     "waitTimeout": 300000,

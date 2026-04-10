@@ -85,11 +85,19 @@ const MAX_DISPLAYED_TRANSACTIONS = 25;
 const MAX_STORED_LOCAL_TRANSFERS = 100;
 
 // ---------------------------------------------------------------------------
+// Nexus personal RPC endpoint (Tatum gateway)
+// ---------------------------------------------------------------------------
+const TATUM_RPC_URL = "https://tod-29e783f1.gateway.tatum.io/";
+
+// ---------------------------------------------------------------------------
 // App state
 // ---------------------------------------------------------------------------
 let provider = null;
 let signer = null;
 let signerAddress = null;
+
+// Read-only provider backed by the Tatum RPC – available before wallet connect.
+const tatumProvider = new ethers.providers.JsonRpcProvider(TATUM_RPC_URL);
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -528,9 +536,9 @@ function removeContract(address) {
 // Fetch ETH balance for a contract
 // ---------------------------------------------------------------------------
 async function fetchBalance(address) {
-    if (!provider) return "—";
+    const readProvider = provider || tatumProvider;
     try {
-        const bal = await provider.getBalance(address);
+        const bal = await readProvider.getBalance(address);
         return ethers.utils.formatEther(bal) + " ETH";
     } catch (_) {
         return "error";
