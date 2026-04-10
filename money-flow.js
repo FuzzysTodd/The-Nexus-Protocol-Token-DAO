@@ -138,6 +138,251 @@ const TIMEFRAMES = {
     yearly: { days: 365, label: "Yearly" }
 };
 
+const TESTNET_CHAINS = new Set([
+    "sepolia",
+    "goerli",
+    "holesky",
+    "localhost",
+    "hardhat",
+    "anvil"
+]);
+
+const STABLE_SYMBOLS = new Set([
+    "USDC",
+    "USDT",
+    "DAI",
+    "USDE",
+    "USDS",
+    "PYUSD",
+    "EURC",
+    "XDAI"
+]);
+
+const COINBASE_DESTINATION_CHAINS = new Set([
+    "ethereum",
+    "base"
+]);
+
+function formatChainLabel(chain) {
+    const value = String(chain ?? "").trim();
+    if (!value) return "Unknown";
+    if (value.toLowerCase() === "base") return "Base";
+    if (value.toLowerCase() === "ethereum") return "Ethereum";
+    return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
+function determineAssetType(asset) {
+    if (asset && String(asset.asset_type || "").trim()) {
+        return String(asset.asset_type).toLowerCase();
+    }
+    if (asset && asset.token_standard) {
+        return "collectible";
+    }
+    return "balance";
+}
+
+function classifySettlementRail(asset) {
+    const chain = String(asset.chain || "").toLowerCase();
+    const assetType = determineAssetType(asset);
+    const chainLabel = formatChainLabel(chain);
+    const supportedChain = COINBASE_DESTINATION_CHAINS.has(chain);
+
+    if (assetType === "collectible") {
+        return {
+            network: chainLabel,
+            destination: chain === "base" ? "Base wallet review" : "Manual NFT review",
+            supportsDirectTransfer: false,
+            reason: supportedChain
+                ? `Collectibles on ${chainLabel} require manual Coinbase or wallet support checks before transfer.`
+                : `Collectibles on ${chainLabel} require manual bridge and destination review before transfer.`
+        };
+    }
+
+    if (chain === "base") {
+        return {
+            network: "Base",
+            destination: "Coinbase Base deposit",
+            supportsDirectTransfer: true,
+            reason: "Use a Base-compatible Coinbase deposit address for direct routing."
+        };
+    }
+
+    if (chain === "ethereum") {
+        return {
+            network: "Ethereum",
+            destination: "Coinbase Ethereum deposit",
+            supportsDirectTransfer: true,
+            reason: "Use an Ethereum-compatible Coinbase deposit address for direct routing."
+        };
+    }
+
+    return {
+        network: chainLabel,
+        destination: "Manual bridge review",
+        supportsDirectTransfer: false,
+        reason: `Verify bridge and destination support before sending funds from ${chainLabel}.`
+    };
+}
+
+function parseDecimalAmount(amount, decimals) {
+    const raw = String(amount ?? "0").trim();
+    const precision = Number.isFinite(Number(decimals)) ? Math.max(0, Number(decimals)) : 0;
+    if (!/^\d+$/.test(raw)) {
+        return Number.NaN;
+    }
+    if (precision === 0) {
+        return Number(raw);
+    }
+    const padded = raw.padStart(precision + 1, "0");
+    const whole = padded.slice(0, -precision) || "0";
+    const fraction = padded.slice(-precision).replace(/0+$/, "");
+    return Number(fraction ? `${whole}.${fraction}` : whole);
+}
+
+function formatUsd(value) {
+    const amount = Number(value);
+    if (!Number.isFinite(amount)) {
+        return "—";
+    }
+    return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: amount >= 1000 ? 0 : 2
+    }).format(amount);
+}
+
+function classifyOffRamp(balance) {
+    const chain = String(balance.chain || "").toLowerCase();
+    const symbol = String(balance.symbol || "").toUpperCase();
+    const valueUsd = Number(balance.value_usd);
+    const poolSize = Number(balance.pool_size);
+    const settlement = classifySettlementRail(balance);
+
+    if (String(balance.asset_type || "").toLowerCase() === "collectible" || balance.token_standard) {
+        return {
+            status: balance.is_spam ? "blocked" : "review",
+            label: balance.is_spam ? "Spam / ignore" : "Collectible review",
+            reason: balance.is_spam
+                ? "Spam collectibles should be ignored and never routed."
+                : "Collectibles are excluded from fiat routing and need manual Coinbase/Base transfer review.",
+            settlement
+        };
+    }
+
+    if (TESTNET_CHAINS.has(chain)) {
+        return {
+            status: "blocked",
+            label: "Testnet only",
+            reason: "Testnet assets cannot be redeemed for fiat.",
+            settlement
+        };
+    }
+    if (!Number.isFinite(valueUsd) || valueUsd <= 0) {
+        return {
+            status: "review",
+            label: "Unpriced",
+            reason: "No USD valuation is available yet.",
+            settlement
+        };
+    }
+    if (balance.low_liquidity) {
+        return {
+            status: "review",
+            label: "Low liquidity",
+            reason: "Swap impact may be too high for a clean off-ramp.",
+            settlement
+        };
+    }
+    if (symbol === "ETH" || symbol === "WETH" || STABLE_SYMBOLS.has(symbol)) {
+        return {
+            status: "ready",
+            label: "Off-ramp ready",
+            reason: "Asset is already a common swap or withdrawal asset.",
+            settlement
+        };
+    }
+    if (Number.isFinite(poolSize) && poolSize >= 100000) {
+        return {
+            status: "swap",
+            label: "Swap first",
+            reason: "Swap into a stablecoin or native asset before off-ramping.",
+            settlement
+        };
+    }
+    return {
+        status: "review",
+        label: "Manual review",
+        reason: "Verify liquidity and routing before attempting fiat conversion.",
+        settlement
+    };
+}
+
+function summarizeImportedBalances(balances) {
+    const summary = {
+        totalValueUsd: 0,
+        pricedAssetCount: 0,
+        unpricedAssetCount: 0,
+        lowLiquidityCount: 0,
+        lowLiquidityValueUsd: 0,
+        readyValueUsd: 0,
+        swapValueUsd: 0,
+        reviewValueUsd: 0,
+        blockedValueUsd: 0,
+        nativeAssetCount: 0,
+        coinbaseReadyCount: 0,
+        baseReadyCount: 0,
+        chains: {}
+    };
+
+    (balances || []).forEach(balance => {
+        const valueUsd = Number(balance.value_usd);
+        const priced = Number.isFinite(valueUsd) && valueUsd > 0;
+        const chain = String(balance.chain || "unknown").toLowerCase();
+        const offRamp = classifyOffRamp(balance);
+
+        if (!summary.chains[chain]) {
+            summary.chains[chain] = { count: 0, valueUsd: 0 };
+        }
+        summary.chains[chain].count += 1;
+
+        if (String(balance.address || "").toLowerCase() === "native") {
+            summary.nativeAssetCount += 1;
+        }
+        if (priced && offRamp.status === "ready" && offRamp.settlement && offRamp.settlement.supportsDirectTransfer) {
+            summary.coinbaseReadyCount += 1;
+            if (offRamp.settlement.network === "Base") {
+                summary.baseReadyCount += 1;
+            }
+        }
+
+        if (!priced) {
+            summary.unpricedAssetCount += 1;
+            return;
+        }
+
+        summary.pricedAssetCount += 1;
+        summary.totalValueUsd += valueUsd;
+        summary.chains[chain].valueUsd += valueUsd;
+
+        if (balance.low_liquidity) {
+            summary.lowLiquidityCount += 1;
+            summary.lowLiquidityValueUsd += valueUsd;
+        }
+
+        if (offRamp.status === "ready") {
+            summary.readyValueUsd += valueUsd;
+        } else if (offRamp.status === "swap") {
+            summary.swapValueUsd += valueUsd;
+        } else if (offRamp.status === "blocked") {
+            summary.blockedValueUsd += valueUsd;
+        } else {
+            summary.reviewValueUsd += valueUsd;
+        }
+    });
+
+    return summary;
+}
+
 /**
  * Calculate returns based on investment, strategy, and timeframe
  */
@@ -368,20 +613,22 @@ function formatTimeframe(months) {
 }
 
 // Add CSS animation for results
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
+if (typeof document !== 'undefined' && document.head) {
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-`;
-document.head.appendChild(style);
+    `;
+    document.head.appendChild(style);
+}
 
 // Auto-calculate on load if values are present
 if (typeof window !== 'undefined') {
@@ -410,10 +657,27 @@ if (typeof module !== 'undefined' && module.exports) {
         REVENUE_STREAMS,
         STRATEGIES,
         TIMEFRAMES,
+        parseDecimalAmount,
+        formatUsd,
+        classifySettlementRail,
+        classifyOffRamp,
+        summarizeImportedBalances,
         calculateReturns,
         calculateIncomeBreakdown,
         calculateTimeToGoal,
         getExpertRecommendations,
+        formatCurrency,
+        formatTimeframe
+    };
+}
+
+if (typeof window !== 'undefined') {
+    window.NexusMoneyFlow = {
+        parseDecimalAmount,
+        formatUsd,
+        classifySettlementRail,
+        classifyOffRamp,
+        summarizeImportedBalances,
         formatCurrency,
         formatTimeframe
     };
