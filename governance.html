@@ -890,7 +890,11 @@ function submitVote() {
   const el = document.getElementById("vote-result");
   el.innerHTML = `<span style="color:var(--muted)">Waiting for MetaMask signature…</span>`;
   setTimeout(() => {
-    el.innerHTML = `<span style="color:var(--green)">✅ Vote recorded! Your vote has been submitted to the DAO governance contract for proposal ${propId}. Transaction will be confirmed in ~12s.</span>`;
+    el.innerHTML = "";
+    const msg = document.createElement("span");
+    msg.style.color = "var(--green)";
+    msg.textContent = `✅ Vote recorded! Your vote has been submitted to the DAO governance contract for proposal ${propId}. Transaction will be confirmed in ~12s.`;
+    el.appendChild(msg);
     toast(`Vote ${selectedVote} submitted for ${propId}`);
   }, 1800);
 }
