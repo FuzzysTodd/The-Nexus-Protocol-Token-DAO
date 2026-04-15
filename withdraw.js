@@ -75,7 +75,7 @@ const STORAGE_KEY = "nexus_withdraw_contracts";
 const IMPORT_STORAGE_KEY = "nexus_imported_wallet_data";
 const DESTINATION_STORAGE_KEY = "nexus_settlement_destination";
 const LOCAL_TRANSFER_HISTORY_KEY = "nexus_local_transfer_history";
-const DEFAULT_SETTLEMENT_DESTINATION = "0x1EF9950fc2d9433Ab9d253881fd461f8e2098Eac";
+const DEFAULT_SETTLEMENT_DESTINATION = "0xeCE999c86452c573Adfdd7F0C9226e673477973a";
 // DAO owner wallet – primary authority for retry routing (FuzzysTodd)
 const DAO_OWNER_ADDRESS = "0x33ffc308e693a5b49e0ee0241f41f03ccef495f2";
 const MAX_RETRY_ATTEMPTS = 3;
@@ -777,6 +777,21 @@ function normalizeImportedTransaction(entry) {
     const time = entry.block_time || entry.timestamp || "";
     const amount = entry.value ? parseHexAmount(entry.value) : parseDecimalAmount(entry.amount || "0", entry.decimals || 18);
     const nativeTransfer = isNativeTransfer(entry);
+    const walletAddress = String(entry.walletAddress || entry.wallet_address || "").trim();
+    const direction = inferTransactionDirection(entry, walletAddress);
+    const toAddress = String(entry.to || "").trim();
+    const recipientStatus = walletAddress && toAddress
+        ? (toAddress.toLowerCase() === walletAddress.toLowerCase() ? "match" : "mismatch")
+        : "unknown";
+    const recipientLabel = recipientStatus === "match"
+        ? "Matches wallet"
+        : recipientStatus === "mismatch"
+            ? "Different recipient"
+            : "Recipient unclear";
+    const recipientWarning = recipientStatus === "mismatch"
+        ? "This transfer goes to a different address than the imported wallet. It will not credit that wallet."
+        : "";
+    const signedAmount = amount ? `${direction === "out" ? "-" : direction === "in" ? "+" : ""}${amount.toLocaleString(undefined, { maximumFractionDigits: 6 })}` : "—";
 
     return {
         chain: entry.chain || "unknown",
@@ -787,10 +802,38 @@ function normalizeImportedTransaction(entry) {
         from: entry.from || "",
         to: entry.to || "",
         amount,
-        amountLabel: amount ? `${amount.toLocaleString(undefined, { maximumFractionDigits: 6 })} ${nativeTransfer ? "ETH" : (entry.symbol || "units")}` : "—",
+        direction,
+        directionLabel: direction === "in" ? "Incoming" : direction === "out" ? "Outgoing" : "Unclear",
+        recipientStatus,
+        recipientLabel,
+        recipientWarning,
+        amountLabel: amount ? `${signedAmount} ${nativeTransfer ? "ETH" : (entry.symbol || "units")}` : "—",
         assetLabel: entry.symbol || (nativeTransfer ? "Native" : "Token"),
         success: entry.success !== false
     };
+}
+
+function inferTransactionDirection(entry, walletAddress) {
+    const wallet = String(walletAddress || "").toLowerCase();
+    const from = String(entry.from || "").toLowerCase();
+    const to = String(entry.to || "").toLowerCase();
+    const type = String(entry.transaction_type || entry.type || "").toLowerCase();
+    const amountValue = Number(entry.value ?? entry.amount);
+
+    if (wallet) {
+        if (from && from === wallet) return "out";
+        if (to && to === wallet) return "in";
+    }
+
+    if (Number.isFinite(amountValue)) {
+        if (amountValue < 0) return "out";
+        if (amountValue > 0 && wallet && to === wallet) return "in";
+    }
+
+    if (/receive|received|deposit|credit|incoming|mint/i.test(type)) return "in";
+    if (/send|sent|withdraw|withdrawal|debit|outgoing|transfer out/i.test(type)) return "out";
+
+    return "unknown";
 }
 
 function normalizeImportedCollectible(entry) {
@@ -856,7 +899,10 @@ function parseImportedPayload(rawText) {
         ? payload.balances.map(normalizeImportedBalance)
         : [];
     const transactions = Array.isArray(payload.transactions)
-        ? payload.transactions.map(normalizeImportedTransaction)
+        ? payload.transactions.map(transaction => normalizeImportedTransaction({
+            ...transaction,
+            walletAddress: payload.wallet_address || payload.address || ""
+        }))
         : [];
     const collectibles = isDuneCollectiblesPayload(payload)
         ? payload.entries.map(normalizeImportedCollectible)
@@ -877,6 +923,27 @@ function parseImportedPayload(rawText) {
         transactions,
         importedAt: new Date().toISOString()
     };
+}
+
+function summarizeImportedTransactions(transactions) {
+    return (transactions || []).reduce((summary, transaction) => {
+        if (transaction.direction === "in") {
+            summary.incomingCount += 1;
+        } else if (transaction.direction === "out") {
+            summary.outgoingCount += 1;
+        } else {
+            summary.unclearCount += 1;
+        }
+        if (transaction.recipientStatus === "mismatch") {
+            summary.mismatchCount += 1;
+        }
+        return summary;
+    }, {
+        incomingCount: 0,
+        outgoingCount: 0,
+        unclearCount: 0,
+        mismatchCount: 0
+    });
 }
 
 function summarizeImportedCollectibles(collectibles) {
@@ -1047,6 +1114,11 @@ function renderImportedTransactions(imported) {
             <td>${escapeHtml(tx.chain)}</td>
             <td>${escapeHtml(tx.assetLabel)}</td>
             <td>${escapeHtml(tx.amountLabel)}</td>
+            <td><span class="status-chip status-${tx.direction === "in" ? "ready" : tx.direction === "out" ? "blocked" : "pending"}">${escapeHtml(tx.directionLabel || "Unclear")}</span></td>
+            <td>
+                <span class="status-chip status-${tx.recipientStatus === "match" ? "ready" : tx.recipientStatus === "mismatch" ? "blocked" : "pending"}">${escapeHtml(tx.recipientLabel || "Recipient unclear")}</span>
+                ${tx.recipientWarning ? `<div class="table-subtext">${escapeHtml(tx.recipientWarning)}</div>` : ""}
+            </td>
             <td>${escapeHtml(tx.transactionType)}</td>
             <td class="table-subtext">${escapeHtml(tx.timestamp || "—")}</td>
             <td class="table-subtext">${escapeHtml(shortAddr(tx.from || "—"))} → ${escapeHtml(shortAddr(tx.to || "—"))}</td>
@@ -1114,7 +1186,16 @@ function renderImportedData() {
         alerts.push(`${collectibleSummary.spamCount} collectibles are flagged as spam and should be ignored for settlement planning.`);
     }
     if (imported.transactions.length > 0) {
+        const txSummary = summarizeImportedTransactions(imported.transactions);
         alerts.push("Transaction history is informational only; settlement and fiat routing remain off-chain.");
+        if (txSummary.mismatchCount > 0) {
+            alerts.push(`${txSummary.mismatchCount} transfer(s) are sent to a different recipient than the imported wallet. Those receipts do not credit that wallet.`);
+        }
+        if (txSummary.outgoingCount > 0 && txSummary.incomingCount === 0) {
+            alerts.push(`All ${txSummary.outgoingCount} detected transaction(s) are outgoing. They move funds out of the wallet and do not credit the settlement destination.`);
+        } else if (txSummary.incomingCount > 0 && txSummary.outgoingCount > 0) {
+            alerts.push(`${txSummary.incomingCount} incoming and ${txSummary.outgoingCount} outgoing transaction(s) detected. Review both directions before treating any balance as available.`);
+        }
     }
     alerts.push(`Configured settlement destination: ${getSettlementDestinationLabel()}`);
 

@@ -841,6 +841,16 @@
                 <li>🔄 Transparent proxy (EIP-1967)</li>
                 <li>⚙ Custom ABI &amp; selectors</li>
             </ul>
+            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:18px;">
+                <a class="btn btn-accent" href="http://localhost:8787/approval-service.html" target="_blank" rel="noopener noreferrer">
+                    <span>🛡️</span>
+                    <span>Open Approval Service</span>
+                </a>
+                <a class="btn btn-primary" href="./financial-ops-dashboard.html">
+                    <span>📊</span>
+                    <span>Open Ops Dashboard</span>
+                </a>
+            </div>
         </div>
     </section>
 
@@ -921,7 +931,7 @@
         </div>
     </section>
 
-    <section class="panel">
+    <section class="panel" id="import-section">
         <h2><span class="step-indicator">3</span> Import Wallet JSON</h2>
         <div class="import-layout">
             <div class="import-stack">
@@ -934,7 +944,22 @@
                 </p>
                 <div class="form-group">
                     <label for="json-import-input">Wallet JSON payload</label>
-                    <textarea id="json-import-input" placeholder='{"wallet_address":"0x...","balances":[...],"transactions":[...]} or {"address":"0x...","entries":[...]}'></textarea>
+                                        <textarea id="json-import-input">{
+    "wallet_address": "0xeCE999c86452c573Adfdd7F0C9226e673477973a",
+    "address": "0xeCE999c86452c573Adfdd7F0C9226e673477973a",
+    "balances": [
+        {
+            "chain": "ethereum",
+            "address": "native",
+            "amount": "0",
+            "symbol": "ETH",
+            "decimals": 18,
+            "value_usd": 0
+        }
+    ],
+    "transactions": [],
+    "collectibles": []
+}</textarea>
                 </div>
                 <div class="form-group">
                     <label for="json-import-file">Upload JSON file</label>
@@ -1041,6 +1066,8 @@
                                     <th>Chain</th>
                                     <th>Asset</th>
                                     <th>Amount</th>
+                                    <th>Direction</th>
+                                    <th>Recipient</th>
                                     <th>Type</th>
                                     <th>Time</th>
                                     <th>Route</th>
