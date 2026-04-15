@@ -595,6 +595,52 @@ function buildSummaryPayload(report) {
   };
 }
 
+function buildStatusPayload(report) {
+  const summary = buildSummaryPayload(report);
+  const signals = buildSignalsPayload(report);
+  const transactions = buildTransactionsPayload(report, LIVE_WALLET_ADDRESS);
+
+  return {
+    generatedAt: report.generatedAt,
+    service: "financial-ops-rest-adapter",
+    source: report.source,
+    sourceType: report.sourceType,
+    sourceUrl: report.sourceUrl,
+    health: {
+      ok: true,
+      publicOrigin: PUBLIC_ORIGIN,
+      reportSource: report.sourceType,
+      liveChain: Boolean(report.liveChain),
+      hasUpstreamError: Boolean(report.upstreamError),
+    },
+    summary,
+    signals,
+    transactions: {
+      wallet: transactions.wallet,
+      count: transactions.count,
+      preview: transactions.transactions.slice(0, 5),
+    },
+    routes: [
+      "/health",
+      "/status",
+      "/api/report",
+      "/api/status",
+      "/api/refresh",
+      "/api/signals",
+      "/api/summary",
+      "/api/transactions",
+    ],
+    publicSurfaces: [
+      "financial-ops-dashboard.html",
+      "approval-service.html",
+      "governance.html",
+      "withdraw.html",
+      "index.html",
+    ],
+    recommendedActions: report.recommendedActions,
+  };
+}
+
 function buildTransactionsPayload(report, wallet) {
   const address = String(wallet || "").trim().toLowerCase();
   const transactions = [];
@@ -728,6 +774,93 @@ async function handleRequest(req, res) {
     );
   }
 
+  if (req.method === "GET" && url.pathname === "/status") {
+    const report = await loadReport();
+    const status = buildStatusPayload(report);
+    return html(
+      res,
+      200,
+      `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DAO Status</title>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: linear-gradient(180deg, #050816, #0f172a); color: #e2e8f0; }
+    main { max-width: 1080px; margin: 0 auto; padding: 32px; }
+    .hero { display: grid; gap: 16px; padding: 28px; border: 1px solid rgba(148,163,184,0.18); border-radius: 24px; background: rgba(15, 23, 42, 0.9); }
+    .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-top: 20px; }
+    .card { padding: 18px; border-radius: 18px; border: 1px solid rgba(148,163,184,0.18); background: rgba(2, 6, 23, 0.7); }
+    h1, h2, h3, p { margin-top: 0; }
+    ul { margin: 0; padding-left: 20px; }
+    a { color: #7dd3fc; }
+    code { background: rgba(15, 23, 42, 0.8); padding: 1px 6px; border-radius: 6px; }
+    .muted { color: #94a3b8; }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero">
+      <p class="muted">Unified public control plane</p>
+      <h1>DAO Status</h1>
+      <p>Generated at <strong>${escapeHtml(status.generatedAt)}</strong> from <code>${escapeHtml(status.source)}</code>.</p>
+      <p>Service health is <strong>${status.health.ok ? "ok" : "degraded"}</strong> and the current source type is <strong>${escapeHtml(status.sourceType)}</strong>.</p>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>Summary</h2>
+        <p>Files scanned: <strong>${status.summary.summary.filesScanned}</strong></p>
+        <p>Pre-errors: <strong>${status.summary.summary.preErrorCount}</strong></p>
+        <p>Withdraw signals: <strong>${status.summary.summary.withdrawSignalCount}</strong></p>
+        <p>Placement signals: <strong>${status.summary.summary.placementSignalCount}</strong></p>
+      </div>
+
+      <div class="card">
+        <h2>Signals</h2>
+        <p>Pre-error findings: <strong>${status.signals.preErrorFindings.length}</strong></p>
+        <p>Withdrawal signals: <strong>${status.signals.withdrawSignals.length}</strong></p>
+        <p>Placement signals: <strong>${status.signals.placementSignals.length}</strong></p>
+      </div>
+
+      <div class="card">
+        <h2>Transactions</h2>
+        <p>Wallet: <strong>${escapeHtml(status.transactions.wallet || "unspecified")}</strong></p>
+        <p>Count: <strong>${status.transactions.count}</strong></p>
+        <p>Preview entries: <strong>${status.transactions.preview.length}</strong></p>
+      </div>
+
+      <div class="card">
+        <h2>Routes</h2>
+        <ul>
+          ${status.routes.map((route) => `<li><code>${escapeHtml(route)}</code></li>`).join("")}
+        </ul>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card">
+        <h2>Public Surfaces</h2>
+        <ul>
+          ${status.publicSurfaces.map((surface) => `<li>${escapeHtml(surface)}</li>`).join("")}
+        </ul>
+      </div>
+      <div class="card">
+        <h2>Recommended Actions</h2>
+        <ul>
+          ${status.recommendedActions.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+        </ul>
+      </div>
+    </section>
+
+    <p class="muted">JSON API: <a href="/api/status">/api/status</a> · Report: <a href="/api/report">/api/report</a> · Summary: <a href="/api/summary">/api/summary</a></p>
+  </main>
+</body>
+</html>`
+    );
+  }
+
   if (req.method === "GET" && url.pathname === "/health") {
     const report = await loadReport();
     return json(res, 200, {
@@ -745,6 +878,11 @@ async function handleRequest(req, res) {
   if (req.method === "GET" && url.pathname === "/api/report") {
     const report = await loadReport();
     return json(res, 200, report);
+  }
+
+  if (req.method === "GET" && url.pathname === "/api/status") {
+    const report = await loadReport();
+    return json(res, 200, buildStatusPayload(report));
   }
 
   if (req.method === "POST" && url.pathname === "/api/refresh") {
@@ -774,7 +912,7 @@ async function handleRequest(req, res) {
 
   return json(res, 404, {
     error: "Not found",
-    routes: ["/", "/health", "/api/report", "/api/refresh", "/api/signals", "/api/summary", "/api/transactions"],
+    routes: ["/", "/status", "/health", "/api/report", "/api/status", "/api/refresh", "/api/signals", "/api/summary", "/api/transactions"],
   });
 }
 

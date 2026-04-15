@@ -56,6 +56,10 @@ Repository owner and primary authority: **@FuzzysTodd** (wallet `0x33ffc308e693a
 - Prefer minimal, targeted changes — small PRs are easier to review.
 - Do not modify files inside third-party reference directories (`Aave-V3/`, `Uniswap-V3/`, `Olympus-DAO/`, etc.) unless specifically instructed.
 - Never commit secrets, private keys, or wallet mnemonics.
+- When the owner explicitly grants permission, AI may update workspace instruction files and Copilot customization files such as `.github/copilot-instructions.md`, `.github/instructions/*.instructions.md`, and `.github/agents/*.agent.md` to keep guidance accurate.
+- Keep instruction-file edits minimal, scoped, and documented in the same change.
+- When an operation is blocked, unavailable, or partially broken, AI may use safe workarounds or alternate paths to complete the task if they do not bypass owner approval, weaken security, or create irreversible side effects.
+- The owner grants AI authority to deeply analyze, coordinate, and optimize the total DAO across interdependent systems, workflows, and publications, including complex multi-step orchestration, provided the same approval and safety boundaries remain in force.
 
 ---
 

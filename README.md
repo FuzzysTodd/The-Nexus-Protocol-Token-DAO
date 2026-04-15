@@ -22,6 +22,7 @@ The User Guide is your friendly, no-jargon walkthrough of everything Nexus Proto
 - **[Governance Structure](GOVERNANCE.md)** - Authority and DAO operating mandate
 - **[Marketing Strategy](MARKETING_STRATEGY.md)** - Comprehensive Harvard-level digital marketing & legal strategy
 - **[Smart Contracts](contracts/)** - Solidity contracts including NGTT token
+- **[Public DAO Pages](.github/workflows/public-pages.yml)** - Free GitHub Pages deployment for static DAO surfaces and report snapshots
 
 ### For Marketing & Growth
 - **[📣 Marketing Path](MARKETING_PATH.md)** - Canonical go-to-market strategy, brand guide, launch roadmap, and phase-by-phase conclusions
@@ -113,6 +114,7 @@ The repository includes comprehensive testing:
 
 ```bash
 # Run linting
+pip install -r requirements-dev.txt
 flake8 .
 
 # Run all tests

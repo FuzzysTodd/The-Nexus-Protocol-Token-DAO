@@ -84,6 +84,19 @@ jobs:
           echo "**Authority**: FuzzysTodd - Total Authorization Granted" >> report.md
           echo "**Report Frequency**: Twice Daily (9 AM & 9 PM UTC)" >> report.md
           echo "**Contact**: fuzzystodd@gmail.com" >> report.md
+
+      - name: Publish Progress Report
+        run: |
+          mkdir -p ops/reports
+          cp report.md ops/reports/progress-report.md
+          {
+            echo "## Published Progress Report"
+            echo ""
+            echo "- Canonical artifact: ops/reports/progress-report.md"
+            echo "- Generated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          } >> "$GITHUB_STEP_SUMMARY"
+          printf '\n' >> "$GITHUB_STEP_SUMMARY"
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
           
       - name: Send Email Report
         if: secrets.EMAIL_USERNAME != ''
@@ -103,7 +116,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: progress-report-${{ github.run_number }}
-          path: report.md
+          path: |
+            report.md
+            ops/reports/progress-report.md
           retention-days: 90
 
       - name: Hive Mind Coordination Post-Processing

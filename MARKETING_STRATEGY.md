@@ -1,3 +1,4 @@
+import type { LoaderFunctionArgs } from "@remix-run/node";
 # NEXUS PROTOCOL TOKEN DAO — MARKETING & LEGAL STRATEGY
 
 **Nexus Game Theory Token (NGTT) | ERC-20 | 1 Billion Supply**
@@ -8,6 +9,10 @@
 ---
 
 ## TABLE OF CONTENTS
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  return null;
+};
+
 
 1. [Executive Summary](#1-executive-summary)
 2. [Market Analysis](#2-market-analysis)
