@@ -1,0 +1,51 @@
+name: Validate Content
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-content:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install YAML parser
+        run: python -m pip install pyyaml
+
+      - name: Validate JSON and HTML content
+        run: |
+          python - <<'PYTHON'
+          from pathlib import Path
+          import json
+
+          root = Path('.')
+          html_files = [
+              path for path in root.rglob('*.html')
+              if '.venv' not in path.parts and 'node_modules' not in path.parts
+          ]
+          json_files = [
+              path for path in root.rglob('*.json')
+              if '.venv' not in path.parts and 'node_modules' not in path.parts
+          ]
+
+          for path in html_files:
+              text = path.read_text(encoding='utf-8', errors='ignore')
+              lower = text.lstrip().lower()
+              assert lower.startswith('<!doctype html>') or '<html' in lower, f'{path} does not look like HTML'
+
+          for path in json_files:
+              json.loads(path.read_text(encoding='utf-8'))
+
+          print(f'Validated {len(html_files)} HTML files and {len(json_files)} JSON files')
+          PYTHON

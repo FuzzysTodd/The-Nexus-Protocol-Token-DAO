@@ -1,4 +1,8 @@
-# Repository Instructions
+---
+applyTo: "**/*"
+---
+
+## Repository Instructions
 
 When working in this repository:
 
@@ -24,4 +28,4 @@ When working in this repository:
 
 ### Solidity
 
-- Follow the repository Solidity guidance in [solidity.instructions.md](instructions/solidity.instructions.md).
+- Follow the repository Solidity guidance in [solidity.instructions.md](solidity.instructions.md).

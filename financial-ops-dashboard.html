@@ -459,10 +459,8 @@ function render(report) {
   const sourceSnapshot = document.getElementById('source-snapshot');
   const chainSnapshot = document.getElementById('chain-snapshot');
   const chainOutputs = document.getElementById('chain-outputs');
-  const duneSnapshot = report.duneSnapshot || (report.liveChain && report.liveChain.sourceKind === 'dune' ? report.liveChain : null);
-
-  if (duneSnapshot) {
-    const dune = duneSnapshot;
+  if (report.duneSnapshot) {
+    const dune = report.duneSnapshot;
     sourceSnapshot.textContent = `Dune snapshot for ${dune.walletAddress || 'an unspecified wallet'} loaded from ${report.sourceType || 'dune-snapshot'}.`;
     chainSnapshot.textContent = `${dune.balanceCount || 0} balances · ${dune.chainCount || 0} chains · total ${formatCurrency(dune.totalValueUsd)} · low-liquidity ${dune.lowLiquidityCount || 0}`;
     const topHoldings = Array.isArray(dune.topHoldings) && dune.topHoldings.length > 0
@@ -491,6 +489,33 @@ function render(report) {
       <div class="chain-output-group">
         <h3>Chain breakdown</h3>
         <div class="chain-output-list">${chainBreakdown}</div>
+      </div>
+    `;
+  } else if (report.liveChain && report.liveChain.sourceKind === 'dune') {
+    const chain = report.liveChain;
+    sourceSnapshot.textContent = `Live source: Dune snapshot at ${report.sourceUrl || report.source}`;
+    chainSnapshot.textContent = `${chain.networkName || 'Dune snapshot'} · ${chain.balanceCount ?? 'unknown'} balances · total ${formatCurrency(chain.portfolioValueUsd)} · low-liquidity ${chain.lowLiquidityCount ?? 'unknown'}`;
+    chainOutputs.innerHTML = `
+      <div class="chain-output-group">
+        <h3>Top holdings</h3>
+        <div class="chain-output-list">${(Array.isArray(chain.topHoldings) ? chain.topHoldings : []).slice(0, 5).map((holding) => `
+          <div class="chain-output-item">
+            <strong>${holding.symbol || holding.name || 'Unknown'}</strong>
+            <span>${formatCurrency(holding.valueUsd)}${holding.lowLiquidity ? ' · low liquidity' : ''}</span>
+          </div>
+        `).join('') || '<div class="chain-output-item"><strong>No holdings</strong><span>Waiting for live Dune data</span></div>'}</div>
+      </div>
+      <div class="chain-output-group">
+        <h3>Chain breakdown</h3>
+        <div class="chain-output-list">${chain.chainBreakdown && Object.keys(chain.chainBreakdown).length > 0
+          ? Object.entries(chain.chainBreakdown).map(([chainName, count]) => `
+            <div class="chain-output-item">
+              <strong>${chainName}</strong>
+              <span>${count} balance${count === 1 ? '' : 's'}</span>
+            </div>
+          `).join('')
+          : '<div class="chain-output-item"><strong>No chain breakdown</strong><span>Waiting for live Dune data</span></div>'}
+        </div>
       </div>
     `;
   } else if (report.liveChain) {
