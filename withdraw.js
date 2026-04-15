@@ -75,7 +75,7 @@ const STORAGE_KEY = "nexus_withdraw_contracts";
 const IMPORT_STORAGE_KEY = "nexus_imported_wallet_data";
 const DESTINATION_STORAGE_KEY = "nexus_settlement_destination";
 const LOCAL_TRANSFER_HISTORY_KEY = "nexus_local_transfer_history";
-const DEFAULT_SETTLEMENT_DESTINATION = "0xeCE999c86452c573Adfdd7F0C9226e673477973a";
+const DEFAULT_SETTLEMENT_DESTINATION = "0x1EF9950fc2d9433Ab9d253881fd461f8e2098Eac";
 // DAO owner wallet – primary authority for retry routing (FuzzysTodd)
 const DAO_OWNER_ADDRESS = "0x33ffc308e693a5b49e0ee0241f41f03ccef495f2";
 const MAX_RETRY_ATTEMPTS = 3;
