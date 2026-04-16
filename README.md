@@ -26,6 +26,7 @@ The User Guide is your friendly, no-jargon walkthrough of everything Nexus Proto
 
 ### For Marketing & Growth
 - **[📣 Marketing Path](MARKETING_PATH.md)** - Canonical go-to-market strategy, brand guide, launch roadmap, and phase-by-phase conclusions
+- **[🛠 Marketing Implementation Plan](docs/MARKETING_IMPLEMENTATION_PLAN.md)** - Execution checklist, owners, deliverables, and launch cadence
 - **[💎 Revenue Guide](CRYPTO_REVENUE_GUIDE.md)** - Complete documentation of all 10 NGTT revenue streams
 
 ## What is Nexus Protocol?

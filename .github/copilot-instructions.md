@@ -1,4 +1,8 @@
-# Repository Instructions
+---
+applyTo: "**/*"
+---
+
+## Repository Instructions
 
 When working in this repository:
 
