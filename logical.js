@@ -228,8 +228,8 @@ function buildDaoStats() {
         },
         {
             value: new Date().toUTCString(),
-            label: "Live browser render",
-            detail: "Rendered from the current checked-in dashboard data.",
+            label: "Page loaded at",
+            detail: "Timestamp captured when this dashboard instance was hydrated.",
         },
     ];
 }
