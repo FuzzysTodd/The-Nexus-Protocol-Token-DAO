@@ -228,7 +228,7 @@ function buildDaoStats() {
         },
         {
             value: new Date().toUTCString(),
-            label: "Page loaded at",
+            label: "Page load time",
             detail: "Timestamp captured when this dashboard instance was hydrated.",
         },
     ];
