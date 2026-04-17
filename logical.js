@@ -8,6 +8,108 @@
 // import NexusGreenTokenABI from './abis/NexusGreenToken.json';
 
 // --- Dashboard data for the static repository index ---
+const DAO_FEATURES = [
+    {
+        name: "Governance authority",
+        description: "Owner authority, MPC automation, and super delegates anchor proposal flow and execution authority.",
+        source: "./GOVERNANCE.md",
+        bullets: [
+            "FuzzysTodd remains the top-level authority",
+            "MPC can propose and automate DAO actions",
+            "Super delegates provide emergency and veto paths",
+        ],
+    },
+    {
+        name: "MCP coordination groups",
+        description: "The NGTT contract can create named MCP groups and track their activity across gameplay and rewards.",
+        source: "./contracts/NexusGameTheoryToken.sol",
+        bullets: [
+            "Owner-managed group creation",
+            "Per-group member rosters",
+            "Games played and token totals tracked on-chain",
+        ],
+    },
+    {
+        name: "Rewards and progression",
+        description: "Gameplay rewards scale with skill growth, optional boosts, and age-group multipliers.",
+        source: "./contracts/NexusGameTheoryToken.sol",
+        bullets: [
+            "Skill-based reward multiplier",
+            "Age-group boost support",
+            "Player stats and timestamps exposed",
+        ],
+    },
+    {
+        name: "Treasury and profit sharing",
+        description: "Profit pool distribution is weighted by active group participation, then claimable per member.",
+        source: "./contracts/NexusGameTheoryToken.sol",
+        bullets: [
+            "Central profit pool accounting",
+            "Activity-weighted group share logic",
+            "Member claim flow for accrued profits",
+        ],
+    },
+    {
+        name: "NES security designation",
+        description: "Repository-authored security, signing, and protected-message conventions are grouped under NES.",
+        source: "./GOVERNANCE.md",
+        bullets: [
+            "Protocol-owned designation",
+            "Applies to repository-authored surfaces",
+            "Respects bundled third-party licenses",
+        ],
+    },
+    {
+        name: "Bundled ecosystem integrations",
+        description: "The repository links into Nouns, Aave, Chainlink, and GMX references for governance and DeFi expansion.",
+        source: "./Nouns-DAO/README.md",
+        bullets: [
+            "Governance reference implementations",
+            "Developer docs and public portals",
+            "Repo-local entry points for deeper review",
+        ],
+    },
+];
+
+const DAO_OPERATIONS = [
+    {
+        name: "1. Direct and propose",
+        description: "Strategy starts with the owner mandate, MPC automation, or delegate intervention.",
+        source: "./GOVERNANCE.md",
+        bullets: [
+            "Authority and mandate are documented in the governance charter",
+            "The page keeps those documents one click away",
+        ],
+    },
+    {
+        name: "2. Organize members",
+        description: "MCP groups organize participants into named teams for scoring, rewards, and treasury share tracking.",
+        source: "./contracts/NexusGameTheoryToken.sol",
+        bullets: [
+            "Member wallets map into a group id",
+            "Group performance contributes to profit allocation",
+        ],
+    },
+    {
+        name: "3. Reward contribution",
+        description: "Completed games mint rewards, increase skill, and update per-group totals for the DAO economy.",
+        source: "./contracts/NexusGameTheoryToken.sol",
+        bullets: [
+            "Skill growth compounds future rewards",
+            "Boost activation can accelerate progression",
+        ],
+    },
+    {
+        name: "4. Route profits",
+        description: "Treasury profits are added to the pool, distributed by activity, then claimed by members.",
+        source: "./contracts/NexusGameTheoryToken.sol",
+        bullets: [
+            "Only active, participating groups receive distribution",
+            "Members can claim minted profit allocations",
+        ],
+    },
+];
+
 const WEB3_PROJECT_LINKS = [
     {
         name: "Nouns DAO webapp",
@@ -103,9 +205,34 @@ const GOVERNANCE_LINKS = [
 
 const VALIDATION_SUMMARY = [
     "flake8 . completed successfully in the repository root.",
-    "pytest -q completed successfully with the existing 5-test suite.",
-    "Governance artifacts are linked for policy, contract logic, and harness coverage.",
+    "pytest -q completed successfully with the existing repository test suite.",
+    "DAO feature cards, operations, and governance artifacts are linked in one browser page.",
 ];
+
+function buildDaoStats() {
+    return [
+        {
+            value: "1.0B NGTT",
+            label: "Initial supply",
+            detail: "Minted in the NexusGameTheoryToken constructor.",
+        },
+        {
+            value: `${DAO_FEATURES.length}`,
+            label: "Core DAO features",
+            detail: "Governance, groups, rewards, treasury, NES, and integrations.",
+        },
+        {
+            value: `${WEB3_PROJECT_LINKS.length + REPOSITORY_ENTRY_POINTS.length + GOVERNANCE_LINKS.length}`,
+            label: "Linked entry points",
+            detail: "External and repo-local surfaces available from this page.",
+        },
+        {
+            value: new Date().toUTCString(),
+            label: "Live browser render",
+            detail: "Rendered from the current checked-in dashboard data.",
+        },
+    ];
+}
 
 function escapeHtml(value) {
     return String(value)
@@ -114,6 +241,16 @@ function escapeHtml(value) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#39;");
+}
+
+function renderStat(item) {
+    return `
+        <article class="stat-card">
+            <strong>${escapeHtml(item.value)}</strong>
+            <div>${escapeHtml(item.label)}</div>
+            <span>${escapeHtml(item.detail)}</span>
+        </article>
+    `;
 }
 
 function renderCard(item) {
@@ -129,11 +266,38 @@ function renderCard(item) {
     `;
 }
 
+function renderFeatureCard(item) {
+    return `
+        <article class="card">
+            <h3>${escapeHtml(item.name)}</h3>
+            <p>${escapeHtml(item.description)}</p>
+            <ul class="feature-list">
+                ${item.bullets.map((bullet) => `<li>${escapeHtml(bullet)}</li>`).join("")}
+            </ul>
+            <span class="source">Source: ${escapeHtml(item.source)}</span>
+        </article>
+    `;
+}
+
 function populateContainer(selector, items) {
     if (typeof document === "undefined") return;
     const container = document.querySelector(selector);
     if (!container) return;
     container.innerHTML = items.map(renderCard).join("");
+}
+
+function populateFeatureContainer(selector, items) {
+    if (typeof document === "undefined") return;
+    const container = document.querySelector(selector);
+    if (!container) return;
+    container.innerHTML = items.map(renderFeatureCard).join("");
+}
+
+function populateDaoStats() {
+    if (typeof document === "undefined") return;
+    const container = document.querySelector("[data-dao-stats]");
+    if (!container) return;
+    container.innerHTML = buildDaoStats().map(renderStat).join("");
 }
 
 function populateValidationSummary() {
@@ -145,6 +309,9 @@ function populateValidationSummary() {
 }
 
 function hydrateChimeraDashboard() {
+    populateDaoStats();
+    populateFeatureContainer("[data-dao-features]", DAO_FEATURES);
+    populateFeatureContainer("[data-dao-operations]", DAO_OPERATIONS);
     populateContainer("[data-web3-links]", WEB3_PROJECT_LINKS);
     populateContainer("[data-repo-links]", REPOSITORY_ENTRY_POINTS);
     populateContainer("[data-governance-links]", GOVERNANCE_LINKS);
@@ -153,10 +320,13 @@ function hydrateChimeraDashboard() {
 
 if (typeof window !== "undefined") {
     window.NexusDashboard = {
+        DAO_FEATURES,
+        DAO_OPERATIONS,
         WEB3_PROJECT_LINKS,
         REPOSITORY_ENTRY_POINTS,
         GOVERNANCE_LINKS,
         VALIDATION_SUMMARY,
+        buildDaoStats,
         hydrateChimeraDashboard,
     };
 

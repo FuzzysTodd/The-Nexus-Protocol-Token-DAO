@@ -7,7 +7,9 @@ REPO_ROOT = Path(__file__).resolve().parent
 def test_chimera_dashboard_references_dashboard_script_and_sections():
     dashboard = (REPO_ROOT / "chimera.html").read_text()
 
-    assert "Nexus Protocol Web3 Directory" in dashboard
+    assert "Nexus DAO Command Center" in dashboard
+    assert "DAO feature map" in dashboard
+    assert "How the DAO operates" in dashboard
     assert "Verified public web links" in dashboard
     assert "Governance coverage" in dashboard
     assert '<script src="./logical.js"></script>' in dashboard

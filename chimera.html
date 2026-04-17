@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Nexus Protocol Web3 Directory</title>
+    <title>Nexus DAO Command Center</title>
     <style>
         :root {
             color-scheme: dark;
@@ -93,6 +93,33 @@
             gap: 16px;
         }
 
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            margin-top: 22px;
+        }
+
+        .stat-card {
+            padding: 18px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .stat-card strong {
+            display: block;
+            font-size: 1.65rem;
+            color: #f8fafc;
+            margin-bottom: 6px;
+        }
+
+        .stat-card span {
+            display: block;
+            color: var(--muted);
+            font-size: 0.92rem;
+        }
+
         .card {
             background: var(--panel-alt);
             border: 1px solid var(--border);
@@ -136,6 +163,16 @@
             color: #f8fafc;
         }
 
+        .feature-list {
+            margin: 12px 0 0;
+            padding-left: 18px;
+            color: var(--muted);
+        }
+
+        .feature-list li + li {
+            margin-top: 8px;
+        }
+
         .note {
             margin-top: 20px;
             padding: 14px 16px;
@@ -154,20 +191,33 @@
 <body>
 <main>
     <section class="hero">
-        <h1>Nexus Protocol Web3 Directory</h1>
+        <h1>Nexus DAO Command Center</h1>
         <p>
-            This dashboard turns the repository's placeholder site into a working browser index for the included web3
-            ecosystems and governance surfaces. The external links below were sourced from repository documentation and
-            live-fetched during verification so you can open them directly.
+            This page presents the DAO as a live repository-backed control center: governance authority, MCP gameplay
+            groups, treasury and profit routing, contract entry points, and external ecosystem surfaces are all
+            summarized in one browser view.
         </p>
         <ul class="badge-row">
             <li>Baseline lint: flake8 . ✅</li>
             <li>Baseline tests: pytest -q ✅</li>
-            <li>Governance docs + contracts indexed ✅</li>
+            <li>DAO features hydrated in-browser ✅</li>
         </ul>
+        <div class="stat-grid" data-dao-stats></div>
     </section>
 
     <div class="layout">
+        <section class="panel">
+            <h2>DAO feature map</h2>
+            <p>Each feature is sourced from the checked-in governance document, contracts, and bundled protocol repos.</p>
+            <div class="grid" data-dao-features></div>
+        </section>
+
+        <section class="panel">
+            <h2>How the DAO operates</h2>
+            <p>These workflow cards explain how members, operators, and automations move through the current design.</p>
+            <div class="grid" data-dao-operations></div>
+        </section>
+
         <section class="panel">
             <h2>Verified public web links</h2>
             <p>These are live external destinations referenced by the bundled web3 project documentation.</p>
