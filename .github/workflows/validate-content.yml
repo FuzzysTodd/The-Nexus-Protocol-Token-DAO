@@ -1,0 +1,65 @@
+name: Validate Content
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-content:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install validation dependencies
+        run: python -m pip install flask ecdsa pytest pytest-cov flake8 pyyaml
+
+      - name: Lint Python
+        run: flake8 .
+
+      - name: Run tests
+        run: pytest -q
+
+      - name: Validate dashboard assets
+        run: |
+          node --check logical.js
+          python - <<'PYTHON'
+          from pathlib import Path
+
+          dashboard = Path("chimera.html").read_text(encoding="utf-8")
+          assert "Nexus DAO Command Center" in dashboard
+          assert '<script src="./logical.js"></script>' in dashboard
+          PYTHON
+
+      - name: Validate workflow YAML files
+        run: |
+          python - <<'PYTHON'
+          import pathlib
+          import yaml
+
+          workflows = list(pathlib.Path(".github/workflows").glob("*.yml"))
+          assert workflows, "No workflow files found"
+
+          for workflow in workflows:
+              document = yaml.safe_load(workflow.read_text(encoding="utf-8"))
+              assert document is not None, f"{workflow} parsed as empty"
+
+          print(
+              "Workflow YAML OK — "
+              f"{len(workflows)} files validated: {[workflow.name for workflow in workflows]}"
+          )
+          PYTHON
