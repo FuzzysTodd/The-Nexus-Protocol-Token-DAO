@@ -205,7 +205,7 @@ const GOVERNANCE_LINKS = [
 
 const VALIDATION_SUMMARY = [
     "flake8 . completed successfully in the repository root.",
-    "pytest completed successfully with the existing repository test suite.",
+    "Repository pytest validation completed successfully with the existing test suite.",
     "DAO feature cards, operations, and governance artifacts are linked in one browser page.",
 ];
 
