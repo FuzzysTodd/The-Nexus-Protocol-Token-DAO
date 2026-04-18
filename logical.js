@@ -253,7 +253,7 @@ function buildSearchText(item) {
         item.description || "",
         item.source || "",
         item.href || "",
-        ...(Array.isArray(item.bullets) ? item.bullets : []),
+        ...(Array.isArray(item.bullets) ? item.bullets.filter((bullet) => bullet !== null && bullet !== undefined).map((bullet) => String(bullet)) : []),
     ].join(" ").toLowerCase();
 }
 
