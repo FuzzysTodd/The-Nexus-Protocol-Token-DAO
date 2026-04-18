@@ -377,7 +377,8 @@ function filterDashboardCards(rawQuery) {
         return 0;
     }
 
-    const query = String(rawQuery || "").trim().toLowerCase();
+    const displayQuery = String(rawQuery || "").trim();
+    const query = displayQuery.toLowerCase();
     const cards = Array.from(document.querySelectorAll("[data-dashboard-card]"));
     let visibleCount = 0;
 
@@ -393,9 +394,9 @@ function filterDashboardCards(rawQuery) {
     if (query === "") {
         updateDashboardSearchStatus("Showing all dashboard cards.");
     } else if (visibleCount === 0) {
-        updateDashboardSearchStatus(`No dashboard cards match "${rawQuery}".`);
+        updateDashboardSearchStatus(`No dashboard cards match "${displayQuery}".`);
     } else {
-        updateDashboardSearchStatus(`Showing ${visibleCount} matching dashboard cards for "${rawQuery}".`);
+        updateDashboardSearchStatus(`Showing ${visibleCount} matching dashboard cards for "${displayQuery}".`);
     }
 
     return visibleCount;
