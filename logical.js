@@ -247,14 +247,14 @@ function escapeHtml(value) {
         .replace(/'/g, "&#39;");
 }
 
-function normalizeBulletsForSearch(bullets) {
-    if (!Array.isArray(bullets)) {
+function sanitizeArrayToStrings(values) {
+    if (!Array.isArray(values)) {
         return [];
     }
 
-    return bullets
-        .filter((bullet) => bullet !== null && bullet !== undefined)
-        .map((bullet) => String(bullet));
+    return values
+        .filter((value) => value !== null && value !== undefined)
+        .map((value) => String(value));
 }
 
 function buildSearchText(item) {
@@ -263,7 +263,7 @@ function buildSearchText(item) {
         item.description || "",
         item.source || "",
         item.href || "",
-        ...normalizeBulletsForSearch(item.bullets),
+        ...sanitizeArrayToStrings(item.bullets),
     ].join(" ").toLowerCase();
 }
 
