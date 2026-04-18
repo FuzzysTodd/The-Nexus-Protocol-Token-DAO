@@ -393,7 +393,7 @@ async function readWalletState() {
         hasMetaMask: true,
         connectedAddress,
         chainId,
-        matchesPreferredWallet: Boolean(connectedAddress) && connectedAddress.toLowerCase() === PREFERRED_WALLET_ADDRESS_LOWER,
+        matchesPreferredWallet: connectedAddress !== "" && connectedAddress.toLowerCase() === PREFERRED_WALLET_ADDRESS_LOWER,
     };
 }
 
