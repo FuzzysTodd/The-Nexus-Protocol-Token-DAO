@@ -1,4 +1,4 @@
-name: Validate Content
+name: Validate Code and Workflows
 
 on:
   pull_request:
@@ -32,7 +32,7 @@ jobs:
         run: flake8 .
 
       - name: Run tests
-        run: pytest -ra
+        run: pytest -ra -v
 
       - name: Validate dashboard assets
         run: |
