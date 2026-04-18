@@ -212,6 +212,7 @@ const VALIDATION_SUMMARY = [
 const PREFERRED_WALLET_ADDRESS = "0xeCE999c86452c573Adfdd7F0C9226e673477973a";
 const PREFERRED_WALLET_ADDRESS_LOWER = PREFERRED_WALLET_ADDRESS.toLowerCase();
 const ETHERSCAN_ADDRESS_URL = `https://etherscan.io/address/${PREFERRED_WALLET_ADDRESS}`;
+const WITHDRAW_METHOD_PATTERN = /(withdraw|claim|redeem|release|payout)/i;
 
 function buildDaoStats() {
     return [
@@ -332,6 +333,18 @@ function populateValidationSummary() {
     container.innerHTML = VALIDATION_SUMMARY.map((item) => `<li><strong>Verified:</strong> ${escapeHtml(item)}</li>`).join("");
 }
 
+function isLikelyEthereumAddress(value) {
+    return /^0x[a-fA-F0-9]{40}$/.test(String(value || "").trim());
+}
+
+function renderMethodList(items, emptyMessage) {
+    if (!Array.isArray(items) || items.length === 0) {
+        return `<li>${escapeHtml(emptyMessage)}</li>`;
+    }
+
+    return items.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
+}
+
 function getWorkspaceElements() {
     if (typeof document === "undefined") {
         return null;
@@ -342,6 +355,29 @@ function getWorkspaceElements() {
         clearDashboardSearchButton: document.querySelector("[data-clear-dashboard-search]"),
         refreshWalletButton: document.querySelector("[data-refresh-wallet]"),
         dashboardSearchStatus: document.querySelector("[data-dashboard-search-status]"),
+    };
+}
+
+function getContractWorkspaceElements() {
+    if (typeof document === "undefined") {
+        return null;
+    }
+
+    return {
+        operatorWalletInput: document.querySelector("[data-operator-wallet-input]"),
+        contractAddressInput: document.querySelector("[data-contract-address-input]"),
+        contractAbiInput: document.querySelector("[data-contract-abi-input]"),
+        useConnectedWalletButton: document.querySelector("[data-use-connected-wallet]"),
+        loadContractWorkspaceButton: document.querySelector("[data-load-contract-workspace]"),
+        clearContractWorkspaceButton: document.querySelector("[data-clear-contract-workspace]"),
+        contractWorkspaceStatus: document.querySelector("[data-contract-workspace-status]"),
+        contractWorkspaceStatusText: document.querySelector("[data-contract-workspace-status-text]"),
+        contractWalletOutput: document.querySelector("[data-contract-wallet-output]"),
+        contractAddressOutput: document.querySelector("[data-contract-address-output]"),
+        contractFunctionCount: document.querySelector("[data-contract-function-count]"),
+        withdrawFunctionCount: document.querySelector("[data-withdraw-function-count]"),
+        withdrawMethodList: document.querySelector("[data-withdraw-method-list]"),
+        contractMethodList: document.querySelector("[data-contract-method-list]"),
     };
 }
 
@@ -372,6 +408,16 @@ function updateDashboardSearchStatus(message) {
     elements.dashboardSearchStatus.textContent = message;
 }
 
+function setContractWorkspaceStatus(message, tone) {
+    const elements = getContractWorkspaceElements();
+    if (!elements || !elements.contractWorkspaceStatus || !elements.contractWorkspaceStatusText) {
+        return;
+    }
+
+    elements.contractWorkspaceStatus.dataset.tone = tone;
+    elements.contractWorkspaceStatusText.textContent = message;
+}
+
 function filterDashboardCards(rawQuery) {
     if (typeof document === "undefined") {
         return 0;
@@ -400,6 +446,195 @@ function filterDashboardCards(rawQuery) {
     }
 
     return visibleCount;
+}
+
+function parseAbiJson(rawAbi) {
+    const parsed = JSON.parse(rawAbi);
+
+    if (Array.isArray(parsed)) {
+        return parsed;
+    }
+
+    if (parsed && Array.isArray(parsed.abi)) {
+        return parsed.abi;
+    }
+
+    throw new Error("ABI must be a JSON array or an object containing an abi array.");
+}
+
+function extractFunctionSignatures(abiEntries) {
+    return abiEntries
+        .filter((entry) => entry && entry.type === "function" && entry.name)
+        .map((entry) => {
+            const inputs = Array.isArray(entry.inputs)
+                ? entry.inputs.map((input) => input && input.type ? input.type : "unknown").join(", ")
+                : "";
+            return `${entry.name}(${inputs})`;
+        });
+}
+
+function updateContractWorkspaceOutputs(state) {
+    const elements = getContractWorkspaceElements();
+    if (!elements) {
+        return;
+    }
+
+    if (elements.contractWalletOutput) {
+        elements.contractWalletOutput.textContent = state.walletAddress || "Not set";
+    }
+
+    if (elements.contractAddressOutput) {
+        elements.contractAddressOutput.textContent = state.contractAddress || "Not set";
+    }
+
+    if (elements.contractFunctionCount) {
+        elements.contractFunctionCount.textContent = `${state.functionSignatures.length} parsed`;
+    }
+
+    if (elements.withdrawFunctionCount) {
+        elements.withdrawFunctionCount.textContent = `${state.withdrawSignatures.length} detected`;
+    }
+
+    if (elements.withdrawMethodList) {
+        elements.withdrawMethodList.innerHTML = renderMethodList(state.withdrawSignatures, "No withdraw-style methods detected.");
+    }
+
+    if (elements.contractMethodList) {
+        elements.contractMethodList.innerHTML = renderMethodList(state.functionSignatures, "No contract functions parsed.");
+    }
+}
+
+function readContractWorkspaceInputs() {
+    const elements = getContractWorkspaceElements();
+    return {
+        walletAddress: elements && elements.operatorWalletInput ? elements.operatorWalletInput.value.trim() : "",
+        contractAddress: elements && elements.contractAddressInput ? elements.contractAddressInput.value.trim() : "",
+        rawAbi: elements && elements.contractAbiInput ? elements.contractAbiInput.value.trim() : "",
+    };
+}
+
+function loadContractWorkspace() {
+    const inputState = readContractWorkspaceInputs();
+
+    if (!inputState.walletAddress) {
+        setContractWorkspaceStatus("Enter a wallet address or use the connected wallet before loading the ABI.", "warn");
+        updateContractWorkspaceOutputs({
+            walletAddress: "",
+            contractAddress: inputState.contractAddress,
+            functionSignatures: [],
+            withdrawSignatures: [],
+        });
+        return null;
+    }
+
+    if (!isLikelyEthereumAddress(inputState.walletAddress)) {
+        setContractWorkspaceStatus("The wallet address must be a valid 42-character hex address.", "warn");
+        return null;
+    }
+
+    if (!inputState.contractAddress) {
+        setContractWorkspaceStatus("Enter the contract address that matches the ABI you want to inspect.", "warn");
+        return null;
+    }
+
+    if (!isLikelyEthereumAddress(inputState.contractAddress)) {
+        setContractWorkspaceStatus("The contract address must be a valid 42-character hex address.", "warn");
+        return null;
+    }
+
+    if (!inputState.rawAbi) {
+        setContractWorkspaceStatus("Paste a contract ABI JSON payload before loading the contract workspace.", "warn");
+        updateContractWorkspaceOutputs({
+            walletAddress: inputState.walletAddress,
+            contractAddress: inputState.contractAddress,
+            functionSignatures: [],
+            withdrawSignatures: [],
+        });
+        return null;
+    }
+
+    try {
+        const abiEntries = parseAbiJson(inputState.rawAbi);
+        const functionSignatures = extractFunctionSignatures(abiEntries);
+        const withdrawSignatures = functionSignatures.filter((signature) => WITHDRAW_METHOD_PATTERN.test(signature));
+
+        updateContractWorkspaceOutputs({
+            walletAddress: inputState.walletAddress,
+            contractAddress: inputState.contractAddress,
+            functionSignatures,
+            withdrawSignatures,
+        });
+
+        if (withdrawSignatures.length > 0) {
+            setContractWorkspaceStatus("Contract ABI loaded successfully. Withdraw-style functions were detected and listed below.", "ok");
+        } else {
+            setContractWorkspaceStatus("Contract ABI loaded successfully. No withdraw-style functions were detected in the parsed ABI.", "idle");
+        }
+
+        return {
+            abiEntries,
+            functionSignatures,
+            withdrawSignatures,
+            walletAddress: inputState.walletAddress,
+            contractAddress: inputState.contractAddress,
+        };
+    } catch (error) {
+        console.error("Failed to parse contract ABI:", error);
+        updateContractWorkspaceOutputs({
+            walletAddress: inputState.walletAddress,
+            contractAddress: inputState.contractAddress,
+            functionSignatures: [],
+            withdrawSignatures: [],
+        });
+        setContractWorkspaceStatus("The ABI JSON could not be parsed. Paste a valid ABI array or artifact object and retry.", "warn");
+        return null;
+    }
+}
+
+function clearContractWorkspace() {
+    const elements = getContractWorkspaceElements();
+    if (!elements) {
+        return;
+    }
+
+    if (elements.operatorWalletInput) {
+        elements.operatorWalletInput.value = "";
+    }
+    if (elements.contractAddressInput) {
+        elements.contractAddressInput.value = "";
+    }
+    if (elements.contractAbiInput) {
+        elements.contractAbiInput.value = "";
+    }
+
+    updateContractWorkspaceOutputs({
+        walletAddress: "",
+        contractAddress: "",
+        functionSignatures: [],
+        withdrawSignatures: [],
+    });
+    setContractWorkspaceStatus("Contract workspace cleared. Paste a wallet, contract address, and ABI to inspect methods again.", "idle");
+}
+
+function applyConnectedWalletToWorkspace() {
+    const contractElements = getContractWorkspaceElements();
+    const walletElements = getWalletElements();
+
+    if (!contractElements || !contractElements.operatorWalletInput) {
+        return;
+    }
+
+    const connectedWallet = walletElements && walletElements.connectedWalletAddress
+        ? walletElements.connectedWalletAddress.textContent.trim()
+        : "";
+
+    if (!isLikelyEthereumAddress(connectedWallet)) {
+        setContractWorkspaceStatus("Connect MetaMask first, then reuse the connected wallet in the contract workspace.", "warn");
+        return;
+    }
+
+    contractElements.operatorWalletInput.value = connectedWallet;
+    setContractWorkspaceStatus("The connected wallet was copied into the contract workspace.", "ok");
 }
 
 function setWalletStatus(message, tone) {
@@ -442,6 +677,11 @@ function updateWalletDetails(state) {
 
     if (elements.openWalletLink) {
         elements.openWalletLink.href = ETHERSCAN_ADDRESS_URL;
+    }
+
+    const contractElements = getContractWorkspaceElements();
+    if (contractElements && contractElements.operatorWalletInput && !contractElements.operatorWalletInput.value.trim() && state.connectedAddress) {
+        contractElements.operatorWalletInput.value = state.connectedAddress;
     }
 }
 
@@ -561,6 +801,31 @@ function bindWalletControls() {
     }
 }
 
+function bindContractWorkspaceControls() {
+    const elements = getContractWorkspaceElements();
+    if (!elements) {
+        return;
+    }
+
+    if (elements.useConnectedWalletButton) {
+        elements.useConnectedWalletButton.addEventListener("click", () => {
+            applyConnectedWalletToWorkspace();
+        });
+    }
+
+    if (elements.loadContractWorkspaceButton) {
+        elements.loadContractWorkspaceButton.addEventListener("click", () => {
+            loadContractWorkspace();
+        });
+    }
+
+    if (elements.clearContractWorkspaceButton) {
+        elements.clearContractWorkspaceButton.addEventListener("click", () => {
+            clearContractWorkspace();
+        });
+    }
+}
+
 function bindWorkspaceControls() {
     const elements = getWorkspaceElements();
     if (!elements) {
@@ -599,6 +864,13 @@ function hydrateChimeraDashboard() {
     populateValidationSummary();
     bindWorkspaceControls();
     filterDashboardCards("");
+    updateContractWorkspaceOutputs({
+        walletAddress: "",
+        contractAddress: "",
+        functionSignatures: [],
+        withdrawSignatures: [],
+    });
+    bindContractWorkspaceControls();
     updateWalletDetails({
         connectedAddress: "",
         chainId: "",
@@ -622,6 +894,9 @@ if (typeof window !== "undefined") {
         filterDashboardCards,
         connectPreferredWallet,
         copyPreferredWalletAddress,
+        loadContractWorkspace,
+        clearContractWorkspace,
+        applyConnectedWalletToWorkspace,
         refreshWalletDashboard,
         hydrateChimeraDashboard,
     };

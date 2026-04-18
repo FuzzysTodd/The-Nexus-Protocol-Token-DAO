@@ -220,6 +220,7 @@
 
         button.action,
         input.action-input,
+        textarea.action-input,
         a.action {
             display: inline-flex;
             align-items: center;
@@ -242,7 +243,20 @@
             color: var(--text);
         }
 
+        textarea.action-input {
+            display: block;
+            width: 100%;
+            min-height: 160px;
+            resize: vertical;
+            background: rgba(15, 23, 42, 0.9);
+            color: var(--text);
+        }
+
         input.action-input::placeholder {
+            color: var(--muted);
+        }
+
+        textarea.action-input::placeholder {
             color: var(--muted);
         }
 
@@ -273,6 +287,46 @@
         .note a {
             color: var(--accent);
             text-decoration: none;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+            margin-top: 18px;
+        }
+
+        .field-group {
+            display: grid;
+            gap: 8px;
+            margin-top: 18px;
+        }
+
+        .field-group label {
+            color: #f8fafc;
+            font-weight: 600;
+        }
+
+        .list-card {
+            margin-top: 18px;
+            padding: 18px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .list-card h3 {
+            margin: 0 0 12px;
+        }
+
+        .method-list {
+            margin: 0;
+            padding-left: 18px;
+            color: var(--muted);
+        }
+
+        .method-list li + li {
+            margin-top: 8px;
         }
 
         [hidden] {
@@ -345,6 +399,64 @@
             </div>
             <div class="note">
                 The dashboard now supports live MetaMask connection state. Contract write actions still require deployed addresses and ABIs before proposal or treasury transactions can be sent.
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Contract workspace</h2>
+            <p>Load a wallet, contract address, and ABI JSON into the dashboard so you can inspect withdraw-style functions before wiring any real transaction flow.</p>
+            <div class="form-grid">
+                <div class="field-group">
+                    <label for="operator-wallet-input">Wallet address</label>
+                    <input class="action-input mono" id="operator-wallet-input" type="text" data-operator-wallet-input placeholder="0x...">
+                </div>
+                <div class="field-group">
+                    <label for="contract-address-input">Contract address</label>
+                    <input class="action-input mono" id="contract-address-input" type="text" data-contract-address-input placeholder="0x...">
+                </div>
+            </div>
+            <div class="field-group">
+                <label for="contract-abi-input">Contract ABI JSON</label>
+                <textarea class="action-input mono" id="contract-abi-input" data-contract-abi-input placeholder='Paste a JSON ABI array or an artifact object with an "abi" field'></textarea>
+            </div>
+            <div class="action-row">
+                <button class="action" type="button" data-use-connected-wallet>Use connected wallet</button>
+                <button class="action" type="button" data-load-contract-workspace>Load contract ABI</button>
+                <button class="action" type="button" data-clear-contract-workspace>Clear contract form</button>
+            </div>
+            <div class="wallet-status" data-contract-workspace-status data-tone="idle">
+                <strong>Contract workspace status</strong>
+                <div data-contract-workspace-status-text>Paste a wallet, contract address, and ABI to inspect withdraw-related methods.</div>
+            </div>
+            <div class="wallet-grid">
+                <article class="wallet-detail">
+                    <strong>Operator wallet</strong>
+                    <div class="mono" data-contract-wallet-output>Not set</div>
+                </article>
+                <article class="wallet-detail">
+                    <strong>Contract address</strong>
+                    <div class="mono" data-contract-address-output>Not set</div>
+                </article>
+                <article class="wallet-detail">
+                    <strong>ABI functions</strong>
+                    <div data-contract-function-count>0 parsed</div>
+                </article>
+                <article class="wallet-detail">
+                    <strong>Withdraw-style functions</strong>
+                    <div data-withdraw-function-count>0 detected</div>
+                </article>
+            </div>
+            <div class="list-card">
+                <h3>Detected withdraw actions</h3>
+                <ul class="method-list" data-withdraw-method-list>
+                    <li>No ABI loaded yet.</li>
+                </ul>
+            </div>
+            <div class="list-card">
+                <h3>All parsed contract functions</h3>
+                <ul class="method-list" data-contract-method-list>
+                    <li>No ABI loaded yet.</li>
+                </ul>
             </div>
         </section>
 

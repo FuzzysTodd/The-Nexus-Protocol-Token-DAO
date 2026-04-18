@@ -16,6 +16,15 @@ def test_chimera_dashboard_references_dashboard_script_and_sections():
     assert "data-dashboard-search-status" in dashboard
     assert "data-preferred-wallet-address" in dashboard
     assert "data-open-wallet" in dashboard
+    assert "Contract workspace" in dashboard
+    assert "data-operator-wallet-input" in dashboard
+    assert "data-contract-address-input" in dashboard
+    assert "data-contract-abi-input" in dashboard
+    assert "data-load-contract-workspace" in dashboard
+    assert "data-clear-contract-workspace" in dashboard
+    assert "data-use-connected-wallet" in dashboard
+    assert "data-withdraw-method-list" in dashboard
+    assert "data-contract-method-list" in dashboard
     assert 'href="#"' in dashboard
     assert "DAO feature map" in dashboard
     assert "How the DAO operates" in dashboard
@@ -63,6 +72,12 @@ def test_dashboard_script_contains_verified_web_links_and_governance_targets():
         "filterDashboardCards",
         "data-dashboard-search",
         "data-refresh-wallet",
+        "data-operator-wallet-input",
+        "data-contract-address-input",
+        "data-contract-abi-input",
+        "loadContractWorkspace",
+        "clearContractWorkspace",
+        "WITHDRAW_METHOD_PATTERN",
     ]
 
     for workspace_hook in expected_workspace_hooks:
