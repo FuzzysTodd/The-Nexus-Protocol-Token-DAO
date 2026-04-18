@@ -247,6 +247,16 @@ function escapeHtml(value) {
         .replace(/'/g, "&#39;");
 }
 
+function buildSearchText(item) {
+    return [
+        item.name || "",
+        item.description || "",
+        item.source || "",
+        item.href || "",
+        ...(Array.isArray(item.bullets) ? item.bullets : []),
+    ].join(" ").toLowerCase();
+}
+
 function renderStat(item) {
     return `
         <article class="stat-card">
@@ -259,7 +269,7 @@ function renderStat(item) {
 
 function renderCard(item) {
     return `
-        <article class="card">
+        <article class="card" data-dashboard-card="true" data-search-text="${escapeHtml(buildSearchText(item))}">
             <h3>${escapeHtml(item.name)}</h3>
             <p>${escapeHtml(item.description)}</p>
             <a href="${escapeHtml(item.href)}" target="${item.href.startsWith("http") ? "_blank" : "_self"}" rel="noopener noreferrer">
@@ -272,7 +282,7 @@ function renderCard(item) {
 
 function renderFeatureCard(item) {
     return `
-        <article class="card">
+        <article class="card" data-dashboard-card="true" data-search-text="${escapeHtml(buildSearchText(item))}">
             <h3>${escapeHtml(item.name)}</h3>
             <p>${escapeHtml(item.description)}</p>
             <ul class="feature-list">
@@ -312,6 +322,19 @@ function populateValidationSummary() {
     container.innerHTML = VALIDATION_SUMMARY.map((item) => `<li><strong>Verified:</strong> ${escapeHtml(item)}</li>`).join("");
 }
 
+function getWorkspaceElements() {
+    if (typeof document === "undefined") {
+        return null;
+    }
+
+    return {
+        dashboardSearch: document.querySelector("[data-dashboard-search]"),
+        clearDashboardSearchButton: document.querySelector("[data-clear-dashboard-search]"),
+        refreshWalletButton: document.querySelector("[data-refresh-wallet]"),
+        dashboardSearchStatus: document.querySelector("[data-dashboard-search-status]"),
+    };
+}
+
 function getWalletElements() {
     if (typeof document === "undefined") {
         return null;
@@ -328,6 +351,44 @@ function getWalletElements() {
         copyWalletButton: document.querySelector("[data-copy-wallet]"),
         openWalletLink: document.querySelector("[data-open-wallet]"),
     };
+}
+
+function updateDashboardSearchStatus(message) {
+    const elements = getWorkspaceElements();
+    if (!elements || !elements.dashboardSearchStatus) {
+        return;
+    }
+
+    elements.dashboardSearchStatus.textContent = message;
+}
+
+function filterDashboardCards(rawQuery) {
+    if (typeof document === "undefined") {
+        return 0;
+    }
+
+    const query = String(rawQuery || "").trim().toLowerCase();
+    const cards = Array.from(document.querySelectorAll("[data-dashboard-card]"));
+    let visibleCount = 0;
+
+    cards.forEach((card) => {
+        const searchText = (card.dataset.searchText || "").toLowerCase();
+        const matches = query === "" || searchText.includes(query);
+        card.hidden = !matches;
+        if (matches) {
+            visibleCount += 1;
+        }
+    });
+
+    if (query === "") {
+        updateDashboardSearchStatus("Showing all dashboard cards.");
+    } else if (visibleCount === 0) {
+        updateDashboardSearchStatus(`No dashboard cards match "${rawQuery}".`);
+    } else {
+        updateDashboardSearchStatus(`Showing ${visibleCount} matching dashboard cards for "${rawQuery}".`);
+    }
+
+    return visibleCount;
 }
 
 function setWalletStatus(message, tone) {
@@ -489,6 +550,34 @@ function bindWalletControls() {
     }
 }
 
+function bindWorkspaceControls() {
+    const elements = getWorkspaceElements();
+    if (!elements) {
+        return;
+    }
+
+    if (elements.dashboardSearch) {
+        elements.dashboardSearch.addEventListener("input", (event) => {
+            filterDashboardCards(event.target.value);
+        });
+    }
+
+    if (elements.clearDashboardSearchButton) {
+        elements.clearDashboardSearchButton.addEventListener("click", () => {
+            if (elements.dashboardSearch) {
+                elements.dashboardSearch.value = "";
+            }
+            filterDashboardCards("");
+        });
+    }
+
+    if (elements.refreshWalletButton) {
+        elements.refreshWalletButton.addEventListener("click", () => {
+            refreshWalletDashboard();
+        });
+    }
+}
+
 function hydrateChimeraDashboard() {
     populateDaoStats();
     populateFeatureContainer("[data-dao-features]", DAO_FEATURES);
@@ -497,6 +586,8 @@ function hydrateChimeraDashboard() {
     populateContainer("[data-repo-links]", REPOSITORY_ENTRY_POINTS);
     populateContainer("[data-governance-links]", GOVERNANCE_LINKS);
     populateValidationSummary();
+    bindWorkspaceControls();
+    filterDashboardCards("");
     updateWalletDetails({
         connectedAddress: "",
         chainId: "",
@@ -517,6 +608,7 @@ if (typeof window !== "undefined") {
         PREFERRED_WALLET_ADDRESS,
         ETHERSCAN_ADDRESS_URL,
         buildDaoStats,
+        filterDashboardCards,
         connectPreferredWallet,
         copyPreferredWalletAddress,
         refreshWalletDashboard,

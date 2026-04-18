@@ -8,7 +8,12 @@ def test_chimera_dashboard_references_dashboard_script_and_sections():
     dashboard = (REPO_ROOT / "chimera.html").read_text()
 
     assert "Nexus DAO Command Center" in dashboard
+    assert "Operator workspace" in dashboard
     assert "MetaMask control center" in dashboard
+    assert "data-dashboard-search" in dashboard
+    assert "data-clear-dashboard-search" in dashboard
+    assert "data-refresh-wallet" in dashboard
+    assert "data-dashboard-search-status" in dashboard
     assert "data-preferred-wallet-address" in dashboard
     assert "data-open-wallet" in dashboard
     assert 'href="#"' in dashboard
@@ -51,3 +56,14 @@ def test_dashboard_script_contains_verified_web_links_and_governance_targets():
 
     for wallet_hook in expected_wallet_hooks:
         assert wallet_hook in script
+
+    expected_workspace_hooks = [
+        "data-dashboard-card",
+        "data-search-text",
+        "filterDashboardCards",
+        "data-dashboard-search",
+        "data-refresh-wallet",
+    ]
+
+    for workspace_hook in expected_workspace_hooks:
+        assert workspace_hook in script

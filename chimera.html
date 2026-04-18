@@ -219,6 +219,7 @@
         }
 
         button.action,
+        input.action-input,
         a.action {
             display: inline-flex;
             align-items: center;
@@ -232,6 +233,17 @@
             text-decoration: none;
             cursor: pointer;
             font: inherit;
+        }
+
+        input.action-input {
+            justify-content: flex-start;
+            min-width: min(100%, 320px);
+            background: rgba(15, 23, 42, 0.9);
+            color: var(--text);
+        }
+
+        input.action-input::placeholder {
+            color: var(--muted);
         }
 
         button.action:disabled {
@@ -262,6 +274,10 @@
             color: var(--accent);
             text-decoration: none;
         }
+
+        [hidden] {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -282,6 +298,21 @@
     </section>
 
     <div class="layout">
+        <section class="panel">
+            <h2>Operator workspace</h2>
+            <p>Filter the dashboard and jump into the DAO surfaces you need most often without leaving this command center.</p>
+            <div class="action-row">
+                <input class="action-input" id="dashboard-search" type="search" data-dashboard-search placeholder="Search governance, wallet, treasury, MCP, rewards, docs...">
+                <button class="action" type="button" data-clear-dashboard-search>Clear filter</button>
+                <button class="action" type="button" data-refresh-wallet>Refresh wallet state</button>
+                <a class="action" href="./GOVERNANCE.md">Open governance charter</a>
+                <a class="action" href="./contracts/NexusGameTheoryToken.sol">Open NGTT contract</a>
+            </div>
+            <div class="note" data-dashboard-search-status>
+                Showing all dashboard cards.
+            </div>
+        </section>
+
         <section class="panel">
             <h2>MetaMask control center</h2>
             <p>Connect MetaMask, verify the active wallet, and open the preferred DAO operator address directly in your browser wallet flow.</p>
