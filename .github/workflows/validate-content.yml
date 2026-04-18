@@ -32,7 +32,7 @@ jobs:
         run: flake8 .
 
       - name: Run tests
-        run: pytest -q
+        run: pytest -ra
 
       - name: Validate dashboard assets
         run: |
