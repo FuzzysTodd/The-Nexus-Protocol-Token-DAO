@@ -313,7 +313,7 @@ function populateValidationSummary() {
 }
 
 function shortenAddress(address) {
-    if (!address || address.length < 12) {
+    if (!address || address.length < 42) {
         return address || "Unavailable";
     }
     return `${address.slice(0, 6)}…${address.slice(-4)}`;
@@ -371,7 +371,7 @@ function updateWalletDetails(state) {
         } else if (state.matchesPreferredWallet) {
             elements.walletMatchState.textContent = "Connected wallet matches preferred DAO wallet";
         } else {
-            elements.walletMatchState.textContent = `Connected wallet differs from preferred wallet (${shortenAddress(PREFERRED_WALLET_ADDRESS)})`;
+            elements.walletMatchState.textContent = `Connected wallet differs from preferred wallet (${PREFERRED_WALLET_ADDRESS})`;
         }
     }
 
