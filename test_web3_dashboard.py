@@ -9,7 +9,8 @@ def test_chimera_dashboard_references_dashboard_script_and_sections():
 
     assert "Nexus DAO Command Center" in dashboard
     assert "MetaMask control center" in dashboard
-    assert "0xeCE999c86452c573Adfdd7F0C9226e673477973a" in dashboard
+    assert "data-preferred-wallet-address" in dashboard
+    assert 'data-open-wallet href="#"' in dashboard
     assert "DAO feature map" in dashboard
     assert "How the DAO operates" in dashboard
     assert "Verified public web links" in dashboard

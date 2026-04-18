@@ -312,13 +312,6 @@ function populateValidationSummary() {
     container.innerHTML = VALIDATION_SUMMARY.map((item) => `<li><strong>Verified:</strong> ${escapeHtml(item)}</li>`).join("");
 }
 
-function shortenAddress(address) {
-    if (!address || address.length < 42) {
-        return address || "Unavailable";
-    }
-    return `${address.slice(0, 6)}…${address.slice(-4)}`;
-}
-
 function getWalletElements() {
     if (typeof document === "undefined") {
         return null;
@@ -400,7 +393,7 @@ async function readWalletState() {
         hasMetaMask: true,
         connectedAddress,
         chainId,
-        matchesPreferredWallet: connectedAddress.toLowerCase() === PREFERRED_WALLET_ADDRESS_LOWER,
+        matchesPreferredWallet: Boolean(connectedAddress) && connectedAddress.toLowerCase() === PREFERRED_WALLET_ADDRESS_LOWER,
     };
 }
 
