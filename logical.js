@@ -247,13 +247,23 @@ function escapeHtml(value) {
         .replace(/'/g, "&#39;");
 }
 
+function normalizeBulletsForSearch(bullets) {
+    if (!Array.isArray(bullets)) {
+        return [];
+    }
+
+    return bullets
+        .filter((bullet) => bullet !== null && bullet !== undefined)
+        .map((bullet) => String(bullet));
+}
+
 function buildSearchText(item) {
     return [
         item.name || "",
         item.description || "",
         item.source || "",
         item.href || "",
-        ...(Array.isArray(item.bullets) ? item.bullets.filter((bullet) => bullet !== null && bullet !== undefined).map((bullet) => String(bullet)) : []),
+        ...normalizeBulletsForSearch(item.bullets),
     ].join(" ").toLowerCase();
 }
 
