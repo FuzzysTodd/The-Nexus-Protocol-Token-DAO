@@ -205,9 +205,13 @@ const GOVERNANCE_LINKS = [
 
 const VALIDATION_SUMMARY = [
     "flake8 . completed successfully in the repository root.",
-    "pytest -q completed successfully with the existing repository test suite.",
+    "pytest completed successfully with the existing repository test suite.",
     "DAO feature cards, operations, and governance artifacts are linked in one browser page.",
 ];
+
+const PREFERRED_WALLET_ADDRESS = "0xeCE999c86452c573Adfdd7F0C9226e673477973a";
+const PREFERRED_WALLET_ADDRESS_LOWER = PREFERRED_WALLET_ADDRESS.toLowerCase();
+const ETHERSCAN_ADDRESS_URL = `https://etherscan.io/address/${PREFERRED_WALLET_ADDRESS}`;
 
 function buildDaoStats() {
     return [
@@ -308,6 +312,190 @@ function populateValidationSummary() {
     container.innerHTML = VALIDATION_SUMMARY.map((item) => `<li><strong>Verified:</strong> ${escapeHtml(item)}</li>`).join("");
 }
 
+function shortenAddress(address) {
+    if (!address || address.length < 12) {
+        return address || "Unavailable";
+    }
+    return `${address.slice(0, 6)}…${address.slice(-4)}`;
+}
+
+function getWalletElements() {
+    if (typeof document === "undefined") {
+        return null;
+    }
+
+    return {
+        preferredWalletAddress: document.querySelector("[data-preferred-wallet-address]"),
+        connectedWalletAddress: document.querySelector("[data-connected-wallet-address]"),
+        walletChainId: document.querySelector("[data-wallet-chain-id]"),
+        walletMatchState: document.querySelector("[data-wallet-match-state]"),
+        walletStatus: document.querySelector("[data-wallet-status]"),
+        walletStatusText: document.querySelector("[data-wallet-status-text]"),
+        connectWalletButton: document.querySelector("[data-connect-wallet]"),
+        copyWalletButton: document.querySelector("[data-copy-wallet]"),
+        openWalletLink: document.querySelector("[data-open-wallet]"),
+    };
+}
+
+function setWalletStatus(message, tone) {
+    const elements = getWalletElements();
+    if (!elements || !elements.walletStatus || !elements.walletStatusText) {
+        return;
+    }
+
+    elements.walletStatus.dataset.tone = tone;
+    elements.walletStatusText.textContent = message;
+}
+
+function updateWalletDetails(state) {
+    const elements = getWalletElements();
+    if (!elements) {
+        return;
+    }
+
+    if (elements.preferredWalletAddress) {
+        elements.preferredWalletAddress.textContent = PREFERRED_WALLET_ADDRESS;
+    }
+
+    if (elements.connectedWalletAddress) {
+        elements.connectedWalletAddress.textContent = state.connectedAddress || "Not connected";
+    }
+
+    if (elements.walletChainId) {
+        elements.walletChainId.textContent = state.chainId || "Unavailable";
+    }
+
+    if (elements.walletMatchState) {
+        if (!state.connectedAddress) {
+            elements.walletMatchState.textContent = "Waiting for MetaMask";
+        } else if (state.matchesPreferredWallet) {
+            elements.walletMatchState.textContent = "Connected wallet matches preferred DAO wallet";
+        } else {
+            elements.walletMatchState.textContent = `Connected wallet differs from preferred wallet (${shortenAddress(PREFERRED_WALLET_ADDRESS)})`;
+        }
+    }
+
+    if (elements.openWalletLink) {
+        elements.openWalletLink.href = ETHERSCAN_ADDRESS_URL;
+    }
+}
+
+async function readWalletState() {
+    if (typeof window === "undefined" || typeof window.ethereum === "undefined") {
+        return {
+            hasMetaMask: false,
+            connectedAddress: "",
+            chainId: "",
+            matchesPreferredWallet: false,
+        };
+    }
+
+    const [accounts, chainId] = await Promise.all([
+        window.ethereum.request({ method: "eth_accounts" }),
+        window.ethereum.request({ method: "eth_chainId" }),
+    ]);
+    const connectedAddress = accounts && accounts.length > 0 ? accounts[0] : "";
+
+    return {
+        hasMetaMask: true,
+        connectedAddress,
+        chainId,
+        matchesPreferredWallet: connectedAddress.toLowerCase() === PREFERRED_WALLET_ADDRESS_LOWER,
+    };
+}
+
+async function refreshWalletDashboard() {
+    try {
+        const state = await readWalletState();
+        updateWalletDetails(state);
+
+        if (!state.hasMetaMask) {
+            setWalletStatus("MetaMask was not detected in this browser. Install it to connect the preferred DAO wallet.", "warn");
+            return state;
+        }
+
+        if (!state.connectedAddress) {
+            setWalletStatus("MetaMask is available. Connect a wallet to compare it against the preferred DAO wallet and inspect chain state.", "idle");
+            return state;
+        }
+
+        if (state.matchesPreferredWallet) {
+            setWalletStatus("MetaMask is connected and the active account matches the preferred DAO wallet.", "ok");
+        } else {
+            setWalletStatus("MetaMask is connected, but the active account does not match the preferred DAO wallet.", "warn");
+        }
+
+        return state;
+    } catch (error) {
+        console.error("Failed to refresh wallet dashboard:", error);
+        setWalletStatus("MetaMask state could not be read. Check wallet permissions and try again.", "warn");
+        updateWalletDetails({
+            connectedAddress: "",
+            chainId: "",
+            matchesPreferredWallet: false,
+        });
+        return null;
+    }
+}
+
+async function connectPreferredWallet() {
+    if (typeof window === "undefined" || typeof window.ethereum === "undefined") {
+        setWalletStatus("MetaMask is not installed. Add the extension, then reconnect from this dashboard.", "warn");
+        return null;
+    }
+
+    try {
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        return await refreshWalletDashboard();
+    } catch (error) {
+        console.error("MetaMask connection failed:", error);
+        setWalletStatus("MetaMask connection request was rejected or failed. Retry when the wallet is available.", "warn");
+        return null;
+    }
+}
+
+async function copyPreferredWalletAddress() {
+    if (typeof navigator !== "undefined" && navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+        await navigator.clipboard.writeText(PREFERRED_WALLET_ADDRESS);
+        setWalletStatus("Preferred DAO wallet address copied to the clipboard.", "ok");
+        return;
+    }
+
+    notifyUser(`Preferred DAO wallet: ${PREFERRED_WALLET_ADDRESS}`);
+    setWalletStatus("Clipboard access is unavailable in this browser. The preferred wallet address was shown in a prompt instead.", "idle");
+}
+
+function bindWalletControls() {
+    const elements = getWalletElements();
+    if (!elements) {
+        return;
+    }
+
+    if (elements.connectWalletButton) {
+        elements.connectWalletButton.addEventListener("click", () => {
+            connectPreferredWallet();
+        });
+    }
+
+    if (elements.copyWalletButton) {
+        elements.copyWalletButton.addEventListener("click", () => {
+            copyPreferredWalletAddress().catch((error) => {
+                console.error("Failed to copy preferred wallet address:", error);
+                setWalletStatus("Copying the preferred wallet address failed. You can still copy it manually from the page.", "warn");
+            });
+        });
+    }
+
+    if (typeof window !== "undefined" && window.ethereum && typeof window.ethereum.on === "function") {
+        window.ethereum.on("accountsChanged", () => {
+            refreshWalletDashboard();
+        });
+        window.ethereum.on("chainChanged", () => {
+            refreshWalletDashboard();
+        });
+    }
+}
+
 function hydrateChimeraDashboard() {
     populateDaoStats();
     populateFeatureContainer("[data-dao-features]", DAO_FEATURES);
@@ -316,6 +504,13 @@ function hydrateChimeraDashboard() {
     populateContainer("[data-repo-links]", REPOSITORY_ENTRY_POINTS);
     populateContainer("[data-governance-links]", GOVERNANCE_LINKS);
     populateValidationSummary();
+    updateWalletDetails({
+        connectedAddress: "",
+        chainId: "",
+        matchesPreferredWallet: false,
+    });
+    bindWalletControls();
+    refreshWalletDashboard();
 }
 
 if (typeof window !== "undefined") {
@@ -326,7 +521,12 @@ if (typeof window !== "undefined") {
         REPOSITORY_ENTRY_POINTS,
         GOVERNANCE_LINKS,
         VALIDATION_SUMMARY,
+        PREFERRED_WALLET_ADDRESS,
+        ETHERSCAN_ADDRESS_URL,
         buildDaoStats,
+        connectPreferredWallet,
+        copyPreferredWalletAddress,
+        refreshWalletDashboard,
         hydrateChimeraDashboard,
     };
 

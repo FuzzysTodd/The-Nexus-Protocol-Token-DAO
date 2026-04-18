@@ -163,6 +163,82 @@
             color: #f8fafc;
         }
 
+        .wallet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+            margin-top: 18px;
+        }
+
+        .wallet-detail {
+            padding: 18px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .wallet-detail strong,
+        .wallet-status strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #f8fafc;
+        }
+
+        .wallet-status {
+            margin-top: 18px;
+            padding: 16px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        .wallet-status[data-tone="ok"] {
+            border-color: rgba(34, 197, 94, 0.5);
+            background: rgba(20, 83, 45, 0.28);
+        }
+
+        .wallet-status[data-tone="warn"] {
+            border-color: rgba(245, 158, 11, 0.45);
+            background: rgba(120, 53, 15, 0.24);
+        }
+
+        .wallet-status[data-tone="idle"] {
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
+        .mono {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            word-break: break-all;
+        }
+
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        button.action,
+        a.action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 10px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            background: rgba(56, 189, 248, 0.14);
+            color: #c7f0ff;
+            text-decoration: none;
+            cursor: pointer;
+            font: inherit;
+        }
+
+        button.action:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .feature-list {
             margin: 12px 0 0;
             padding-left: 18px;
@@ -206,6 +282,41 @@
     </section>
 
     <div class="layout">
+        <section class="panel">
+            <h2>MetaMask control center</h2>
+            <p>Connect MetaMask, verify the active wallet, and open the preferred DAO operator address directly in your browser wallet flow.</p>
+            <div class="wallet-grid">
+                <article class="wallet-detail">
+                    <strong>Preferred DAO wallet</strong>
+                    <div class="mono" data-preferred-wallet-address>0xeCE999c86452c573Adfdd7F0C9226e673477973a</div>
+                </article>
+                <article class="wallet-detail">
+                    <strong>Connected wallet</strong>
+                    <div class="mono" data-connected-wallet-address>Not connected</div>
+                </article>
+                <article class="wallet-detail">
+                    <strong>Chain ID</strong>
+                    <div data-wallet-chain-id>Unavailable</div>
+                </article>
+                <article class="wallet-detail">
+                    <strong>Address match</strong>
+                    <div data-wallet-match-state>Waiting for MetaMask</div>
+                </article>
+            </div>
+            <div class="wallet-status" data-wallet-status data-tone="idle">
+                <strong>Wallet status</strong>
+                <div data-wallet-status-text>Checking for MetaMask support and current account access.</div>
+            </div>
+            <div class="action-row">
+                <button class="action" type="button" data-connect-wallet>Connect MetaMask</button>
+                <button class="action" type="button" data-copy-wallet>Copy preferred wallet</button>
+                <a class="action" data-open-wallet href="https://etherscan.io/address/0xeCE999c86452c573Adfdd7F0C9226e673477973a" target="_blank" rel="noopener noreferrer">Open wallet on Etherscan</a>
+            </div>
+            <div class="note">
+                The dashboard now supports live MetaMask connection state. Contract write actions still require deployed addresses and ABIs before proposal or treasury transactions can be sent.
+            </div>
+        </section>
+
         <section class="panel">
             <h2>DAO feature map</h2>
             <p>Each feature is sourced from the checked-in governance document, contracts, and bundled protocol repos.</p>
