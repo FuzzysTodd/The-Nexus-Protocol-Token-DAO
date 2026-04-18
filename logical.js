@@ -345,6 +345,10 @@ function renderMethodList(items, emptyMessage) {
     return items.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
 }
 
+function formatAbiInputType(input) {
+    return input && input.type ? input.type : "unknown";
+}
+
 function getWorkspaceElements() {
     if (typeof document === "undefined") {
         return null;
@@ -467,7 +471,7 @@ function extractFunctionSignatures(abiEntries) {
         .filter((entry) => entry && entry.type === "function" && entry.name)
         .map((entry) => {
             const inputs = Array.isArray(entry.inputs)
-                ? entry.inputs.map((input) => input && input.type ? input.type : "unknown").join(", ")
+                ? entry.inputs.map((input) => formatAbiInputType(input)).join(", ")
                 : "";
             return `${entry.name}(${inputs})`;
         });
@@ -616,17 +620,26 @@ function clearContractWorkspace() {
     setContractWorkspaceStatus("Contract workspace cleared. Paste a wallet, contract address, and ABI to inspect methods again.", "idle");
 }
 
-function applyConnectedWalletToWorkspace() {
+function setWorkspaceWalletInputIfEmpty(walletAddress) {
     const contractElements = getContractWorkspaceElements();
-    const walletElements = getWalletElements();
 
     if (!contractElements || !contractElements.operatorWalletInput) {
         return;
     }
 
-    const connectedWallet = walletElements && walletElements.connectedWalletAddress
-        ? walletElements.connectedWalletAddress.textContent.trim()
-        : "";
+    if (!contractElements.operatorWalletInput.value.trim() && isLikelyEthereumAddress(walletAddress)) {
+        contractElements.operatorWalletInput.value = walletAddress;
+    }
+}
+
+async function applyConnectedWalletToWorkspace() {
+    const contractElements = getContractWorkspaceElements();
+    if (!contractElements || !contractElements.operatorWalletInput) {
+        return;
+    }
+
+    const state = await readWalletState();
+    const connectedWallet = state && state.connectedAddress ? state.connectedAddress.trim() : "";
 
     if (!isLikelyEthereumAddress(connectedWallet)) {
         setContractWorkspaceStatus("Connect MetaMask first, then reuse the connected wallet in the contract workspace.", "warn");
@@ -680,8 +693,8 @@ function updateWalletDetails(state) {
     }
 
     const contractElements = getContractWorkspaceElements();
-    if (contractElements && contractElements.operatorWalletInput && !contractElements.operatorWalletInput.value.trim() && state.connectedAddress) {
-        contractElements.operatorWalletInput.value = state.connectedAddress;
+    if (contractElements && state.connectedAddress) {
+        setWorkspaceWalletInputIfEmpty(state.connectedAddress);
     }
 }
 
@@ -809,7 +822,10 @@ function bindContractWorkspaceControls() {
 
     if (elements.useConnectedWalletButton) {
         elements.useConnectedWalletButton.addEventListener("click", () => {
-            applyConnectedWalletToWorkspace();
+            applyConnectedWalletToWorkspace().catch((error) => {
+                console.error("Failed to copy connected wallet into contract workspace:", error);
+                setContractWorkspaceStatus("The connected wallet could not be read from MetaMask. Retry after reconnecting.", "warn");
+            });
         });
     }
 
