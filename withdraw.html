@@ -619,15 +619,204 @@
             color: var(--muted);
         }
 
+        .empty-state.compact {
+            padding: 24px 20px;
+        }
+
+        .import-layout {
+            display: grid;
+            grid-template-columns: minmax(280px, 1fr) minmax(280px, 1.3fr);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .import-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 14px;
+        }
+
+        .summary-card {
+            background: rgba(31, 41, 55, 0.6);
+            border: 1px solid rgba(56, 189, 248, 0.18);
+            border-radius: 14px;
+            padding: 18px;
+        }
+
+        .summary-label {
+            color: var(--muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 10px;
+        }
+
+        .summary-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .summary-note,
+        .table-subtext {
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        .import-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: rgba(56, 189, 248, 0.08);
+            border: 1px solid rgba(56, 189, 248, 0.18);
+        }
+
+        .import-alerts {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .import-alert {
+            padding: 12px 14px;
+            border-radius: 12px;
+            background: rgba(251, 191, 36, 0.12);
+            border: 1px solid rgba(251, 191, 36, 0.28);
+            color: #fde68a;
+            font-size: 0.92rem;
+        }
+
+        .table-card {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            background: rgba(2, 6, 23, 0.25);
+        }
+
+        .table-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-card-header h3 {
+            margin: 0;
+            font-size: 1rem;
+            color: var(--text);
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+        }
+
+        table.import-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table.import-table th,
+        table.import-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+            text-align: left;
+            vertical-align: top;
+        }
+
+        table.import-table th {
+            color: var(--muted);
+            font-size: 0.78rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            background: rgba(148, 163, 184, 0.04);
+        }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+
+        .status-ready {
+            background: rgba(74, 222, 128, 0.14);
+            color: var(--success);
+            border: 1px solid rgba(74, 222, 128, 0.25);
+        }
+
+        .status-pending {
+            background: rgba(250, 204, 21, 0.16);
+            color: #fde68a;
+            border: 1px solid rgba(250, 204, 21, 0.28);
+        }
+
+        .status-swap {
+            background: rgba(56, 189, 248, 0.14);
+            color: var(--accent);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+        }
+
+        .status-review,
+        .status-blocked {
+            background: rgba(248, 113, 113, 0.14);
+            color: #fca5a5;
+            border: 1px solid rgba(248, 113, 113, 0.25);
+        }
+
         /* ---- Responsive ---- */
+        @media (max-width: 900px) {
+            .import-layout { grid-template-columns: 1fr; }
+        }
+
         @media (max-width: 540px) {
             .form-grid { grid-template-columns: 1fr; }
             .form-group.full { grid-column: 1; }
+            .summary-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Skip navigation link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 0 0 8px 0;
+            font-weight: bold;
+            z-index: 9999;
+            text-decoration: none;
+            transition: top 0.2s ease;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Focus-visible for buttons */
+        .btn:focus-visible {
+            outline: 3px solid var(--accent);
+            outline-offset: 3px;
         }
     </style>
 </head>
 <body>
-<main>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<main id="main-content">
 
     <!-- Progress bar -->
     <div class="progress-bar">
@@ -652,6 +841,16 @@
                 <li>🔄 Transparent proxy (EIP-1967)</li>
                 <li>⚙ Custom ABI &amp; selectors</li>
             </ul>
+            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:18px;">
+                <a class="btn btn-accent" href="http://localhost:8787/approval-service.html" target="_blank" rel="noopener noreferrer">
+                    <span>🛡️</span>
+                    <span>Open Approval Service</span>
+                </a>
+                <a class="btn btn-primary" href="./financial-ops-dashboard.html">
+                    <span>📊</span>
+                    <span>Open Ops Dashboard</span>
+                </a>
+            </div>
         </div>
     </section>
 
@@ -732,6 +931,160 @@
         </div>
     </section>
 
+    <section class="panel" id="import-section">
+        <h2><span class="step-indicator">3</span> Import Wallet JSON</h2>
+        <div class="import-layout">
+            <div class="import-stack">
+                <p class="muted" style="margin:0;">
+                    Paste or upload a wallet <strong>balances</strong> payload, a
+                    <strong>transactions</strong> feed, or a Dune SIM
+                    <strong>collectibles</strong> response. The dashboard keeps the data
+                    local, extracts off-chain settlement fields, and estimates what is
+                    ready for a mainnet off-ramp.
+                </p>
+                <div class="form-group">
+                    <label for="json-import-input">Wallet JSON payload</label>
+                                        <textarea id="json-import-input">{
+    "wallet_address": "0xeCE999c86452c573Adfdd7F0C9226e673477973a",
+    "address": "0xeCE999c86452c573Adfdd7F0C9226e673477973a",
+    "balances": [
+        {
+            "chain": "ethereum",
+            "address": "native",
+            "amount": "0",
+            "symbol": "ETH",
+            "decimals": 18,
+            "value_usd": 0
+        }
+    ],
+    "transactions": [],
+    "collectibles": []
+}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="json-import-file">Upload JSON file</label>
+                    <input type="file" id="json-import-file" accept=".json,application/json">
+                </div>
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-primary" id="import-json-btn">
+                        <span>📥</span>
+                        <span>Import JSON</span>
+                    </button>
+                    <button type="button" class="btn btn-danger" id="clear-json-btn">
+                        <span>🧹</span>
+                        <span>Clear import</span>
+                    </button>
+                </div>
+                <div class="import-meta">
+                    <strong id="import-wallet-address">No wallet loaded</strong>
+                    <span id="import-meta" class="table-subtext">Local-only import storage is empty.</span>
+                </div>
+                <div class="form-group">
+                    <label for="settlement-destination">Coinbase settlement destination</label>
+                    <input type="text" id="settlement-destination" placeholder="Enter your verified Coinbase deposit address">
+                    <span class="table-subtext">Enter your own Coinbase deposit address and verify Coinbase supports the asset and network before saving or sending funds.</span>
+                </div>
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-accent" id="save-settlement-destination">
+                        <span>🏦</span>
+                        <span>Save destination</span>
+                    </button>
+                    <span class="table-subtext" style="align-self:center;">Current target: <strong id="settlement-destination-display">No destination configured</strong></span>
+                </div>
+                <div class="import-alerts" id="import-alerts"></div>
+            </div>
+
+            <div class="import-stack">
+                <div class="summary-grid" id="import-summary">
+                    <div class="empty-state compact">
+                        <div class="empty-state-text">No wallet JSON imported yet</div>
+                        <div class="empty-state-hint">Import a payload to build a local portfolio and settlement view.</div>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <h3>Portfolio / settlement view</h3>
+                        <span class="table-subtext" id="import-balance-count">0 assets</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="import-table">
+                            <thead>
+                                <tr>
+                                    <th>Chain</th>
+                                    <th>Asset</th>
+                                    <th>Amount</th>
+                                    <th>Value</th>
+                                    <th>Liquidity</th>
+                                    <th>Fiat path</th>
+                                    <th>Transfer</th>
+                                </tr>
+                            </thead>
+                            <tbody id="import-balance-table"></tbody>
+                        </table>
+                    </div>
+                    <div class="empty-state compact" id="import-balance-empty">
+                        <div class="empty-state-text">No balances imported</div>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <h3>Imported collectibles</h3>
+                        <span class="table-subtext" id="import-collectible-count">0 collectibles</span>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="import-table">
+                            <thead>
+                                <tr>
+                                    <th>Chain</th>
+                                    <th>Collectible</th>
+                                    <th>Balance</th>
+                                    <th>Network</th>
+                                    <th>Destination</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="import-collectible-table"></tbody>
+                        </table>
+                    </div>
+                    <div class="empty-state compact" id="import-collectible-empty">
+                        <div class="empty-state-text">No collectibles imported</div>
+                    </div>
+                </div>
+
+                <div class="table-card">
+                    <div class="table-card-header">
+                        <h3>Transaction history</h3>
+                        <span class="table-subtext" id="import-transaction-count">0 transactions</span>
+                        <button type="button" class="btn btn-accent btn-sm" id="retry-all-withdrawals-btn" title="Retry all failed withdrawals using the DAO owner address (0x33ffc308…)">↺ Retry Failed</button>
+                    </div>
+                    <div class="table-wrap">
+                        <table class="import-table">
+                            <thead>
+                                <tr>
+                                    <th>Chain</th>
+                                    <th>Asset</th>
+                                    <th>Amount</th>
+                                    <th>Direction</th>
+                                    <th>Recipient</th>
+                                    <th>Type</th>
+                                    <th>Time</th>
+                                    <th>Route</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="import-transaction-table"></tbody>
+                        </table>
+                    </div>
+                    <div class="empty-state compact" id="import-transaction-empty">
+                        <div class="empty-state-text">No imported or local transactions yet</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- How it works -->
     <section class="panel">
         <h2>❓ How it works</h2>
@@ -755,12 +1108,26 @@
         </p>
     </section>
 
+    <section class="panel">
+        <h2>📈 Financial Ops Oversight</h2>
+        <p>
+            For repo-wide monitoring, pre-error checks, withdrawal-path inventory, and placement-opportunity reporting,
+            use the dedicated financial operations dashboard.
+        </p>
+        <p style="margin-top: 14px;">
+            <a class="btn btn-accent" href="./financial-ops-dashboard.html">
+                <span>Open Financial Ops Dashboard</span>
+            </a>
+        </p>
+    </section>
+
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"
         integrity="sha512-FDcVY+g7vc5CXANbrTSg1K5qLyriCsGDYCE02Li1tXEYdNQPvLPHNE+rT2Mjei8N7fZbe0WLhw27j2SrGRpdMg=="
         crossorigin="anonymous"
         referrerpolicy="no-referrer"
         ></script>
+<script src="./money-flow.js"></script>
 <script src="./withdraw.js"></script>
 </body>
 </html>

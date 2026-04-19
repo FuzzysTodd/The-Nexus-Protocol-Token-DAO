@@ -1,11 +1,4 @@
-// This file contains example JavaScript code to interact with the Project Chimera smart contracts.
-// It uses the ethers.js library, a popular alternative to web3.js.
-// You would integrate this logic into the interactive web application's frontend.
-
-// --- Required imports (assuming you're using a bundler like Vite or Webpack) ---
-// import { ethers } from "ethers";
-// import NexusFinancialContractABI from './abis/NexusFinancialContract.json';
-// import NexusGreenTokenABI from './abis/NexusGreenToken.json';
+// Static dashboard data and rendering for the Project Chimera repository index.
 
 // --- Dashboard data for the static repository index ---
 const WEB3_PROJECT_LINKS = [
@@ -113,31 +106,40 @@ const GOVERNANCE_LINKS = [
     },
 ];
 
-const AUTHORITY_MAP = [
+const CUSTOM_MCP_SERVERS = [
     {
-        name: "Nexus owner profile",
-        href: "./GOVERNANCE.md",
-        description: "Canonical owner/admin identity for repository-authored Nexus surfaces is @FuzzysTodd.",
-        source: "Local governance doc",
+        name: "Repository assessment module",
+        href: "./nexus/repo_assessment.py",
+        description: "Calculates repository inventory, branch coverage, and DAO improvement priorities against real-world web3 references.",
+        source: "nexus/repo_assessment.py",
     },
     {
-        name: "Delegated AI + MPC creation scope",
-        href: "./GOVERNANCE.md",
-        description: "Automation may draft, write, organize data, and prepare token or governance workflows on behalf of the Nexus mission.",
-        source: "Local governance doc",
-    },
-    {
-        name: "Protected account + token controls",
-        href: "./GOVERNANCE.md",
-        description: "Spending, minting, secret handling, credential grants, and irreversible account actions still require owner-controlled permissions or signatures.",
-        source: "Local governance doc",
+        name: "MIG network config (MCP agents)",
+        href: "./mcp/agents/mig-network-config.json",
+        description: "Defines 10 MCP agents (mcp-001 through mcp-010) covering game theory, tokenomics, governance, GPU rendering, and more.",
+        source: "mcp/agents/mig-network-config.json",
     },
 ];
 
-const VALIDATION_SUMMARY = [
-    "flake8 . completed successfully in the repository root.",
-    "pytest -q completed successfully — 149 tests across 9 modules.",
-    "Governance artifacts are linked for policy, contract logic, and harness coverage.",
+const AUTHORITY_MAP_LINKS = [
+    {
+        name: "Owner & authority — @FuzzysTodd",
+        href: "./@FuzzysTodd.md",
+        description: "Repository owner and primary admin anchor. Wallet: 0x33ffc308e693a5b49e0ee0241f41f03ccef495f2",
+        source: "@FuzzysTodd.md",
+    },
+    {
+        name: "Governance charter",
+        href: "./GOVERNANCE.md",
+        description: "Authority structure, DAO mandate, and operating rules for the Nexus Protocol repository.",
+        source: "GOVERNANCE.md",
+    },
+    {
+        name: "MCP gateway documentation",
+        href: "./MCP_GATEWAY_DOCUMENTATION.md",
+        description: "Complete MCP/MFC Gateway FPGA GPU Swarm Hive orchestration system documentation.",
+        source: "MCP_GATEWAY_DOCUMENTATION.md",
+    },
 ];
 
 const MONSTERBALL_LINKS = [
@@ -208,30 +210,30 @@ const SUPREMACY_LINKS = [
 
 const SIGNAL_REPAIR_LINKS = [
     {
-        name: "Signal Repair module",
+        name: "Signal repair module",
         href: "./nexus/signal_repair.py",
-        description: "1 000 deterministic LCG particles. Each applies a unique L1+L2+L3 correction strategy. Median-aggregated consensus repair. Detects 10 degradation types for exchange feeds.",
+        description: "1 000-particle deterministic solver that evaluates degraded exchange signals and votes on consensus repair. Detects NOISY / DRIFTED / SPIKED / CLIPPED / DROPPED and more.",
         source: "nexus/signal_repair.py",
     },
     {
-        name: "Signal Repair tests",
+        name: "Signal repair tests",
         href: "./nexus/test_signal_repair.py",
-        description: "22 tests: particle count/determinism/bounds, clean/degraded signals, corrected values, degradation type detection, report rendering.",
+        description: "Tests for the 1 000-particle signal repair consensus algorithm.",
         source: "nexus/test_signal_repair.py",
     },
 ];
 
 const ATMOSPHERE_LINKS = [
     {
-        name: "Atmosphere module",
+        name: "Atmosphere / planetary harmony module",
         href: "./nexus/atmosphere.py",
-        description: "Full Standard Model: 26 particle classes (quarks, leptons, bosons, composite, dark sector). Atmospheric layers + Sol metrics scored through 3-Algebra + Super Logical. GREATEST planet verdict.",
+        description: "Electrons, quarks, neutrinos, photons, the Higgs boson and every Standard Model particle scored through 3-Algebra + Super Logical for GREATEST planetary health.",
         source: "nexus/atmosphere.py",
     },
     {
         name: "Atmosphere tests",
         href: "./nexus/test_atmosphere.py",
-        description: "22 tests: particle catalogue, ideal snapshot, degraded snapshot, three-engine scores, declaration content, report rendering.",
+        description: "Tests validating the planetary and solar harmony scoring system.",
         source: "nexus/test_atmosphere.py",
     },
 ];
@@ -240,15 +242,23 @@ const FAMILY_LINKS = [
     {
         name: "Family Renaissance module",
         href: "./nexus/family_renaissance.py",
-        description: "40-dimension family health model for Gen X (1965-1980) and Gen Z (1997-2012). 3-Algebra resilience score + Super Logical stressor pressure + MonsterBall intervention ranking. Full repair plan.",
+        description: "Quantitative diagnosis of the American family crisis. Ranks root causes and prescribes a prioritised repair plan for communication, wealth, community, and purpose.",
         source: "nexus/family_renaissance.py",
     },
     {
         name: "Family Renaissance tests",
         href: "./nexus/test_family_renaissance.py",
-        description: "34 tests: crisis index bounds, health tiers, root-cause ranking, repair plan ordering, domain coverage, declaration content, both-generations analysis.",
+        description: "Tests for the Gen X & Gen Z family crisis diagnosis and repair prioritisation engine.",
         source: "nexus/test_family_renaissance.py",
     },
+];
+
+const VALIDATION_SUMMARY = [
+    "Baseline lint: flake8 . — 0 errors",
+    "Baseline tests: pytest -q — all tests passing",
+    "Governance docs and contracts indexed",
+    "MCP/MPC assessment coverage: repository inventory, branch calculation, and DAO improvement priorities",
+    "NGTT Bitcoin-era supremacy: DOMINANT verdict, CRITICAL tier, GREATEST rank — forever",
 ];
 
 function escapeHtml(value) {
@@ -291,8 +301,9 @@ function populateValidationSummary() {
 function hydrateChimeraDashboard() {
     populateContainer("[data-web3-links]", WEB3_PROJECT_LINKS);
     populateContainer("[data-repo-links]", REPOSITORY_ENTRY_POINTS);
+    populateContainer("[data-custom-mcp-servers]", CUSTOM_MCP_SERVERS);
     populateContainer("[data-governance-links]", GOVERNANCE_LINKS);
-    populateContainer("[data-authority-map]", AUTHORITY_MAP);
+    populateContainer("[data-authority-map]", AUTHORITY_MAP_LINKS);
     populateContainer("[data-monsterball-links]", MONSTERBALL_LINKS);
     populateContainer("[data-super-logical-links]", SUPER_LOGICAL_LINKS);
     populateContainer("[data-algebra3-links]", ALGEBRA3_LINKS);
@@ -300,6 +311,7 @@ function hydrateChimeraDashboard() {
     populateContainer("[data-signal-repair-links]", SIGNAL_REPAIR_LINKS);
     populateContainer("[data-atmosphere-links]", ATMOSPHERE_LINKS);
     populateContainer("[data-family-links]", FAMILY_LINKS);
+
     populateValidationSummary();
 }
 
@@ -307,8 +319,9 @@ if (typeof window !== "undefined") {
     window.NexusDashboard = {
         WEB3_PROJECT_LINKS,
         REPOSITORY_ENTRY_POINTS,
+        CUSTOM_MCP_SERVERS,
         GOVERNANCE_LINKS,
-        AUTHORITY_MAP,
+        AUTHORITY_MAP_LINKS,
         MONSTERBALL_LINKS,
         SUPER_LOGICAL_LINKS,
         ALGEBRA3_LINKS,
@@ -317,7 +330,6 @@ if (typeof window !== "undefined") {
         ATMOSPHERE_LINKS,
         FAMILY_LINKS,
         VALIDATION_SUMMARY,
-        hydrateChimeraDashboard,
     };
 
     if (typeof document !== "undefined") {
@@ -327,133 +339,4 @@ if (typeof window !== "undefined") {
             hydrateChimeraDashboard();
         }
     }
-}
-
-function notifyUser(message) {
-    if (typeof window !== "undefined" && typeof window.alert === "function") {
-        window.alert(message);
-        return;
-    }
-    console.warn(message);
-}
-
-// --- Contract Addresses (replace with your deployed addresses) ---
-const nexusFinancialContractAddress = "0x...";
-const nexusGreenTokenAddress = "0x...";
-
-let provider;
-let signer;
-let nexusFinancialContract;
-let nexusGreenToken;
-
-/**
- * Connects to the user's Ethereum wallet (e.g., MetaMask).
- */
-async function connectWallet() {
-    if (typeof window.ethereum !== 'undefined') {
-        try {
-            provider = new ethers.providers.Web3Provider(window.ethereum);
-            await provider.send("eth_requestAccounts", []);
-            signer = provider.getSigner();
-
-            nexusFinancialContract = new ethers.Contract(nexusFinancialContractAddress, NexusFinancialContractABI.abi, signer);
-            nexusGreenToken = new ethers.Contract(nexusGreenTokenAddress, NexusGreenTokenABI.abi, signer);
-
-            console.log("Wallet connected:", await signer.getAddress());
-            // Add UI logic to show connected state
-        } catch (error) {
-            console.error("User rejected connection:", error);
-            // Add UI logic to show connection error
-        }
-    } else {
-        console.error("MetaMask is not installed!");
-        // Add UI logic to prompt user to install MetaMask
-    }
-}
-
-/**
- * Listens for events from the NexusFinancialContract.
- */
-function setupEventListeners() {
-    if (!nexusFinancialContract) return;
-
-    nexusFinancialContract.on("TransactionInitiated", (transactionId, initiator, principal) => {
-        console.log(`Transaction Initiated: ID=${transactionId}, User=${initiator}, Amount=${ethers.utils.formatEther(principal)}`);
-        // Add UI logic to display a notification or update a transaction list.
-    });
-
-    nexusFinancialContract.on("TransactionStateChanged", (transactionId, newState) => {
-        console.log(`Transaction State Changed: ID=${transactionId}, New State=${newState}`);
-        // Update the UI to reflect the new state of the transaction.
-    });
-
-    nexusFinancialContract.on("ProposalCreated", (proposalId, proposer, description) => {
-        console.log(`New Proposal: ID=${proposalId}, Proposer=${proposer}, Desc=${description}`);
-        // Add the new proposal to the DAO voting section of the UI.
-    });
-}
-
-
-/**
- * Example function to be called from the UI to create a DAO proposal.
- * Note: In the real dApp, this would be an admin/backend function.
- * @param {string} description The text description of the proposal.
- */
-async function createProposal(description) {
-    if (!nexusFinancialContract) {
-        notifyUser("Please connect your wallet first.");
-        return;
-    }
-    try {
-        const tx = await nexusFinancialContract.createProposal(description);
-        console.log("Creating proposal... TX hash:", tx.hash);
-        await tx.wait();
-        console.log("Proposal created successfully!");
-        // Add UI feedback
-    } catch (error) {
-        console.error("Error creating proposal:", error);
-    }
-}
-
-
-/**
- * Example function to vote on a proposal.
- * @param {number} proposalId The ID of the proposal to vote on.
- */
-async function voteOnProposal(proposalId) {
-    if (!nexusFinancialContract) {
-        notifyUser("Please connect your wallet first.");
-        return;
-    }
-    try {
-        const tx = await nexusFinancialContract.vote(proposalId);
-        console.log(`Voting on proposal ${proposalId}... TX hash:`, tx.hash);
-        await tx.wait();
-        console.log("Voted successfully!");
-        // Add UI feedback
-    } catch (error) {
-        console.error("Error voting:", error);
-    }
-}
-
-
-// --- Pseudo-code for how the off-chain system would interact ---
-// This part is NOT for the frontend but illustrates the backend process.
-
-/**
- * [BACKEND ONLY] Simulates the autonomous system initiating a transaction.
- * @param {string} userAddress The user's wallet address.
- * @param {number} amount The principal amount.
- */
-async function backend_initiateTransaction(userAddress, amount) {
-    // This requires a signer with owner privileges on the contract.
-    const ownerSigner = new ethers.Wallet("YOUR_PRIVATE_KEY", provider);
-    const contractAsOwner = nexusFinancialContract.connect(ownerSigner);
-
-    const principal = ethers.utils.parseEther(amount.toString());
-    const metadataUri = `https://api.projectchimera.dev/transactions/${Date.now()}`;
-
-    const tx = await contractAsOwner.initiateTransaction(userAddress, principal, metadataUri);
-    await tx.wait();
-    // ... then backend monitors and calls updateTransactionState and distributeValue
 }

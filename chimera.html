@@ -149,10 +149,30 @@
             color: var(--accent);
             text-decoration: none;
         }
+
+        /* Skip navigation link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--accent);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 0 0 8px 0;
+            font-weight: bold;
+            z-index: 9999;
+            text-decoration: none;
+            transition: top 0.2s ease;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
     </style>
 </head>
 <body>
-<main>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+<main id="main-content">
     <section class="hero">
         <h1>Nexus Protocol Web3 Directory</h1>
         <p>
@@ -181,13 +201,23 @@
         </section>
 
         <section class="panel">
+            <h2>Customized MCP/MPC servers</h2>
+            <p>
+                These repo-native services calculate repository inventory, branch coverage, and DAO improvement priorities
+                against the bundled real-world web3 application references.
+            </p>
+            <div class="grid" data-custom-mcp-servers></div>
+        </section>
+
+        <section class="panel">
             <h2>Governance coverage</h2>
             <p>Governance is represented here by the repository authority document, the NGTT contract, and the bundled DAO suite.</p>
             <div class="grid" data-governance-links></div>
             <ul class="status-list" data-validation-summary></ul>
             <div class="note">
-                Wallet-powered proposal and voting helpers remain available in <a href="./logical.js">logical.js</a>,
-                but on-chain actions still require real deployed contract addresses, ABIs, and a browser wallet.
+                Static dashboard rendering lives in <a href="./logical.js">logical.js</a>. Optional wallet demo helpers
+                are isolated in <a href="./logical_demo.js">logical_demo.js</a>, while server-side signing and other
+                privileged actions remain intentionally excluded from the browser assets in this repository.
             </div>
         </section>
 

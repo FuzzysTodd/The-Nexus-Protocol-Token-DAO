@@ -1,4 +1,4 @@
-/ --- Conceptual Gemini Agent Script (Node.js) ---
+// --- Conceptual Gemini Agent Script (Node.js) ---
 
 const fs = require('fs');
 const path = require('path');

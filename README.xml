@@ -8,7 +8,7 @@ Ownership and legal notice: Repository-authored NES specifications, naming, and 
 Canonical specification: docs/NEXUS_ENCRYPTION_STANDARD.md
 
 Vision
-Project Chimera is a conceptual framework for a decentralized application (dApp) designed to create a seamless, autonomous bridge between the traditional financial (TradFi) system and decentralized finance (DeFi). The core objective is to eliminate the inefficiencies, costs, and delays inherent in the current financial infrastructure by leveraging a novel on-chain mechanism.
+Project Chimera is a real decentralized application (dApp) initiative designed to create a seamless, autonomous bridge between the traditional financial (TradFi) system and decentralized finance (DeFi). The core objective is to eliminate the inefficiencies, costs, and delays inherent in the current financial infrastructure by leveraging a novel on-chain mechanism.
 
 The system is designed to be self-sustaining, capturing value through arbitrage and efficiency gains, which are then redistributed to participants, the governing DAO, and a fund dedicated to incentivizing environmentally positive actions.
 
@@ -46,6 +46,8 @@ DAO Governance: The contract incorporates a decentralized autonomous organizatio
 
 Core Functions: Logic for initiating transactions, managing the "bridge" state, interacting with other DeFi protocols, and distributing profits.
 
+Repository-authored web interfaces also include a withdrawal dashboard that lets you connect your wallet, add any contracts you own, and withdraw ETH proceeds through the transparent proxy flow.
+
 2. NexusGreenToken.sol
 This is an ERC-20 utility token designed to incentivize positive real-world impact.
 
@@ -71,7 +73,16 @@ Navigate to the "Deploy & run transactions" tab.
 Ensure your environment is set to a test network (like Sepolia) via your browser wallet (e.g., MetaMask) or use a "Remix VM" for local testing.
 Select NexusFinancialContract from the contract dropdown and click "Deploy".
 Repeat the process for NexusGreenToken, making sure to provide the address of the deployed NexusFinancialContract in its constructor.
+
+Public Addresses
+
+- Owner wallet: 0x33ffc308e693a5b49e0ee0241f41f03ccef495f2
+- Etherscan: https://etherscan.io/address/0x33ffc308e693a5b49e0ee0241f41f03ccef495f2
+- GitHub owner: https://github.com/FuzzysTodd
+- Canonical repository: https://github.com/FuzzysTodd/The-Nexus-Protocol-Token-DOA
+- Official deployed contract addresses: No additional official deployed contract addresses are published in this repository at this time.
+
 Disclaimer
-This is a conceptual and hypothetical project. The provided smart contracts are simplified for educational purposes and have not been audited. They should not be deployed on a mainnet environment without extensive testing, security audits, and further development.
+This is a real project, but the provided smart contracts and repository flows may not be fully audited for production use. Do not deploy or rely on mainnet flows without extensive testing, independent review, security audits, and further development.
 
 This revised document maintains clarity and organization, enhancing its professionalism and readiness for approval.
