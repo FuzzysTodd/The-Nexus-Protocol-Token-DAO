@@ -105,6 +105,7 @@ jobs:
         if: ${{ env.EMAIL_USERNAME != '' && env.EMAIL_PASSWORD != '' }}
         run: |
           python - <<'PYTHON'
+          import ssl
           import smtplib
           from email.message import EmailMessage
           from pathlib import Path
@@ -113,7 +114,7 @@ jobs:
           try:
               report_body = Path('report.md').read_text(encoding='utf-8')
           except OSError as exc:
-              raise SystemExit(f"Unable to read report.md: {exc}") from exc
+              raise SystemExit(f"Unable to read report.md (report generation may have failed): {exc}") from exc
 
           message = EmailMessage()
           message['Subject'] = '📊 Nexus Protocol - Twice Daily Progress Report & Gantt Chart'
@@ -123,7 +124,7 @@ jobs:
 
           try:
               with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
-                  smtp.starttls()
+                  smtp.starttls(context=ssl.create_default_context())
                   smtp.login(os.environ['EMAIL_USERNAME'], os.environ['EMAIL_PASSWORD'])
                   smtp.send_message(message)
           except smtplib.SMTPException as exc:
