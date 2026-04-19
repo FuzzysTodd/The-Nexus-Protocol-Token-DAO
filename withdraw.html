@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nexus – Contract Withdrawal Manager</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #0f172a;
+            --panel: #111827;
+            --panel-alt: #1f2937;
+            --text: #e5e7eb;
+            --muted: #94a3b8;
+            --accent: #38bdf8;
+            --danger: #f87171;
+            --success: #4ade80;
+            --border: rgba(148, 163, 184, 0.2);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(180deg, #020617 0%, var(--bg) 100%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 32px 20px 64px;
+        }
+
+        /* ---- Hero ---- */
+        .hero {
+            background: rgba(17, 24, 39, 0.92);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 12px 32px rgba(2, 6, 23, 0.3);
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .hero h1 { margin-top: 0; font-size: 1.5rem; }
+        .hero p { color: var(--muted); line-height: 1.6; margin: 0 0 16px; }
+
+        .hero .badge-row {
+            display: flex; gap: 10px; flex-wrap: wrap;
+            margin: 16px 0 0; padding: 0; list-style: none;
+        }
+
+        .hero .badge-row li {
+            display: inline-flex; align-items: center;
+            padding: 6px 12px; border-radius: 999px;
+            background: rgba(56, 189, 248, 0.14);
+            color: #c7f0ff;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            font-size: 0.9rem;
+        }
+
+        /* ---- Panel ---- */
+        .panel {
+            background: rgba(17, 24, 39, 0.92);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: 0 12px 32px rgba(2, 6, 23, 0.3);
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .panel h2 { margin-top: 0; font-size: 1.15rem; }
+
+        /* ---- Wallet section ---- */
+        #wallet-section .wallet-row {
+            display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+        }
+
+        #wallet-address {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--accent);
+            word-break: break-all;
+        }
+
+        /* ---- Form ---- */
+        #add-contract-form { display: none; margin-top: 20px; }
+        #add-contract-form h3 { margin: 0 0 14px; font-size: 1rem; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 4px; }
+        .form-group.full { grid-column: 1 / -1; }
+
+        label {
+            font-size: 0.85rem;
+            color: var(--muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        input[type="text"],
+        select,
+        textarea {
+            background: var(--panel-alt);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            padding: 9px 12px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            width: 100%;
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        input[type="text"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--accent);
+        }
+
+        textarea { resize: vertical; min-height: 80px; font-family: monospace; font-size: 0.82rem; }
+
+        #custom-selector-row { display: none; }
+
+        /* ---- Buttons ---- */
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 9px 18px; border-radius: 10px; border: none;
+            font-size: 0.95rem; font-weight: 600; cursor: pointer;
+            transition: opacity 0.15s, transform 0.1s;
+        }
+
+        .btn:hover:not(:disabled) { opacity: 0.85; }
+        .btn:active:not(:disabled) { transform: scale(0.97); }
+        .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        .btn-accent { background: var(--accent); color: #0f172a; }
+        .btn-danger { background: rgba(248, 113, 113, 0.18); color: var(--danger); border: 1px solid rgba(248, 113, 113, 0.35); }
+        .btn-primary { background: rgba(56, 189, 248, 0.18); color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.35); }
+        .btn-sm { padding: 5px 11px; font-size: 0.82rem; border-radius: 7px; }
+
+        /* ---- Status bar ---- */
+        .status-bar {
+            display: none;
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            padding: 12px 22px; border-radius: 12px;
+            font-size: 0.9rem; font-weight: 600;
+            z-index: 9999; max-width: 90vw; text-align: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        .status-ok { background: rgba(74, 222, 128, 0.18); color: var(--success); border: 1px solid rgba(74, 222, 128, 0.4); }
+        .status-error { background: rgba(248, 113, 113, 0.18); color: var(--danger); border: 1px solid rgba(248, 113, 113, 0.4); }
+
+        /* ---- Contract cards ---- */
+        .contract-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .contract-card {
+            background: var(--panel-alt);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+            display: flex; flex-direction: column; gap: 12px;
+        }
+
+        .card-header {
+            display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;
+        }
+
+        .card-header h3 { margin: 0 0 4px; font-size: 1rem; }
+
+        code.addr {
+            font-size: 0.78rem;
+            color: var(--muted);
+            word-break: break-all;
+        }
+
+        .card-body { display: flex; flex-direction: column; gap: 10px; }
+
+        .balance-row {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.92rem;
+        }
+
+        .balance { color: var(--success); font-weight: 700; font-family: monospace; }
+
+        .method-row { display: flex; align-items: center; gap: 8px; }
+
+        .pill {
+            display: inline-flex; align-items: center;
+            padding: 4px 10px; border-radius: 999px;
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            font-size: 0.8rem; font-family: monospace;
+        }
+
+        .muted { color: var(--muted); }
+        .empty-state { color: var(--muted); font-style: italic; }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 540px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full { grid-column: 1; }
+        }
+    </style>
+</head>
+<body>
+<main>
+
+    <!-- Status bar (fixed, floating) -->
+    <div id="status-bar" class="status-bar" role="status" aria-live="polite"></div>
+
+    <!-- Hero -->
+    <section class="hero">
+        <h1>⚡ Nexus Contract Withdrawal Manager</h1>
+        <p>
+            Connect your wallet, add any contracts you own, and withdraw ETH proceeds
+            directly through the transparent proxy interface.  All contract data is
+            stored locally in your browser – nothing is sent to any server.
+        </p>
+        <ul class="badge-row">
+            <li>🔒 Local-only storage</li>
+            <li>🔑 MetaMask / EIP-1193 wallets</li>
+            <li>🔄 Transparent proxy (EIP-1967)</li>
+            <li>⚙ Custom ABI &amp; selectors</li>
+        </ul>
+    </section>
+
+    <!-- Wallet -->
+    <section class="panel" id="wallet-section">
+        <h2>Wallet</h2>
+        <div class="wallet-row">
+            <button class="btn btn-accent" id="connect-btn">Connect Wallet</button>
+            <span id="wallet-address" class="muted">not connected</span>
+        </div>
+
+        <!-- Add-contract form (shown after connection) -->
+        <form id="add-contract-form" autocomplete="off">
+            <h3>Add a contract</h3>
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label for="input-address">Contract address *</label>
+                    <input type="text" id="input-address" placeholder="0x…" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="input-label">Label (optional)</label>
+                    <input type="text" id="input-label" placeholder="My staking contract">
+                </div>
+
+                <div class="form-group">
+                    <label for="input-method">Withdraw method</label>
+                    <select id="input-method">
+                        <option value="withdraw()">withdraw()</option>
+                        <option value="withdrawAll()">withdrawAll()</option>
+                        <option value="withdrawEth()">withdrawEth()</option>
+                        <option value="release(address)">release(address payee)</option>
+                        <option value="claimRewards()">claimRewards()</option>
+                        <option value="collectProceeds()">collectProceeds()</option>
+                        <option value="custom">Custom selector / call-data</option>
+                    </select>
+                </div>
+
+                <div class="form-group full" id="custom-selector-row">
+                    <label for="input-custom-selector">Custom selector or call-data (hex)</label>
+                    <input type="text" id="input-custom-selector" placeholder="0x3ccfd60b  or full call-data">
+                </div>
+
+                <div class="form-group full">
+                    <label for="input-custom-abi">Implementation ABI (optional JSON – overrides selector)</label>
+                    <textarea id="input-custom-abi" placeholder='[{"name":"withdraw","type":"function","inputs":[],"outputs":[],"stateMutability":"nonpayable"}]'></textarea>
+                </div>
+            </div>
+
+            <div style="margin-top: 14px; display: flex; gap: 10px;">
+                <button type="submit" class="btn btn-accent">＋ Add Contract</button>
+            </div>
+        </form>
+    </section>
+
+    <!-- Contract list -->
+    <section class="panel">
+        <h2>My Contracts</h2>
+        <p class="muted" style="margin:0 0 12px; font-size:0.9rem;">
+            Click <strong>Withdraw</strong> to send the configured method call through the proxy
+            to the implementation contract.  Balances refresh automatically after each transaction.
+        </p>
+        <div class="contract-grid" id="contract-list">
+            <p class="empty-state">Connect your wallet and add a contract above.</p>
+        </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="panel">
+        <h2>How it works</h2>
+        <p>
+            Every contract in this dashboard is treated as a
+            <strong>transparent upgradeable proxy</strong> (EIP-1967).  The proxy itself
+            exposes only a <code>fallback</code> and a <code>receive</code> function; all
+            other calls are forwarded by the proxy to the implementation contract.
+        </p>
+        <p>
+            When you click <em>Withdraw</em> this interface encodes the selected function
+            selector and sends it as the <code>data</code> payload of an ETH transaction
+            addressed to the proxy.  The proxy's fallback delegates the call to the
+            implementation, which executes the withdrawal logic and transfers ETH (or
+            tokens) to you.
+        </p>
+        <p style="color:var(--muted); font-size:0.9rem;">
+            The ABI embedded in this dashboard matches exactly the proxy ABI you provided
+            (<code>AdminChanged</code>, <code>BeaconUpgraded</code>, <code>Upgraded</code>
+            events + payable fallback/receive).
+        </p>
+    </section>
+
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"
+        integrity="sha512-FDcVY+g7vc5CXANbrTSg1K5qLyriCsGDYCE02Li1tXEYdNQPvLPHNE+rT2Mjei8N7fZbe0WLhw27j2SrGRpdMg=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+        ></script>
+<script src="./withdraw.js"></script>
+</body>
+</html>
