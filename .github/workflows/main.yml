@@ -1,23 +1,16 @@
 
-name: Nexus Agent Runner
+name: CI
 
 on:
-  schedule:
-    - cron: "*/30 * * * *"   # every 30 minutes
   push:
-    branches:
-      - "agent/**"
-  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  plan-implement-verify:
+  build-test:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    env:
-      AGENT_DIR: .github/agents
-      PLAN_DIR: .agent/plans
-      PROV_DIR: .agent/provenance
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -27,76 +20,56 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install deps
-        run: |
-          python -m pip install --upgrade pip
-          pip install flask ecdsa pytest pytest-cov flake8
+      - name: Install dependencies
+        run: python -m pip install -r requirements-dev.txt
 
-      - name: Lint code
-        run: |
-          flake8 .
+      - name: Lint
+        run: flake8 .
 
-      - name: Agent scan
-        run: |
-          mkdir -p $PLAN_DIR $PROV_DIR
-          python - <<'PY'
-import json, os, time, glob
-ts = int(time.time())
-plan_path = os.path.join(".agent","plans",f"plan-{ts}.md")
-open(plan_path,"w").write("# Plan\n- Scan repo\n- Propose changes\n")
-prov = {"ts": ts, "files": glob.glob("**/*.py", recursive=True)}
-open(os.path.join(".agent","provenance",f"{ts}.json"),"w").write(json.dumps(prov))
-print("Generated plan and provenance.")
-PY
+      - name: Test
+        run: pytest -q
 
-      - name: Run tests
+      - name: Validate MCP agent configuration
         run: |
-          pytest -q || echo "TESTS_FAILED" > .agent/status
+          python - <<'PYTHON'
+          import json
+          with open('mcp/agents/mig-network-config.json') as f:
+              cfg = json.load(f)
+          agents = cfg['migNetwork']['mcpAgents']
+          assert len(agents) == 10, f"Expected 10 MCP agents, got {len(agents)}"
+          ids = [a['id'] for a in agents]
+          assert len(ids) == len(set(ids)), "Duplicate agent IDs detected"
+          roles = [a['role'] for a in agents]
+          assert len(roles) == len(set(roles)), "Duplicate agent roles detected"
+          print(f"MCP config OK — {len(agents)} agents, all IDs and roles unique")
+          PYTHON
 
-      - name: Self-heal backoff attempt 1
-        if: ${{ hashFiles('.agent/status') != '' }}
+      - name: Validate workflow YAML files
         run: |
-          echo "Attempt 1: Adding diagnostics and reducing scope."
-          # Example: add logging to simulator to catch failure causes
-          python - <<'PY'
-import fileinput, sys
-p="simulator/app.py"
-buf=open(p).read()
-if "LOG_DIAGNOSTICS" not in buf:
-    buf = buf.replace("app = Flask(__name__)", "app = Flask(__name__)\nLOG_DIAGNOSTICS=True")
-    open(p,"w").write(buf)
-print("Injected diagnostics flag.")
-PY
-          pytest -q || echo "TESTS_FAILED" > .agent/status
+          python - <<'PYTHON'
+          import yaml, pathlib
+          workflows = list(pathlib.Path('.github/workflows').glob('*.yml'))
+          assert workflows, "No workflow files found"
+          for wf in workflows:
+              with open(wf) as f:
+                  doc = yaml.safe_load(f)
+              assert doc is not None, f"{wf} parsed as empty"
+          print(f"Workflow YAML OK — {len(workflows)} files validated: {[w.name for w in workflows]}")
+          PYTHON
 
-      - name: Self-heal backoff attempt 2
-        if: ${{ hashFiles('.agent/status') != '' }}
+      - name: Run repo assessment
         run: |
-          echo "Attempt 2: Revert last risky chunk and re-run."
-          git checkout -- simulator/safe_core.py || true
-          pytest -q || echo "TESTS_FAILED" > .agent/status
+          python - <<'PYTHON'
+          import sys
+          sys.path.insert(0, '.')
+          from nexus.repo_assessment import collect_repo_assessment, render_repo_assessment
+          summary = collect_repo_assessment()
+          report = render_repo_assessment(summary)
+          assert len(summary.branches) > 0, "No branches found in assessment"
+          assert summary.custom_mcp_agent_count == 10, \
+              f"Expected 10 MCP agents, got {summary.custom_mcp_agent_count}"
+          assert summary.web3_protocol_count > 0, "No web3 protocols found"
+          print(report[:500])  # first 500 chars are enough for CI log confirmation
+          print("Repo assessment OK")
+          PYTHON
 
-      - name: Self-heal backoff attempt 3
-        if: ${{ hashFiles('.agent/status') != '' }}
-        run: |
-          echo "Attempt 3: Split changes; isolate failing tests."
-          pytest -q -k "not slow" || echo "TESTS_FAILED" > .agent/status
-
-      - name: Create PR on success
-        if: ${{ hashFiles('.agent/status') == '' }}
-        run: |
-          BR="agent/iteration-$(date +%s)"
-          git checkout -b "$BR"
-          git add -A
-          git commit -m "Agent iteration: green tests and diagnostics"
-          git push origin "$BR"
-          echo "::notice title=PR::Created agent branch $BR"
-
-      - name: Attach logs
-        run: |
-          echo "Attaching CI logs for provenance."
-          mkdir -p .agent/logs
-          dmesg | tail -n 200 > .agent/logs/kernel_tail.txt || true
-          git add .agent
-          git commit -m "Agent: attach provenance/logs" || true
-          git push origin HEAD || true
