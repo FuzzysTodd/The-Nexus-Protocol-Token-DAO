@@ -14,7 +14,7 @@ jobs:
       issues: read      
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         
       - name: Generate Progress Report
         id: report
@@ -99,8 +99,8 @@ jobs:
           cat report.md >> "$GITHUB_STEP_SUMMARY"
           
       - name: Send Email Report
-        if: secrets.EMAIL_USERNAME != ''
-        uses: dawidd6/action-send-mail@v3
+        if: ${{ secrets.EMAIL_USERNAME != '' }}
+        uses: dawidd6/action-send-mail@4226df7daafa6fc901a43789c49bf7ab309066e7
         with:
           server_address: smtp.gmail.com
           server_port: 587
@@ -113,7 +113,7 @@ jobs:
           convert_markdown: true
           
       - name: Archive Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: progress-report-${{ github.run_number }}
           path: |
