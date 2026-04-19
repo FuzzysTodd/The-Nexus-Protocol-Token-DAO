@@ -11,7 +11,10 @@ jobs:
     permissions:
       contents: read
       pull-requests: read
-      issues: read      
+      issues: read
+    env:
+      EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
@@ -99,10 +102,7 @@ jobs:
           cat report.md >> "$GITHUB_STEP_SUMMARY"
           
       - name: Send Email Report
-        if: ${{ secrets.EMAIL_USERNAME != '' && secrets.EMAIL_PASSWORD != '' }}
-        env:
-          EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
-          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+        if: ${{ env.EMAIL_USERNAME != '' && env.EMAIL_PASSWORD != '' }}
         run: |
           python - <<'PYTHON'
           import smtplib
@@ -110,7 +110,10 @@ jobs:
           from pathlib import Path
           import os
 
-          report_body = Path('report.md').read_text(encoding='utf-8')
+          try:
+              report_body = Path('report.md').read_text(encoding='utf-8')
+          except OSError as exc:
+              raise SystemExit(f"Unable to read report.md: {exc}") from exc
 
           message = EmailMessage()
           message['Subject'] = '📊 Nexus Protocol - Twice Daily Progress Report & Gantt Chart'
@@ -118,10 +121,13 @@ jobs:
           message['To'] = 'fuzzystodd@gmail.com'
           message.set_content(report_body)
 
-          with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
-              smtp.starttls()
-              smtp.login(os.environ['EMAIL_USERNAME'], os.environ['EMAIL_PASSWORD'])
-              smtp.send_message(message)
+          try:
+              with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+                  smtp.starttls()
+                  smtp.login(os.environ['EMAIL_USERNAME'], os.environ['EMAIL_PASSWORD'])
+                  smtp.send_message(message)
+          except smtplib.SMTPException as exc:
+              raise SystemExit(f"Email delivery failed: {exc}") from exc
           PYTHON
           
       - name: Archive Report
