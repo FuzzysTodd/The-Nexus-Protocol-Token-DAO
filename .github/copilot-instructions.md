@@ -24,4 +24,4 @@ Follow these rules when implementing changes:
 
 - Python: use the configured conda environment when available.
 - Frontend (`.html`, `.js`): keep pages framework-free and self-contained; use `ethers.js` only where existing Web3 behavior already uses it.
-- Solidity (`contracts/**/*.sol`): follow `.github/instructions/solidity.instructions.md`.
+- Solidity (`contracts/**/*.sol`): follow `instructions/solidity.instructions.md`.
