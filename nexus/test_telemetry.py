@@ -75,6 +75,22 @@ def test_render_dashboard_marks_nominal_and_warning_states():
     snapshot = collect_gpu_telemetry(command_runner=stub_runner)
     output = render_dashboard(snapshot)
 
-    assert "SAFE ML MONITOR" in output
-    assert "Status: STABLE" in output
+    assert "ML-ENHANCED BOT" in output
+    assert "UUC: STABLE" in output
     assert "eth0" in output
+    assert "Bit-Level Topology v20" in output
+
+
+def test_render_dashboard_marks_predicted_anomalies_as_lock():
+    output = render_dashboard(
+        collect_gpu_telemetry(
+            command_runner=lambda command: (
+                "0, 145, 70, 0, NVIDIA GeForce RTX 5090 Ti"
+                if command[:1] == ["nvidia-smi"]
+                else "eth0    UP"
+            )
+        )
+    )
+
+    assert "UUC: LOCK" in output
+    assert "predictive-threshold" in output
