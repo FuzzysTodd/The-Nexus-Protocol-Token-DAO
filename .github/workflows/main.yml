@@ -74,13 +74,18 @@ jobs:
           echo "Attempt 1: Adding diagnostics and reducing scope."
           # Example: add logging to simulator to catch failure causes
           python - <<'PY'
-          import fileinput, sys
-          p="simulator/app.py"
-          buf=open(p).read()
-          if "LOG_DIAGNOSTICS" not in buf:
-              buf = buf.replace("app = Flask(__name__)", "app = Flask(__name__)\nLOG_DIAGNOSTICS=True")
-              open(p,"w").write(buf)
-          print("Injected diagnostics flag.")
+          from pathlib import Path
+          p = Path("simulator/app.py")
+          if p.exists():
+              buf = p.read_text()
+              if "LOG_DIAGNOSTICS" not in buf:
+                  buf = buf.replace("app = Flask(__name__)", "app = Flask(__name__)\nLOG_DIAGNOSTICS=True")
+                  p.write_text(buf)
+                  print("Injected diagnostics flag.")
+              else:
+                  print("Diagnostics flag already present; no changes made.")
+          else:
+              print("simulator/app.py not found; skipping diagnostics injection.")
           PY
           rm -f .agent/status
           pytest -q || echo "TESTS_FAILED" > .agent/status
