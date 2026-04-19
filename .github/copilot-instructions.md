@@ -29,3 +29,11 @@ When working in this repository:
 ### Solidity
 
 - Follow the repository Solidity guidance in [solidity.instructions.md](instructions/solidity.instructions.md).
+
+### MCP & Workflow Operations
+
+- For workflow, CI, and MCP orchestration tasks, prioritize repository expert agents:
+  - `preerror-remediation-bot` for workflow failures and config drift
+  - `financial-rails-signal` for transaction and settlement signal workflows
+  - `success-documentation-reporter` for runbooks and operational reporting
+- Keep workflow permissions least-privilege and avoid broad write scopes unless explicitly required.
