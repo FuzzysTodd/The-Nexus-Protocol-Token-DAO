@@ -99,18 +99,30 @@ jobs:
           cat report.md >> "$GITHUB_STEP_SUMMARY"
           
       - name: Send Email Report
-        if: ${{ secrets.EMAIL_USERNAME != '' }}
-        uses: dawidd6/action-send-mail@4226df7daafa6fc901a43789c49bf7ab309066e7
-        with:
-          server_address: smtp.gmail.com
-          server_port: 587
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
-          to: fuzzystodd@gmail.com
-          from: Nexus Protocol Progress Bot <${{ secrets.EMAIL_USERNAME }}>
-          subject: 📊 Nexus Protocol - Twice Daily Progress Report & Gantt Chart
-          body: file://report.md
-          convert_markdown: true
+        if: ${{ secrets.EMAIL_USERNAME != '' && secrets.EMAIL_PASSWORD != '' }}
+        env:
+          EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+        run: |
+          python - <<'PYTHON'
+          import smtplib
+          from email.message import EmailMessage
+          from pathlib import Path
+          import os
+
+          report_body = Path('report.md').read_text(encoding='utf-8')
+
+          message = EmailMessage()
+          message['Subject'] = '📊 Nexus Protocol - Twice Daily Progress Report & Gantt Chart'
+          message['From'] = f"Nexus Protocol Progress Bot <{os.environ['EMAIL_USERNAME']}>"
+          message['To'] = 'fuzzystodd@gmail.com'
+          message.set_content(report_body)
+
+          with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+              smtp.starttls()
+              smtp.login(os.environ['EMAIL_USERNAME'], os.environ['EMAIL_PASSWORD'])
+              smtp.send_message(message)
+          PYTHON
           
       - name: Archive Report
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
