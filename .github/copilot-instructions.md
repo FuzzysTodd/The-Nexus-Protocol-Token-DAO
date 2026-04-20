@@ -25,3 +25,11 @@ Follow these rules when implementing changes:
 - Python: use the configured conda environment when available.
 - Frontend (`.html`, `.js`): keep pages framework-free and self-contained; use `ethers.js` only where existing Web3 behavior already uses it.
 - Solidity (`contracts/**/*.sol`): follow `instructions/solidity.instructions.md`.
+
+### MCP & Workflow Operations
+
+- For workflow, CI, and MCP orchestration tasks, prioritize repository expert agents:
+  - `preerror-remediation-bot` for workflow failures and config drift
+  - `financial-rails-signal` for transaction and settlement signal workflows
+  - `success-documentation-reporter` for runbooks and operational reporting
+- Keep workflow permissions least-privilege and avoid broad write scopes unless explicitly required.
