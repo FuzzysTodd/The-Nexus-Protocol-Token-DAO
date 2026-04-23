@@ -8,6 +8,8 @@ if [ -f requirements-dev.txt ]; then
 fi
 
 if [ -f playwright-tool/package.json ]; then
-  cd playwright-tool
-  npm install
+  (
+    cd playwright-tool
+    npm install
+  )
 fi
