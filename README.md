@@ -78,6 +78,25 @@ See [`MARKETING_PATH.md`](MARKETING_PATH.md) for the complete go-to-market strat
 2. **Get Test ETH** - Use testnets (Sepolia/Goerli) with free faucets
 3. **Explore** - Open the [User Guide](user-guide.html), [Games Arcade](games.html), or [Web3 Directory](chimera.html)
 
+### GitHub Codespaces
+
+This repository includes a `.devcontainer/devcontainer.json` configuration for Codespaces.
+
+After creating a Codespace:
+- Python 3.11 and Node.js 20 are available
+- `requirements-dev.txt` dependencies are installed automatically
+- `playwright-tool` npm dependencies are installed automatically
+
+Then run:
+
+```bash
+# Optional lint check (may report pre-existing repository issues):
+flake8 .
+
+# Main validation:
+pytest -q
+```
+
 ## Important Notes
 
 ⚠️ **Audit Status** - This is a real project, but repository components and on-chain flows may not all be audited for production use.
