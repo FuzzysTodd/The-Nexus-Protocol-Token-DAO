@@ -6,7 +6,7 @@
       "version": "20"
     }
   },
-  "postCreateCommand": "python -m pip install --upgrade pip && if [ -f requirements-dev.txt ]; then pip install -r requirements-dev.txt; fi && if [ -f playwright-tool/package.json ]; then cd playwright-tool && npm install; fi",
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -23,11 +23,7 @@
         "bierner.markdown-mermaid",
         "ms-vscode-remote.remote-containers",
         "ms-vscode-remote.remote-ssh"
-      ],
-      "settings": {
-        "python-envs.defaultEnvManager": "ms-python.python:conda",
-        "python-envs.defaultPackageManager": "ms-python.python:conda"
-      }
+      ]
     }
   }
 }
