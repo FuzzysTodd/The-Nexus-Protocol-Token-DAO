@@ -90,7 +90,10 @@ After creating a Codespace:
 Then run:
 
 ```bash
+# Optional lint check (may report pre-existing repository issues):
 flake8 .
+
+# Main validation:
 pytest -q
 ```
 
