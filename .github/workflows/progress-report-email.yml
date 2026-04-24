@@ -12,9 +12,11 @@ jobs:
       contents: read
       pull-requests: read
       issues: read      
+    env:
+      EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         
       - name: Generate Progress Report
         id: report
@@ -99,8 +101,8 @@ jobs:
           cat report.md >> "$GITHUB_STEP_SUMMARY"
           
       - name: Send Email Report
-        if: secrets.EMAIL_USERNAME != ''
-        uses: dawidd6/action-send-mail@v3
+        if: env.EMAIL_USERNAME != ''
+        uses: dawidd6/action-send-mail@v16
         with:
           server_address: smtp.gmail.com
           server_port: 587

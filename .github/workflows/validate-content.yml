@@ -13,10 +13,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
 
@@ -112,15 +112,15 @@ jobs:
               elif suffix == '.json':
                   try:
                       json.loads(text)
-                    counts['json'] += 1
+                      counts['json'] += 1
                   except json.JSONDecodeError:
                       js_markers = ('require(', 'module.exports', 'exports.', 'function ', 'const ', 'let ', 'var ')
                       if any(marker in text for marker in js_markers):
-                      with tempfile.NamedTemporaryFile('w', suffix='.cjs', delete=True) as temp_file:
-                        temp_file.write(text)
-                        temp_file.flush()
-                        subprocess.run(['node', '--check', temp_file.name], check=True)
-                      counts['javascript'] += 1
+                          with tempfile.NamedTemporaryFile('w', suffix='.cjs', delete=True) as temp_file:
+                              temp_file.write(text)
+                              temp_file.flush()
+                              subprocess.run(['node', '--check', temp_file.name], check=True)
+                          counts['javascript'] += 1
                       else:
                           raise
               elif suffix in {'.yml', '.yaml'}:
