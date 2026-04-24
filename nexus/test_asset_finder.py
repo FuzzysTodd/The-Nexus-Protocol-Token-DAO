@@ -3,8 +3,6 @@
 from __future__ import annotations
 
 from nexus.asset_finder import (
-    TokenAsset,
-    TokenAssetInventory,
     find_token_assets,
     render_asset_report,
 )
