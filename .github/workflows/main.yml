@@ -32,17 +32,17 @@ jobs:
       PROV_DIR: .agent/provenance
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           fetch-depth: 0
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: "3.11"
 
       - name: Cache pip
-        uses: actions/cache@v4
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-3.11-${{ hashFiles('**/requirements*.txt', '**/pyproject.toml', '**/setup.py', '**/setup.cfg', '**/Pipfile.lock') }}
@@ -74,18 +74,13 @@ jobs:
           echo "Attempt 1: Adding diagnostics and reducing scope."
           # Example: add logging to simulator to catch failure causes
           python - <<'PY'
-          from pathlib import Path
-          p = Path("simulator/app.py")
-          if p.exists():
-              buf = p.read_text()
-              if "LOG_DIAGNOSTICS" not in buf:
-                  buf = buf.replace("app = Flask(__name__)", "app = Flask(__name__)\nLOG_DIAGNOSTICS=True")
-                  p.write_text(buf)
-                  print("Injected diagnostics flag.")
-              else:
-                  print("Diagnostics flag already present; no changes made.")
-          else:
-              print("simulator/app.py not found; skipping diagnostics injection.")
+          import fileinput, sys
+          p="simulator/app.py"
+          buf=open(p).read()
+          if "LOG_DIAGNOSTICS" not in buf:
+              buf = buf.replace("app = Flask(__name__)", "app = Flask(__name__)\nLOG_DIAGNOSTICS=True")
+              open(p,"w").write(buf)
+          print("Injected diagnostics flag.")
           PY
           rm -f .agent/status
           pytest -q || echo "TESTS_FAILED" > .agent/status
@@ -123,7 +118,7 @@ jobs:
 
       - name: Upload agent artifacts
         if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: agent-${{ github.run_id }}
           path: .agent/**
@@ -137,7 +132,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         with:
           fetch-depth: 0
 
