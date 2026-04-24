@@ -3,6 +3,10 @@
 from __future__ import annotations
 
 from nexus.asset_finder import (
+    _detect_token_standards,
+    _extract_contract_name,
+    _is_library_path,
+    _is_owner_path,
     find_token_assets,
     render_asset_report,
 )
@@ -237,3 +241,89 @@ def test_relative_path_recorded(tmp_path):
     inventory = find_token_assets(repo_root=tmp_path)
     paths = [a.relative_path for a in inventory.owner_contracts]
     assert any("SpecialToken.sol" in p for p in paths)
+
+
+# ---------------------------------------------------------------------------
+# Tests: internal helper functions
+# ---------------------------------------------------------------------------
+
+_ABSTRACT_ERC20_SOL = """\
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+abstract contract AbstractToken is ERC20 {
+    function doSomething() external virtual;
+}
+"""
+
+_NO_INHERITANCE_SOL = """\
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+contract JustStorage {
+    uint256 public val;
+}
+"""
+
+
+def test_extract_contract_name_from_abstract_contract():
+    name = _extract_contract_name(_ABSTRACT_ERC20_SOL)
+    assert name == "AbstractToken"
+
+
+def test_extract_contract_name_from_regular_contract():
+    name = _extract_contract_name(_ERC20_SOL)
+    assert name == "MyToken"
+
+
+def test_extract_contract_name_empty_source():
+    assert _extract_contract_name("pragma solidity ^0.8.0;") == ""
+
+
+def test_detect_token_standards_no_inheritance_returns_empty():
+    # A contract with no "contract X is Y" line should yield no standards
+    standards = _detect_token_standards(_NO_INHERITANCE_SOL)
+    assert standards == []
+
+
+def test_detect_token_standards_erc20_detected_directly():
+    standards = _detect_token_standards(_ERC20_SOL)
+    assert "ERC-20" in standards
+
+
+def test_detect_token_standards_erc721_not_in_erc20_source():
+    standards = _detect_token_standards(_ERC20_SOL)
+    assert "ERC-721" not in standards
+
+
+def test_is_library_path_true_for_openzeppelin(tmp_path):
+    oz = tmp_path / "mintable-token" / "@openzeppelin" / "contracts" / "ERC20.sol"
+    oz.parent.mkdir(parents=True)
+    oz.touch()
+    assert _is_library_path(oz, tmp_path) is True
+
+
+def test_is_library_path_false_for_first_party(tmp_path):
+    first = tmp_path / "contracts" / "MyToken.sol"
+    first.parent.mkdir()
+    first.touch()
+    assert _is_library_path(first, tmp_path) is False
+
+
+def test_is_owner_path_true_for_contracts_dir(tmp_path):
+    sol = tmp_path / "contracts" / "Token.sol"
+    sol.parent.mkdir()
+    sol.touch()
+    assert _is_owner_path(sol, tmp_path) is True
+
+
+def test_is_owner_path_false_for_protocol_dir(tmp_path):
+    sol = tmp_path / "Uniswap-V3" / "UniswapV3Pool.sol"
+    sol.parent.mkdir()
+    sol.touch()
+    assert _is_owner_path(sol, tmp_path) is False
+
+
+def test_is_owner_path_false_for_library_inside_owner_dir(tmp_path):
+    oz = tmp_path / "mintable-token" / "@openzeppelin" / "ERC20.sol"
+    oz.parent.mkdir(parents=True)
+    oz.touch()
+    assert _is_owner_path(oz, tmp_path) is False

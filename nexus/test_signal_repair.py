@@ -4,6 +4,9 @@ from nexus.signal_repair import (
     EXCHANGE_SIGNAL_RANGES,
     PARTICLE_COUNT,
     DegradedSignal,
+    SignalRepairResult,
+    _majority,
+    _median,
     evaluate_particle,
     generate_particles,
     render_repair_report,
@@ -278,3 +281,98 @@ def test_exchange_signal_ranges_catalogue_populated():
     assert len(EXCHANGE_SIGNAL_RANGES) >= 10
     for key, (lo, hi) in EXCHANGE_SIGNAL_RANGES.items():
         assert hi >= lo, f"Range for {key} invalid: [{lo}, {hi}]"
+
+
+# ---------------------------------------------------------------------------
+# _median helper
+# ---------------------------------------------------------------------------
+
+def test_median_empty_list_returns_zero():
+    assert _median([]) == 0.0
+
+
+def test_median_single_element():
+    assert _median([42.0]) == 42.0
+
+
+def test_median_odd_count():
+    assert _median([3.0, 1.0, 2.0]) == 2.0
+
+
+def test_median_even_count_averages_middle_two():
+    assert _median([1.0, 2.0, 3.0, 4.0]) == 2.5
+
+
+def test_median_unsorted_input():
+    assert _median([10.0, 1.0, 5.0, 3.0]) == 4.0
+
+
+# ---------------------------------------------------------------------------
+# _majority helper
+# ---------------------------------------------------------------------------
+
+def test_majority_empty_labels_returns_clean_100():
+    label, pct = _majority([])
+    assert label == "CLEAN"
+    assert pct == 100.0
+
+
+def test_majority_unanimous_labels():
+    label, pct = _majority(["NOISY", "NOISY", "NOISY"])
+    assert label == "NOISY"
+    assert abs(pct - 100.0) < 1e-9
+
+
+def test_majority_majority_wins():
+    labels = ["CLEAN", "CLEAN", "NOISY"]
+    label, pct = _majority(labels)
+    assert label == "CLEAN"
+    assert abs(pct - (2 / 3) * 100) < 1e-6
+
+
+# ---------------------------------------------------------------------------
+# DegradedSignal.range_for
+# ---------------------------------------------------------------------------
+
+def test_degraded_signal_range_for_custom_range_overrides_catalogue():
+    signal = DegradedSignal(
+        exchange="TestEx",
+        dimensions={"my_dim": 50.0},
+        expected_ranges={"my_dim": (40.0, 60.0)},
+    )
+    rng = signal.range_for("my_dim")
+    assert rng == (40.0, 60.0)
+
+
+def test_degraded_signal_range_for_falls_back_to_catalogue():
+    signal = DegradedSignal(
+        exchange="TestEx",
+        dimensions={"latency_ms": 100.0},
+    )
+    rng = signal.range_for("latency_ms")
+    assert rng is not None
+    assert rng == EXCHANGE_SIGNAL_RANGES["latency_ms"]
+
+
+def test_degraded_signal_range_for_unknown_returns_none():
+    signal = DegradedSignal(
+        exchange="TestEx",
+        dimensions={"totally_unknown": 42.0},
+    )
+    assert signal.range_for("totally_unknown") is None
+
+
+# ---------------------------------------------------------------------------
+# render_repair_report — show_corrections=False
+# ---------------------------------------------------------------------------
+
+def test_render_repair_report_omits_corrections_when_disabled():
+    signal = DegradedSignal(
+        exchange="NoCorr",
+        dimensions={"latency_ms": 50.0, "noise_floor": 1.0},
+    )
+    result = repair_signal(signal, particles=generate_particles(20))
+    output = render_repair_report(result, show_corrections=False, show_chain=True)
+
+    assert "Corrected signal values" not in output
+    assert "Repair chain" in output
