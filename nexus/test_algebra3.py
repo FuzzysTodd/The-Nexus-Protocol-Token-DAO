@@ -349,3 +349,38 @@ def test_algebra3_applied_to_arbitrary_outcome():
     assert "CLIMATE READING" in result.answer
     assert result.active_dimensions == 4
     assert len(result.algebra_chain) == 8
+
+
+# ---------------------------------------------------------------------------
+# render_algebra3_report — additional cases
+# ---------------------------------------------------------------------------
+
+def test_render_algebra3_report_multiple_results_all_included():
+    r1 = apply_algebra3(
+        "MonsterBall",
+        {"speed": 50.0, "skill": 70.0},
+        MONSTERBALL_A3_WEIGHTS,
+    )
+    r2 = apply_algebra3(
+        "Token Activity",
+        {"liquidity": 400.0, "staking_ratio": 55.0},
+        TOKEN_A3_WEIGHTS,
+    )
+    output = render_algebra3_report([r1, r2])
+
+    assert "#1 MonsterBall" in output
+    assert "#2 Token Activity" in output
+
+
+def test_render_algebra3_report_shows_drivers_when_reasons_present():
+    weights = Algebra3Weights(
+        linear={"big": 10.0, "tiny": 0.001},
+        polynomial={},
+        exponential={},
+    )
+    result = apply_algebra3(
+        "Driver", {"big": 100.0, "tiny": 1.0}, weights, profiles=[]
+    )
+    assert result.reasons  # sanity check
+    output = render_algebra3_report([result], show_chain=False)
+    assert "DRIVERS" in output
