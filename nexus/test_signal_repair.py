@@ -4,7 +4,6 @@ from nexus.signal_repair import (
     EXCHANGE_SIGNAL_RANGES,
     PARTICLE_COUNT,
     DegradedSignal,
-    SignalRepairResult,
     _majority,
     _median,
     evaluate_particle,
