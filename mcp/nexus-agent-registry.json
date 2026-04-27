@@ -101,6 +101,32 @@
       "tools": ["mql5-terminal", "python-scipy", "numpy", "pandas"],
       "academicAlignment": ["MIT 15.401 (Finance Theory)", "Wharton Options Theory", "Black-Scholes-Merton 1973"],
       "notes": "Provides MQL5 signal feeds as inputs to the Chainlink oracle adapter. Calculates optimal reinvestBps for the FractalVault using Kelly criterion: f* = (bp - q) / b."
+    },
+    {
+      "id": "nexus-builder-fund",
+      "domain": "Developer Micropayment & Builder Compensation",
+      "primaryExpertise": [
+        "Protocol Guild share-weight pool pattern",
+        "Chainlink AggregatorV3 ETH/USD and BTC/USD price feeds",
+        "Satoshi denomination conversion (wei ↔ satoshi via Chainlink)",
+        "Chainlink Automation upkeep scripts",
+        "REST API usage metering (in-process counters → on-chain oracle settlement)",
+        "NexusBuilderFund.sol access control (DEFAULT_ADMIN_ROLE, ORACLE_ROLE)",
+        "CEI (Checks-Effects-Interactions) claim pattern"
+      ],
+      "scope": [
+        "contracts/NexusBuilderFund.sol",
+        "financial-ops-rest-server.js (/api/v1/builder-fund/*)",
+        "docs/BUILDER_FUND.md"
+      ],
+      "authorityLevel": "analysis-and-draft",
+      "tools": ["chainlink-automation", "ethers.js", "hardhat"],
+      "academicAlignment": [
+        "Protocol Guild (Ethereum core dev funding model)",
+        "MIT 15.S12 (data-driven settlement without intermediaries)",
+        "Wharton (proportional revenue share incentive alignment)"
+      ],
+      "notes": "Owns the developer micropayment pipeline: REST usage metering → Chainlink oracle settlement → on-chain proportional claim. Manages builder registration and share-weight adjustments. Reviews any code that touches depositFees(), recordUsage(), or claimReward()."
     }
   ],
   "governance": {
@@ -109,5 +135,5 @@
     "authority": "All agent actions are subject to GOVERNANCE.md safeguards. Irreversible actions require explicit owner authorization.",
     "escalationPath": "nexus-security-audit → FuzzysTodd → Super Delegates"
   },
-  "updatedAt": "2026-04-27T19:26:17.000Z"
+  "updatedAt": "2026-04-27T20:25:23.000Z"
 }

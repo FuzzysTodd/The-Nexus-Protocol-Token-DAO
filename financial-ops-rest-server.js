@@ -13,6 +13,48 @@ const DEFAULT_WALLET_ADDRESS = "0x33ffc308e693a5b49e0ee0241f41f03ccef495f2";
 const LIVE_WALLET_ADDRESS = String(process.env.FINANCIAL_OPS_WALLET_ADDRESS || DEFAULT_WALLET_ADDRESS).trim();
 const PUBLIC_ORIGIN = process.env.FINANCIAL_OPS_PUBLIC_ORIGIN || "*";
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Builder Fund Usage Tracker
+// ─────────────────────────────────────────────────────────────────────────────
+// In-process accumulator for API usage metrics.  These counters are:
+//   1. Exposed read-only at GET /api/v1/builder-fund/stats for dashboards.
+//   2. Submitted on-chain to NexusBuilderFund.sol via the ORACLE_ROLE wallet
+//      (either manually or via a Chainlink Automation upkeep that polls /stats
+//      and calls recordUsage() when the delta crosses a batch threshold).
+//
+// The contract address and oracle wallet are NOT embedded here — they are
+// managed off-chain by the Chainlink Automation config or a cron job.
+// This keeps the REST server stateless with respect to on-chain state.
+// ─────────────────────────────────────────────────────────────────────────────
+const builderFundUsage = (function () {
+    const _counts = Object.create(null); // endpoint -> cumulative call count
+    let _grandTotal = 0;
+    const _startedAt = new Date().toISOString();
+
+    return {
+        /** Record one or more calls to an endpoint. */
+        record(endpoint, count) {
+            const n = (Number.isFinite(count) && count > 0) ? Math.floor(count) : 1;
+            const key = String(endpoint || "unknown").trim();
+            _counts[key] = (_counts[key] || 0) + n;
+            _grandTotal += n;
+        },
+        /** Returns a plain-object snapshot suitable for JSON serialisation. */
+        stats() {
+            return {
+                service: "nexus-builder-fund-usage",
+                startedAt: _startedAt,
+                snapshotAt: new Date().toISOString(),
+                totalCalls: _grandTotal,
+                byEndpoint: Object.assign(Object.create(null), _counts),
+                builderFundContract: process.env.NEXUS_BUILDER_FUND_ADDRESS || null,
+                oracleNote: "Submit stats.byEndpoint to NexusBuilderFund.recordUsage() via ORACLE_ROLE.",
+                feeNote: "Fee per call configured in NexusBuilderFund.feePerCallUsdCents.",
+            };
+        },
+    };
+}());
+
 function json(res, statusCode, payload, extraHeaders = {}) {
   res.writeHead(statusCode, {
     "Content-Type": "application/json; charset=utf-8",
@@ -896,16 +938,19 @@ async function handleRequest(req, res) {
   }
 
   if (req.method === "GET" && url.pathname === "/api/signals") {
+    builderFundUsage.record("/api/signals");
     const report = await loadReport();
     return json(res, 200, buildSignalsPayload(report));
   }
 
   if (req.method === "GET" && url.pathname === "/api/summary") {
+    builderFundUsage.record("/api/summary");
     const report = await loadReport();
     return json(res, 200, buildSummaryPayload(report));
   }
 
   if (req.method === "GET" && url.pathname === "/api/transactions") {
+    builderFundUsage.record("/api/transactions");
     const rawWallet = url.searchParams.get("wallet") || "";
     const wallet = sanitizeAddress(rawWallet);
     if (rawWallet && !wallet) {
@@ -919,6 +964,7 @@ async function handleRequest(req, res) {
   const memberMatch = url.pathname.match(/^\/api\/v1\/member\/(0x[0-9a-fA-F]{40})$/i);
   if (req.method === "GET" && memberMatch) {
     const address = memberMatch[1].toLowerCase();
+    builderFundUsage.record("/api/v1/member");
     const report = await loadReport();
     const transactions = buildTransactionsPayload(report, address);
     const chain = report.liveChain || null;
@@ -949,6 +995,43 @@ async function handleRequest(req, res) {
     });
   }
 
+  // /api/v1/builder-fund/stats — read-only view of accumulated usage metrics
+  // Used by the dashboard and by the Chainlink Automation upkeep to decide
+  // when to submit a recordUsage() tx to NexusBuilderFund.sol.
+  if (req.method === "GET" && url.pathname === "/api/v1/builder-fund/stats") {
+    return json(res, 200, builderFundUsage.stats());
+  }
+
+  // /api/v1/builder-fund/usage — oracle relayer records off-chain usage
+  // Expected body: { "endpoint": "/api/v1/member", "callCount": 42 }
+  // Secured by the NEXUS_ORACLE_SECRET env var (Bearer token).
+  if (req.method === "POST" && url.pathname === "/api/v1/builder-fund/usage") {
+    const authHeader = req.headers.authorization || "";
+    const oracleSecret = String(process.env.NEXUS_ORACLE_SECRET || "").trim();
+    if (oracleSecret && authHeader !== "Bearer " + oracleSecret) {
+      return json(res, 401, { error: "Unauthorized" });
+    }
+    let body = "";
+    for await (const chunk of req) body += chunk;
+    let parsed;
+    try { parsed = JSON.parse(body); } catch (_) {
+      return json(res, 400, { error: "Invalid JSON body" });
+    }
+    const endpoint = String(parsed.endpoint || "").trim();
+    const callCount = Math.floor(Number(parsed.callCount));
+    if (!endpoint) return json(res, 400, { error: "endpoint required" });
+    if (!Number.isFinite(callCount) || callCount < 1) {
+      return json(res, 400, { error: "callCount must be a positive integer" });
+    }
+    builderFundUsage.record(endpoint, callCount);
+    return json(res, 200, {
+      ok: true,
+      endpoint,
+      callCount,
+      stats: builderFundUsage.stats(),
+    });
+  }
+
   return json(res, 404, {
     error: "Not found",
     routes: [
@@ -956,6 +1039,8 @@ async function handleRequest(req, res) {
       "/api/report", "/api/status", "/api/refresh",
       "/api/signals", "/api/summary", "/api/transactions",
       "/api/v1/member/:address",
+      "/api/v1/builder-fund/stats",
+      "/api/v1/builder-fund/usage",
     ],
   });
 }
