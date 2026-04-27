@@ -11,6 +11,12 @@ on:
       - "approval-service.html"
       - "governance.html"
       - "withdraw.html"
+      - "marketing.html"
+      - "builder-fund.html"
+      - "chimera.html"
+      - "games.html"
+      - "crypto-expert-guide.html"
+      - "user-guide.html"
       - "docs/**"
       - "nexus/**"
       - "ops/reports/**"
@@ -63,6 +69,12 @@ jobs:
               'approval-service.html',
               'governance.html',
               'withdraw.html',
+              'marketing.html',
+              'builder-fund.html',
+              'chimera.html',
+              'games.html',
+              'crypto-expert-guide.html',
+              'user-guide.html',
               'docs/DAO_AUTOMATION_ROADMAP.md',
               'ops/reports/financial-ops-report.md',
               'ops/reports/financial-ops-report.json',
