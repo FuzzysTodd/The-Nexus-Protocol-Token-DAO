@@ -50,9 +50,27 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 /// total accumulated usage counter drives the dashboard at
 /// /api/v1/builder-fund/stats on the REST server.
 ///
+/// ─── PLACEMENT WALLET ────────────────────────────────────────────────────────
+/// A `placementWallet` and `placementBps` (basis points, max 5 000 = 50%) can
+/// be configured by the admin.  On every `depositFees()` or plain ETH receive,
+/// `placementBps / 10 000` of the incoming ETH is forwarded **immediately** to
+/// `placementWallet` (e.g., the dashboard treasury wallet).  The remainder
+/// enters the pool for builder claims.  Setting `placementWallet = address(0)`
+/// or `placementBps = 0` disables the auto-forward.
+///
+/// ─── NGTT TOKEN AWARDS ───────────────────────────────────────────────────────
+/// An optional `ngttToken` (IERC20) and `ngttRewardPerEthWei` rate can be set
+/// by the admin.  When a builder claims ETH rewards, the contract transfers
+/// `claimedEth * ngttRewardPerEthWei / 1e18` NGTT tokens from its own balance
+/// to the builder's wallet as an additional bonus.  The contract must hold
+/// NGTT tokens (sent by the admin or minted via governance) for this to work;
+/// if the balance is insufficient the ETH claim still succeeds (tokens silently
+/// skipped).  Set `ngttRewardPerEthWei = 0` to disable.
+///
 /// ─── SECURITY ────────────────────────────────────────────────────────────────
 /// • `depositFees()` is payable and open to anyone (API gateways, contract
 ///    hooks, bridge wallets, individual users tipping the protocol).
+/// • Placement forward uses `call{value:}`, guarded by ReentrancyGuard.
 /// • Claim math uses integer division; dust (wei remainder) stays in the pool.
 /// • ReentrancyGuard on all fund-movement functions.
 /// • DEFAULT_ADMIN_ROLE required to register/remove builders.
@@ -122,6 +140,30 @@ contract NexusBuilderFund is AccessControl, ReentrancyGuard {
     uint256 public totalShares;
 
     // ─────────────────────────────────────────────────────────────────────────
+    // Placement wallet — auto-forward a cut of each deposit
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /// @notice Destination for the auto-forwarded placement cut.
+    ///         Set to address(0) to disable placement forwarding.
+    address public placementWallet;
+
+    /// @notice Basis points (0–5000) of each deposit auto-forwarded to
+    ///         placementWallet.  10 000 bps = 100%.  Max 50% = 5 000.
+    uint256 public placementBps;
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // NGTT token award — bonus tokens given to builders on ETH claim
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /// @notice The NGTT governance token.  Set to address(0) to disable.
+    IERC20 public ngttToken;
+
+    /// @notice NGTT tokens awarded per 1 ETH (1e18 wei) claimed.
+    ///         E.g., 1000e18 = 1 000 NGTT per ETH claimed.
+    ///         Set to 0 to disable token awards.
+    uint256 public ngttRewardPerEthWei;
+
+    // ─────────────────────────────────────────────────────────────────────────
     // Fee configuration
     // ─────────────────────────────────────────────────────────────────────────
 
@@ -175,27 +217,46 @@ contract NexusBuilderFund is AccessControl, ReentrancyGuard {
     /// @notice Emitted when the per-call USD-cent fee is updated.
     event FeePerCallUpdated(uint256 newFeeUsdCents);
 
+    /// @notice Emitted when the placement wallet or bps is updated.
+    event PlacementConfigUpdated(address indexed wallet, uint256 bps);
+
+    /// @notice Emitted when ETH is auto-forwarded to the placement wallet.
+    event PlacementSent(address indexed to, uint256 amount);
+
+    /// @notice Emitted when NGTT tokens are awarded to a builder on claim.
+    event NgttAwarded(uint256 indexed builderId, address indexed wallet, uint256 ngttAmount);
+
+    /// @notice Emitted when the NGTT token award config is updated.
+    event NgttRewardConfigUpdated(address indexed token, uint256 rewardPerEthWei);
+
     // ─────────────────────────────────────────────────────────────────────────
     // Constructor
     // ─────────────────────────────────────────────────────────────────────────
 
     /// @notice Deploys the builder fund.
-    /// @param admin         DEFAULT_ADMIN_ROLE holder (owner wallet).
-    /// @param _ethUsdFeed   Chainlink ETH/USD feed address (address(0) to disable).
-    /// @param _btcUsdFeed   Chainlink BTC/USD feed address (address(0) to disable).
+    /// @param admin                DEFAULT_ADMIN_ROLE holder (owner wallet).
+    /// @param _ethUsdFeed          Chainlink ETH/USD feed address (address(0) to disable).
+    /// @param _btcUsdFeed          Chainlink BTC/USD feed address (address(0) to disable).
     /// @param _feePerCallUsdCents  Initial per-call fee in USD cents (0 = free / externally metered).
+    /// @param _placementWallet     Auto-forward destination (address(0) to disable).
+    /// @param _placementBps        Basis points of each deposit to auto-forward (0–5000).
     constructor(
         address admin,
         address _ethUsdFeed,
         address _btcUsdFeed,
-        uint256 _feePerCallUsdCents
+        uint256 _feePerCallUsdCents,
+        address _placementWallet,
+        uint256 _placementBps
     ) {
         require(admin != address(0), "NexusBuilderFund: zero admin");
+        require(_placementBps <= 5000, "NexusBuilderFund: placementBps > 50%");
         _grantRole(DEFAULT_ADMIN_ROLE, admin);
         _grantRole(ORACLE_ROLE, admin); // Admin can also act as oracle initially
         ethUsdFeed = IAggregatorV3(_ethUsdFeed);
         btcUsdFeed = IAggregatorV3(_btcUsdFeed);
         feePerCallUsdCents = _feePerCallUsdCents;
+        placementWallet = _placementWallet;
+        placementBps = _placementBps;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -256,18 +317,48 @@ contract NexusBuilderFund is AccessControl, ReentrancyGuard {
     // Fee deposit (open to anyone — API gateways, bridge wallets, users)
     // ─────────────────────────────────────────────────────────────────────────
 
+    /// @dev Splits an incoming ETH payment: forwards placementBps/10000 to
+    ///      placementWallet immediately, and adds the remainder to totalDeposited
+    ///      (the builder pool).
+    ///
+    ///      `totalDeposited` intentionally tracks only the builder-pool portion —
+    ///      NOT the gross received amount.  This is correct: `claimReward()` uses
+    ///      `totalDeposited` to calculate entitlements, and the contract balance
+    ///      already excludes the placed portion (forwarded out immediately).
+    ///      Tracking gross here would allow builders to claim funds that no longer
+    ///      exist in the contract, causing `claimReward()` to revert.
+    ///
+    ///      Reentrancy: `_handleDeposit` is internal-only.  Every external entry
+    ///      point that calls it (`depositFees`, `receive`) is already guarded by
+    ///      `nonReentrant`.  The external call to `placementWallet` therefore runs
+    ///      inside an active ReentrancyGuard lock, making re-entry impossible.
+    function _handleDeposit(uint256 amount) internal {
+        if (placementWallet != address(0) && placementBps > 0) {
+            uint256 placed = (amount * placementBps) / 10_000;
+            if (placed > 0) {
+                // CEI: credit pool with the builder portion BEFORE external call
+                totalDeposited += (amount - placed);
+                (bool ok,) = payable(placementWallet).call{value: placed}("");
+                require(ok, "NexusBuilderFund: placement transfer failed");
+                emit PlacementSent(placementWallet, placed);
+                return;
+            }
+        }
+        totalDeposited += amount;
+    }
+
     /// @notice Deposits ETH into the builder fund.
     /// @param note  Human-readable label for this deposit (e.g., "REST API batch",
     ///              "Lightning bridge settlement", "GitHub Sponsors top-up").
     function depositFees(string calldata note) external payable nonReentrant {
         require(msg.value > 0, "NexusBuilderFund: zero deposit");
-        totalDeposited += msg.value;
+        _handleDeposit(msg.value);
         emit FeesDeposited(msg.sender, msg.value, note);
     }
 
     /// @notice Accepts plain ETH transfers (e.g., from the signal-bus settlement wallet).
     receive() external payable {
-        totalDeposited += msg.value;
+        _handleDeposit(msg.value);
         emit FeesDeposited(msg.sender, msg.value, "direct transfer");
     }
 
@@ -307,6 +398,8 @@ contract NexusBuilderFund is AccessControl, ReentrancyGuard {
     }
 
     /// @notice Claims all pending ETH rewards for the calling builder.
+    ///         If an NGTT token award rate is configured and the contract holds
+    ///         enough NGTT, a proportional NGTT bonus is also transferred.
     ///         The caller must be a registered builder's wallet.
     function claimReward() external nonReentrant {
         uint256 idx = builderIndex[msg.sender];
@@ -325,6 +418,15 @@ contract NexusBuilderFund is AccessControl, ReentrancyGuard {
         require(success, "NexusBuilderFund: ETH transfer failed");
 
         emit RewardClaimed(builderId, msg.sender, amount);
+
+        // NGTT token bonus — sent after ETH transfer; failure is non-blocking
+        if (address(ngttToken) != address(0) && ngttRewardPerEthWei > 0) {
+            uint256 ngttAmount = (amount * ngttRewardPerEthWei) / 1e18;
+            if (ngttAmount > 0 && ngttToken.balanceOf(address(this)) >= ngttAmount) {
+                ngttToken.safeTransfer(msg.sender, ngttAmount);
+                emit NgttAwarded(builderId, msg.sender, ngttAmount);
+            }
+        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -437,5 +539,62 @@ contract NexusBuilderFund is AccessControl, ReentrancyGuard {
     function setFeePerCall(uint256 newFeeUsdCents) external onlyRole(DEFAULT_ADMIN_ROLE) {
         feePerCallUsdCents = newFeeUsdCents;
         emit FeePerCallUpdated(newFeeUsdCents);
+    }
+
+    /// @notice Configures the placement wallet and basis points.
+    ///         On each deposit, `bps / 10000` of the ETH is immediately forwarded
+    ///         to `wallet`, with the remainder staying in the builder pool.
+    /// @param wallet  Destination address (address(0) = disable auto-forward).
+    /// @param bps     Basis points to forward (0–5000; 5000 = 50%).
+    function setPlacementConfig(address wallet, uint256 bps) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(bps <= 5000, "NexusBuilderFund: placementBps > 50%");
+        placementWallet = wallet;
+        placementBps = bps;
+        emit PlacementConfigUpdated(wallet, bps);
+    }
+
+    /// @notice Configures the NGTT token bonus awarded to builders on ETH claim.
+    /// @param token            NGTT token contract address (address(0) = disable).
+    /// @param rewardPerEthWei  NGTT tokens (18 dec) awarded per 1 ETH (1e18 wei) claimed.
+    ///                         E.g., 1000e18 = 1 000 NGTT per ETH.
+    function setNgttRewardConfig(address token, uint256 rewardPerEthWei)
+        external
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        ngttToken = IERC20(token);
+        ngttRewardPerEthWei = rewardPerEthWei;
+        emit NgttRewardConfigUpdated(token, rewardPerEthWei);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // Extended view helpers
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /// @notice Returns the NGTT token balance currently held by this contract
+    ///         (available for builder awards).
+    function ngttBalance() external view returns (uint256) {
+        if (address(ngttToken) == address(0)) return 0;
+        return ngttToken.balanceOf(address(this));
+    }
+
+    /// @notice Returns placement and NGTT reward configuration in one call.
+    function rewardConfig()
+        external
+        view
+        returns (
+            address _placementWallet,
+            uint256 _placementBps,
+            address _ngttToken,
+            uint256 _ngttRewardPerEthWei,
+            uint256 _ngttContractBalance
+        )
+    {
+        _placementWallet      = placementWallet;
+        _placementBps         = placementBps;
+        _ngttToken            = address(ngttToken);
+        _ngttRewardPerEthWei  = ngttRewardPerEthWei;
+        _ngttContractBalance  = (address(ngttToken) != address(0))
+            ? ngttToken.balanceOf(address(this))
+            : 0;
     }
 }

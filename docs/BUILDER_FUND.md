@@ -7,7 +7,7 @@ It answers the question:
 
 > *"Can we sparsely embed a payment API in the code so that every time someone
 > uses the protocol, a tiny satoshi/wei fee flows automatically to the builders
-> who wrote it?"*
+> who wrote it — and optionally to a dashboard wallet too?"*
 
 **Yes — and this is exactly how it works.**
 
@@ -33,13 +33,66 @@ GET /api/v1/builder-fund/stats   ← read-only snapshot for dashboards / upkeeps
     ▼
 NexusBuilderFund.recordUsage(endpoint_hash, callCount)  ← on-chain
     │
-    │  ETH fees accumulate in the contract from:
-    │    • depositFees()  (API gateways, bridges, GitHub Sponsors)
-    │    • receive()      (plain ETH transfers)
+    │  ETH fees arrive via depositFees() or plain receive():
+    │
+    │  ┌─── placementBps% ──────────────────────────────────────────────┐
+    │  │   Auto-forwarded IMMEDIATELY to placementWallet               │
+    │  │   (dashboard/treasury wallet — no builder action needed)       │
+    │  └───────────────────────────────────────────────────────────────┘
+    │
+    │  Remainder (100% - placementBps%) accumulates in pool
     │
     ▼
 Builder calls claimReward()
-    └──► proportional ETH transferred to builder's wallet
+    ├──► proportional ETH transferred to builder's wallet
+    └──► NGTT token bonus transferred (ngttRewardPerEthWei × ETH claimed)
+```
+
+---
+
+## Placement wallet — instant fee routing to the dashboard
+
+Set a `placementWallet` (e.g., the DAO treasury or your dashboard wallet address)
+and a `placementBps` (basis points, max 5 000 = 50%).  On **every deposit**,
+`placementBps / 10 000` of the ETH is forwarded instantly to that wallet —
+no claiming required.
+
+```solidity
+// Route 20% of every fee deposit to the dashboard/treasury wallet
+builderFund.setPlacementConfig(
+    0x33ffc308e693a5b49e0ee0241f41f03ccef495f2, // dashboard wallet
+    2000                                          // 20% = 2000 bps
+);
+```
+
+With `placementBps = 2000`:
+- $0.01 fee deposit → $0.002 goes instantly to the treasury wallet
+- $0.008 enters the builder pool for proportional claims
+
+Set `placementWallet = address(0)` or `placementBps = 0` to disable.
+
+---
+
+## NGTT token awards for developers
+
+When a builder claims ETH rewards, they **automatically receive NGTT governance
+tokens** as an additional bonus, proportional to the ETH claimed.
+
+```solidity
+// Award 1 000 NGTT per ETH claimed
+builderFund.setNgttRewardConfig(
+    0xNGTTTokenAddress,
+    1000e18   // 1 000 NGTT per 1 ETH (1e18 wei)
+);
+```
+
+The contract must hold NGTT tokens (funded by the admin or DAO governance).
+If the contract balance is insufficient, the ETH claim still succeeds —
+the NGTT bonus is silently skipped until tokens are replenished.
+
+```solidity
+// Check how many NGTT tokens the contract holds for awards
+uint256 available = builderFund.ngttBalance();
 ```
 
 ---
@@ -153,12 +206,16 @@ curl -X POST http://localhost:8788/api/v1/builder-fund/usage \
 |---|---|---|
 | `registerBuilder(wallet, shares, handle)` | Admin | Add a developer to the fund |
 | `updateBuilder(id, shares, active)` | Admin | Change shares or deactivate |
-| `depositFees(note)` | Anyone (payable) | Deposit ETH into the pool |
+| `depositFees(note)` | Anyone (payable) | Deposit ETH; placement cut auto-forwarded |
 | `recordUsage(endpoint, count)` | ORACLE_ROLE | Record off-chain API calls |
-| `claimReward()` | Registered builder | Pull proportional ETH share |
+| `claimReward()` | Registered builder | Pull proportional ETH + NGTT bonus |
+| `setPlacementConfig(wallet, bps)` | Admin | Set placement wallet + basis points |
+| `setNgttRewardConfig(token, rate)` | Admin | Set NGTT token address + award rate |
 | `getFeeWei()` | View | Current per-call fee in wei (Chainlink) |
 | `getFeeSatoshis()` | View | Current per-call fee in satoshis (Chainlink) |
 | `pendingReward(builderId)` | View | Claimable ETH for a builder |
+| `rewardConfig()` | View | Returns placement + NGTT config in one call |
+| `ngttBalance()` | View | NGTT tokens available for awards in contract |
 | `builderCount()` | View | Total registered builders |
 
 ---
@@ -169,6 +226,10 @@ curl -X POST http://localhost:8788/api/v1/builder-fund/usage \
 |---|---|---|
 | `NEXUS_ORACLE_SECRET` | *(empty = no auth)* | Bearer token for POST `/api/v1/builder-fund/usage` |
 | `NEXUS_BUILDER_FUND_ADDRESS` | *(empty)* | Deployed contract address (shown in stats) |
+| `NEXUS_PLACEMENT_WALLET` | *(empty)* | Dashboard/treasury wallet shown in stats (informational) |
+| `NEXUS_PLACEMENT_BPS` | `0` | Basis points shown in stats (mirrors on-chain `placementBps`) |
+| `NEXUS_NGTT_TOKEN_ADDRESS` | *(empty)* | NGTT token address shown in stats |
+| `NEXUS_NGTT_REWARD_PER_ETH` | *(empty)* | NGTT reward rate shown in stats |
 
 ---
 

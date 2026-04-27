@@ -48,8 +48,14 @@ const builderFundUsage = (function () {
                 totalCalls: _grandTotal,
                 byEndpoint: Object.assign(Object.create(null), _counts),
                 builderFundContract: process.env.NEXUS_BUILDER_FUND_ADDRESS || null,
+                placementWallet: process.env.NEXUS_PLACEMENT_WALLET || null,
+                placementBps: (Number(process.env.NEXUS_PLACEMENT_BPS) || 0),
+                ngttToken: process.env.NEXUS_NGTT_TOKEN_ADDRESS || null,
+                ngttRewardPerEthWei: process.env.NEXUS_NGTT_REWARD_PER_ETH || null,
                 oracleNote: "Submit stats.byEndpoint to NexusBuilderFund.recordUsage() via ORACLE_ROLE.",
                 feeNote: "Fee per call configured in NexusBuilderFund.feePerCallUsdCents.",
+                placementNote: "placementBps of each deposit is auto-forwarded to placementWallet (dashboard/treasury wallet).",
+                ngttNote: "ngttRewardPerEthWei NGTT tokens are awarded to builders per 1 ETH claimed.",
             };
         },
     };
