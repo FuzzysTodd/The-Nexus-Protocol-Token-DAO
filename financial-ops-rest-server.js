@@ -629,6 +629,7 @@ function buildStatusPayload(report) {
       "/api/signals",
       "/api/summary",
       "/api/transactions",
+      "/api/v1/member/:address",
     ],
     publicSurfaces: [
       "financial-ops-dashboard.html",
@@ -905,15 +906,69 @@ async function handleRequest(req, res) {
   }
 
   if (req.method === "GET" && url.pathname === "/api/transactions") {
+    const rawWallet = url.searchParams.get("wallet") || "";
+    const wallet = sanitizeAddress(rawWallet);
+    if (rawWallet && !wallet) {
+      return json(res, 400, { error: "Invalid wallet address" });
+    }
     const report = await loadReport();
-    const wallet = url.searchParams.get("wallet") || "";
-    return json(res, 200, buildTransactionsPayload(report, wallet));
+    return json(res, 200, buildTransactionsPayload(report, wallet || ""));
+  }
+
+  // /api/v1/member/:address — personal member dashboard data
+  const memberMatch = url.pathname.match(/^\/api\/v1\/member\/(0x[0-9a-fA-F]{40})$/i);
+  if (req.method === "GET" && memberMatch) {
+    const address = memberMatch[1].toLowerCase();
+    const report = await loadReport();
+    const transactions = buildTransactionsPayload(report, address);
+    const chain = report.liveChain || null;
+    return json(res, 200, {
+      address,
+      generatedAt: new Date().toISOString(),
+      portfolio: {
+        walletAddress: address,
+        ethBalance: chain ? chain.walletBalanceEth : null,
+        nonce: chain ? chain.walletNonce : null,
+        networkName: chain ? chain.networkName : null,
+        chainId: chain ? chain.chainId : null,
+        blockNumber: chain ? chain.blockNumber : null,
+        portfolioValueUsd: chain ? (chain.portfolioValueUsd || null) : null,
+        topHoldings: chain ? (chain.topHoldings || []) : [],
+      },
+      governance: {
+        note: "Query the NexusDAOGovernor contract on-chain for voting power and active proposals.",
+      },
+      treasury: {
+        note: "Query the NexusDAOTreasury contract on-chain for real-time balances.",
+      },
+      transactions: {
+        count: transactions.count,
+        preview: transactions.transactions.slice(0, 10),
+      },
+      signals: buildSignalsPayload(report),
+    });
   }
 
   return json(res, 404, {
     error: "Not found",
-    routes: ["/", "/status", "/health", "/api/report", "/api/status", "/api/refresh", "/api/signals", "/api/summary", "/api/transactions"],
+    routes: [
+      "/", "/status", "/health",
+      "/api/report", "/api/status", "/api/refresh",
+      "/api/signals", "/api/summary", "/api/transactions",
+      "/api/v1/member/:address",
+    ],
   });
+}
+
+function isValidEthAddress(value) {
+  return /^0x[0-9a-fA-F]{40}$/.test(String(value || "").trim());
+}
+
+function sanitizeAddress(value) {
+  const trimmed = String(value || "").trim();
+  if (!trimmed) return null;
+  if (!isValidEthAddress(trimmed)) return null;
+  return trimmed.toLowerCase();
 }
 
 function escapeHtml(value) {

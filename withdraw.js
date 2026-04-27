@@ -538,6 +538,53 @@ async function fetchBalance(address) {
 }
 
 // ---------------------------------------------------------------------------
+// Slippage protection
+// ---------------------------------------------------------------------------
+/** Default slippage tolerance: 50 basis points (0.5 %). */
+const DEFAULT_SLIPPAGE_BPS = 50;
+
+/**
+ * Validates that a received amount is within the acceptable slippage band.
+ * @param {number|string} expectedAmount  Quote amount (before the swap).
+ * @param {number|string} actualAmount    Amount received after the swap.
+ * @param {number}        toleranceBps    Max allowable slippage in bps (default 50 = 0.5 %).
+ * @returns {{ ok: boolean, slippageBps: number, message: string }}
+ */
+function checkSlippageTolerance(expectedAmount, actualAmount, toleranceBps) {
+    const expected = Number(expectedAmount);
+    const actual = Number(actualAmount);
+    const tol = Number.isFinite(toleranceBps) ? toleranceBps : DEFAULT_SLIPPAGE_BPS;
+
+    if (!Number.isFinite(expected) || expected <= 0) {
+        return { ok: false, slippageBps: 0, message: "Invalid expected amount." };
+    }
+    if (!Number.isFinite(actual) || actual < 0) {
+        return { ok: false, slippageBps: 0, message: "Invalid actual amount." };
+    }
+
+    const slippageBps = Math.round(((expected - actual) / expected) * 10000);
+    const ok = slippageBps <= tol;
+    const message = ok
+        ? `Slippage within tolerance (${slippageBps} bps ≤ ${tol} bps).`
+        : `Slippage too high (${slippageBps} bps > ${tol} bps). Transaction blocked for safety.`;
+    return { ok, slippageBps, message };
+}
+
+/**
+ * Returns the minimum amount out for a given quote and slippage tolerance.
+ * Used to compute minAmountOut for DEX calls.
+ * @param {number|string} quoteAmount  Expected output amount.
+ * @param {number}        toleranceBps Allowed slippage in bps.
+ * @returns {number}
+ */
+function minAmountOut(quoteAmount, toleranceBps) {
+    const quote = Number(quoteAmount);
+    const tol = Number.isFinite(toleranceBps) ? toleranceBps : DEFAULT_SLIPPAGE_BPS;
+    if (!Number.isFinite(quote) || quote <= 0) return 0;
+    return quote * (1 - tol / 10000);
+}
+
+// ---------------------------------------------------------------------------
 // Execute a withdrawal through the proxy (fallback delegation)
 // ---------------------------------------------------------------------------
 async function withdrawFromContract(address, method, customSelector, customAbi) {
@@ -599,6 +646,24 @@ async function withdrawFromContract(address, method, customSelector, customAbi) 
 
         showStatus("Sending withdrawal transaction…");
         const network = await provider.getNetwork();
+
+        // Slippage guard: warn when contract balance shows low-liquidity flags
+        // before committing the on-chain transaction.
+        const balanceCheck = (typeof window !== "undefined" && window._nexusContractBalances)
+            ? window._nexusContractBalances[address.toLowerCase()]
+            : null;
+        if (balanceCheck && balanceCheck.low_liquidity) {
+            const proceed = window.confirm(
+                "⚠️ Slippage Warning: This asset is flagged as low liquidity.\n" +
+                "Swap or settlement routes may experience high slippage (>0.5%).\n\n" +
+                "Proceed anyway?"
+            );
+            if (!proceed) {
+                showStatus("Withdrawal cancelled due to slippage risk.", true);
+                return;
+            }
+        }
+
         tx = await signer.sendTransaction({ to: address, data: callData });
         upsertLocalTransferHistory(buildLocalTransferHistoryEntry({
             chain: network.name || "unknown",
