@@ -203,11 +203,9 @@ contract NexusDAOTreasury is AccessControl, ReentrancyGuard {
     // ETH transfers (governance-only, with multi-sig for large amounts)
     // -------------------------------------------------------------------------
 
-    /// @notice Transfers ETH to the specified recipient.
-    ///         For amounts ≤ MULTISIG_THRESHOLD, executes immediately.
-    ///         For amounts > MULTISIG_THRESHOLD, use requestLargeETHTransfer /
-    ///         confirmLargeETHTransfer / executeLargeETHTransfer instead.
-    ///         Can only be called by the NexusDAOTimelock (EXECUTOR_ROLE).
+    /// @notice Transfers ETH to the specified recipient (amounts ≤ MULTISIG_THRESHOLD only).
+    ///         For larger amounts use requestLargeETHTransfer / confirmLargeETHTransfer /
+    ///         executeLargeETHTransfer. Can only be called by the NexusDAOTimelock (EXECUTOR_ROLE).
     /// @param recipient Destination address.
     /// @param amount    Amount of ETH in wei.
     /// @param reason    Human-readable description for audit logging.
