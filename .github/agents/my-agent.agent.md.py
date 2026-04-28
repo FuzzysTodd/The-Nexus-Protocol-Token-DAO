@@ -1,13 +1,10 @@
----
-# Fill in the fields below to create a basic custom agent for your repository.
-# The Copilot CLI can be used for local testing: https://gh.io/customagents/cli
-# To make this agent available, merge this file into the default repository branch.
-# For format details, see: https://gh.io/customagents/config
+"""Legacy placeholder file retained as an inert Python stub.
 
-name:
-description:
----
+This repository uses `.agent.md` files under `.github/agents/` for custom
+Copilot agents. This `.py` file previously contained agent frontmatter text,
+which caused Python syntax errors during repo-wide scans.
+"""
 
-# My Agent
 
-Describe what your agent does here...
+def placeholder() -> str:
+	return "legacy-agent-placeholder"
