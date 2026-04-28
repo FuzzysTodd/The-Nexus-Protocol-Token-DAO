@@ -127,6 +127,7 @@ contract NexusBuilderFund is AccessControl, ReentrancyGuard {
         address wallet;        // Payment destination
         uint256 shares;        // Relative weight in the pool (e.g., 100 = 1 share)
         string  handle;        // GitHub handle or display name
+        string  component;     // Expert domain / code-space attribution (e.g., "Solidity-DeFi-Core")
         uint256 totalClaimed;  // Cumulative ETH (in wei) ever claimed by this builder
         bool    active;        // False = removed from pool but historical data kept
     }
@@ -136,6 +137,9 @@ contract NexusBuilderFund is AccessControl, ReentrancyGuard {
 
     /// @notice Wallet → builderId (+1, so 0 = not registered).
     mapping(address => uint256) public builderIndex;
+
+    /// @notice keccak256(component) → list of builderIds attributed to that component.
+    mapping(bytes32 => uint256[]) private _buildersByComponent;
 
     /// @notice Total shares across all active builders.
     uint256 public totalShares;
@@ -198,7 +202,7 @@ contract NexusBuilderFund is AccessControl, ReentrancyGuard {
     // ─────────────────────────────────────────────────────────────────────────
 
     /// @notice Emitted when a builder is registered.
-    event BuilderRegistered(uint256 indexed builderId, address indexed wallet, string handle, uint256 shares);
+    event BuilderRegistered(uint256 indexed builderId, address indexed wallet, string handle, uint256 shares, string component);
 
     /// @notice Emitted when a builder's active status or shares are updated.
     event BuilderUpdated(uint256 indexed builderId, uint256 newShares, bool active);
@@ -264,7 +268,7 @@ contract NexusBuilderFund is AccessControl, ReentrancyGuard {
     // Builder registry management
     // ─────────────────────────────────────────────────────────────────────────
 
-    /// @notice Registers a new builder in the fund.
+    /// @notice Registers a new builder in the fund (legacy overload — component defaults to "").
     /// @param wallet   Payment destination address.
     /// @param shares   Relative weight (e.g., 100 = 1 standard share).
     /// @param handle   GitHub handle or display name for the dashboard.
@@ -272,6 +276,38 @@ contract NexusBuilderFund is AccessControl, ReentrancyGuard {
     function registerBuilder(address wallet, uint256 shares, string calldata handle)
         external
         onlyRole(DEFAULT_ADMIN_ROLE)
+        returns (uint256 builderId)
+    {
+        return _registerBuilderCore(wallet, shares, handle, "");
+    }
+
+    /// @notice Registers a new builder with explicit expert-domain attribution.
+    /// @param wallet     Payment destination address.
+    /// @param shares     Relative weight (e.g., 100 = 1 standard share).
+    /// @param handle     GitHub handle or display name for the dashboard.
+    /// @param component  Expert domain / code-space (e.g., "Solidity-DeFi-Core").
+    /// @return builderId  The new builder's array index.
+    function registerBuilder(
+        address wallet,
+        uint256 shares,
+        string calldata handle,
+        string calldata component
+    )
+        external
+        onlyRole(DEFAULT_ADMIN_ROLE)
+        returns (uint256 builderId)
+    {
+        return _registerBuilderCore(wallet, shares, handle, component);
+    }
+
+    /// @dev Core registration logic shared by both `registerBuilder` overloads.
+    function _registerBuilderCore(
+        address wallet,
+        uint256 shares,
+        string memory handle,
+        string memory component
+    )
+        internal
         returns (uint256 builderId)
     {
         require(wallet != address(0), "NexusBuilderFund: zero wallet");
@@ -283,6 +319,7 @@ contract NexusBuilderFund is AccessControl, ReentrancyGuard {
             wallet: wallet,
             shares: shares,
             handle: handle,
+            component: component,
             totalClaimed: 0,
             active: true
         }));
@@ -293,7 +330,12 @@ contract NexusBuilderFund is AccessControl, ReentrancyGuard {
         // New builder starts claiming from the current deposit snapshot
         _lastClaimSnapshot[builderId] = totalDeposited;
 
-        emit BuilderRegistered(builderId, wallet, handle, shares);
+        // Track component attribution
+        if (bytes(component).length > 0) {
+            _buildersByComponent[keccak256(bytes(component))].push(builderId);
+        }
+
+        emit BuilderRegistered(builderId, wallet, handle, shares, component);
     }
 
     /// @notice Updates a builder's share weight or active status.
@@ -496,6 +538,13 @@ contract NexusBuilderFund is AccessControl, ReentrancyGuard {
     /// @notice Returns the total number of registered builders (including inactive).
     function builderCount() external view returns (uint256) {
         return builders.length;
+    }
+
+    /// @notice Returns the builder IDs attributed to a given component/expert domain.
+    /// @param component  The component string (e.g., "Solidity-DeFi-Core").
+    /// @return ids  Array of builderIds that were registered with this component.
+    function buildersByComponent(string calldata component) external view returns (uint256[] memory ids) {
+        return _buildersByComponent[keccak256(bytes(component))];
     }
 
     /// @notice Returns complete info for a builder.
