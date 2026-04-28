@@ -21,70 +21,110 @@
       {
         "id": "mcp-001",
         "role": "Game Theory Coordinator",
-        "tasks": ["coordinate game sessions", "distribute rewards", "monitor player activity"],
+        "tasks": [
+          "coordinate game sessions",
+          "distribute rewards",
+          "monitor player activity"
+        ],
         "priority": "high",
         "computational_load": "medium"
       },
       {
         "id": "mcp-002",
         "role": "Token Economics Manager",
-        "tasks": ["manage token distribution", "calculate profit sharing", "Bitcoin backing reconciliation"],
+        "tasks": [
+          "manage token distribution",
+          "calculate profit sharing",
+          "Bitcoin backing reconciliation"
+        ],
         "priority": "critical",
         "computational_load": "low"
       },
       {
         "id": "mcp-003",
         "role": "DAO Governance Agent",
-        "tasks": ["process proposals", "vote counting", "policy enforcement"],
+        "tasks": [
+          "process proposals",
+          "vote counting",
+          "policy enforcement"
+        ],
         "priority": "high",
         "computational_load": "low"
       },
       {
         "id": "mcp-004",
         "role": "AI Data Pipeline Manager",
-        "tasks": ["collect gameplay data", "train models", "optimize strategies"],
+        "tasks": [
+          "collect gameplay data",
+          "train models",
+          "optimize strategies"
+        ],
         "priority": "high",
         "computational_load": "very-high"
       },
       {
         "id": "mcp-005",
         "role": "GPU Rendering Engine",
-        "tasks": ["TRON-style graphics rendering", "real-time game visuals", "VR/AR support"],
+        "tasks": [
+          "TRON-style graphics rendering",
+          "real-time game visuals",
+          "VR/AR support"
+        ],
         "priority": "critical",
         "computational_load": "very-high"
       },
       {
         "id": "mcp-006",
         "role": "VPN Node Manager",
-        "tasks": ["manage VPN nodes", "security monitoring", "traffic routing"],
+        "tasks": [
+          "manage VPN nodes",
+          "security monitoring",
+          "traffic routing"
+        ],
         "priority": "high",
         "computational_load": "medium"
       },
       {
         "id": "mcp-007",
         "role": "NFT Minting & Trading Agent",
-        "tasks": ["mint game NFTs", "manage marketplace", "track ownership"],
+        "tasks": [
+          "mint game NFTs",
+          "manage marketplace",
+          "track ownership"
+        ],
         "priority": "medium",
         "computational_load": "low"
       },
       {
         "id": "mcp-008",
         "role": "Marketing & Promotion Agent",
-        "tasks": ["social media campaigns", "community engagement", "partnership outreach"],
+        "tasks": [
+          "social media campaigns",
+          "community engagement",
+          "partnership outreach"
+        ],
         "priority": "high",
         "computational_load": "low"
       },
       {
         "id": "mcp-009",
         "role": "Cloud-Local Sync Manager",
-        "tasks": ["sync cloud and local data", "backup management", "disaster recovery"],
+        "tasks": [
+          "sync cloud and local data",
+          "backup management",
+          "disaster recovery"
+        ],
         "priority": "critical",
         "computational_load": "medium"
       },
       {
         "id": "mcp-010",
         "role": "Financial Analytics Agent",
-        "tasks": ["track revenue", "optimize profit distribution", "Bitcoin integration monitoring"],
+        "tasks": [
+          "track revenue",
+          "optimize profit distribution",
+          "Bitcoin integration monitoring"
+        ],
         "priority": "high",
         "computational_load": "medium"
       }
@@ -93,28 +133,46 @@
       {
         "id": "mpc-server-001",
         "role": "Multi-Party Computation Coordinator",
-        "capabilities": ["secure key management", "distributed signing", "privacy-preserving computation"],
+        "capabilities": [
+          "secure key management",
+          "distributed signing",
+          "privacy-preserving computation"
+        ],
         "uptime": "99.99%",
         "location": "distributed"
       },
       {
         "id": "mpc-server-002",
         "role": "Backup MPC Node",
-        "capabilities": ["failover support", "load balancing", "redundancy"],
+        "capabilities": [
+          "failover support",
+          "load balancing",
+          "redundancy"
+        ],
         "uptime": "99.99%",
         "location": "distributed"
       }
     ],
     "aiBackend": {
       "dataCollection": {
-        "sources": ["gameplay metrics", "user behavior", "token transactions", "GPU performance"],
+        "sources": [
+          "gameplay metrics",
+          "user behavior",
+          "token transactions",
+          "GPU performance"
+        ],
         "frequency": "real-time",
         "storage": "distributed ledger + cloud hybrid"
       },
       "modelTraining": {
         "framework": "PyTorch + TensorFlow",
         "cudaAcceleration": true,
-        "models": ["game strategy prediction", "user churn analysis", "token price forecasting", "fraud detection"]
+        "models": [
+          "game strategy prediction",
+          "user churn analysis",
+          "token price forecasting",
+          "fraud detection"
+        ]
       },
       "inferenceEngine": {
         "latency": "<50ms",
