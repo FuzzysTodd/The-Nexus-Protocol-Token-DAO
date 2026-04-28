@@ -777,13 +777,23 @@ $("pick-metamask").addEventListener("click", () => {
 $("pick-coinbase").addEventListener("click", () => {
     closeWalletPicker();
     let raw;
-    if (typeof window.ethereum !== "undefined" && window.ethereum.isCoinbaseWallet) {
-        raw = window.ethereum;
-    } else if (window.coinbaseWalletExtension) {
+    // 1. Direct Coinbase extension reference — works even when MetaMask is also installed
+    if (window.coinbaseWalletExtension) {
         raw = window.coinbaseWalletExtension;
+    // 2. window.ethereum is already Coinbase Wallet (single-wallet setup)
+    } else if (typeof window.ethereum !== "undefined" && window.ethereum.isCoinbaseWallet) {
+        raw = window.ethereum;
+    // 3. Multi-wallet array (some setups expose window.ethereum.providers[])
+    } else if (Array.isArray(window.ethereum && window.ethereum.providers)) {
+        raw = window.ethereum.providers.find(p => p.isCoinbaseWallet);
+        if (!raw) {
+            showResult("wallet-result", "Coinbase Wallet not found among installed wallets. Install from coinbase.com/wallet.", "err"); return;
+        }
+    // 4. No extension — fall back to Coinbase Wallet SDK (QR / deeplink)
     } else if (typeof CoinbaseWalletSDK !== "undefined") {
         const sdk = new CoinbaseWalletSDK({ appName: "Nexus Protocol DAO", appLogoUrl: "" });
-        raw = sdk.makeWeb3Provider();
+        // Pass options:'all' so SDK v4 shows the EOA choice, not Smart Wallet only
+        raw = sdk.makeWeb3Provider({ options: "all" });
     } else {
         showResult("wallet-result", "Coinbase Wallet not detected. Install from coinbase.com/wallet.", "err"); return;
     }
