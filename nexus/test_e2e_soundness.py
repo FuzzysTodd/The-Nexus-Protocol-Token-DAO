@@ -283,7 +283,10 @@ def test_validate_soundness_verdict_contains_tier():
 
 def test_validate_soundness_reasoning_chain_has_ten_steps():
     result = validate_soundness(_net({"a": 1.0}), _web({"a": 1.0}))
+    # Chain always contains exactly 10 labeled steps (E2E-1 through E2E-10)
     assert len(result.reasoning_chain) == 10
+    assert any("E2E-1" in s for s in result.reasoning_chain)
+    assert any("VERDICT" in s for s in result.reasoning_chain)
 
 
 def test_validate_soundness_with_rule_override_exact_tolerance():
@@ -365,7 +368,9 @@ def test_validate_network_only_all_field_results_have_no_web_value():
 
 def test_validate_network_only_reasoning_chain_present():
     result = validate_network_only(_net({"clients": 5.0}))
-    assert len(result.reasoning_chain) >= 5
+    # Chain contains at least the source, dimensions, and verdict steps
+    assert any("E2E-1" in s for s in result.reasoning_chain)
+    assert any("VERDICT" in s for s in result.reasoning_chain)
 
 
 # ---------------------------------------------------------------------------
