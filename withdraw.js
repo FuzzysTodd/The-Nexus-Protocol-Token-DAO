@@ -442,16 +442,20 @@ function buildLocalTransferHistoryEntry({
 // ---------------------------------------------------------------------------
 // Wallet connection
 // ---------------------------------------------------------------------------
-async function connectWallet() {
-    if (typeof window.ethereum === "undefined") {
-        showStatus("MetaMask (or compatible wallet) is not installed.", true);
+async function connectWallet(rawProvider) {
+    if (!rawProvider) {
+        // Legacy direct call — try window.ethereum for backward compat
+        rawProvider = window.ethereum;
+    }
+    if (!rawProvider) {
+        showStatus("No wallet detected. Install MetaMask or Coinbase Wallet.", true);
         return;
     }
     try {
         // Update progress bar
         updateProgress(33);
         
-        provider = new ethers.providers.Web3Provider(window.ethereum);
+        provider = new ethers.providers.Web3Provider(rawProvider, "any");
         await provider.send("eth_requestAccounts", []);
         signer = provider.getSigner();
         signerAddress = await signer.getAddress();
@@ -475,6 +479,9 @@ async function connectWallet() {
         showStatus("✓ Wallet connected: " + shortAddr(signerAddress));
         await refreshAll();
         updateProgress(100);
+
+        rawProvider.on("accountsChanged", () => connectWallet(rawProvider));
+        rawProvider.on("chainChanged", () => window.location.reload());
     } catch (err) {
         updateProgress(0);
         showStatus("✗ Wallet connection failed: " + err.message, true);
@@ -1680,7 +1687,44 @@ function initWithdrawDashboard() {
     if (methodSel) methodSel.addEventListener("change", onMethodChange);
 
     const connectBtn = document.getElementById("connect-btn");
-    if (connectBtn) connectBtn.addEventListener("click", connectWallet);
+    if (connectBtn) connectBtn.addEventListener("click", () => {
+        const picker = document.getElementById("wallet-picker");
+        if (picker) picker.style.display = picker.style.display === "none" ? "block" : "none";
+    });
+
+    const pickMM = document.getElementById("pick-metamask");
+    if (pickMM) pickMM.addEventListener("click", () => {
+        const picker = document.getElementById("wallet-picker");
+        if (picker) picker.style.display = "none";
+        if (!window.ethereum) { showStatus("MetaMask not detected. Install from metamask.io", true); return; }
+        connectWallet(window.ethereum);
+    });
+
+    const pickCB = document.getElementById("pick-coinbase");
+    if (pickCB) pickCB.addEventListener("click", () => {
+        const picker = document.getElementById("wallet-picker");
+        if (picker) picker.style.display = "none";
+        let raw;
+        if (typeof window.ethereum !== "undefined" && window.ethereum.isCoinbaseWallet) {
+            raw = window.ethereum;
+        } else if (window.coinbaseWalletExtension) {
+            raw = window.coinbaseWalletExtension;
+        } else if (typeof CoinbaseWalletSDK !== "undefined") {
+            const sdk = new CoinbaseWalletSDK({ appName: "Nexus Protocol DAO", appLogoUrl: "" });
+            raw = sdk.makeWeb3Provider();
+        } else {
+            showStatus("Coinbase Wallet not detected. Install from coinbase.com/wallet.", true); return;
+        }
+        connectWallet(raw);
+    });
+
+    document.addEventListener("click", evt => {
+        const picker = document.getElementById("wallet-picker");
+        const section = document.getElementById("wallet-section");
+        if (picker && picker.style.display !== "none" && section && !section.contains(evt.target)) {
+            picker.style.display = "none";
+        }
+    });
 
     const importBtn = document.getElementById("import-json-btn");
     if (importBtn) importBtn.addEventListener("click", handleJsonImport);

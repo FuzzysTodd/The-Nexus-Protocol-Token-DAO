@@ -439,7 +439,7 @@
         <aside class="wallet-card" aria-label="wallet connection">
             <strong id="wallet-heading">Connect wallet</strong>
             <p id="wallet-desc" style="color:var(--muted);font-size:0.85rem;line-height:1.55;">
-                Use MetaMask to claim rewards, deposit fees, or configure admin settings.
+                Connect MetaMask or Coinbase Wallet to claim rewards, deposit fees, or configure admin settings.
             </p>
             <div class="wallet-address" id="wallet-addr" aria-live="polite"></div>
             <div id="network-row" style="display:none;">
@@ -448,9 +448,16 @@
             <div id="role-row" style="font-size:0.82rem;color:var(--muted);display:none;">
                 Role: <span id="wallet-role" style="color:var(--text);">—</span>
             </div>
-            <button class="btn btn-primary" id="connect-btn" aria-label="Connect MetaMask">
-                Connect MetaMask
-            </button>
+            <div style="position:relative;">
+                <button class="btn btn-primary" id="connect-btn" aria-label="Connect wallet">
+                    Connect Wallet
+                </button>
+                <!-- Wallet picker dropdown -->
+                <div id="wallet-picker" style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:#1f2937;border:1px solid rgba(148,163,184,0.2);border-radius:10px;padding:10px;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+                    <button id="pick-metamask" style="width:100%;display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid rgba(148,163,184,0.15);border-radius:7px;background:#111827;color:#e5e7eb;font-size:0.88rem;cursor:pointer;margin-bottom:7px;">🦊 MetaMask</button>
+                    <button id="pick-coinbase" style="width:100%;display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid rgba(148,163,184,0.15);border-radius:7px;background:#111827;color:#e5e7eb;font-size:0.88rem;cursor:pointer;">🔵 Coinbase Wallet</button>
+                </div>
+            </div>
             <div class="result" id="wallet-result"></div>
         </aside>
     </section>
@@ -644,6 +651,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"
     integrity="sha512-izHMSMOSPULdxGaygRGNYSFrOjf31CaBp9Ej7sgPMoVTTa40JxXXVYqSJE3YJAaE07e6s6dZj6n+J6S7oBr1Q=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/@coinbase/wallet-sdk@4.3.0/dist/index.global.js"></script>
 <script>
 "use strict";
 
@@ -721,14 +729,17 @@ function fmt(wei, dp = 6) {
 }
 
 // ── Connect wallet ───────────────────────────────────────────────────────────
-$("connect-btn").addEventListener("click", async () => {
-    if (!window.ethereum) {
-        showResult("wallet-result", "MetaMask not detected. Please install it.", "err");
-        return;
-    }
+function openWalletPicker() {
+    const picker = $("wallet-picker");
+    picker.style.display = picker.style.display === "none" ? "block" : "none";
+}
+function closeWalletPicker() {
+    $("wallet-picker").style.display = "none";
+}
+async function connectWithProvider(rawProvider) {
     try {
         setLoading("connect-btn", true, "Connecting…");
-        provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+        provider = new ethers.providers.Web3Provider(rawProvider, "any");
         await provider.send("eth_requestAccounts", []);
         signer  = provider.getSigner();
         account = await signer.getAddress();
@@ -740,22 +751,48 @@ $("connect-btn").addEventListener("click", async () => {
         $("network-row").style.display = "";
         clearResult("wallet-result");
 
-        // Re-attach signer contract if already loaded
         if (contract) {
             signerContract = contract.connect(signer);
             await refreshWalletRole();
             await refreshPendingReward();
         }
-
-        // Enable deposit button
         $("deposit-btn").disabled = !contract;
-
         setLoading("connect-btn", false);
         $("connect-btn").textContent = "Reconnect";
 
+        rawProvider.on("accountsChanged", () => connectWithProvider(rawProvider));
+        rawProvider.on("chainChanged", () => connectWithProvider(rawProvider));
     } catch (err) {
         setLoading("connect-btn", false);
         showResult("wallet-result", err.message || String(err), "err");
+    }
+}
+
+$("connect-btn").addEventListener("click", openWalletPicker);
+$("pick-metamask").addEventListener("click", () => {
+    closeWalletPicker();
+    if (!window.ethereum) { showResult("wallet-result", "MetaMask not detected. Install from metamask.io", "err"); return; }
+    connectWithProvider(window.ethereum);
+});
+$("pick-coinbase").addEventListener("click", () => {
+    closeWalletPicker();
+    let raw;
+    if (typeof window.ethereum !== "undefined" && window.ethereum.isCoinbaseWallet) {
+        raw = window.ethereum;
+    } else if (window.coinbaseWalletExtension) {
+        raw = window.coinbaseWalletExtension;
+    } else if (typeof CoinbaseWalletSDK !== "undefined") {
+        const sdk = new CoinbaseWalletSDK({ appName: "Nexus Protocol DAO", appLogoUrl: "" });
+        raw = sdk.makeWeb3Provider();
+    } else {
+        showResult("wallet-result", "Coinbase Wallet not detected. Install from coinbase.com/wallet.", "err"); return;
+    }
+    connectWithProvider(raw);
+});
+document.addEventListener("click", evt => {
+    const picker = $("wallet-picker");
+    if (picker && picker.style.display !== "none" && !document.querySelector("aside.wallet-card").contains(evt.target)) {
+        closeWalletPicker();
     }
 });
 
@@ -1115,7 +1152,7 @@ $("contract-address").addEventListener("change", () => {
     }
 });
 
-// ── Handle MetaMask account/chain changes ─────────────────────────────────────
+// ── Handle wallet account/chain changes (MetaMask fallback) ───────────────────
 if (window.ethereum) {
     window.ethereum.on("accountsChanged", accs => {
         if (accs.length === 0) {

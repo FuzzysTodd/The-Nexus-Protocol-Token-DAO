@@ -148,6 +148,7 @@
             gap: 14px;
             flex-wrap: wrap;
             margin-bottom: 20px;
+            position: relative;
         }
 
         .btn {
@@ -396,7 +397,13 @@
         <section class="panel" id="wallet-section">
             <h2>🔑 Web3 Wallet</h2>
             <div class="wallet-row">
-                <button class="btn btn-accent" id="connect-btn" aria-label="Connect MetaMask wallet"><span>🔌</span><span>Connect Wallet</span></button>
+                <button class="btn btn-accent" id="connect-btn" aria-label="Connect wallet"><span>🔌</span><span>Connect Wallet</span></button>
+                <!-- Wallet picker -->
+                <div id="wallet-picker" style="display:none;position:absolute;top:calc(100% + 8px);left:0;background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px;min-width:220px;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+                    <p style="margin:0 0 10px;font-size:0.8rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">Choose Wallet</p>
+                    <button id="pick-metamask" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--panel-alt);color:var(--text);font-size:0.9rem;cursor:pointer;margin-bottom:8px;">🦊 MetaMask</button>
+                    <button id="pick-coinbase" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--border);border-radius:8px;background:var(--panel-alt);color:var(--text);font-size:0.9rem;cursor:pointer;">🔵 Coinbase Wallet</button>
+                </div>
                 <div class="connection-status disconnected" id="connection-status" aria-live="polite"><span>Disconnected</span></div>
             </div>
             <div class="wallet-detail" id="wallet-detail" style="display:none;">
@@ -521,6 +528,7 @@
 
 </main>
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@coinbase/wallet-sdk@4.3.0/dist/index.global.js"></script>
 <script src="./money-flow.js"></script>
 <script>
 (function () {
@@ -598,15 +606,41 @@
     }
 
     // Wallet
-    async function connectWallet() {
+    function openWalletPicker() {
+        var picker = document.getElementById("wallet-picker");
+        picker.style.display = picker.style.display === "none" ? "block" : "none";
+    }
+    function closeWalletPicker() {
+        document.getElementById("wallet-picker").style.display = "none";
+    }
+    async function connectWallet(type) {
+        closeWalletPicker();
         var errEl = document.getElementById("wallet-error"); errEl.style.display = "none";
-        if (typeof window.ethereum === "undefined") { errEl.textContent = "MetaMask not installed."; errEl.style.display = "block"; return; }
+        var rawProvider;
+        if (type === "coinbase") {
+            // Prefer Coinbase Wallet extension if already injected
+            if (typeof window.ethereum !== "undefined" && window.ethereum.isCoinbaseWallet) {
+                rawProvider = window.ethereum;
+            } else if (window.coinbaseWalletExtension) {
+                rawProvider = window.coinbaseWalletExtension;
+            } else if (typeof CoinbaseWalletSDK !== "undefined") {
+                var sdk = new CoinbaseWalletSDK({ appName: "Nexus Protocol DAO", appLogoUrl: "" });
+                rawProvider = sdk.makeWeb3Provider();
+            } else {
+                errEl.textContent = "Coinbase Wallet not detected. Install from coinbase.com/wallet or use the mobile app.";
+                errEl.style.display = "block"; return;
+            }
+        } else {
+            // MetaMask (default)
+            if (typeof window.ethereum === "undefined") { errEl.textContent = "MetaMask not installed."; errEl.style.display = "block"; return; }
+            rawProvider = window.ethereum;
+        }
         try {
-            provider = new ethers.providers.Web3Provider(window.ethereum);
+            provider = new ethers.providers.Web3Provider(rawProvider, "any");
             await provider.send("eth_requestAccounts", []);
             await updateWalletUI();
-            window.ethereum.on("accountsChanged", updateWalletUI);
-            window.ethereum.on("chainChanged", function () { provider = new ethers.providers.Web3Provider(window.ethereum); updateWalletUI(); });
+            rawProvider.on("accountsChanged", updateWalletUI);
+            rawProvider.on("chainChanged", function () { provider = new ethers.providers.Web3Provider(rawProvider, "any"); updateWalletUI(); });
         } catch (err) { var e = document.getElementById("wallet-error"); e.textContent = "Connection failed: " + err.message; e.style.display = "block"; }
     }
 
@@ -769,7 +803,16 @@
 
     function setText(id, text) { var el = document.getElementById(id); if (el) el.textContent = text; }
 
-    document.getElementById("connect-btn").addEventListener("click", connectWallet);
+    document.getElementById("connect-btn").addEventListener("click", openWalletPicker);
+    document.getElementById("pick-metamask").addEventListener("click", function () { connectWallet("metamask"); });
+    document.getElementById("pick-coinbase").addEventListener("click", function () { connectWallet("coinbase"); });
+    // Close picker when clicking outside
+    document.addEventListener("click", function (evt) {
+        var picker = document.getElementById("wallet-picker");
+        if (picker.style.display !== "none" && !document.getElementById("wallet-section").contains(evt.target)) {
+            closeWalletPicker();
+        }
+    });
     loadGitHubProfile();
     connectSignalBus();
 }());
