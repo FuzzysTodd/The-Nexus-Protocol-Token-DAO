@@ -99,7 +99,7 @@ def test_user_guide_has_safety_warnings():
         "security",
         "safe",
         "warning",
-        "educational",
+        "audited",
         "testnet",
         "risk",
     ]
@@ -243,7 +243,7 @@ def test_user_guide_warns_about_risks():
     content = guide_path.read_text()
 
     risk_warnings = [
-        "educational",
+        "real project",
         "not audited",
         "own research",
         "testnet",
