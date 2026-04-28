@@ -192,6 +192,14 @@ function networkNameForChainId(chainId) {
     return "Sepolia";
   }
 
+  if (chainId === 8453) {
+    return "Base Mainnet";
+  }
+
+  if (chainId === 56) {
+    return "BNB Smart Chain";
+  }
+
   return chainId ? `Chain ${chainId}` : "Unknown network";
 }
 
