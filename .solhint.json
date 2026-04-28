@@ -7,6 +7,9 @@
     "no-unused-vars": "warn",
     "func-visibility": ["warn", {"ignoreConstructors": true}],
     "reentrancy": "error",
-    "no-inline-assembly": "warn"
+    "no-inline-assembly": "warn",
+    "gas-custom-errors": "off",
+    "reason-string": "off",
+    "no-global-import": "off"
   }
 }

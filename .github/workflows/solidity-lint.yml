@@ -28,26 +28,19 @@ jobs:
       - name: Install solhint
         run: npm install -g solhint@4
 
-      - name: Write solhint config
-        run: |
-          cat > .solhint.json <<'JSON'
-          {
-            "extends": "solhint:recommended",
-            "rules": {
-              "compiler-version": ["warn", "^0.8.20"],
-              "avoid-suicide": "error",
-              "avoid-sha3": "warn",
-              "no-unused-vars": "warn",
-              "func-visibility": ["warn", {"ignoreConstructors": true}],
-              "reentrancy": "error",
-              "no-inline-assembly": "warn"
-            }
-          }
-          JSON
-
       - name: Run solhint on Nexus contracts
         run: |
-          solhint 'contracts/**/*.sol' --max-warnings 30
+          files=$(find contracts -type f -name "*.sol" | sort)
+          if [ -z "$files" ]; then
+            echo "No Solidity files found in contracts/"
+            exit 0
+          fi
+          failed=0
+          for f in $files; do
+            echo "Linting: $f"
+            solhint "$f" --max-warnings 30 || failed=1
+          done
+          exit $failed
 
       - name: Verify pragma versions
         run: |

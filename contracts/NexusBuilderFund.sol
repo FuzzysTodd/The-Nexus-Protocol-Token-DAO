@@ -79,6 +79,27 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 ///
 /// NES: this contract is a Nexus-authored surface governed by the
 /// Nexus Encryption Standard as documented in docs/NEXUS_ENCRYPTION_STANDARD.md.
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Chainlink price-feed interface (minimal — only latestRoundData used)
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// @dev Minimal AggregatorV3 interface so we avoid importing the full
+///      Chainlink NPM package at deployment time.
+interface IAggregatorV3 {
+    function latestRoundData()
+        external
+        view
+        returns (
+            uint80  roundId,
+            int256  answer,
+            uint256 startedAt,
+            uint256 updatedAt,
+            uint80  answeredInRound
+        );
+    function decimals() external view returns (uint8);
+}
+
 contract NexusBuilderFund is AccessControl, ReentrancyGuard {
     using SafeERC20 for IERC20;
 
@@ -89,26 +110,6 @@ contract NexusBuilderFund is AccessControl, ReentrancyGuard {
     /// @notice May call recordUsage() — assigned to Chainlink Automation upkeep
     ///         or the Nexus signal-bus server acting as a trusted oracle.
     bytes32 public constant ORACLE_ROLE = keccak256("ORACLE_ROLE");
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Chainlink price-feed interfaces (minimal — only latestRoundData used)
-    // ─────────────────────────────────────────────────────────────────────────
-
-    /// @dev Minimal AggregatorV3 interface so we avoid importing the full
-    ///      Chainlink NPM package at deployment time.
-    interface IAggregatorV3 {
-        function latestRoundData()
-            external
-            view
-            returns (
-                uint80  roundId,
-                int256  answer,
-                uint256 startedAt,
-                uint256 updatedAt,
-                uint80  answeredInRound
-            );
-        function decimals() external view returns (uint8);
-    }
 
     /// @notice Chainlink ETH/USD price feed (8 decimal answer, e.g. 3_000_00000000 = $3000).
     ///         Set to address(0) to disable USD-denominated fee conversion.
