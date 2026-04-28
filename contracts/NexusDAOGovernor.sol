@@ -56,6 +56,14 @@ contract NexusDAOGovernor is
     /// @notice Default quorum numerator: 4 % of total token supply.
     uint256 public constant DEFAULT_QUORUM_NUMERATOR = 4;
 
+    /// @notice Minimum allowed quorum numerator (1 %).
+    ///         Prevents governance from setting an effectively zero quorum.
+    uint256 public constant MIN_QUORUM_NUMERATOR = 1;
+
+    /// @notice Maximum allowed quorum numerator (20 %).
+    ///         Prevents governance from setting an impossible-to-reach quorum.
+    uint256 public constant MAX_QUORUM_NUMERATOR = 20;
+
     // -------------------------------------------------------------------------
     // Events
     // -------------------------------------------------------------------------
@@ -177,5 +185,30 @@ contract NexusDAOGovernor is
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
+    }
+
+    // -------------------------------------------------------------------------
+    // Quorum governance (bounded update)
+    // -------------------------------------------------------------------------
+
+    /// @notice Updates the quorum numerator via a governance proposal.
+    /// @dev Overrides GovernorVotesQuorumFraction to enforce Nexus bounds
+    ///      [MIN_QUORUM_NUMERATOR, MAX_QUORUM_NUMERATOR].  Callable only
+    ///      through a successful on-chain governance vote (msg.sender must be
+    ///      the governor itself, i.e. called via timelock execution).
+    /// @param newQuorumNumerator New quorum percentage (1–20 inclusive).
+    function updateQuorumNumerator(uint256 newQuorumNumerator)
+        public
+        override
+    {
+        require(
+            newQuorumNumerator >= MIN_QUORUM_NUMERATOR,
+            "NexusDAOGovernor: quorum below minimum"
+        );
+        require(
+            newQuorumNumerator <= MAX_QUORUM_NUMERATOR,
+            "NexusDAOGovernor: quorum above maximum"
+        );
+        super.updateQuorumNumerator(newQuorumNumerator);
     }
 }
