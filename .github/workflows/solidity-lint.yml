@@ -38,6 +38,7 @@ jobs:
           failed=0
           for f in $files; do
             echo "Linting: $f"
+            # 30 warnings per file: tuned for current contracts with gas-custom-errors/reason-string/no-global-import disabled
             solhint "$f" --max-warnings 30 || failed=1
           done
           exit $failed
