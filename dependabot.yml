@@ -5,7 +5,7 @@ updates:
     schedule:
       interval: "weekly"
   - package-ecosystem: "pip"
-    directory: "/" # Location of requirements.txt
+    directory: "/" # Location of requirements*.txt
     schedule:
       interval: "weekly"
   - package-ecosystem: "gomod"
