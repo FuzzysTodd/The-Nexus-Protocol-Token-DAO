@@ -394,7 +394,7 @@
 <div id="tooltip" role="tooltip"></div>
 
 <!-- ── Popup notifications ── -->
-<div id="popup-container" aria-live="assertive" aria-label="Trade notifications"></div>
+<div id="popup-container" aria-live="polite" aria-label="Trade notifications"></div>
 
 <script>
 /* ============================================================
@@ -406,6 +406,16 @@
    - Falls back to simulated demo data automatically
 ============================================================ */
 'use strict';
+
+// ── Configuration constants ───────────────────────────────────
+const SIGNAL_BUS_PORT        = 8790;
+const ETH_PRICE_USD          = 2800;    // approximate ETH/USD for volume display
+const WHALE_PROBABILITY      = 0.04;    // fraction of trades that are "whale" size
+const WHALE_MIN_AMOUNT       = 10;      // ETH — minimum whale trade
+const WHALE_MAX_AMOUNT       = 80;      // ETH — max additional whale amount
+const NORMAL_MAX_AMOUNT      = 3;       // ETH — maximum normal trade
+const MIN_TRADE_INTERVAL_MS  = 500;     // ms — minimum time between demo trades
+const TRADE_INTERVAL_JITTER  = 700;     // ms — random jitter added to interval
 
 // ── Canvas & sizing ──────────────────────────────────────────
 const canvas = document.getElementById('globe');
@@ -824,7 +834,7 @@ function showPopup(ev) {
 // ── Shared event handler ──────────────────────────────────────
 function onTradeEvent(ev) {
     totalTrades++;
-    totalVolumeUSD += ev.amount * 2800;
+    totalVolumeUSD += ev.amount * ETH_PRICE_USD;
     pairCounts[ev.pair] = (pairCounts[ev.pair] || 0) + 1;
 
     addArc(ev.fromIdx, ev.toIdx, ev.type);
@@ -849,9 +859,9 @@ function randomTrade() {
     while (toIdx === fromIdx) toIdx = Math.floor(Math.random() * HUBS.length);
 
     const type   = TYPES[Math.floor(Math.random() * TYPES.length)];
-    const amount = Math.random() < 0.04
-        ? 10 + Math.random() * 80   // whale
-        : Math.random() * 3;
+    const amount = Math.random() < WHALE_PROBABILITY
+        ? WHALE_MIN_AMOUNT + Math.random() * WHALE_MAX_AMOUNT
+        : Math.random() * NORMAL_MAX_AMOUNT;
     const pair = PAIRS[Math.floor(Math.random() * PAIRS.length)];
 
     return { fromIdx, toIdx, from: HUBS[fromIdx].name, to: HUBS[toIdx].name, type, pair, amount };
@@ -874,7 +884,7 @@ function startDemo() {
         demoInterval = setInterval(() => {
             const n = Math.random() < 0.22 ? 2 : 1;
             for (let i = 0; i < n; i++) onTradeEvent(randomTrade());
-        }, 500 + Math.random() * 700);
+        }, MIN_TRADE_INTERVAL_MS + Math.random() * TRADE_INTERVAL_JITTER);
     }
 }
 
@@ -887,7 +897,7 @@ let ws    = null;
 let wsOK  = false;
 
 function connectWS() {
-    const url = 'ws://' + (location.hostname || 'localhost') + ':8790';
+    const url = 'ws://' + (location.hostname || 'localhost') + ':' + SIGNAL_BUS_PORT;
     try { ws = new WebSocket(url); }
     catch (_) { startDemo(); return; }
 
@@ -919,7 +929,7 @@ function connectWS() {
                 pair:   String(msg.pair || msg.token || 'NGTT/ETH'),
                 amount
             });
-        } catch (_) { /* ignore malformed */ }
+        } catch (err) { console.warn('[live-map] WS message parse error:', err); }
     });
 
     ws.addEventListener('close', () => {
