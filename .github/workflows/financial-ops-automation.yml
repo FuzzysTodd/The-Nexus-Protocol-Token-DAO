@@ -27,10 +27,10 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: "3.11"
 
@@ -42,12 +42,52 @@ jobs:
             --output-json ops/reports/financial-ops-report.json \
             --output-md ops/reports/financial-ops-report.md
 
-      - name: Publish Job Summary
-        run: cat ops/reports/financial-ops-report.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Build Public Publication Index
+        run: |
+          python - <<'PYTHON'
+          from pathlib import Path
+
+          publication_index = Path('ops/reports/publication-index.md')
+          publication_index.parent.mkdir(parents=True, exist_ok=True)
+          publication_index.write_text(
+              '# DAO Public Publication Index\n\n'
+              'Generated reports and public surfaces produced by the automation layer.\n\n'
+              '## Report Artifacts\n\n'
+              '- `ops/reports/financial-ops-report.md`\n'
+              '- `ops/reports/financial-ops-report.json`\n'
+              '- `ops/reports/publication-index.md`\n\n'
+              '## Public Surfaces\n\n'
+              '- `financial-ops-dashboard.html`\n'
+              '- `approval-service.html`\n'
+              '- `governance.html`\n'
+              '- `withdraw.html`\n'
+              '- `index.html`\n\n'
+              '## REST Endpoints\n\n'
+              '- `GET /health`\n'
+              '- `GET /api/report`\n'
+              '- `POST /api/refresh`\n'
+              '- `GET /api/signals`\n'
+              '- `GET /api/summary`\n'
+              '- `GET /api/transactions?wallet=<address>`\n'
+          )
+          PYTHON
+
+      - name: Publish Financial Ops Summary
+        run: |
+          cat ops/reports/publication-index.md >> "$GITHUB_STEP_SUMMARY"
+          printf '\n' >> "$GITHUB_STEP_SUMMARY"
+          cat ops/reports/financial-ops-report.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload Financial Ops Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: financial-ops-report
-          path: ops/reports/*
+          name: dao-public-ops-pack
+          path: |
+            ops/reports/*
+            financial-ops-dashboard.html
+            approval-service.html
+            governance.html
+            withdraw.html
+            index.html
+            docs/DAO_AUTOMATION_ROADMAP.md
           retention-days: 30

@@ -11,10 +11,13 @@ jobs:
     permissions:
       contents: read
       pull-requests: read
-      issues: read      
+      issues: read
+    env:
+      EMAIL_USERNAME: ${{ secrets.EMAIL_USERNAME }}
+      EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
         
       - name: Generate Progress Report
         id: report
@@ -84,26 +87,57 @@ jobs:
           echo "**Authority**: FuzzysTodd - Total Authorization Granted" >> report.md
           echo "**Report Frequency**: Twice Daily (9 AM & 9 PM UTC)" >> report.md
           echo "**Contact**: fuzzystodd@gmail.com" >> report.md
+
+      - name: Publish Progress Report
+        run: |
+          mkdir -p ops/reports
+          cp report.md ops/reports/progress-report.md
+          {
+            echo "## Published Progress Report"
+            echo ""
+            echo "- Canonical artifact: ops/reports/progress-report.md"
+            echo "- Generated: $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+          } >> "$GITHUB_STEP_SUMMARY"
+          printf '\n' >> "$GITHUB_STEP_SUMMARY"
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
           
       - name: Send Email Report
-        if: secrets.EMAIL_USERNAME != ''
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: smtp.gmail.com
-          server_port: 587
-          username: ${{ secrets.EMAIL_USERNAME }}
-          password: ${{ secrets.EMAIL_PASSWORD }}
-          to: fuzzystodd@gmail.com
-          from: Nexus Protocol Progress Bot <${{ secrets.EMAIL_USERNAME }}>
-          subject: 📊 Nexus Protocol - Twice Daily Progress Report & Gantt Chart
-          body: file://report.md
-          convert_markdown: true
+        if: ${{ env.EMAIL_USERNAME != '' && env.EMAIL_PASSWORD != '' }}
+        run: |
+          python - <<'PYTHON'
+          import ssl
+          import smtplib
+          from email.message import EmailMessage
+          from pathlib import Path
+          import os
+
+          try:
+              report_body = Path('report.md').read_text(encoding='utf-8')
+          except OSError as exc:
+              raise SystemExit(f"Unable to read report.md (report generation may have failed): {exc}") from exc
+
+          message = EmailMessage()
+          message['Subject'] = '📊 Nexus Protocol - Twice Daily Progress Report & Gantt Chart'
+          message['From'] = f"Nexus Protocol Progress Bot <{os.environ['EMAIL_USERNAME']}>"
+          message['To'] = 'fuzzystodd@gmail.com'
+          message.set_content(report_body)
+
+          try:
+              with smtplib.SMTP('smtp.gmail.com', 587) as smtp:
+                  smtp.starttls(context=ssl.create_default_context())
+                  smtp.login(os.environ['EMAIL_USERNAME'], os.environ['EMAIL_PASSWORD'])
+                  smtp.send_message(message)
+          except smtplib.SMTPException as exc:
+              raise SystemExit(f"Email delivery failed: {exc}") from exc
+          PYTHON
           
       - name: Archive Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: progress-report-${{ github.run_number }}
-          path: report.md
+          path: |
+            report.md
+            ops/reports/progress-report.md
           retention-days: 90
 
       - name: Hive Mind Coordination Post-Processing

@@ -60,6 +60,8 @@ def test_withdraw_html_has_json_import_and_settlement_controls():
     assert 'id="json-import-file"' in html
     assert 'id="import-summary"' in html
     assert 'id="import-collectible-table"' in html
+    assert 'Direction' in html
+    assert 'Recipient' in html
     assert 'id="settlement-destination"' in html
     assert "Coinbase settlement destination" in html
     assert "Enter your own Coinbase deposit address" in html
@@ -213,6 +215,58 @@ def test_withdraw_js_can_parse_balances_and_transactions_payloads():
     assert "payload.transactions" in script
     assert "payload.entries" in script
     assert "renderImportedData" in script
+
+
+def test_withdraw_js_runtime_labels_transaction_direction():
+    output = run_node(
+        """
+        const withdraw = require('./withdraw.js');
+        const wallet = '0xeCE999c86452c573Adfdd7F0C9226e673477973a';
+        const parsed = withdraw.parseImportedPayload(JSON.stringify({
+          wallet_address: wallet,
+          transactions: [
+            {
+              chain: 'ethereum',
+              transaction_type: 'Sent USDT',
+              from: wallet,
+              to: '0x1111111111111111111111111111111111111111',
+              amount: '1000000',
+              decimals: 6,
+              symbol: 'USDT'
+            },
+            {
+              chain: 'ethereum',
+              transaction_type: 'Received USDT',
+              from: '0x1111111111111111111111111111111111111111',
+              to: wallet,
+              amount: '2000000',
+              decimals: 6,
+              symbol: 'USDT'
+            }
+          ]
+        }));
+        console.log(JSON.stringify(parsed.transactions.map(tx => ({
+          direction: tx.direction,
+          directionLabel: tx.directionLabel,
+          recipientStatus: tx.recipientStatus,
+          recipientLabel: tx.recipientLabel,
+          recipientWarning: tx.recipientWarning,
+          amountLabel: tx.amountLabel
+        }))));
+        """
+    )
+    parsed = json.loads(output)
+    assert parsed[0]["direction"] == "out"
+    assert parsed[0]["directionLabel"] == "Outgoing"
+    assert parsed[0]["recipientStatus"] == "mismatch"
+    assert parsed[0]["recipientLabel"] == "Different recipient"
+    assert "will not credit" in parsed[0]["recipientWarning"]
+    assert parsed[0]["amountLabel"].startswith("-1")
+    assert parsed[1]["direction"] == "in"
+    assert parsed[1]["directionLabel"] == "Incoming"
+    assert parsed[1]["recipientStatus"] == "match"
+    assert parsed[1]["recipientLabel"] == "Matches wallet"
+    assert parsed[1]["amountLabel"].startswith("+2")
 
 
 def test_money_flow_js_exports_import_helpers():

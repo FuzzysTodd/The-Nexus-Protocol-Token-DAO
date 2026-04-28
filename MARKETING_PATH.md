@@ -13,6 +13,8 @@ This document is the **canonical marketing path** for the Nexus Protocol Token (
 
 **Core Conclusion**: The project infrastructure, revenue mechanisms, and governance are fully built. The marketing path is the structured process of moving people from *never heard of Nexus* through *active, revenue-generating community member*. This document defines every phase, the assets that serve each phase, and the actions required to complete the path.
 
+**Implementation Companion**: See [`docs/MARKETING_IMPLEMENTATION_PLAN.md`](docs/MARKETING_IMPLEMENTATION_PLAN.md) for the execution checklist, owners, deliverables, and 30/60/90-day rollout sequence.
+
 ---
 
 ## 🗺️ The Marketing Path — Five Phases

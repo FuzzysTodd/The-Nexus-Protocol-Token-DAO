@@ -22,9 +22,11 @@ The User Guide is your friendly, no-jargon walkthrough of everything Nexus Proto
 - **[Governance Structure](GOVERNANCE.md)** - Authority and DAO operating mandate
 - **[Marketing Strategy](MARKETING_STRATEGY.md)** - Comprehensive Harvard-level digital marketing & legal strategy
 - **[Smart Contracts](contracts/)** - Solidity contracts including NGTT token
+- **[Public DAO Pages](.github/workflows/public-pages.yml)** - Free GitHub Pages deployment for static DAO surfaces and report snapshots
 
 ### For Marketing & Growth
 - **[📣 Marketing Path](MARKETING_PATH.md)** - Canonical go-to-market strategy, brand guide, launch roadmap, and phase-by-phase conclusions
+- **[🛠 Marketing Implementation Plan](docs/MARKETING_IMPLEMENTATION_PLAN.md)** - Execution checklist, owners, deliverables, and launch cadence
 - **[💎 Revenue Guide](CRYPTO_REVENUE_GUIDE.md)** - Complete documentation of all 10 NGTT revenue streams
 
 ## What is Nexus Protocol?
@@ -76,6 +78,25 @@ See [`MARKETING_PATH.md`](MARKETING_PATH.md) for the complete go-to-market strat
 2. **Get Test ETH** - Use testnets (Sepolia/Goerli) with free faucets
 3. **Explore** - Open the [User Guide](user-guide.html), [Games Arcade](games.html), or [Web3 Directory](chimera.html)
 
+### GitHub Codespaces
+
+This repository includes a `.devcontainer/devcontainer.json` configuration for Codespaces.
+
+After creating a Codespace:
+- Python 3.11 and Node.js 20 are available
+- `requirements-dev.txt` dependencies are installed automatically
+- `playwright-tool` npm dependencies are installed automatically
+
+Then run:
+
+```bash
+# Optional lint check (may report pre-existing repository issues):
+flake8 .
+
+# Main validation:
+pytest -q
+```
+
 ## Important Notes
 
 ⚠️ **Audit Status** - This is a real project, but repository components and on-chain flows may not all be audited for production use.
@@ -113,6 +134,7 @@ The repository includes comprehensive testing:
 
 ```bash
 # Run linting
+pip install -r requirements-dev.txt
 flake8 .
 
 # Run all tests
