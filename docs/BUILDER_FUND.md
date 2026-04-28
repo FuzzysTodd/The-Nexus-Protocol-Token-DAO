@@ -269,6 +269,99 @@ run().catch(console.error);
 
 ---
 
+## Component-Based Expert Registration
+
+Every Nexus code-space component is attributed to an expert domain and registered
+as a dedicated builder entry in the fund.  This means the dev-pay system
+automatically routes proportional ETH to the maintainer of each code space —
+no manual invoicing required.
+
+### The 10 registered expert components
+
+| # | Code Space | Expert Domain | Shares |
+|---|-----------|--------------|-------:|
+| 1 | `contracts/NexusBuilderFund.sol` | `Solidity-DeFi-Core` | 200 |
+| 2 | `contracts/NexusLPStaking.sol` | `Solidity-AMM-Staking` | 150 |
+| 3 | `contracts/NexusRWA.sol` | `Solidity-RWA-Compliance` | 150 |
+| 4 | `contracts/NexusFractionalize.sol` | `Solidity-NFT-Fractionalization` | 120 |
+| 5 | `contracts/NexusOptionsVault.sol` | `Solidity-Options-DeFi` | 180 |
+| 6 | `contracts/NexusFractalVault.sol` | `Solidity-Vault-Yield` | 160 |
+| 7 | `nexus-signal-bus.js` | `NodeJS-WebSocket-Infra` | 100 |
+| 8 | `nexus/e2e_soundness.py` | `Python-QA-Validation` | 80 |
+| 9 | `web3-interface.html` | `Frontend-Web3-UX` | 90 |
+| 10 | `builder-fund.html` | `Frontend-DApp-UX` | 70 |
+
+See [`docs/EXPERT_REGISTRY.md`](EXPERT_REGISTRY.md) for full rationale, wallet
+env vars, and the registration script usage guide.
+
+### Registering component experts
+
+Use the `scripts/register-expert-builders.js` script after deployment:
+
+```bash
+# Dry run — preview all 10 registrations without broadcasting
+DRY_RUN=true node scripts/register-expert-builders.js
+
+# Live run — registers all 10 expert roles on-chain
+NEXUS_BUILDER_FUND_ADDRESS=0x... \
+ADMIN_PRIVATE_KEY=<key> \
+RPC_URL=https://mainnet.infura.io/v3/<id> \
+node scripts/register-expert-builders.js
+```
+
+### Updated `registerBuilder` signature
+
+The contract now supports an optional `component` parameter for expert-domain
+attribution (backward-compatible overload — existing calls with 3 params still work):
+
+```solidity
+// 4-param overload — with expert-domain attribution
+builderFund.registerBuilder(
+    0xExpertWallet,
+    200,
+    "nexus-solidity-defi-expert",
+    "Solidity-DeFi-Core"         // ← component field
+);
+
+// 3-param legacy overload — component defaults to ""
+builderFund.registerBuilder(
+    0xContributorWallet,
+    50,
+    "contributor-github-handle"
+);
+```
+
+### Querying component attribution on-chain
+
+```solidity
+// Which builder IDs are attributed to the Solidity-DeFi-Core component?
+uint256[] memory ids = builderFund.buildersByComponent("Solidity-DeFi-Core");
+
+// Get full builder record including component field
+NexusBuilderFund.Builder memory b = builderFund.getBuilder(ids[0]);
+// b.component == "Solidity-DeFi-Core"
+// b.handle    == "nexus-solidity-defi-expert"
+// b.shares    == 200
+```
+
+### Component usage in the REST API
+
+The `/api/v1/builder-fund/stats` endpoint now includes the `expertRegistry`
+field — a JSON array of all 10 registered components with their handles, share
+weights, and code-space paths:
+
+```json
+{
+  "service": "nexus-builder-fund-usage",
+  "expertRegistry": [
+    { "handle": "nexus-solidity-defi-expert", "component": "Solidity-DeFi-Core", "shares": 200, "codeSpace": "contracts/NexusBuilderFund.sol" },
+    ...
+  ]
+}
+```
+
+---
+
 ## Academic alignment
 
 - **Protocol Guild** (Ethereum core dev funding) — exact same share-weight pool pattern
