@@ -1,12 +1,13 @@
-# This file was intentionally renamed/repurposed.
-#
-# The repository's CI includes a YAML validation step that parses every *.yml
-# file. The previous contents of this file were a copied snippet (a single
-# GitHub Actions step) and were not a valid workflow/document, causing CI to
-# fail with a YAML parse error.
-#
-# If you want CodeQL scanning, create a proper workflow file such as:
-#   .github/workflows/codeql.yml
-# using GitHub's CodeQL template.
+name: "CodeQL (disabled placeholder)"
 
-note: "Removed invalid workflow snippet that broke YAML validation."
+on:
+  workflow_dispatch:
+
+jobs:
+  placeholder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Placeholder
+        run: |
+          echo "This workflow is intentionally disabled."
+          echo "Add a real CodeQL workflow in .github/workflows/codeql.yml if desired."
