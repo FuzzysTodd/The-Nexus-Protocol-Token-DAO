@@ -486,13 +486,14 @@
 
         <div id="chain-warn" class="unsupported-chain-warn">
             ⚠️ Your wallet is connected to an unsupported network.
-            Please switch to <strong>Ethereum Mainnet</strong> (chainId: 1) or <strong>Base Mainnet</strong> (chainId: 8453).
+            Please switch to <strong>Ethereum Mainnet</strong> (chainId: 1), <strong>Base Mainnet</strong> (chainId: 8453), or <strong>BNB Smart Chain</strong> (chainId: 56).
         </div>
 
         <!-- Network selector tabs -->
         <div class="network-selector" id="net-selector">
             <button class="net-btn active" data-chain="1"    onclick="selectNetworkView(1)">Ethereum</button>
             <button class="net-btn"        data-chain="8453" onclick="selectNetworkView(8453)">Base</button>
+            <button class="net-btn"        data-chain="56"   onclick="selectNetworkView(56)">BSC</button>
         </div>
 
         <!-- Token/address table -->
@@ -718,6 +719,20 @@ const REGISTRY = {
                 WETH:  { symbol: "WETH",  name: "Wrapped Ether",  address: "0x4200000000000000000000000000000000000006", decimals: 18 },
                 DAI:   { symbol: "DAI",   name: "Dai Stablecoin", address: "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb", decimals: 18 },
                 USDbC: { symbol: "USDbC", name: "USD Base Coin",  address: "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA", decimals: 6  }
+            }
+        },
+        56: {
+            chainId: 56,
+            name: "BNB Smart Chain",
+            shortName: "bnb",
+            nativeCurrency: { name: "BNB", symbol: "BNB", decimals: 18 },
+            blockExplorerUrl: "https://bscscan.com",
+            tokens: {
+                BNB:  { symbol: "BNB",  name: "BNB",           address: "0x0000000000000000000000000000000000000000", decimals: 18, native: true },
+                WBNB: { symbol: "WBNB", name: "Wrapped BNB",   address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c", decimals: 18 },
+                USDT: { symbol: "USDT", name: "Tether USD",    address: "0x55d398326f99059fF775485246999027B3197955", decimals: 18 },
+                USDC: { symbol: "USDC", name: "USD Coin",      address: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d", decimals: 18 },
+                BUSD: { symbol: "BUSD", name: "Binance USD",   address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56", decimals: 18 }
             }
         }
     }
@@ -1111,7 +1126,7 @@ async function executeSend() {
         return;
     }
     if (!SUPPORTED_CHAINS.has(chainId)) {
-        showTxResult("error", "⚠ Unsupported network. Switch to Ethereum or Base.");
+        showTxResult("error", "⚠ Unsupported network. Switch to Ethereum, Base, or BSC.");
         return;
     }
 
