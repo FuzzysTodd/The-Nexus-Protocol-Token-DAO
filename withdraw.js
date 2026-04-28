@@ -442,16 +442,20 @@ function buildLocalTransferHistoryEntry({
 // ---------------------------------------------------------------------------
 // Wallet connection
 // ---------------------------------------------------------------------------
-async function connectWallet() {
-    if (typeof window.ethereum === "undefined") {
-        showStatus("MetaMask (or compatible wallet) is not installed.", true);
+async function connectWallet(rawProvider) {
+    if (!rawProvider) {
+        // Legacy direct call — try window.ethereum for backward compat
+        rawProvider = window.ethereum;
+    }
+    if (!rawProvider) {
+        showStatus("No wallet detected. Install MetaMask or Coinbase Wallet.", true);
         return;
     }
     try {
         // Update progress bar
         updateProgress(33);
         
-        provider = new ethers.providers.Web3Provider(window.ethereum);
+        provider = new ethers.providers.Web3Provider(rawProvider, "any");
         await provider.send("eth_requestAccounts", []);
         signer = provider.getSigner();
         signerAddress = await signer.getAddress();
@@ -475,6 +479,9 @@ async function connectWallet() {
         showStatus("✓ Wallet connected: " + shortAddr(signerAddress));
         await refreshAll();
         updateProgress(100);
+
+        rawProvider.on("accountsChanged", () => connectWallet(rawProvider));
+        rawProvider.on("chainChanged", () => window.location.reload());
     } catch (err) {
         updateProgress(0);
         showStatus("✗ Wallet connection failed: " + err.message, true);
@@ -535,6 +542,53 @@ async function fetchBalance(address) {
     } catch (_) {
         return "error";
     }
+}
+
+// ---------------------------------------------------------------------------
+// Slippage protection
+// ---------------------------------------------------------------------------
+/** Default slippage tolerance: 50 basis points (0.5 %). */
+const DEFAULT_SLIPPAGE_BPS = 50;
+
+/**
+ * Validates that a received amount is within the acceptable slippage band.
+ * @param {number|string} expectedAmount  Quote amount (before the swap).
+ * @param {number|string} actualAmount    Amount received after the swap.
+ * @param {number}        toleranceBps    Max allowable slippage in bps (default 50 = 0.5 %).
+ * @returns {{ ok: boolean, slippageBps: number, message: string }}
+ */
+function checkSlippageTolerance(expectedAmount, actualAmount, toleranceBps) {
+    const expected = Number(expectedAmount);
+    const actual = Number(actualAmount);
+    const tol = Number.isFinite(toleranceBps) ? toleranceBps : DEFAULT_SLIPPAGE_BPS;
+
+    if (!Number.isFinite(expected) || expected <= 0) {
+        return { ok: false, slippageBps: 0, message: "Invalid expected amount." };
+    }
+    if (!Number.isFinite(actual) || actual < 0) {
+        return { ok: false, slippageBps: 0, message: "Invalid actual amount." };
+    }
+
+    const slippageBps = Math.round(((expected - actual) / expected) * 10000);
+    const ok = slippageBps <= tol;
+    const message = ok
+        ? `Slippage within tolerance (${slippageBps} bps ≤ ${tol} bps).`
+        : `Slippage too high (${slippageBps} bps > ${tol} bps). Transaction blocked for safety.`;
+    return { ok, slippageBps, message };
+}
+
+/**
+ * Returns the minimum amount out for a given quote and slippage tolerance.
+ * Used to compute minAmountOut for DEX calls.
+ * @param {number|string} quoteAmount  Expected output amount.
+ * @param {number}        toleranceBps Allowed slippage in bps.
+ * @returns {number}
+ */
+function minAmountOut(quoteAmount, toleranceBps) {
+    const quote = Number(quoteAmount);
+    const tol = Number.isFinite(toleranceBps) ? toleranceBps : DEFAULT_SLIPPAGE_BPS;
+    if (!Number.isFinite(quote) || quote <= 0) return 0;
+    return quote * (1 - tol / 10000);
 }
 
 // ---------------------------------------------------------------------------
@@ -599,6 +653,24 @@ async function withdrawFromContract(address, method, customSelector, customAbi) 
 
         showStatus("Sending withdrawal transaction…");
         const network = await provider.getNetwork();
+
+        // Slippage guard: warn when contract balance shows low-liquidity flags
+        // before committing the on-chain transaction.
+        const balanceCheck = (typeof window !== "undefined" && window._nexusContractBalances)
+            ? window._nexusContractBalances[address.toLowerCase()]
+            : null;
+        if (balanceCheck && balanceCheck.low_liquidity) {
+            const proceed = window.confirm(
+                "⚠️ Slippage Warning: This asset is flagged as low liquidity.\n" +
+                "Swap or settlement routes may experience high slippage (>0.5%).\n\n" +
+                "Proceed anyway?"
+            );
+            if (!proceed) {
+                showStatus("Withdrawal cancelled due to slippage risk.", true);
+                return;
+            }
+        }
+
         tx = await signer.sendTransaction({ to: address, data: callData });
         upsertLocalTransferHistory(buildLocalTransferHistoryEntry({
             chain: network.name || "unknown",
@@ -1615,7 +1687,44 @@ function initWithdrawDashboard() {
     if (methodSel) methodSel.addEventListener("change", onMethodChange);
 
     const connectBtn = document.getElementById("connect-btn");
-    if (connectBtn) connectBtn.addEventListener("click", connectWallet);
+    if (connectBtn) connectBtn.addEventListener("click", () => {
+        const picker = document.getElementById("wallet-picker");
+        if (picker) picker.style.display = picker.style.display === "none" ? "block" : "none";
+    });
+
+    const pickMM = document.getElementById("pick-metamask");
+    if (pickMM) pickMM.addEventListener("click", () => {
+        const picker = document.getElementById("wallet-picker");
+        if (picker) picker.style.display = "none";
+        if (!window.ethereum) { showStatus("MetaMask not detected. Install from metamask.io", true); return; }
+        connectWallet(window.ethereum);
+    });
+
+    const pickCB = document.getElementById("pick-coinbase");
+    if (pickCB) pickCB.addEventListener("click", () => {
+        const picker = document.getElementById("wallet-picker");
+        if (picker) picker.style.display = "none";
+        let raw;
+        if (typeof window.ethereum !== "undefined" && window.ethereum.isCoinbaseWallet) {
+            raw = window.ethereum;
+        } else if (window.coinbaseWalletExtension) {
+            raw = window.coinbaseWalletExtension;
+        } else if (typeof CoinbaseWalletSDK !== "undefined") {
+            const sdk = new CoinbaseWalletSDK({ appName: "Nexus Protocol DAO", appLogoUrl: "" });
+            raw = sdk.makeWeb3Provider();
+        } else {
+            showStatus("Coinbase Wallet not detected. Install from coinbase.com/wallet.", true); return;
+        }
+        connectWallet(raw);
+    });
+
+    document.addEventListener("click", evt => {
+        const picker = document.getElementById("wallet-picker");
+        const section = document.getElementById("wallet-section");
+        if (picker && picker.style.display !== "none" && section && !section.contains(evt.target)) {
+            picker.style.display = "none";
+        }
+    });
 
     const importBtn = document.getElementById("import-json-btn");
     if (importBtn) importBtn.addEventListener("click", handleJsonImport);
