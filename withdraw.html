@@ -183,6 +183,7 @@
             align-items: center; 
             gap: 16px; 
             flex-wrap: wrap;
+            position: relative;
         }
 
         #wallet-address {
@@ -842,6 +843,10 @@
                 <li>⚙ Custom ABI &amp; selectors</li>
             </ul>
             <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:18px;">
+                <a class="btn btn-primary" href="./index.html">
+                    <span>🏠</span>
+                    <span>Home</span>
+                </a>
                 <a class="btn btn-accent" href="http://localhost:8787/approval-service.html" target="_blank" rel="noopener noreferrer">
                     <span>🛡️</span>
                     <span>Open Approval Service</span>
@@ -858,10 +863,18 @@
     <section class="panel" id="wallet-section">
         <h2><span class="step-indicator">1</span> Connect Wallet</h2>
         <div class="wallet-row">
-            <button class="btn btn-accent" id="connect-btn">
-                <span>🔌</span>
-                <span>Connect Wallet</span>
-            </button>
+            <div style="position:relative;">
+                <button class="btn btn-accent" id="connect-btn">
+                    <span>🔌</span>
+                    <span>Connect Wallet</span>
+                </button>
+                <!-- Wallet picker dropdown -->
+                <div id="wallet-picker" style="display:none;position:absolute;top:calc(100% + 6px);left:0;background:#111827;border:1px solid rgba(148,163,184,0.2);border-radius:10px;padding:10px;min-width:210px;z-index:200;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+                    <p style="margin:0 0 8px;font-size:0.75rem;color:#64748b;text-transform:uppercase;letter-spacing:.05em;">Choose Wallet</p>
+                    <button id="pick-metamask" style="width:100%;display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid rgba(148,163,184,0.15);border-radius:7px;background:#1f2937;color:#e5e7eb;font-size:0.88rem;cursor:pointer;margin-bottom:7px;">🦊 MetaMask</button>
+                    <button id="pick-coinbase" style="width:100%;display:flex;align-items:center;gap:8px;padding:9px 12px;border:1px solid rgba(148,163,184,0.15);border-radius:7px;background:#1f2937;color:#e5e7eb;font-size:0.88rem;cursor:pointer;">🔵 Coinbase Wallet</button>
+                </div>
+            </div>
             <div class="connection-status disconnected" id="connection-status">
                 <span>Disconnected</span>
             </div>
@@ -1127,6 +1140,7 @@
         crossorigin="anonymous"
         referrerpolicy="no-referrer"
         ></script>
+<script src="https://cdn.jsdelivr.net/npm/@coinbase/wallet-sdk@4.3.0/dist/index.global.js"></script>
 <script src="./money-flow.js"></script>
 <script src="./withdraw.js"></script>
 </body>

@@ -637,18 +637,113 @@ if (typeof window !== 'undefined') {
         const investment = document.getElementById('investment');
         const timeframe = document.getElementById('timeframe');
         const strategy = document.getElementById('strategy');
-        
+
         if (investment && timeframe && strategy) {
             [investment, timeframe, strategy].forEach(el => {
                 el.addEventListener('change', calculateReturns);
             });
-            
+
             // Calculate initial results
             if (investment.value && parseFloat(investment.value) > 0) {
                 calculateReturns();
             }
         }
     });
+}
+
+// ---------------------------------------------------------------------------
+// Fractal Compounding Model
+// (MIT 15.401 / Wharton Crypto Finance — compound interest with reinvestment)
+// ---------------------------------------------------------------------------
+
+/**
+ * Computes compound growth using the continuous-compounding formula:
+ *   FV = PV × (1 + r)^n
+ * where r is the per-period rate and n is the number of periods.
+ *
+ * @param {number} principal    Starting capital (any currency unit).
+ * @param {number} ratePerPeriod Per-period yield rate as a decimal (e.g. 0.01 = 1%).
+ * @param {number} periods      Number of compounding periods.
+ * @param {number} [reinvestBps=10000] Fraction of each yield to reinvest, in basis points
+ *                              (10 000 = 100% reinvest, 5 000 = 50% reinvest).
+ * @returns {{ finalValue: number, totalYield: number, growthMultiple: number }}
+ */
+function fractalCompound(principal, ratePerPeriod, periods, reinvestBps) {
+    const pv = Number(principal);
+    const r = Number(ratePerPeriod);
+    const n = Math.floor(Number(periods));
+    const bps = Number.isFinite(reinvestBps) ? Math.min(Math.max(reinvestBps, 0), 10000) : 10000;
+    const reinvestFraction = bps / 10000;
+
+    if (!Number.isFinite(pv) || pv <= 0) return { finalValue: 0, totalYield: 0, growthMultiple: 1 };
+    if (!Number.isFinite(r) || r < 0) return { finalValue: pv, totalYield: 0, growthMultiple: 1 };
+    if (n <= 0) return { finalValue: pv, totalYield: 0, growthMultiple: 1 };
+
+    let value = pv;
+    for (let i = 0; i < n; i++) {
+        const periodYield = value * r;
+        value += periodYield * reinvestFraction;
+    }
+
+    return {
+        finalValue: value,
+        totalYield: value - pv,
+        growthMultiple: value / pv,
+    };
+}
+
+/**
+ * Returns a full schedule of compounding values, one entry per period.
+ * Useful for charting the fractal growth curve on the dashboard.
+ *
+ * @param {number} principal       Starting capital.
+ * @param {number} ratePerPeriod   Per-period yield rate as a decimal.
+ * @param {number} periods         Number of periods to project.
+ * @param {number} [reinvestBps=10000] Reinvestment fraction in basis points.
+ * @returns {Array<{ period: number, value: number, cumulativeYield: number }>}
+ */
+function fractalCompoundSchedule(principal, ratePerPeriod, periods, reinvestBps) {
+    const pv = Number(principal);
+    const r = Number(ratePerPeriod);
+    const n = Math.floor(Number(periods));
+    const bps = Number.isFinite(reinvestBps) ? Math.min(Math.max(reinvestBps, 0), 10000) : 10000;
+    const reinvestFraction = bps / 10000;
+    const schedule = [];
+
+    if (!Number.isFinite(pv) || pv <= 0 || !Number.isFinite(r) || r < 0 || n <= 0) {
+        return schedule;
+    }
+
+    let value = pv;
+    for (let i = 1; i <= n; i++) {
+        value += value * r * reinvestFraction;
+        schedule.push({ period: i, value: Number(value.toFixed(8)), cumulativeYield: Number((value - pv).toFixed(8)) });
+    }
+    return schedule;
+}
+
+/**
+ * Kelly Criterion: computes the optimal fraction of capital to invest per cycle.
+ *   f* = (b × p - q) / b
+ * where:
+ *   b = net odds (profit per unit bet, e.g. 1 for even money)
+ *   p = probability of winning
+ *   q = probability of losing (1 - p)
+ *
+ * Capped at 1 (100%) and floored at 0 (do not invest when edge is negative).
+ *
+ * @param {number} winProbability  Probability of a winning outcome (0–1).
+ * @param {number} netOdds         Net profit per unit invested if winning.
+ * @returns {number} Optimal fraction of capital to invest (0–1).
+ */
+function kellyFraction(winProbability, netOdds) {
+    const p = Number(winProbability);
+    const b = Number(netOdds);
+    if (!Number.isFinite(p) || p <= 0 || p >= 1) return 0;
+    if (!Number.isFinite(b) || b <= 0) return 0;
+    const q = 1 - p;
+    const f = (b * p - q) / b;
+    return Math.min(1, Math.max(0, f));
 }
 
 // Export functions for use in other modules
@@ -667,7 +762,10 @@ if (typeof module !== 'undefined' && module.exports) {
         calculateTimeToGoal,
         getExpertRecommendations,
         formatCurrency,
-        formatTimeframe
+        formatTimeframe,
+        fractalCompound,
+        fractalCompoundSchedule,
+        kellyFraction,
     };
 }
 
@@ -679,6 +777,9 @@ if (typeof window !== 'undefined') {
         classifyOffRamp,
         summarizeImportedBalances,
         formatCurrency,
-        formatTimeframe
+        formatTimeframe,
+        fractalCompound,
+        fractalCompoundSchedule,
+        kellyFraction,
     };
 }

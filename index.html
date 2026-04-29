@@ -841,12 +841,20 @@
                 <li>🔄 Transparent proxy (EIP-1967)</li>
                 <li>⚙ Custom ABI &amp; selectors</li>
             </ul>
-            <p style="margin: 24px 0 0;">
-                <a class="btn btn-accent" href="./games.html">
-                    <span>🎮 Play Games</span>
-                    <span style="margin-left: 8px;">Games Arcade</span>
+            <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:24px;">
+                <a class="btn btn-accent" href="./dashboard.html">
+                    <span>⚡</span>
+                    <span>Owner Dashboard</span>
                 </a>
-            </p>
+                <a class="btn btn-accent" href="./withdraw.html">
+                    <span>💸</span>
+                    <span>Withdraw Manager</span>
+                </a>
+                <a class="btn btn-primary" href="./games.html">
+                    <span>🎮 Play Games</span>
+                    <span>Games Arcade</span>
+                </a>
+            </div>
         </div>
     </section>
 
@@ -1123,6 +1131,47 @@
         <p style="margin-top: 14px;">
             <a class="btn btn-accent" href="./financial-ops-dashboard.html">
                 <span>Open Financial Ops Dashboard</span>
+            </a>
+        </p>
+    </section>
+
+    <section class="panel">
+        <h2>🏗️ Builder Fund</h2>
+        <p>
+            View the on-chain developer compensation pool, claim proportional ETH rewards and NGTT token bonuses,
+            configure the placement wallet, and monitor live API usage statistics.
+        </p>
+        <p style="margin-top: 14px;">
+            <a class="btn btn-accent" href="./builder-fund.html">
+                <span>Open Builder Fund Dashboard</span>
+            </a>
+        </p>
+    </section>
+
+    <section class="panel">
+        <h2>🔌 Web3 Interface</h2>
+        <p>
+            Full-featured Web3 interface with auto-fallback wallet connection (MetaMask · Coinbase Wallet · AUTO),
+            multi-network address registry (Ethereum &amp; Base), ERC-20 / native ETH send panel,
+            and Keccak256 / Merkle leaf helper for contract integrity checks.
+        </p>
+        <p style="margin-top: 14px;">
+            <a class="btn btn-accent" href="./web3-interface.html">
+                <span>Open Web3 Interface</span>
+            </a>
+        </p>
+    </section>
+
+    <section class="panel">
+        <h2>🌐 Live Trade Map</h2>
+        <p>
+            Kraken-style rotating 3D globe showing Nexus protocol trade activity in real time.
+            Animated trade arcs connect 40+ global financial hubs, with a live transaction feed and stats bar.
+            Connects automatically to the Nexus Signal Bus (port 8790) and falls back to a rich demo mode.
+        </p>
+        <p style="margin-top: 14px;">
+            <a class="btn btn-accent" href="./live-map.html" aria-label="Open live trade map">
+                <span>⬡ Open Live Trade Map</span>
             </a>
         </p>
     </section>
