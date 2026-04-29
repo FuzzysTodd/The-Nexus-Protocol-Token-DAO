@@ -376,6 +376,7 @@
         <button class="tab-btn" data-tab="treasury" aria-label="Treasury tab">🏦 Treasury</button>
         <button class="tab-btn" data-tab="properties" aria-label="Properties tab">🏠 Properties</button>
         <button class="tab-btn" data-tab="signals" aria-label="Live Signals tab">📡 Live Signals</button>
+        <button class="tab-btn" data-tab="config" aria-label="Contract configuration tab">⚙️ Config</button>
     </nav>
 
     <!-- Tab: Overview -->
@@ -510,6 +511,55 @@
         </section>
     </div>
 
+    <!-- Tab: Contract Config -->
+    <div class="tab-panel" id="tab-config">
+        <section class="panel">
+            <h2>⚙️ Contract Addresses</h2>
+            <p style="color:var(--muted);font-size:0.88rem;margin:0 0 20px;">Configure the deployed Nexus contract addresses. Values are saved to your browser's localStorage and loaded automatically on each visit.</p>
+            <div style="display:grid;gap:14px;">
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:0.85rem;font-weight:600;">
+                    NGTT Token Address
+                    <input type="text" id="cfg-ngtt" placeholder="0x… NGTTGovernanceToken or NexusGameTheoryToken"
+                        style="padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--panel-alt);color:var(--text);font-family:monospace;font-size:0.88rem;"
+                        aria-label="NGTT token contract address">
+                </label>
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:0.85rem;font-weight:600;">
+                    Governor Address
+                    <input type="text" id="cfg-gov" placeholder="0x… NexusDAOGovernor"
+                        style="padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--panel-alt);color:var(--text);font-family:monospace;font-size:0.88rem;"
+                        aria-label="NexusDAOGovernor contract address">
+                </label>
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:0.85rem;font-weight:600;">
+                    Treasury Address
+                    <input type="text" id="cfg-treasury" placeholder="0x… NexusDAOTreasury"
+                        style="padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--panel-alt);color:var(--text);font-family:monospace;font-size:0.88rem;"
+                        aria-label="NexusDAOTreasury contract address">
+                </label>
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:0.85rem;font-weight:600;">
+                    RWA (NexusRWA) Address
+                    <input type="text" id="cfg-rwa" placeholder="0x… NexusRWA"
+                        style="padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--panel-alt);color:var(--text);font-family:monospace;font-size:0.88rem;"
+                        aria-label="NexusRWA contract address">
+                </label>
+                <label style="display:flex;flex-direction:column;gap:6px;font-size:0.85rem;font-weight:600;">
+                    Signal Bus WebSocket URL
+                    <input type="text" id="cfg-bus" placeholder="ws://localhost:8790"
+                        style="padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--panel-alt);color:var(--text);font-family:monospace;font-size:0.88rem;"
+                        aria-label="Signal bus WebSocket URL">
+                </label>
+            </div>
+            <div style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap;">
+                <button class="btn btn-accent" id="cfg-save-btn" aria-label="Save contract addresses to localStorage"><span>💾</span><span>Save &amp; Apply</span></button>
+                <button class="btn btn-primary" id="cfg-clear-btn" aria-label="Clear saved contract addresses"><span>🗑️</span><span>Clear Saved</span></button>
+            </div>
+            <p id="cfg-msg" style="font-size:0.85rem;margin:12px 0 0;display:none;"></p>
+            <div style="margin-top:20px;padding:14px 16px;background:var(--panel-alt);border-radius:10px;font-size:0.82rem;">
+                <p style="margin:0 0 6px;font-weight:600;color:var(--accent);">ℹ️ How to use</p>
+                <p style="margin:0;color:var(--muted);line-height:1.6;">Paste the deployed contract addresses above and click <strong>Save &amp; Apply</strong>. The dashboard will immediately use these addresses for all on-chain reads when you connect a wallet. The verified owner address is <code style="color:var(--accent)">0x33ffc308e693a5b49e0ee0241f41f03ccef495f2</code>.</p>
+            </div>
+        </section>
+    </div>
+
     <!-- Tab: Live Signals -->
     <div class="tab-panel" id="tab-signals">
         <section class="panel">
@@ -533,11 +583,17 @@
 <script>
 (function () {
     "use strict";
-    var NGTT_ADDRESS     = (window.__NEXUS_NGTT__     || "");
-    var GOVERNOR_ADDRESS = (window.__NEXUS_GOV__      || "");
-    var TREASURY_ADDRESS = (window.__NEXUS_TREASURY__ || "");
-    var RWA_ADDRESS      = (window.__NEXUS_RWA__      || "");
-    var SIGNAL_BUS_URL   = (window.__NEXUS_BUS__      || "ws://localhost:8790");
+    // Load from localStorage (overrides any page-level window globals)
+    var LS_KEYS = { ngtt: "nexus_cfg_ngtt", gov: "nexus_cfg_gov", treasury: "nexus_cfg_treasury", rwa: "nexus_cfg_rwa", bus: "nexus_cfg_bus" };
+    function lsGet(k) { try { return localStorage.getItem(LS_KEYS[k]) || ""; } catch(e) { console.error("localStorage read failed:", e); return ""; } }
+    function lsSet(k, v) { try { localStorage.setItem(LS_KEYS[k], v); } catch(e) { console.error("localStorage write failed:", e); } }
+    function lsClear() { try { Object.values(LS_KEYS).forEach(function(k) { localStorage.removeItem(k); }); } catch(e) { console.error("localStorage clear failed:", e); } }
+
+    var NGTT_ADDRESS     = lsGet("ngtt")     || (window.__NEXUS_NGTT__     || "");
+    var GOVERNOR_ADDRESS = lsGet("gov")      || (window.__NEXUS_GOV__      || "");
+    var TREASURY_ADDRESS = lsGet("treasury") || (window.__NEXUS_TREASURY__ || "");
+    var RWA_ADDRESS      = lsGet("rwa")      || (window.__NEXUS_RWA__      || "");
+    var SIGNAL_BUS_URL   = lsGet("bus")      || (window.__NEXUS_BUS__      || "ws://localhost:8790");
     var NGTT_ABI = [
         "function balanceOf(address) view returns (uint256)",
         "function getVotes(address) view returns (uint256)",
@@ -813,6 +869,46 @@
             closeWalletPicker();
         }
     });
+
+    // Config tab — populate fields from current values
+    function populateConfigFields() {
+        document.getElementById("cfg-ngtt").value     = NGTT_ADDRESS;
+        document.getElementById("cfg-gov").value      = GOVERNOR_ADDRESS;
+        document.getElementById("cfg-treasury").value = TREASURY_ADDRESS;
+        document.getElementById("cfg-rwa").value      = RWA_ADDRESS;
+        document.getElementById("cfg-bus").value      = SIGNAL_BUS_URL;
+    }
+    document.getElementById("cfg-save-btn").addEventListener("click", function () {
+        NGTT_ADDRESS     = document.getElementById("cfg-ngtt").value.trim();
+        GOVERNOR_ADDRESS = document.getElementById("cfg-gov").value.trim();
+        TREASURY_ADDRESS = document.getElementById("cfg-treasury").value.trim();
+        RWA_ADDRESS      = document.getElementById("cfg-rwa").value.trim();
+        SIGNAL_BUS_URL   = document.getElementById("cfg-bus").value.trim() || "ws://localhost:8790";
+        lsSet("ngtt",     NGTT_ADDRESS);
+        lsSet("gov",      GOVERNOR_ADDRESS);
+        lsSet("treasury", TREASURY_ADDRESS);
+        lsSet("rwa",      RWA_ADDRESS);
+        lsSet("bus",      SIGNAL_BUS_URL);
+        var msg = document.getElementById("cfg-msg");
+        msg.textContent = "✅ Saved. Reconnect wallet to load live contract data.";
+        msg.style.color = "var(--success)"; msg.style.display = "block";
+        setTimeout(function() { msg.style.display = "none"; }, 4000);
+    });
+    document.getElementById("cfg-clear-btn").addEventListener("click", function () {
+        lsClear();
+        NGTT_ADDRESS = "";
+        GOVERNOR_ADDRESS = "";
+        TREASURY_ADDRESS = "";
+        RWA_ADDRESS = "";
+        SIGNAL_BUS_URL = "ws://localhost:8790";
+        populateConfigFields();
+        var msg = document.getElementById("cfg-msg");
+        msg.textContent = "Saved addresses cleared.";
+        msg.style.color = "var(--muted)"; msg.style.display = "block";
+        setTimeout(function() { msg.style.display = "none"; }, 3000);
+    });
+    populateConfigFields();
+
     loadGitHubProfile();
     connectSignalBus();
 }());

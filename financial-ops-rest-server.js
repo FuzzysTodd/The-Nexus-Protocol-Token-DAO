@@ -14,6 +14,27 @@ const LIVE_WALLET_ADDRESS = String(process.env.FINANCIAL_OPS_WALLET_ADDRESS || D
 const PUBLIC_ORIGIN = process.env.FINANCIAL_OPS_PUBLIC_ORIGIN || "*";
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Expert Component Registry
+// ─────────────────────────────────────────────────────────────────────────────
+// Static manifest of the 10 Nexus code-space components and their expert
+// domain, share weight, and registered handle.  Exposed read-only in the
+// /api/v1/builder-fund/stats response so dashboards and Chainlink Automation
+// upkeeps can correlate on-chain builder IDs with code-space attribution.
+// ─────────────────────────────────────────────────────────────────────────────
+const EXPERT_COMPONENTS = [
+  { handle: "nexus-solidity-defi-expert",      component: "Solidity-DeFi-Core",             shares: 200, codeSpace: "contracts/NexusBuilderFund.sol"     },
+  { handle: "nexus-lp-staking-expert",         component: "Solidity-AMM-Staking",           shares: 150, codeSpace: "contracts/NexusLPStaking.sol"        },
+  { handle: "nexus-rwa-compliance-expert",     component: "Solidity-RWA-Compliance",        shares: 150, codeSpace: "contracts/NexusRWA.sol"              },
+  { handle: "nexus-nft-fractionalize-expert",  component: "Solidity-NFT-Fractionalization", shares: 120, codeSpace: "contracts/NexusFractionalize.sol"    },
+  { handle: "nexus-options-defi-expert",       component: "Solidity-Options-DeFi",          shares: 180, codeSpace: "contracts/NexusOptionsVault.sol"     },
+  { handle: "nexus-vault-yield-expert",        component: "Solidity-Vault-Yield",           shares: 160, codeSpace: "contracts/NexusFractalVault.sol"     },
+  { handle: "nexus-nodejs-infra-expert",       component: "NodeJS-WebSocket-Infra",         shares: 100, codeSpace: "nexus-signal-bus.js"                 },
+  { handle: "nexus-python-qa-expert",          component: "Python-QA-Validation",           shares:  80, codeSpace: "nexus/e2e_soundness.py"             },
+  { handle: "nexus-frontend-web3-expert",      component: "Frontend-Web3-UX",               shares:  90, codeSpace: "web3-interface.html"                 },
+  { handle: "nexus-frontend-dapp-expert",      component: "Frontend-DApp-UX",               shares:  70, codeSpace: "builder-fund.html"                  },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Builder Fund Usage Tracker
 // ─────────────────────────────────────────────────────────────────────────────
 // In-process accumulator for API usage metrics.  These counters are:
@@ -52,10 +73,12 @@ const builderFundUsage = (function () {
                 placementBps: (Number(process.env.NEXUS_PLACEMENT_BPS) || 0),
                 ngttToken: process.env.NEXUS_NGTT_TOKEN_ADDRESS || null,
                 ngttRewardPerEthWei: process.env.NEXUS_NGTT_REWARD_PER_ETH || null,
+                expertRegistry: EXPERT_COMPONENTS,
                 oracleNote: "Submit stats.byEndpoint to NexusBuilderFund.recordUsage() via ORACLE_ROLE.",
                 feeNote: "Fee per call configured in NexusBuilderFund.feePerCallUsdCents.",
                 placementNote: "placementBps of each deposit is auto-forwarded to placementWallet (dashboard/treasury wallet).",
                 ngttNote: "ngttRewardPerEthWei NGTT tokens are awarded to builders per 1 ETH claimed.",
+                expertRegistryNote: "expertRegistry lists the 10 Nexus code-space components, their expert domains, and share weights.",
             };
         },
     };
@@ -167,6 +190,14 @@ function networkNameForChainId(chainId) {
 
   if (chainId === 11155111) {
     return "Sepolia";
+  }
+
+  if (chainId === 8453) {
+    return "Base Mainnet";
+  }
+
+  if (chainId === 56) {
+    return "BNB Smart Chain";
   }
 
   return chainId ? `Chain ${chainId}` : "Unknown network";

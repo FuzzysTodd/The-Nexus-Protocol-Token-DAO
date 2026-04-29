@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Nexus Web3 Interface — Wallet · Send · Receive</title>
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #07111b;
+            --panel: rgba(10, 25, 41, 0.92);
+            --panel-alt: #1a2535;
+            --line: rgba(148, 163, 184, 0.18);
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --primary: #22c55e;
+            --primary-soft: rgba(34, 197, 94, 0.14);
+            --accent: #38bdf8;
+            --accent-soft: rgba(56, 189, 248, 0.14);
+            --warn: #f59e0b;
+            --warn-soft: rgba(245, 158, 11, 0.14);
+            --danger: #fb7185;
+            --danger-soft: rgba(251, 113, 133, 0.14);
+            --purple: #a78bfa;
+            --purple-soft: rgba(167, 139, 250, 0.14);
+            --coinbase-blue: #0052ff;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: "Space Grotesk", "Avenir Next", "Segoe UI", sans-serif;
+            background:
+                radial-gradient(circle at top right, rgba(34, 197, 94, 0.12), transparent 48%),
+                linear-gradient(180deg, #030712 0%, #07111b 48%, #0f172a 100%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        main { width: min(1100px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 80px; }
+
+        h1, h2, h3 { line-height: 1.15; }
+
+        /* ── Breadcrumb nav ─────────────────────────────────────── */
+        .topnav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 28px;
+        }
+        .topnav a { color: var(--accent); text-decoration: none; }
+        .topnav a:hover { text-decoration: underline; }
+
+        /* ── Panels ─────────────────────────────────────────────── */
+        .panel {
+            background: var(--panel);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--line);
+            border-radius: 20px;
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ── Status badge ───────────────────────────────────────── */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+        }
+        .badge-disconnected { background: var(--danger-soft); color: var(--danger); border: 1px solid rgba(251,113,133,.3); }
+        .badge-connected    { background: var(--primary-soft); color: #86efac; border: 1px solid rgba(34,197,94,.3); }
+        .badge-warn         { background: var(--warn-soft); color: var(--warn); border: 1px solid rgba(245,158,11,.3); }
+        .badge-info         { background: var(--accent-soft); color: var(--accent); border: 1px solid rgba(56,189,248,.3); }
+
+        /* ── Buttons ────────────────────────────────────────────── */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 18px;
+            border-radius: 10px;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity .15s, transform .12s;
+        }
+        .btn:hover { opacity: .88; transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
+        .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+        .btn-primary  { background: var(--primary); color: #052e16; }
+        .btn-accent   { background: var(--accent); color: #0c1a2e; }
+        .btn-purple   { background: var(--purple); color: #1e0a44; }
+        .btn-ghost    { background: var(--panel-alt); color: var(--text); border: 1px solid var(--line); }
+        .btn-danger   { background: var(--danger); color: #1a0010; }
+        .btn-coinbase { background: var(--coinbase-blue); color: #fff; }
+        .btn-sm       { padding: 7px 12px; font-size: 0.82rem; border-radius: 8px; }
+
+        /* ── Wallet picker popup ────────────────────────────────── */
+        .wallet-picker {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            min-width: 260px;
+            background: #0f1f30;
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 14px;
+            z-index: 100;
+            box-shadow: 0 20px 60px rgba(2,6,23,.7);
+        }
+        .wallet-picker.open { display: block; }
+        .wallet-picker-title {
+            font-size: 0.75rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            margin-bottom: 12px;
+        }
+        .wallet-pick-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border: 1px solid var(--line);
+            border-radius: 9px;
+            background: var(--panel-alt);
+            color: var(--text);
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 8px;
+            transition: background .14s;
+        }
+        .wallet-pick-btn:last-child { margin-bottom: 0; }
+        .wallet-pick-btn:hover { background: rgba(56,189,248,.12); border-color: var(--accent); }
+
+        /* ── Wallet connection area ─────────────────────────────── */
+        .wallet-connect-area {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .wallet-trigger { position: relative; }
+        .wallet-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 14px;
+            flex: 1;
+        }
+        .wallet-info-card {
+            background: var(--panel-alt);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 14px 16px;
+        }
+        .info-label {
+            font-size: 0.72rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            margin-bottom: 6px;
+        }
+        .info-value {
+            font-size: 0.92rem;
+            font-weight: 600;
+            word-break: break-all;
+            font-family: "SF Mono", "Monaco", "Consolas", monospace;
+        }
+
+        /* ── Handle pill ────────────────────────────────────────── */
+        .handle-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--coinbase-blue);
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.92rem;
+        }
+
+        /* ── Network + Registry table ───────────────────────────── */
+        .network-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .net-btn {
+            padding: 8px 16px;
+            border-radius: 999px;
+            border: 2px solid var(--line);
+            background: transparent;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .14s;
+        }
+        .net-btn.active {
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-soft);
+        }
+        .net-btn:hover:not(.active) {
+            border-color: rgba(148,163,184,.4);
+            color: var(--text);
+        }
+
+        .token-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.87rem;
+        }
+        .token-table th {
+            text-align: left;
+            color: var(--muted);
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            padding: 0 12px 10px;
+            border-bottom: 1px solid var(--line);
+        }
+        .token-table td {
+            padding: 11px 12px;
+            border-bottom: 1px solid rgba(148,163,184,.07);
+            vertical-align: middle;
+        }
+        .token-table tr:last-child td { border-bottom: none; }
+        .token-table tr:hover td { background: rgba(56,189,248,.04); }
+        .addr-code {
+            font-family: "SF Mono", "Monaco", "Consolas", monospace;
+            font-size: 0.8rem;
+            color: var(--accent);
+            background: var(--accent-soft);
+            padding: 2px 7px;
+            border-radius: 5px;
+        }
+        .unsupported-chain-warn {
+            display: none;
+            padding: 12px 16px;
+            border-radius: 10px;
+            background: var(--warn-soft);
+            border: 1px solid rgba(245,158,11,.35);
+            color: var(--warn);
+            font-size: 0.88rem;
+            margin-bottom: 16px;
+        }
+
+        /* ── Send / Receive panel ───────────────────────────────── */
+        .send-receive-tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 1px solid var(--line);
+            margin-bottom: 22px;
+        }
+        .tab-btn {
+            padding: 10px 22px;
+            border: none;
+            background: transparent;
+            color: var(--muted);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            transition: all .14s;
+        }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        .form-group { margin-bottom: 18px; }
+        .form-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            margin-bottom: 7px;
+        }
+        .form-input, .form-select {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: var(--panel-alt);
+            color: var(--text);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color .14s;
+        }
+        .form-input:focus, .form-select:focus { border-color: var(--accent); }
+        .form-input.invalid { border-color: var(--danger); }
+        .form-hint {
+            font-size: 0.78rem;
+            color: var(--muted);
+            margin-top: 5px;
+        }
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .tx-result {
+            margin-top: 14px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            display: none;
+        }
+        .tx-result.success {
+            background: var(--primary-soft);
+            border: 1px solid rgba(34,197,94,.3);
+            color: #86efac;
+            display: block;
+        }
+        .tx-result.error {
+            background: var(--danger-soft);
+            border: 1px solid rgba(251,113,133,.3);
+            color: var(--danger);
+            display: block;
+        }
+        .tx-result.info {
+            background: var(--accent-soft);
+            border: 1px solid rgba(56,189,248,.3);
+            color: var(--accent);
+            display: block;
+        }
+
+        /* ── Keccak / Merkle helper ─────────────────────────────── */
+        .mono-result {
+            font-family: "SF Mono", "Monaco", "Consolas", monospace;
+            font-size: 0.82rem;
+            background: #070f1a;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 14px 16px;
+            word-break: break-all;
+            color: var(--primary);
+            min-height: 46px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+        .encoding-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        /* ── Accordion ──────────────────────────────────────────── */
+        .accordion-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 14px 18px;
+            background: var(--panel-alt);
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            user-select: none;
+        }
+        .accordion-header:hover { border-color: var(--accent); }
+        .accordion-body {
+            display: none;
+            padding: 18px;
+            background: rgba(10,25,41,.5);
+            border: 1px solid var(--line);
+            border-radius: 0 0 10px 10px;
+            margin-top: -8px;
+            margin-bottom: 8px;
+        }
+        .accordion-body.open { display: block; }
+
+        /* ── Spinner ────────────────────────────────────────────── */
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spin { animation: spin .8s linear infinite; display: inline-block; }
+
+        code { font-family: "SF Mono","Monaco","Consolas",monospace; font-size: .88em; }
+    </style>
+</head>
+<body>
+<main>
+    <!-- Breadcrumb -->
+    <nav class="topnav" aria-label="Breadcrumb">
+        <a href="./index.html">⚡ Nexus</a>
+        <span>›</span>
+        <span>Web3 Interface</span>
+    </nav>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         SECTION 1 — WALLET CONNECTION
+    ════════════════════════════════════════════════════════════════════ -->
+    <section class="panel">
+        <div class="panel-title">
+            🔌 Wallet Connection
+            <span id="status-badge" class="badge badge-disconnected">⬤ Disconnected</span>
+        </div>
+
+        <!-- Handle identity -->
+        <div style="margin-bottom:20px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <span class="handle-pill" id="handle-pill">🔵 </span>
+            <span class="badge badge-info" style="font-size:.78rem;">Coinbase Wallet Handle (display-only)</span>
+        </div>
+
+        <div class="wallet-connect-area">
+            <!-- Wallet picker trigger -->
+            <div class="wallet-trigger" id="wallet-trigger">
+                <button class="btn btn-accent" id="connect-btn" onclick="toggleWalletPicker()">
+                    🔌 Connect Wallet
+                </button>
+                <div class="wallet-picker" id="wallet-picker">
+                    <p class="wallet-picker-title">Choose wallet</p>
+                    <button class="wallet-pick-btn" id="pick-auto"   onclick="connectWallet('auto')">
+                        ⚡ AUTO (recommended)
+                    </button>
+                    <button class="wallet-pick-btn" id="pick-metamask" onclick="connectWallet('metamask')">
+                        🦊 MetaMask
+                    </button>
+                    <button class="wallet-pick-btn" id="pick-coinbase" onclick="connectWallet('coinbase')">
+                        🔵 Coinbase Wallet
+                    </button>
+                    <hr style="border-color:var(--line); margin:10px 0;">
+                    <button class="wallet-pick-btn" id="pick-disconnect" onclick="disconnectWallet()" style="color:var(--danger);">
+                        ✕ Disconnect
+                    </button>
+                </div>
+            </div>
+
+            <!-- Connected wallet info cards -->
+            <div class="wallet-info-grid" id="wallet-info-grid" style="display:none;">
+                <div class="wallet-info-card">
+                    <div class="info-label">Connected Address</div>
+                    <div class="info-value" id="info-address">—</div>
+                </div>
+                <div class="wallet-info-card">
+                    <div class="info-label">Network</div>
+                    <div class="info-value" id="info-network">—</div>
+                </div>
+                <div class="wallet-info-card">
+                    <div class="info-label">Chain ID</div>
+                    <div class="info-value" id="info-chain-id">—</div>
+                </div>
+                <div class="wallet-info-card">
+                    <div class="info-label">Wallet Type</div>
+                    <div class="info-value" id="info-wallet-type">—</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="wallet-msg" class="tx-result" style="margin-top:14px;"></div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         SECTION 2 — NETWORK + ADDRESS REGISTRY
+    ════════════════════════════════════════════════════════════════════ -->
+    <section class="panel">
+        <div class="panel-title">🌐 Network &amp; Address Registry</div>
+
+        <div id="chain-warn" class="unsupported-chain-warn">
+            ⚠️ Your wallet is connected to an unsupported network.
+            Please switch to <strong>Ethereum Mainnet</strong> (chainId: 1), <strong>Base Mainnet</strong> (chainId: 8453), or <strong>BNB Smart Chain</strong> (chainId: 56).
+        </div>
+
+        <!-- Network selector tabs -->
+        <div class="network-selector" id="net-selector">
+            <button class="net-btn active" data-chain="1"    onclick="selectNetworkView(1)">Ethereum</button>
+            <button class="net-btn"        data-chain="8453" onclick="selectNetworkView(8453)">Base</button>
+            <button class="net-btn"        data-chain="56"   onclick="selectNetworkView(56)">BSC</button>
+        </div>
+
+        <!-- Token/address table -->
+        <div id="registry-table-wrap">
+            <table class="token-table">
+                <thead>
+                    <tr>
+                        <th>Token</th>
+                        <th>Contract Address</th>
+                        <th>Decimals</th>
+                        <th>Type</th>
+                    </tr>
+                </thead>
+                <tbody id="registry-tbody"></tbody>
+            </table>
+        </div>
+
+        <p style="font-size:.8rem;color:var(--muted);margin-top:14px;">
+            Addresses sourced from canonical on-chain deployments. Always verify independently before sending funds.
+            See <a href="./network-registry.json" target="_blank" style="color:var(--accent);">network-registry.json</a> for the full registry.
+        </p>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         SECTION 3 — SEND / RECEIVE
+    ════════════════════════════════════════════════════════════════════ -->
+    <section class="panel">
+        <div class="panel-title">💸 Send / Receive</div>
+
+        <!-- Tabs -->
+        <div class="send-receive-tabs">
+            <button class="tab-btn active" onclick="switchTab('send')">Send</button>
+            <button class="tab-btn"        onclick="switchTab('receive')">Receive</button>
+        </div>
+
+        <!-- ── SEND panel ── -->
+        <div class="tab-panel active" id="tab-send">
+
+            <div class="form-group">
+                <label class="form-label" for="send-token">Token / Asset</label>
+                <select class="form-select" id="send-token" onchange="onTokenChange()"></select>
+                <p class="form-hint" id="send-token-addr-hint"></p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="send-to">Recipient Address</label>
+                <input type="text"
+                       class="form-input"
+                       id="send-to"
+                       placeholder="0x… (EIP-55 checksummed or lowercase)"
+                       oninput="validateRecipient(this)">
+                <p class="form-hint" id="send-to-hint"></p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="send-amount">Amount</label>
+                <input type="text"
+                       class="form-input"
+                       id="send-amount"
+                       placeholder="e.g. 0.01">
+                <p class="form-hint" id="send-amount-hint"></p>
+            </div>
+
+            <div class="form-actions">
+                <button class="btn btn-primary" id="send-btn" onclick="executeSend()">
+                    Send
+                </button>
+                <span class="badge badge-warn" id="send-chain-badge" style="display:none;">
+                    Wrong network
+                </span>
+            </div>
+
+            <div class="tx-result" id="send-result"></div>
+        </div>
+
+        <!-- ── RECEIVE panel ── -->
+        <div class="tab-panel" id="tab-receive">
+            <p style="margin-bottom:18px; color:var(--muted); font-size:.9rem;">
+                Share your connected address or your Coinbase Wallet handle to receive funds.
+            </p>
+
+            <div class="wallet-info-card" style="margin-bottom:16px;">
+                <div class="info-label">Your Address (connected wallet)</div>
+                <div class="info-value" id="receive-address" style="color:var(--primary);">
+                    Connect wallet to see your address
+                </div>
+            </div>
+
+            <div class="wallet-info-card">
+                <div class="info-label">Coinbase Wallet Handle</div>
+                <div class="info-value" id="receive-handle" style="color:var(--coinbase-blue);"></div>
+            </div>
+
+            <p style="font-size:.78rem; color:var(--muted); margin-top:14px;">
+                Note: Sending to a <code>.cb.id</code> handle requires the sender to use Coinbase Wallet or a
+                compatible resolver. For maximum compatibility, share your <code>0x</code> address.
+            </p>
+        </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         SECTION 4 — KECCAK256 / MERKLE HELPERS
+    ════════════════════════════════════════════════════════════════════ -->
+    <section class="panel">
+        <div class="panel-title">🔐 Keccak256 &amp; Merkle Leaf Helper</div>
+
+        <p style="color:var(--muted); font-size:.9rem; margin-bottom:22px;">
+            Compute <code>keccak256</code> leaves consistent with Solidity contract patterns used in this repo.
+            Contracts use <code>keccak256(abi.encodePacked(value))</code> for single-value hashing
+            (e.g. endpoint names, title strings). For Merkle allowlists use double-leaf encoding:
+            <code>keccak256(abi.encodePacked(keccak256(abi.encodePacked(address))))</code>.
+        </p>
+
+        <!-- Encoding selector -->
+        <div class="encoding-row">
+            <button class="btn btn-ghost btn-sm active-enc" id="enc-packed" onclick="setEncoding('packed')">
+                abi.encodePacked (single)
+            </button>
+            <button class="btn btn-ghost btn-sm" id="enc-encode" onclick="setEncoding('encode')">
+                abi.encode (padded 32-byte)
+            </button>
+            <button class="btn btn-ghost btn-sm" id="enc-double" onclick="setEncoding('double')">
+                Double-hash Merkle leaf
+            </button>
+        </div>
+
+        <!-- Input -->
+        <div class="form-group">
+            <label class="form-label" for="keccak-input">Input value</label>
+            <input type="text"
+                   class="form-input"
+                   id="keccak-input"
+                   placeholder="0xAddress or any string">
+            <p class="form-hint">
+                Enter an Ethereum address or arbitrary string.
+                Address inputs are checksummed automatically.
+            </p>
+        </div>
+        <button class="btn btn-purple btn-sm" onclick="computeKeccak()">Compute Hash</button>
+
+        <div class="mono-result" id="keccak-result">
+— result will appear here —
+        </div>
+
+        <!-- Accordion: Proof placeholder -->
+        <div style="margin-top:20px;">
+            <div class="accordion-header" onclick="toggleAccordion('merkle-acc')">
+                <span>🌿 Merkle Proof Placeholder</span>
+                <span id="merkle-acc-arrow">▸</span>
+            </div>
+            <div class="accordion-body" id="merkle-acc">
+                <p style="color:var(--muted); font-size:.88rem; margin-bottom:14px;">
+                    Paste a JSON array of proof siblings (as hex strings) and the leaf
+                    to verify membership against a root.
+                </p>
+                <div class="form-group">
+                    <label class="form-label">Merkle Root (bytes32)</label>
+                    <input type="text" class="form-input" id="merkle-root" placeholder="0x…">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Leaf (bytes32 — use hash result above)</label>
+                    <input type="text" class="form-input" id="merkle-leaf" placeholder="0x…">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Proof Siblings (JSON array of bytes32)</label>
+                    <input type="text" class="form-input" id="merkle-proof"
+                           placeholder='["0xabc…","0xdef…"]'>
+                </div>
+                <button class="btn btn-purple btn-sm" onclick="verifyMerkle()">Verify Proof</button>
+                <div class="mono-result" id="merkle-result">— result will appear here —</div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- ethers.js v5 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"
+        integrity="sha512-FDcVY+g7vc5CXANbrTSg1K5qLyriCsGDYCE02Li1tXEYdNQPvLPHNE+rT2Mjei8N7fZbe0WLhw27j2SrGRpdMg=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"></script>
+
+<!-- Coinbase Wallet SDK v4 (optional — loaded dynamically for SDK fallback) -->
+
+<script>
+// ─────────────────────────────────────────────────────────────────────────────
+// GLOBAL CONSTANTS
+// ─────────────────────────────────────────────────────────────────────────────
+const APP_NAME  = "Nexus Protocol DAO";
+const CB_HANDLE = "tenkrypt.cb.id";
+const CB_SDK_CDN = "https://cdnjs.cloudflare.com/ajax/libs/coinbase-wallet-sdk/4.0.4/index.umd.js";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NETWORK REGISTRY
+// Mirrors network-registry.json — kept inline for zero-build, zero-fetch usage.
+// ─────────────────────────────────────────────────────────────────────────────
+const REGISTRY = {
+    networks: {
+        1: {
+            chainId: 1,
+            name: "Ethereum Mainnet",
+            shortName: "eth",
+            nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+            blockExplorerUrl: "https://etherscan.io",
+            tokens: {
+                ETH:  { symbol: "ETH",  name: "Ether",              address: "0x0000000000000000000000000000000000000000", decimals: 18, native: true },
+                USDC: { symbol: "USDC", name: "USD Coin",            address: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48", decimals: 6  },
+                USDT: { symbol: "USDT", name: "Tether USD",          address: "0xdAC17F958D2ee523a2206206994597C13D831ec7", decimals: 6  },
+                WETH: { symbol: "WETH", name: "Wrapped Ether",       address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", decimals: 18 },
+                DAI:  { symbol: "DAI",  name: "Dai Stablecoin",      address: "0x6B175474E89094C44Da98b954EedeAC495271d0F", decimals: 18 },
+                NGTT: { symbol: "NGTT", name: "Nexus Game Theory Token", address: "0xeCE999c86452c573Adfdd7F0C9226e673477973a", decimals: 18 }
+            }
+        },
+        8453: {
+            chainId: 8453,
+            name: "Base Mainnet",
+            shortName: "base",
+            nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+            blockExplorerUrl: "https://basescan.org",
+            tokens: {
+                ETH:   { symbol: "ETH",   name: "Ether",         address: "0x0000000000000000000000000000000000000000", decimals: 18, native: true },
+                USDC:  { symbol: "USDC",  name: "USD Coin",       address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", decimals: 6  },
+                WETH:  { symbol: "WETH",  name: "Wrapped Ether",  address: "0x4200000000000000000000000000000000000006", decimals: 18 },
+                DAI:   { symbol: "DAI",   name: "Dai Stablecoin", address: "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb", decimals: 18 },
+                USDbC: { symbol: "USDbC", name: "USD Base Coin",  address: "0xd9aAEc86B65D86f6A7B5B1b0c42FFA531710b6CA", decimals: 6  }
+            }
+        },
+        56: {
+            chainId: 56,
+            name: "BNB Smart Chain",
+            shortName: "bnb",
+            nativeCurrency: { name: "BNB", symbol: "BNB", decimals: 18 },
+            blockExplorerUrl: "https://bscscan.com",
+            tokens: {
+                BNB:  { symbol: "BNB",  name: "BNB",           address: "0x0000000000000000000000000000000000000000", decimals: 18, native: true },
+                WBNB: { symbol: "WBNB", name: "Wrapped BNB",   address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c", decimals: 18 },
+                USDT: { symbol: "USDT", name: "Tether USD",    address: "0x55d398326f99059fF775485246999027B3197955", decimals: 18 },
+                USDC: { symbol: "USDC", name: "USD Coin",      address: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d", decimals: 18 },
+                BUSD: { symbol: "BUSD", name: "Binance USD",   address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56", decimals: 18 }
+            }
+        }
+    }
+};
+
+const SUPPORTED_CHAINS = new Set(Object.keys(REGISTRY.networks).map(Number));
+
+// ERC-20 minimal ABI (transfer + decimals + symbol)
+const ERC20_ABI = [
+    "function transfer(address to, uint256 amount) returns (bool)",
+    "function decimals() view returns (uint8)",
+    "function symbol() view returns (string)",
+    "function balanceOf(address owner) view returns (uint256)"
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────────────────────
+let provider     = null;
+let signer       = null;
+let account      = null;
+let chainId      = null;
+let rawProvider  = null;
+let walletType   = null;
+let _connecting  = false;   // guard against recursive reconnect
+let _viewChain   = 1;       // currently viewed network in registry
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PROVIDER SELECTION — AUTO-FALLBACK LOGIC
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Pick the best available provider based on the requested wallet type:
+ *   "auto"     — auto-detect best available
+ *   "metamask" — prefer MetaMask
+ *   "coinbase" — prefer Coinbase Wallet extension → SDK
+ *
+ * Returns { raw, type } or throws with a human-readable message.
+ */
+function selectProvider(type) {
+    const eth = window.ethereum;
+
+    if (type === "metamask") {
+        if (!eth) throw new Error("MetaMask not detected. Install from metamask.io");
+        // Multi-wallet: scan providers array
+        if (Array.isArray(eth.providers)) {
+            const mm = eth.providers.find(p => p.isMetaMask && !p.isCoinbaseWallet);
+            if (mm) return { raw: mm, type: "MetaMask" };
+        }
+        if (eth.isMetaMask) return { raw: eth, type: "MetaMask" };
+        throw new Error("MetaMask not found. Ensure it is installed and enabled.");
+    }
+
+    if (type === "coinbase") {
+        // 1. Direct Coinbase extension reference (works alongside MetaMask)
+        if (window.coinbaseWalletExtension) return { raw: window.coinbaseWalletExtension, type: "Coinbase Wallet (extension)" };
+        // 2. window.ethereum is Coinbase Wallet
+        if (eth && eth.isCoinbaseWallet)    return { raw: eth, type: "Coinbase Wallet (extension)" };
+        // 3. Multi-wallet providers array
+        if (eth && Array.isArray(eth.providers)) {
+            const cb = eth.providers.find(p => p.isCoinbaseWallet);
+            if (cb) return { raw: cb, type: "Coinbase Wallet (extension)" };
+        }
+        // 4. SDK fallback — construct inline without a module bundler
+        if (typeof CoinbaseWalletSDK !== "undefined") {
+            const sdk = new CoinbaseWalletSDK({ appName: APP_NAME, appLogoUrl: "" });
+            return { raw: sdk.makeWeb3Provider({ options: "all" }), type: "Coinbase Wallet (SDK)" };
+        }
+        // 5. Load SDK dynamically then retry
+        throw new Error("LOAD_CB_SDK"); // caller handles this
+    }
+
+    // ── AUTO ──────────────────────────────────────────────────────────────
+    // Strategy: if only one provider → use it; if multiple → prefer MetaMask
+    // then Coinbase; fallback to first; if none → SDK.
+    if (!eth) {
+        // No injected provider at all → try SDK
+        if (typeof CoinbaseWalletSDK !== "undefined") {
+            const sdk = new CoinbaseWalletSDK({ appName: APP_NAME, appLogoUrl: "" });
+            return { raw: sdk.makeWeb3Provider({ options: "all" }), type: "Coinbase Wallet (SDK)" };
+        }
+        throw new Error("No wallet detected. Install MetaMask (metamask.io) or Coinbase Wallet (coinbase.com/wallet).");
+    }
+    if (Array.isArray(eth.providers) && eth.providers.length > 0) {
+        const mm = eth.providers.find(p => p.isMetaMask && !p.isCoinbaseWallet);
+        if (mm) return { raw: mm, type: "MetaMask (auto)" };
+        const cb = eth.providers.find(p => p.isCoinbaseWallet);
+        if (cb) return { raw: cb, type: "Coinbase Wallet (auto)" };
+        return { raw: eth.providers[0], type: "Unknown Wallet (auto)" };
+    }
+    const autoType = eth.isCoinbaseWallet
+        ? "Coinbase Wallet (auto)"
+        : eth.isMetaMask
+            ? "MetaMask (auto)"
+            : "Injected Wallet (auto)";
+    return { raw: eth, type: autoType };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COINBASE SDK DYNAMIC LOADER
+// ─────────────────────────────────────────────────────────────────────────────
+function loadCoinbaseSDK() {
+    return new Promise((resolve, reject) => {
+        if (typeof CoinbaseWalletSDK !== "undefined") { resolve(); return; }
+        const s = document.createElement("script");
+        s.src = CB_SDK_CDN;
+        s.onload  = () => resolve();
+        s.onerror = () => reject(new Error("Failed to load Coinbase Wallet SDK."));
+        document.head.appendChild(s);
+    });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CONNECT
+// ─────────────────────────────────────────────────────────────────────────────
+async function connectWallet(type) {
+    if (_connecting) return;
+    _connecting = true;
+    closeWalletPicker();
+    setWalletMsg("info", "⏳ Connecting…");
+
+    try {
+        let sel;
+        try {
+            sel = selectProvider(type);
+        } catch (e) {
+            if (e.message === "LOAD_CB_SDK") {
+                setWalletMsg("info", "⏳ Loading Coinbase Wallet SDK…");
+                await loadCoinbaseSDK();
+                sel = selectProvider(type); // retry after SDK loaded
+            } else {
+                throw e;
+            }
+        }
+
+        // Tear down previous listeners before re-assigning rawProvider
+        if (rawProvider && rawProvider.removeListener) {
+            rawProvider.removeListener("accountsChanged", handleAccountsChanged);
+            rawProvider.removeListener("chainChanged",    handleChainChanged);
+        }
+
+        rawProvider = sel.raw;
+        walletType  = sel.type;
+
+        provider = new ethers.providers.Web3Provider(rawProvider, "any");
+        await provider.send("eth_requestAccounts", []);
+        signer  = provider.getSigner();
+        account = await signer.getAddress();
+
+        const network = await provider.getNetwork();
+        chainId = network.chainId;
+
+        // Attach events (deduplicated)
+        rawProvider.on("accountsChanged", handleAccountsChanged);
+        rawProvider.on("chainChanged",    handleChainChanged);
+
+        updateWalletUI();
+        clearWalletMsg();
+    } catch (err) {
+        setWalletMsg("error", "❌ " + (err.message || String(err)));
+    } finally {
+        _connecting = false;
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EVENT HANDLERS
+// ─────────────────────────────────────────────────────────────────────────────
+
+async function handleAccountsChanged(accounts) {
+    if (_connecting) return;
+    if (!accounts || accounts.length === 0) {
+        disconnectWallet(); return;
+    }
+    _connecting = true;
+    try {
+        provider = new ethers.providers.Web3Provider(rawProvider, "any");
+        signer   = provider.getSigner();
+        account  = await signer.getAddress();
+        const network = await provider.getNetwork();
+        chainId = network.chainId;
+        updateWalletUI();
+    } finally {
+        _connecting = false;
+    }
+}
+
+async function handleChainChanged() {
+    if (_connecting) return;
+    _connecting = true;
+    try {
+        provider = new ethers.providers.Web3Provider(rawProvider, "any");
+        signer   = provider.getSigner();
+        const network = await provider.getNetwork();
+        chainId = network.chainId;
+        updateWalletUI();
+    } finally {
+        _connecting = false;
+    }
+}
+
+function disconnectWallet() {
+    if (rawProvider && rawProvider.removeListener) {
+        rawProvider.removeListener("accountsChanged", handleAccountsChanged);
+        rawProvider.removeListener("chainChanged",    handleChainChanged);
+    }
+    provider = signer = account = rawProvider = walletType = null;
+    chainId = null;
+    updateWalletUI();
+    closeWalletPicker();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// UI UPDATES
+// ─────────────────────────────────────────────────────────────────────────────
+function updateWalletUI() {
+    const connected = !!account;
+    const badge     = document.getElementById("status-badge");
+    const grid      = document.getElementById("wallet-info-grid");
+    const connectBtn = document.getElementById("connect-btn");
+
+    if (connected) {
+        badge.className = "badge badge-connected";
+        badge.textContent = "⬤ Connected";
+        grid.style.display = "";
+
+        document.getElementById("info-address").textContent     = account;
+        document.getElementById("info-chain-id").textContent    = chainId;
+        document.getElementById("info-wallet-type").textContent = walletType || "—";
+
+        const netInfo = REGISTRY.networks[chainId];
+        document.getElementById("info-network").textContent =
+            netInfo ? netInfo.name : (chainId ? `Chain ${chainId}` : "—");
+
+        connectBtn.textContent = "🔌 Switch Wallet";
+        document.getElementById("receive-address").textContent = account;
+
+        // Unsupported chain warning
+        const warn = document.getElementById("chain-warn");
+        if (!SUPPORTED_CHAINS.has(chainId)) {
+            warn.style.display = "block";
+            document.getElementById("send-chain-badge").style.display = "inline-flex";
+        } else {
+            warn.style.display = "none";
+            document.getElementById("send-chain-badge").style.display = "none";
+            // Auto-switch registry view to connected chain
+            selectNetworkView(chainId);
+        }
+    } else {
+        badge.className = "badge badge-disconnected";
+        badge.textContent = "⬤ Disconnected";
+        grid.style.display = "none";
+        connectBtn.textContent = "🔌 Connect Wallet";
+        document.getElementById("receive-address").textContent = "Connect wallet to see your address";
+        document.getElementById("chain-warn").style.display = "none";
+        document.getElementById("send-chain-badge").style.display = "none";
+    }
+
+    refreshSendTokenList();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WALLET PICKER
+// ─────────────────────────────────────────────────────────────────────────────
+function toggleWalletPicker() {
+    const picker = document.getElementById("wallet-picker");
+    picker.classList.toggle("open");
+}
+function closeWalletPicker() {
+    document.getElementById("wallet-picker").classList.remove("open");
+}
+document.addEventListener("click", e => {
+    const trigger = document.getElementById("wallet-trigger");
+    if (trigger && !trigger.contains(e.target)) closeWalletPicker();
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WALLET MESSAGE
+// ─────────────────────────────────────────────────────────────────────────────
+function setWalletMsg(cls, text) {
+    const el = document.getElementById("wallet-msg");
+    el.className = "tx-result " + cls;
+    el.textContent = text;
+    el.style.display = "block";
+}
+function clearWalletMsg() {
+    const el = document.getElementById("wallet-msg");
+    el.style.display = "none";
+    el.className = "tx-result";
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// NETWORK REGISTRY VIEW
+// ─────────────────────────────────────────────────────────────────────────────
+function selectNetworkView(cid) {
+    _viewChain = Number(cid);
+    document.querySelectorAll(".net-btn").forEach(btn => {
+        btn.classList.toggle("active", Number(btn.dataset.chain) === _viewChain);
+    });
+    renderRegistryTable(_viewChain);
+    refreshSendTokenList();
+}
+
+function renderRegistryTable(cid) {
+    const netInfo = REGISTRY.networks[cid];
+    const tbody = document.getElementById("registry-tbody");
+    if (!netInfo) { tbody.innerHTML = "<tr><td colspan='4' style='color:var(--muted); padding:14px;'>No data for this chain.</td></tr>"; return; }
+
+    tbody.innerHTML = Object.entries(netInfo.tokens).map(([sym, tok]) => `
+        <tr>
+            <td><strong>${sym}</strong> <span style="color:var(--muted); font-size:.8rem;">${tok.name}</span></td>
+            <td>${tok.native
+                ? '<span style="color:var(--muted); font-size:.8rem;">Native currency</span>'
+                : `<span class="addr-code">${tok.address}</span>`
+            }</td>
+            <td>${tok.decimals}</td>
+            <td>${tok.native ? "Native" : "ERC-20"}</td>
+        </tr>
+    `).join("");
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// SEND / RECEIVE
+// ─────────────────────────────────────────────────────────────────────────────
+function switchTab(tab) {
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.getElementById("tab-" + tab).classList.add("active");
+    document.querySelectorAll(".tab-btn").forEach(b => {
+        if (b.textContent.toLowerCase().trim() === tab) b.classList.add("active");
+    });
+}
+
+function refreshSendTokenList() {
+    const viewChain = (chainId && SUPPORTED_CHAINS.has(chainId)) ? chainId : _viewChain;
+    const netInfo = REGISTRY.networks[viewChain];
+    const sel = document.getElementById("send-token");
+    sel.innerHTML = "";
+
+    if (netInfo) {
+        Object.entries(netInfo.tokens).forEach(([sym, tok]) => {
+            const opt = document.createElement("option");
+            opt.value = sym;
+            opt.textContent = sym + " — " + tok.name;
+            sel.appendChild(opt);
+        });
+    }
+    onTokenChange();
+}
+
+function onTokenChange() {
+    const viewChain = (chainId && SUPPORTED_CHAINS.has(chainId)) ? chainId : _viewChain;
+    const netInfo = REGISTRY.networks[viewChain];
+    const sym = document.getElementById("send-token").value;
+    const hint = document.getElementById("send-token-addr-hint");
+    if (!netInfo || !sym) { hint.textContent = ""; return; }
+    const tok = netInfo.tokens[sym];
+    if (!tok) { hint.textContent = ""; return; }
+    hint.textContent = tok.native
+        ? "Native " + tok.symbol + " — no contract address"
+        : "Contract: " + tok.address;
+}
+
+function validateRecipient(input) {
+    const val = input.value.trim();
+    const hint = document.getElementById("send-to-hint");
+    if (!val) { input.classList.remove("invalid"); hint.textContent = ""; return false; }
+    if (!ethers.utils.isAddress(val)) {
+        input.classList.add("invalid");
+        hint.textContent = "⚠ Invalid Ethereum address.";
+        return false;
+    }
+    input.classList.remove("invalid");
+    // Show checksummed form
+    try {
+        const checksummed = ethers.utils.getAddress(val);
+        hint.textContent = val !== checksummed ? "✔ Checksummed: " + checksummed : "✔ Valid checksummed address";
+    } catch (_) {
+        hint.textContent = "";
+    }
+    return true;
+}
+
+async function executeSend() {
+    const resultEl = document.getElementById("send-result");
+    resultEl.className = "tx-result";
+    resultEl.style.display = "none";
+
+    if (!signer) {
+        showTxResult("error", "⚠ No wallet connected. Connect a wallet first.");
+        return;
+    }
+    if (!SUPPORTED_CHAINS.has(chainId)) {
+        showTxResult("error", "⚠ Unsupported network. Switch to Ethereum, Base, or BSC.");
+        return;
+    }
+
+    const toInput = document.getElementById("send-to");
+    const to      = toInput.value.trim();
+    if (!validateRecipient(toInput)) {
+        showTxResult("error", "⚠ Invalid recipient address.");
+        return;
+    }
+
+    const checksumTo = ethers.utils.getAddress(to);
+    const amountStr = document.getElementById("send-amount").value.trim();
+    if (!amountStr || isNaN(Number(amountStr)) || Number(amountStr) <= 0) {
+        showTxResult("error", "⚠ Enter a valid positive amount.");
+        return;
+    }
+
+    const sym     = document.getElementById("send-token").value;
+    const netInfo = REGISTRY.networks[chainId];
+    const tok     = netInfo && netInfo.tokens[sym];
+    if (!tok) { showTxResult("error", "⚠ Token not found in registry for current network."); return; }
+
+    const sendBtn = document.getElementById("send-btn");
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = '<span class="spin">⏳</span> Sending…';
+
+    try {
+        let tx;
+        if (tok.native) {
+            // Native ETH
+            const value = ethers.utils.parseEther(amountStr);
+            tx = await signer.sendTransaction({ to: checksumTo, value });
+        } else {
+            // ERC-20
+            const contract = new ethers.Contract(tok.address, ERC20_ABI, signer);
+            const decimals = tok.decimals;
+            const amount   = ethers.utils.parseUnits(amountStr, decimals);
+            tx = await contract.transfer(checksumTo, amount);
+        }
+
+        showTxResult("success",
+            "✔ Transaction submitted! Tx hash: " + tx.hash +
+            "\n\nView on " + (netInfo.blockExplorerUrl || "block explorer") +
+            "/tx/" + tx.hash
+        );
+    } catch (err) {
+        showTxResult("error", "❌ " + (err.reason || err.message || String(err)));
+    } finally {
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = "Send";
+    }
+}
+
+function showTxResult(cls, text) {
+    const el = document.getElementById("send-result");
+    el.className = "tx-result " + cls;
+    el.textContent = text;
+    el.style.display = "block";
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// KECCAK256 HELPER
+// ─────────────────────────────────────────────────────────────────────────────
+let _encoding = "packed"; // "packed" | "encode" | "double"
+
+function setEncoding(enc) {
+    _encoding = enc;
+    document.querySelectorAll(".active-enc").forEach(b => b.classList.remove("active-enc"));
+    document.getElementById("enc-" + enc).classList.add("active-enc");
+
+    // Visual feedback on active button
+    ["packed", "encode", "double"].forEach(e => {
+        document.getElementById("enc-" + e).style.borderColor =
+            e === enc ? "var(--accent)" : "var(--line)";
+        document.getElementById("enc-" + e).style.color =
+            e === enc ? "var(--accent)" : "var(--text)";
+    });
+}
+
+function computeKeccak() {
+    const raw = document.getElementById("keccak-input").value.trim();
+    const resultEl = document.getElementById("keccak-result");
+    if (!raw) { resultEl.textContent = "⚠ Enter a value to hash."; return; }
+
+    try {
+        let bytes, hash, description;
+
+        if (_encoding === "packed") {
+            // keccak256(abi.encodePacked(value))
+            // If it's an address, encode as 20 bytes; otherwise as UTF-8 string bytes
+            if (ethers.utils.isAddress(raw)) {
+                const addr = ethers.utils.getAddress(raw); // checksum
+                bytes = ethers.utils.solidityPack(["address"], [addr]);
+                hash  = ethers.utils.keccak256(bytes);
+                description = `keccak256(abi.encodePacked(address(${addr})))`;
+            } else {
+                bytes = ethers.utils.toUtf8Bytes(raw);
+                hash  = ethers.utils.keccak256(bytes);
+                description = `keccak256(abi.encodePacked("${raw}"))`;
+            }
+        } else if (_encoding === "encode") {
+            // keccak256(abi.encode(value)) — 32-byte left-padded
+            if (ethers.utils.isAddress(raw)) {
+                const addr = ethers.utils.getAddress(raw);
+                bytes = ethers.utils.defaultAbiCoder.encode(["address"], [addr]);
+                hash  = ethers.utils.keccak256(bytes);
+                description = `keccak256(abi.encode(address(${addr})))`;
+            } else {
+                bytes = ethers.utils.defaultAbiCoder.encode(["string"], [raw]);
+                hash  = ethers.utils.keccak256(bytes);
+                description = `keccak256(abi.encode("${raw}"))`;
+            }
+        } else {
+            // Double-hash Merkle leaf: keccak256(abi.encodePacked(keccak256(abi.encodePacked(addr))))
+            if (!ethers.utils.isAddress(raw)) {
+                resultEl.textContent = "⚠ Double-hash leaf requires an Ethereum address.";
+                return;
+            }
+            const addr   = ethers.utils.getAddress(raw);
+            const inner  = ethers.utils.keccak256(ethers.utils.solidityPack(["address"], [addr]));
+            hash = ethers.utils.keccak256(ethers.utils.solidityPack(["bytes32"], [inner]));
+            description = `keccak256(abi.encodePacked(keccak256(abi.encodePacked(address(${addr})))))`;
+        }
+
+        // Copy leaf to Merkle leaf field for convenience
+        document.getElementById("merkle-leaf").value = hash;
+
+        resultEl.textContent =
+            `Encoding: ${description}\n\nResult (bytes32):\n${hash}`;
+
+    } catch (err) {
+        resultEl.textContent = "❌ Error: " + (err.message || String(err));
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MERKLE PROOF VERIFIER (client-side, for debugging)
+// Uses the same pairwise-hash algorithm as OpenZeppelin MerkleProof.sol
+// ─────────────────────────────────────────────────────────────────────────────
+function verifyMerkle() {
+    const resultEl  = document.getElementById("merkle-result");
+    const rootStr   = document.getElementById("merkle-root").value.trim();
+    const leafStr   = document.getElementById("merkle-leaf").value.trim();
+    const proofStr  = document.getElementById("merkle-proof").value.trim();
+
+    if (!rootStr || !leafStr) {
+        resultEl.textContent = "⚠ Root and leaf are required.";
+        return;
+    }
+
+    let proof = [];
+    if (proofStr) {
+        try { proof = JSON.parse(proofStr); }
+        catch (_) { resultEl.textContent = "⚠ Proof must be a valid JSON array of hex strings."; return; }
+    }
+
+    try {
+        // Verify: iteratively compute parent hashes
+        let computedHash = leafStr.toLowerCase();
+
+        for (const sibling of proof) {
+            const sib = sibling.toLowerCase();
+            // Sort: smaller hash first (OZ convention)
+            const [a, b] = computedHash < sib ? [computedHash, sib] : [sib, computedHash];
+            // keccak256(abi.encodePacked(a, b))
+            computedHash = ethers.utils.keccak256(
+                ethers.utils.concat([a, b])
+            );
+        }
+
+        const valid = computedHash.toLowerCase() === rootStr.toLowerCase();
+        resultEl.textContent = valid
+            ? "✔ Proof VALID — computed root matches.\nRoot: " + computedHash
+            : "✗ Proof INVALID — computed root does NOT match.\nExpected: " + rootStr.toLowerCase() + "\nComputed: " + computedHash;
+
+    } catch (err) {
+        resultEl.textContent = "❌ Error: " + (err.message || String(err));
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ACCORDION
+// ─────────────────────────────────────────────────────────────────────────────
+function toggleAccordion(id) {
+    const body  = document.getElementById(id);
+    const arrow = document.getElementById(id + "-arrow");
+    const open  = body.classList.toggle("open");
+    if (arrow) arrow.textContent = open ? "▾" : "▸";
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────────────────────
+(function init() {
+    // Inject handle from constant (single source of truth)
+    const handlePill = document.getElementById("handle-pill");
+    if (handlePill) handlePill.textContent = "🔵 " + CB_HANDLE;
+    const receiveHandle = document.getElementById("receive-handle");
+    if (receiveHandle) receiveHandle.textContent = CB_HANDLE;
+
+    setEncoding("packed");
+    selectNetworkView(1);
+    updateWalletUI();
+})();
+</script>
+</body>
+</html>
