@@ -12,6 +12,8 @@
         "davidanson.vscode-markdownlint",
         "bierner.markdown-mermaid",
         "ms-vscode-remote.remote-containers",
-        "ms-vscode-remote.remote-ssh"
+        "ms-vscode-remote.remote-ssh",
+        "fabric.vscode-fabric-functions",
+        "spylogsster.app-debug-helper"
     ]
 }
