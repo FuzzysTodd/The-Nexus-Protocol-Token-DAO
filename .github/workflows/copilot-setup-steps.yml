@@ -18,10 +18,12 @@ jobs:
       contents: read
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        # Pinned to full-length commit SHA to satisfy "Require actions to be pinned" policy
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
       - name: Setup Python
-        uses: actions/setup-python@v6
+        # Pinned to full-length commit SHA to satisfy "Require actions to be pinned" policy
+        uses: actions/setup-python@82c7ea9d1f7f17d6b78d14d7d3b8c2f95e5b3c8b
         with:
           python-version: "3.11"
 
