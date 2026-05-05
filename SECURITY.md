@@ -15,8 +15,8 @@ Please do **not** open a public GitHub issue for suspected vulnerabilities.
 
 To report a vulnerability, use GitHub's private vulnerability reporting flow
 for this repository ("Report a vulnerability" under the Security tab). If that
-option is unavailable, contact the repository owner directly at **@FuzzysTodd**
-and include:
+option is temporarily unavailable, please wait and retry there rather than
+disclosing details publicly. When reporting, include:
 
 - a short description of the issue
 - affected component(s), contract(s), script(s), or page(s)
