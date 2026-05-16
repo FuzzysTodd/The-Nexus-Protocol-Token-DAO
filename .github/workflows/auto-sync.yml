@@ -64,8 +64,8 @@ jobs:
 
             git checkout -B "$branch" "origin/$branch"
 
-            # Attempt merge from main — skip on conflict (human must resolve)
-            if git merge --no-edit --strategy-option=ours origin/main 2>&1; then
+            # Attempt a normal merge from main — if conflicts occur, skip for manual resolution
+            if git merge --no-edit origin/main 2>&1; then
               echo "Merge succeeded for $branch — pushing"
               git push origin "$branch"
               echo "::notice title=AutoSync::Merged main into $branch ($BEHIND commits)"
