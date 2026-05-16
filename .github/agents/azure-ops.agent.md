@@ -1,4 +1,5 @@
 ---
+name: "azure-ops"
 description: "Azure operations orchestrator. Use when: checking Azure activity logs, diagnosing resource health, reviewing alerts, analyzing costs, auditing security compliance, troubleshooting deployments, or investigating Azure operational issues."
 tools: [read, search, web, agent, azureResources_getAzureActivityLog]
 ---
