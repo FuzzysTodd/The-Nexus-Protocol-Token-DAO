@@ -1,0 +1,68 @@
+name: Auto-assign reviewers based on subsystem
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  assign-reviewers:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get changed files
+        id: files
+        run: |
+          CHANGED=$(gh pr view ${{ github.event.pull_request.number }} --json files --jq '.files[].path')
+          echo "changed=$CHANGED" >> $GITHUB_OUTPUT
+
+      - name: Determine subsystem
+        id: detect
+        run: |
+          FILES="${{ steps.files.outputs.changed }}"
+
+          if echo "$FILES" | grep -q "^contracts/"; then
+            echo "subsystem=contracts" >> $GITHUB_OUTPUT
+          elif echo "$FILES" | grep -q "^dashboard/"; then
+            echo "subsystem=dashboards" >> $GITHUB_OUTPUT
+          elif echo "$FILES" | grep -q "^governance/"; then
+            echo "subsystem=governance" >> $GITHUB_OUTPUT
+          elif echo "$FILES" | grep -q "^signal-bus/"; then
+            echo "subsystem=signalbus" >> $GITHUB_OUTPUT
+          elif echo "$FILES" | grep -q "^agents/"; then
+            echo "subsystem=ai_mcp" >> $GITHUB_OUTPUT
+          else
+            echo "subsystem=infra" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Assign reviewers
+        run: |
+          SUBSYSTEM="${{ steps.detect.outputs.subsystem }}"
+
+          # Define reviewer groups
+          if [ "$SUBSYSTEM" = "contracts" ]; then
+            REVIEWERS="solidity-reviewer-1 solidity-reviewer-2"
+          elif [ "$SUBSYSTEM" = "dashboards" ]; then
+            REVIEWERS="frontend-reviewer-1 frontend-reviewer-2"
+          elif [ "$SUBSYSTEM" = "governance" ]; then
+            REVIEWERS="governance-maintainer"
+          elif [ "$SUBSYSTEM" = "signalbus" ]; then
+            REVIEWERS="infra-reviewer-1"
+          elif [ "$SUBSYSTEM" = "ai_mcp" ]; then
+            REVIEWERS="agent-reviewer-1 agent-reviewer-2"
+          else
+            REVIEWERS="infra-reviewer-1"
+          fi
+
+          echo "Assigning reviewers: $REVIEWERS"
+
+          gh pr edit ${{ github.event.pull_request.number }} --add-reviewer $REVIEWERS
