@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
-
+$sudo
 class KenwoodTS990S:
     def __init__(self):
         self.frequency = 14.250e6  # 20m band, MHz
