@@ -1,0 +1,21 @@
+name: CI Health Report
+
+on:
+  schedule:
+    - cron: "0 12 * * MON" # weekly Monday report
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate CI health summary
+        run: |
+          echo "## CI Health Report" >> $GITHUB_STEP_SUMMARY
+          echo "- Success rate: TBD" >> $GITHUB_STEP_SUMMARY
+          echo "- Failure rate: TBD" >> $GITHUB_STEP_SUMMARY
+          echo "- Slowest jobs: TBD" >> $GITHUB_STEP_SUMMARY
