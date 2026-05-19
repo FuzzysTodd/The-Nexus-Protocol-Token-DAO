@@ -10,6 +10,9 @@
 // Transparent-proxy ABI (provided by owner – only exposes proxy-level pieces;
 // implementation calls go through the proxy fallback via raw call-data).
 // ---------------------------------------------------------------------------
+
+
+
 const PROXY_ABI = [
     {
         "inputs": [
@@ -102,6 +105,69 @@ const tatumProvider = new ethers.providers.JsonRpcProvider(TATUM_RPC_URL);
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+
+contract NexusWithdrawManager is Ownable, ReentrancyGuard {
+    // Hard‑coded withdrawal target: YOUR wallet
+    address public constant WITHDRAW_TARGET =
+        0xdd0bd4453dBB446a28DF643CDD49441bc125DED3;
+
+    event WithdrawViaProxy(
+        address indexed caller,
+        address indexed proxy,
+        uint256 amount,
+        bytes data,
+        bool payGasFromContract
+    );
+
+    /**
+     * @notice Withdraw ETH from this contract and forward it to WITHDRAW_TARGET.
+     * @param proxy Optional proxy address. If zero, send directly to WITHDRAW_TARGET.
+     * @param amount Amount of ETH (in wei) to send.
+     * @param data Optional calldata passed to proxy or target.
+     * @param payGasFromContract Flag reserved for internal accounting (not implemented here).
+     */
+    function withdrawViaProxy(
+        address proxy,
+        uint256 amount,
+        bytes calldata data,
+        bool payGasFromContract
+    ) external nonReentrant onlyOwner {
+        require(amount > 0, "ZERO_AMOUNT");
+        require(address(this).balance >= amount, "INSUFFICIENT_CONTRACT_BALANCE");
+
+        emit WithdrawViaProxy(msg.sender, proxy, amount, data, payGasFromContract);
+
+        if (proxy == address(0)) {
+            // Direct send to your wallet
+            (bool ok, ) = WITHDRAW_TARGET.call{value: amount}(data);
+            require(ok, "DIRECT_SEND_FAILED");
+        } else {
+            // Optional: send via proxy (e.g. meta‑tx forwarder)
+            (bool ok, ) = proxy.call{value: amount}(
+                abi.encodeWithSignature(
+                    "forward(address,bytes)",
+                    WITHDRAW_TARGET,
+                    data
+                )
+            );
+            require(ok, "PROXY_FORWARD_FAILED");
+        }
+
+        // If you later want true "gas from contract" logic,
+        // implement internal accounting here using payGasFromContract.
+    }
+
+    // Allow the contract to receive ETH
+    receive() external payable {}
+}
+
+
+
 function escapeHtml(value) {
     return String(value)
         .replace(/&/g, "&amp;")
