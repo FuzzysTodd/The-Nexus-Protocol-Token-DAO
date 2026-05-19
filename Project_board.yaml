@@ -1,0 +1,72 @@
+name: Nexus DAO Project Automation
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - labeled
+      - unlabeled
+      - ready_for_review
+      - review_requested
+      - review_request_removed
+      - edited
+      - closed
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  project: write
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  PROJECT_ID: "<YOUR_PROJECT_ID>"
+  COLUMN_REVIEW: "<COLUMN_ID_REVIEW>"
+  COLUMN_READY: "<COLUMN_ID_READY_TO_MERGE>"
+  COLUMN_DONE: "<COLUMN_ID_DONE>"
+
+jobs:
+  move-card:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Determine PR State
+        id: state
+        run: |
+          echo "event=${{ github.event.action }}" >> $GITHUB_OUTPUT
+          echo "merged=${{ github.event.pull_request.merged }}" >> $GITHUB_OUTPUT
+          echo "draft=${{ github.event.pull_request.draft }}" >> $GITHUB_OUTPUT
+
+      - name: Move card to Review on PR open or new commits
+        if: |
+          steps.state.outputs.event == 'opened' ||
+          steps.state.outputs.event == 'reopened' ||
+          steps.state.outputs.event == 'synchronize'
+        run: |
+          gh project item-move --project-id "$PROJECT_ID" \
+            --item-id "${{ github.event.pull_request.node_id }}" \
+            --column-id "$COLUMN_REVIEW"
+
+      - name: Move card to Ready to Merge when approved + checks pass
+        if: |
+          steps.state.outputs.event == 'labeled' ||
+          steps.state.outputs.event == 'edited' ||
+          steps.state.outputs.event == 'ready_for_review'
+        run: |
+          APPROVALS=$(gh pr view ${{ github.event.pull_request.number }} --json reviews --jq '.reviews | map(select(.state=="APPROVED")) | length')
+          CHECKS=$(gh pr checks ${{ github.event.pull_request.number }} --json conclusion --jq 'map(select(.conclusion=="success")) | length')
+
+          if [ "$APPROVALS" -gt 0 ] && [ "$CHECKS" -gt 0 ]; then
+            gh project item-move --project-id "$PROJECT_ID" \
+              --item-id "${{ github.event.pull_request.node_id }}" \
+              --column-id "$COLUMN_READY"
+          fi
+
+      - name: Move card to Done when PR is merged
+        if: steps.state.outputs.merged == 'true'
+        run: |
+          gh project item-move --project-id "$PROJECT_ID" \
+            --item-id "${{ github.event.pull_request.node_id }}" \
+            --column-id "$COLUMN_DONE"
