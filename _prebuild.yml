@@ -1,0 +1,36 @@
+name: Prebuild
+
+on:
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: prebuild-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  prebuild:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prebuild
+        run: npm run prebuild
+
+      - name: Summary
+        run: echo "Prebuild completed successfully" >> $GITHUB_STEP_SUMMARY
