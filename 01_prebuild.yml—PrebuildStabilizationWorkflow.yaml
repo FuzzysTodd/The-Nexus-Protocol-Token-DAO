@@ -1,1 +1,11 @@
+# Generate a load test script
+@testing /generateLoadTest
 
+# Run a load test in Azure
+@testing /runLoadTestInAzure
+
+# Run a load test locally
+@testing /runLoadTestLocally
+
+# Validate your load test configuration
+@testing /validateLoadTestConfig
