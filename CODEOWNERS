@@ -5,29 +5,29 @@
 # https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
 # ── Global default ──────────────────────────────────────────────
-*                               @FuzzysTodd
+*                               @FuzzysTodd;@Co-Pilot
 
 # ── Smart contracts ─────────────────────────────────────────────
-/contracts/                     @FuzzysTodd
+/contracts/                     @FuzzysTodd;@Co-Pilot
 
 # ── GitHub infrastructure ───────────────────────────────────────
-/.github/                       @FuzzysTodd
-/.github/workflows/             @FuzzysTodd
+/.github/                       @FuzzysTodd;@Co-Pilot
+/.github/workflows/             @FuzzysTodd;@Co-Pilot
 
 # ── MCP / AI agents ─────────────────────────────────────────────
-/mcp/                           @FuzzysTodd
+/mcp/                           @FuzzysTodd;@Co-Pilot
 
 # ── Documentation ───────────────────────────────────────────────
-/docs/                          @FuzzysTodd
-GOVERNANCE.md                   @FuzzysTodd
-SECURITY.md                     @FuzzysTodd
+/docs/                          @FuzzysTodd;@Co-Pilot
+GOVERNANCE.md                   @FuzzysTodd;@Co-Pilot
+SECURITY.md                     @FuzzysTodd;@Co-Pilot
 
 # ── Financial operations ────────────────────────────────────────
-financial-ops-rest-server.js    @FuzzysTodd
-nexus-signal-bus.js             @FuzzysTodd
-money-flow.js                   @FuzzysTodd
+financial-ops-rest-server.js    @FuzzysTodd;@Co-Pilot
+nexus-signal-bus.js             @FuzzysTodd;@Co-Pilot
+money-flow.js                   @FuzzysTodd;@Co-Pilot
 
 # ── Frontend ────────────────────────────────────────────────────
-dashboard.html                  @FuzzysTodd
-governance.html                 @FuzzysTodd
-withdraw.html                   @FuzzysTodd
+dashboard.html                  @FuzzysTodd;@Co-Pilot
+governance.html                 @FuzzysTodd;@Co-Pilot
+withdraw.html                   @FuzzysTodd;@Co-Pilot
