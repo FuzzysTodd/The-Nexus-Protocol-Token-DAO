@@ -1,0 +1,14 @@
+import os
+import requests
+
+token = os.getenv("DAO_BOT_TOKEN")          # Load from env variable
+repo = "FuzzysTodd/NEXER-PROTOGEE-DAO"
+api_url = f"https://api.github.com/repos/{repo}/contents/README.md"
+
+headers = {
+    "Authorization": f"token {token}",
+    "Accept": "application/vnd.github.v3+json"
+}
+
+response = requests.get(api_url, headers=headers)
+print(response.json())
