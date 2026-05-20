@@ -16,6 +16,17 @@
         "fabric.vscode-fabric-functions",
         "spylogsster.app-debug-helper",
         "ms-azure-load-testing.microsoft-testing",
-        "ms-kubernetes-tools.vscode-kubernetes-tools"
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "ms-dotnettools.csdevkit",
+        "genieai.chatgpt-vscode",
+        "k9982874.github-gist-explorer",
+        "visualstudioexptteam.vscodeintellicode",
+        "tintinweb.solidity-ai",
+        "ms-vscode.vscode-chat-customizations-evaluations",
+        "intel-corporation.oneapi-gdb-debug",
+        "7finney.sol-exec",
+        "armurai.sol-armur-ai-audit",
+        "beaugunderson.solidity-extended",
+        "obigo.obigowebsimulatorlinux"
     ]
 }
