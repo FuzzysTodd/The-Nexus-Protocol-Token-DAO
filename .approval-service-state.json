@@ -1,5 +1,8 @@
 {
-  "serviceUrl": "http://localhost:8787",
+  "serviceUrl": "<a href= "https://fuzzystodd.github.io/The-Nexus-Protocol-Token-DOA/approval-service.html"
+  Open Approval Service
+</a>
+",
   "audit": [
     {
       "action": "service-started",
