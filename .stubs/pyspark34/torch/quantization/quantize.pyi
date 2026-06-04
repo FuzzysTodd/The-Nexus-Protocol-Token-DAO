@@ -1,0 +1,1 @@
+from torch.ao.quantization.quantize import add_quant_dequant as add_quant_dequant, convert as convert, prepare as prepare, prepare_qat as prepare_qat, propagate_qconfig_ as propagate_qconfig_, quantize as quantize, quantize_dynamic as quantize_dynamic, quantize_qat as quantize_qat, swap_module as swap_module

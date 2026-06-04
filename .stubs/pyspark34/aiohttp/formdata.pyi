@@ -1,0 +1,16 @@
+from .payload import Payload
+from typing import Any, Iterable
+
+__all__ = ['FormData']
+
+class FormData:
+    """Helper class for form body generation.
+
+    Supports multipart/form-data and application/x-www-form-urlencoded.
+    """
+    def __init__(self, fields: Iterable[Any] = (), quote_fields: bool = True, charset: str | None = None) -> None: ...
+    @property
+    def is_multipart(self) -> bool: ...
+    def add_field(self, name: str, value: Any, *, content_type: str | None = None, filename: str | None = None, content_transfer_encoding: str | None = None) -> None: ...
+    def add_fields(self, *fields: Any) -> None: ...
+    def __call__(self) -> Payload: ...

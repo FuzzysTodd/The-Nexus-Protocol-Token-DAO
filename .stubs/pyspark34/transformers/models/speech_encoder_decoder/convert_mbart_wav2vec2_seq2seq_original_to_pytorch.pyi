@@ -1,0 +1,16 @@
+from _typeshed import Incomplete
+from transformers import MBart50Tokenizer as MBart50Tokenizer, MBartConfig as MBartConfig, MBartForCausalLM as MBartForCausalLM, SpeechEncoderDecoderConfig as SpeechEncoderDecoderConfig, SpeechEncoderDecoderModel as SpeechEncoderDecoderModel, Wav2Vec2Config as Wav2Vec2Config, Wav2Vec2FeatureExtractor as Wav2Vec2FeatureExtractor, Wav2Vec2Model as Wav2Vec2Model, logging as logging
+
+logger: Incomplete
+MAPPING: Incomplete
+TOP_LEVEL_KEYS: Incomplete
+
+def set_recursively(hf_pointer, key, value, full_name, weight_type) -> None: ...
+def recursively_load_weights_wav2vec2(fairseq_model, hf_model) -> None: ...
+def load_conv_layer(full_name, value, feature_extractor, unused_weights, use_group_norm) -> None: ...
+def load_adapter(full_name, value, adapter, unused_weights) -> None: ...
+def make_linear_from_emb(emb): ...
+def convert_wav2vec2_checkpoint(checkpoint_path, pytorch_dump_folder_path, dict_path, config_yaml_path, encoder_config_path, decoder_config_path, add_adapter, adapter_kernel_size, adapter_stride, decoder_start_token_id, encoder_output_dim) -> None:
+    """
+    Copy/paste/tweak model's weights to transformers design.
+    """

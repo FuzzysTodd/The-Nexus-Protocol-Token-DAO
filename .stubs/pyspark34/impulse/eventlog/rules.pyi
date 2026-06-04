@@ -1,0 +1,16 @@
+__all__ = ['AnalyzeCriticalPath', 'AnalyzeEfficiency', 'AnalyzeFailures', 'AnalyzeStageSkew', 'AnalyzeSummary']
+
+class AnalyzeCriticalPath:
+    def __init__(self, spark) -> None: ...
+
+class AnalyzeEfficiency:
+    def __init__(self, spark) -> None: ...
+
+class AnalyzeFailures:
+    def __init__(self, spark) -> None: ...
+
+class AnalyzeStageSkew:
+    def __init__(self, spark) -> None: ...
+
+class AnalyzeSummary:
+    def __init__(self, spark) -> None: ...
