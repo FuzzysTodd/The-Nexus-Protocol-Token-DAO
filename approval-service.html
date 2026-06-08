@@ -1,318 +1,91 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Nexus Approval Service · Human Gate for Automation</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="styles.css" />
-  <style>
-    body { font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background:#050816; color:#f5f5f5; margin:0; }
-    header { padding:16px 24px; border-bottom:1px solid #222; display:flex; justify-content:space-between; align-items:center; }
-    header h1 { font-size:1.2rem; margin:0; }
-    header nav a { color:#aaa; margin-left:16px; text-decoration:none; font-size:0.9rem; }
-    header nav a.active { color:#fff; font-weight:600; }
-    main { padding:24px; max-width:1200px; margin:0 auto; }
-    h2 { margin-top:0; }
-    .grid { display:grid; grid-template-columns:2fr 1.5fr; gap:24px; align-items:flex-start; }
-    .card { background:#0b1020; border:1px solid #222; border-radius:10px; padding:16px 18px; }
-    .card h3 { margin-top:0; font-size:1rem; }
-    .pill { display:inline-block; padding:2px 8px; border-radius:999px; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.06em; }
-    .pill-ready { background:#12351f; color:#7dff9b; }
-    .pill-waiting { background:#33240f; color:#ffc46b; }
-    .pill-error { background:#3b1111; color:#ff8b8b; }
-    table { width:100%; border-collapse:collapse; font-size:0.85rem; }
-    th, td { padding:6px 4px; border-bottom:1px solid #222; text-align:left; vertical-align:top; }
-    th { color:#aaa; font-weight:500; }
-    .tag { display:inline-block; padding:2px 6px; border-radius:6px; font-size:0.7rem; background:#1b2238; color:#9fb4ff; margin-right:4px; }
-    .btn-row { display:flex; gap:8px; margin-top:8px; }
-    button { border:none; border-radius:6px; padding:6px 10px; font-size:0.8rem; cursor:pointer; }
-    .btn-approve { background:#1f8b4d; color:#fff; }
-    .btn-reject { background:#7a1b1b; color:#fff; }
-    .btn-details { background:#22293f; color:#d0d6ff; }
-    .status-dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:6px; }
-    .dot-ok { background:#35d48b; }
-    .dot-warn { background:#ffc46b; }
-    .dot-off { background:#555; }
-    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size:0.75rem; }
-    .small { font-size:0.75rem; color:#aaa; }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>Nexus Approval Service</h1>
-    <nav>
-      <a href="index.html">Home</a>
-      <a href="financial-ops-dashboard.html">Financial Ops</a>
-      <a href="web3-interface.html">Web3 Interface</a>
-      <a href="live-map.html">Live Map</a>
-      <a href="approval-service.html" class="active">Approval Service</a>
-    </nav>
-  </header>
-
-  <main>
-    <section class="card" style="margin-bottom:18px;">
-      <h2>Human Approval Gate</h2>
-      <p class="small">
-        All fund movement and treasury actions must be explicitly approved here.  
-        Automation may <strong>propose</strong> actions, but only a human operator can <strong>execute</strong> them.
-      </p>
-      <p class="small">
-        Source: <span class="tag">Nexus Signals</span>
-        <span class="tag">Repo Scan</span>
-        <span class="tag">Chain Snapshot (future: Tenderly + Dune)</span>
-      </p>
-    </section>
-
-    <section class="grid">
-      <!-- Left: Approval Queue -->
-      <div class="card">
-        <h3>Pending Approvals</h3>
-        <table id="approval-table">
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Summary</th>
-              <th>Risk</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Example rows; in production, populate from JSON / API -->
-            <tr>
-              <td>
-                <span class="tag">Withdrawal</span><br />
-                <span class="small mono">chainId: 8453</span>
-              </td>
-              <td>
-                Treasury withdrawal request from<br />
-                <span class="mono">0xdd0bd4453dBB446a28DF643CDD49441bc125DED3</span><br />
-                <span class="small">Destination: operator-specified at execution time</span>
-              </td>
-              <td>
-                <span class="pill pill-waiting">Review</span><br />
-                <span class="small">Requires human confirmation</span>
-              </td>
-              <td>
-                <div class="btn-row">
-                  <button class="btn-approve">Approve</button>
-                  <button class="btn-reject">Reject</button>
-                  <button class="btn-details">Details</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <span class="tag">Placement</span><br />
-                <span class="small mono">chainId: 1</span>
-              </td>
-              <td>
-                Strategy allocation update for<br />
-                <span class="mono">NEXUS_TOKEN</span><br />
-                <span class="small">Rebalance across pools (no direct withdrawal)</span>
-              </td>
-              <td>
-                <span class="pill pill-ready">Low</span><br />
-                <span class="small">No direct treasury outflow</span>
-              </td>
-              <td>
-                <div class="btn-row">
-                  <button class="btn-approve">Approve</button>
-                  <button class="btn-reject">Reject</button>
-                  <button class="btn-details">Details</button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <p class="small" style="margin-top:10px;">
-          In production, this table should be populated from a JSON feed (e.g. <span class="mono">signals/approvals.json</span>)
-          generated by your automation layer.
-        </p>
-      </div>
 <script>
-  let approvalsCache = [];
-
-  // Extend loader to store full JSON
   async function loadApprovals() {
     const tableBody = document.querySelector('#approval-table tbody');
     if (!tableBody) return;
 
     try {
       const res = await fetch('signals/approvals.json', { cache: 'no-store' });
+      if (!res.ok) throw new Error('Failed to load approvals.json');
       const data = await res.json();
-      approvalsCache = data.approvals || [];
 
       tableBody.innerHTML = '';
 
-      approvalsCache.forEach(item => {
+      (data.approvals || []).forEach(item => {
         const tr = document.createElement('tr');
 
-        tr.innerHTML = `
-          <td>
-            <span class="tag">${item.type}</span><br />
-            <span class="small mono">chainId: ${item.chainId}</span>
-          </td>
-          <td>
-            <span class="mono">${item.id}</span><br />
-            <span class="small">${item.request?.reason || item.request?.details || ''}</span>
-          </td>
-          <td>
-            <span class="pill pill-${item.risk?.level === 'high' ? 'error' : item.risk?.level === 'low' ? 'ready' : 'waiting'}">
-              ${item.risk?.level}
-            </span>
-          </td>
-          <td>
-            <div class="btn-row">
-              <button class="btn-approve" data-id="${item.id}">Approve</button>
-              <button class="btn-reject" data-id="${item.id}">Reject</button>
-              <button class="btn-details" data-id="${item.id}">Details</button>
-            </div>
-          </td>
+        // Type / chain
+        const tdType = document.createElement('td');
+        tdType.innerHTML = `
+          <span class="tag">${item.type || 'unknown'}</span><br />
+          <span class="small mono">chainId: ${item.chainId ?? 'n/a'}</span>
         `;
+        tr.appendChild(tdType);
+
+        // Summary
+        const tdSummary = document.createElement('td');
+        let summaryHtml = '';
+
+        if (item.type === 'withdrawal') {
+          summaryHtml = `
+            Treasury withdrawal request from<br />
+            <span class="mono">${item.request?.from || 'unknown'}</span><br />
+            <span class="small">
+              Token: ${item.request?.token || 'n/a'} · Amount: ${item.request?.amount || '0'}
+            </span>
+          `;
+        } else if (item.type === 'placement') {
+          summaryHtml = `
+            Strategy allocation update for<br />
+            <span class="mono">${item.request?.strategy || 'strategy'}</span><br />
+            <span class="small">${item.request?.details || ''}</span>
+          `;
+        } else {
+          summaryHtml = `
+            <span class="mono">${item.id || 'unlabeled'}</span><br />
+            <span class="small">${item.request?.reason || ''}</span>
+          `;
+        }
+
+        tdSummary.innerHTML = summaryHtml;
+        tr.appendChild(tdSummary);
+
+        // Risk
+        const tdRisk = document.createElement('td');
+        const level = item.risk?.level || 'unknown';
+        const pillClass =
+          level === 'high' ? 'pill-error' :
+          level === 'low'  ? 'pill-ready' :
+                             'pill-waiting';
+
+        tdRisk.innerHTML = `
+          <span class="pill ${pillClass}">${level}</span><br />
+          <span class="small">Score: ${item.risk?.score ?? 'n/a'}</span>
+        `;
+        tr.appendChild(tdRisk);
+
+        // Actions
+        const tdActions = document.createElement('td');
+        tdActions.innerHTML = `
+          <div class="btn-row">
+            <button class="btn-approve" data-id="${item.id}">Approve</button>
+            <button class="btn-reject" data-id="${item.id}">Reject</button>
+            <button class="btn-details" data-id="${item.id}">Details</button>
+          </div>
+        `;
+        tr.appendChild(tdActions);
 
         tableBody.appendChild(tr);
       });
-
     } catch (err) {
       console.error('Error loading approvals:', err);
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="4" class="small">Failed to load approvals.json — check path and GitHub Pages build.</td>
+        </tr>
+      `;
     }
   }
-
-  document.addEventListener('DOMContentLoaded', loadApprovals);
-
-  // DETAILS MODAL HANDLER
-  document.addEventListener('click', function (e) {
-    const btn = e.target;
-    if (!btn.dataset.id) return;
-
-    const id = btn.dataset.id;
-
-    if (btn.classList.contains('btn-details')) {
-      const modal = document.getElementById('details-modal');
-      const pre = document.getElementById('details-json');
-
-      const item = approvalsCache.find(a => a.id === id);
-
-      pre.textContent = JSON.stringify(item, null, 2);
-      modal.style.display = 'flex';
-
-      console.log("NEXUS DETAILS VIEW →", item);
-    }
-  });
-
-  // CLOSE MODAL
-  document.getElementById('details-close').addEventListener('click', () => {
-    document.getElementById('details-modal').style.display = 'none';
-  });
-</script>
-
-      <!-- Right: Signals & Verification -->
-      <div class="card">
-        <h3>Signal & Verification Status</h3>
-
-        <p class="small">
-          <span class="status-dot dot-ok"></span>Pre-Error Remediation Bot:
-          <span class="pill pill-ready">Ready</span><br />
-          <span class="status-dot dot-ok"></span>Withdrawal Placement Scanner:
-          <span class="pill pill-ready">Ready</span><br />
-          <span class="status-dot dot-ok"></span>Success Documentation Reporter:
-          <span class="pill pill-ready">Ready</span>
-        </p>
-
-        <hr style="border:none;border-top:1px solid #222;margin:10px 0;" />
-
-        <p class="small">
-          <strong>Verification Providers</strong>
-        </p>
-        <ul class="small">
-          <li>
-            <strong>Tenderly</strong> — planned integration for bytecode verification, simulations, and state diffs.
-          </li>
-          <li>
-            <strong>Dune</strong> — planned integration for contract activity, anomaly detection, and treasury behavior.
-          </li>
-        </ul>
-
-        <p class="small">
-          Configure these in a central config file, e.g.:
-        </p>
-        <pre class="mono" style="white-space:pre-wrap;background:#050816;padding:8px;border-radius:6px;">
-"verification": {
-  "tenderly": {
-    "enabled": true,
-    "account": "YOUR_TENDERLY_ACCOUNT",
-    "project": "YOUR_PROJECT",
-    "apiKey": "YOUR_TENDERLY_API_KEY"
-  },
-  "dune": {
-    "enabled": true,
-    "apiKey": "YOUR_DUNE_API_KEY",
-    "queries": {
-      "treasurySignals": 1923353
-    }
-  }
-}
-        </pre>
-
-        <p class="small">
-          The approval service should treat Tenderly + Dune as <strong>signal providers</strong>, not executors.  
-          They inform the operator; they never move funds.
-        </p>
-      </div>
-    </section>
-  </main>
-
-  <script>
-    
-    // Placeholder: wire this to your real signals feed later.
-    console.log("Nexus Approval Service loaded. Hook this page to your signals JSON + verification APIs.");
-  </script>
-<!-- Details Modal -->
-<div id="details-modal" style="
-  display:none;
-  position:fixed;
-  top:0; left:0; width:100%; height:100%;
-  background:rgba(0,0,0,0.65);
-  backdrop-filter: blur(4px);
-  z-index:9999;
-  align-items:center;
-  justify-content:center;
-">
-  <div style="
-    background:#0b1020;
-    border:1px solid #222;
-    border-radius:10px;
-    width:90%;
-    max-width:700px;
-    max-height:80%;
-    overflow:auto;
-    padding:20px;
-  ">
-    <h3 style="margin-top:0;">Approval Details</h3>
-    <pre id="details-json" style="
-      white-space:pre-wrap;
-      background:#050816;
-      padding:12px;
-      border-radius:8px;
-      color:#d0d6ff;
-      font-size:0.8rem;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    "></pre>
-
-    <button id="details-close" style="
-      margin-top:12px;
-      padding:8px 14px;
-      background:#22293f;
-      color:#fff;
-      border:none;
-      border-radius:6px;
-      cursor:pointer;
-    ">Close</button>
-  </div>
-</div>
-</body>
-  
-</html<script>
+<script>
   // Button event delegation for Approve / Reject / Details
   document.addEventListener('click', function (e) {
     const btn = e.target;
@@ -348,4 +121,7 @@
     }
   });
 </script>
->
+
+  document.addEventListener('DOMContentLoaded', loadApprovals);
+</script>
+
