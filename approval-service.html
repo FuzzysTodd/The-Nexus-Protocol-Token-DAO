@@ -187,8 +187,46 @@
   </main>
 
   <script>
+    
     // Placeholder: wire this to your real signals feed later.
     console.log("Nexus Approval Service loaded. Hook this page to your signals JSON + verification APIs.");
   </script>
 </body>
-</html>
+  
+</html<script>
+  // Button event delegation for Approve / Reject / Details
+  document.addEventListener('click', function (e) {
+    const btn = e.target;
+    if (!btn.dataset.id) return;
+
+    const id = btn.dataset.id;
+    const action =
+      btn.classList.contains('btn-approve') ? 'APPROVE' :
+      btn.classList.contains('btn-reject')  ? 'REJECT'  :
+      btn.classList.contains('btn-details') ? 'DETAILS' :
+      null;
+
+    if (!action) return;
+
+    // Console log output
+    console.log(`NEXUS APPROVAL ACTION →`, {
+      id,
+      action,
+      timestamp: new Date().toISOString()
+    });
+
+    // Optional: visual feedback
+    if (action === 'APPROVE') {
+      btn.textContent = 'Approved';
+      btn.style.opacity = '0.7';
+    }
+    if (action === 'REJECT') {
+      btn.textContent = 'Rejected';
+      btn.style.opacity = '0.7';
+    }
+    if (action === 'DETAILS') {
+      alert(`Details for: ${id}\n\nCheck console for full payload.`);
+    }
+  });
+</script>
+>
