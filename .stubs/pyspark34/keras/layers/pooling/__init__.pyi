@@ -1,0 +1,12 @@
+from keras.layers.pooling.average_pooling1d import AveragePooling1D as AveragePooling1D, AvgPool1D as AvgPool1D
+from keras.layers.pooling.average_pooling2d import AveragePooling2D as AveragePooling2D, AvgPool2D as AvgPool2D
+from keras.layers.pooling.average_pooling3d import AveragePooling3D as AveragePooling3D, AvgPool3D as AvgPool3D
+from keras.layers.pooling.global_average_pooling1d import GlobalAveragePooling1D as GlobalAveragePooling1D, GlobalAvgPool1D as GlobalAvgPool1D
+from keras.layers.pooling.global_average_pooling2d import GlobalAveragePooling2D as GlobalAveragePooling2D, GlobalAvgPool2D as GlobalAvgPool2D
+from keras.layers.pooling.global_average_pooling3d import GlobalAveragePooling3D as GlobalAveragePooling3D, GlobalAvgPool3D as GlobalAvgPool3D
+from keras.layers.pooling.global_max_pooling1d import GlobalMaxPool1D as GlobalMaxPool1D, GlobalMaxPooling1D as GlobalMaxPooling1D
+from keras.layers.pooling.global_max_pooling2d import GlobalMaxPool2D as GlobalMaxPool2D, GlobalMaxPooling2D as GlobalMaxPooling2D
+from keras.layers.pooling.global_max_pooling3d import GlobalMaxPool3D as GlobalMaxPool3D, GlobalMaxPooling3D as GlobalMaxPooling3D
+from keras.layers.pooling.max_pooling1d import MaxPool1D as MaxPool1D, MaxPooling1D as MaxPooling1D
+from keras.layers.pooling.max_pooling2d import MaxPool2D as MaxPool2D, MaxPooling2D as MaxPooling2D
+from keras.layers.pooling.max_pooling3d import MaxPool3D as MaxPool3D, MaxPooling3D as MaxPooling3D

@@ -1,0 +1,9 @@
+from .iprerun import IPrerun as IPrerun
+from pyspark.sql.session import SparkSession as SparkSession
+
+TRIDENT_DISABLE_AUTOLOG_CONF_KEY: str
+
+class MlflowPrerun(IPrerun):
+    def initialize(self, global_namespace: dict) -> None: ...
+    def init_personalized_session(self, spark: SparkSession) -> None: ...
+    def add_custom_magic(self, jvmMagicHelper) -> None: ...

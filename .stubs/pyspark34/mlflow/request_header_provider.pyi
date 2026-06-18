@@ -1,0 +1,6 @@
+from .synapse_mlflow_utils import get_mlflow_env_config as get_mlflow_env_config
+from mlflow.tracking.request_header.abstract_request_header_provider import RequestHeaderProvider as RequestHeaderProvider
+
+class TridentRequestHeaderProvider(RequestHeaderProvider):
+    def in_context(self): ...
+    def request_headers(self): ...

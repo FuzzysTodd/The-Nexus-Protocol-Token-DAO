@@ -1,0 +1,222 @@
+from _typeshed import Incomplete
+from mako import ast as ast, exceptions as exceptions, filters as filters, util as util
+
+class Node:
+    """base class for a Node in the parse tree."""
+    source: Incomplete
+    lineno: Incomplete
+    pos: Incomplete
+    filename: Incomplete
+    def __init__(self, source, lineno, pos, filename) -> None: ...
+    @property
+    def exception_kwargs(self): ...
+    def get_children(self): ...
+    def accept_visitor(self, visitor) -> None: ...
+
+class TemplateNode(Node):
+    """a 'container' node that stores the overall collection of nodes."""
+    nodes: Incomplete
+    page_attributes: Incomplete
+    def __init__(self, filename) -> None: ...
+    def get_children(self): ...
+
+class ControlLine(Node):
+    """defines a control line, a line-oriented python line or end tag.
+
+    e.g.::
+
+        % if foo:
+            (markup)
+        % endif
+
+    """
+    has_loop_context: bool
+    text: Incomplete
+    keyword: Incomplete
+    isend: Incomplete
+    is_primary: Incomplete
+    nodes: Incomplete
+    def __init__(self, keyword, isend, text, **kwargs) -> None: ...
+    def get_children(self): ...
+    def declared_identifiers(self): ...
+    def undeclared_identifiers(self): ...
+    def is_ternary(self, keyword):
+        """return true if the given keyword is a ternary keyword
+        for this ControlLine"""
+
+class Text(Node):
+    """defines plain text in the template."""
+    content: Incomplete
+    def __init__(self, content, **kwargs) -> None: ...
+
+class Code(Node):
+    """defines a Python code block, either inline or module level.
+
+    e.g.::
+
+        inline:
+        <%
+            x = 12
+        %>
+
+        module level:
+        <%!
+            import logger
+        %>
+
+    """
+    text: Incomplete
+    ismodule: Incomplete
+    code: Incomplete
+    def __init__(self, text, ismodule, **kwargs) -> None: ...
+    def declared_identifiers(self): ...
+    def undeclared_identifiers(self): ...
+
+class Comment(Node):
+    """defines a comment line.
+
+    # this is a comment
+
+    """
+    text: Incomplete
+    def __init__(self, text, **kwargs) -> None: ...
+
+class Expression(Node):
+    """defines an inline expression.
+
+    ${x+y}
+
+    """
+    text: Incomplete
+    escapes: Incomplete
+    escapes_code: Incomplete
+    code: Incomplete
+    def __init__(self, text, escapes, **kwargs) -> None: ...
+    def declared_identifiers(self): ...
+    def undeclared_identifiers(self): ...
+
+class _TagMeta(type):
+    """metaclass to allow Tag to produce a subclass according to
+    its keyword"""
+    def __init__(cls, clsname, bases, dict_) -> None: ...
+    def __call__(cls, keyword, attributes, **kwargs): ...
+
+class Tag(Node, metaclass=_TagMeta):
+    """abstract base class for tags.
+
+    e.g.::
+
+        <%sometag/>
+
+        <%someothertag>
+            stuff
+        </%someothertag>
+
+    """
+    __keyword__: Incomplete
+    keyword: Incomplete
+    attributes: Incomplete
+    parent: Incomplete
+    nodes: Incomplete
+    def __init__(self, keyword, attributes, expressions, nonexpressions, required, **kwargs) -> None:
+        """construct a new Tag instance.
+
+        this constructor not called directly, and is only called
+        by subclasses.
+
+        :param keyword: the tag keyword
+
+        :param attributes: raw dictionary of attribute key/value pairs
+
+        :param expressions: a set of identifiers that are legal attributes,
+         which can also contain embedded expressions
+
+        :param nonexpressions: a set of identifiers that are legal
+         attributes, which cannot contain embedded expressions
+
+        :param \\**kwargs:
+         other arguments passed to the Node superclass (lineno, pos)
+
+        """
+    def is_root(self): ...
+    def get_children(self): ...
+    def declared_identifiers(self): ...
+    def undeclared_identifiers(self): ...
+
+class IncludeTag(Tag):
+    __keyword__: str
+    page_args: Incomplete
+    def __init__(self, keyword, attributes, **kwargs) -> None: ...
+    def declared_identifiers(self): ...
+    def undeclared_identifiers(self): ...
+
+class NamespaceTag(Tag):
+    __keyword__: str
+    name: Incomplete
+    def __init__(self, keyword, attributes, **kwargs) -> None: ...
+    def declared_identifiers(self): ...
+
+class TextTag(Tag):
+    __keyword__: str
+    filter_args: Incomplete
+    def __init__(self, keyword, attributes, **kwargs) -> None: ...
+    def undeclared_identifiers(self): ...
+
+class DefTag(Tag):
+    __keyword__: str
+    function_decl: Incomplete
+    name: Incomplete
+    decorator: Incomplete
+    filter_args: Incomplete
+    def __init__(self, keyword, attributes, **kwargs) -> None: ...
+    is_anonymous: bool
+    is_block: bool
+    @property
+    def funcname(self): ...
+    def get_argument_expressions(self, **kw): ...
+    def declared_identifiers(self): ...
+    def undeclared_identifiers(self): ...
+
+class BlockTag(Tag):
+    __keyword__: str
+    body_decl: Incomplete
+    name: Incomplete
+    decorator: Incomplete
+    filter_args: Incomplete
+    def __init__(self, keyword, attributes, **kwargs) -> None: ...
+    is_block: bool
+    @property
+    def is_anonymous(self): ...
+    @property
+    def funcname(self): ...
+    def get_argument_expressions(self, **kw): ...
+    def declared_identifiers(self): ...
+    def undeclared_identifiers(self): ...
+
+class CallTag(Tag):
+    __keyword__: str
+    expression: Incomplete
+    code: Incomplete
+    body_decl: Incomplete
+    def __init__(self, keyword, attributes, **kwargs) -> None: ...
+    def declared_identifiers(self): ...
+    def undeclared_identifiers(self): ...
+
+class CallNamespaceTag(Tag):
+    expression: Incomplete
+    code: Incomplete
+    body_decl: Incomplete
+    def __init__(self, namespace, defname, attributes, **kwargs) -> None: ...
+    def declared_identifiers(self): ...
+    def undeclared_identifiers(self): ...
+
+class InheritTag(Tag):
+    __keyword__: str
+    def __init__(self, keyword, attributes, **kwargs) -> None: ...
+
+class PageTag(Tag):
+    __keyword__: str
+    body_decl: Incomplete
+    filter_args: Incomplete
+    def __init__(self, keyword, attributes, **kwargs) -> None: ...
+    def declared_identifiers(self): ...

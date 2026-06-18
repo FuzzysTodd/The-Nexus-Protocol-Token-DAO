@@ -1,0 +1,1 @@
+from interpret.glassbox._ebm._ebm import DPExplainableBoostingClassifier as DPExplainableBoostingClassifier, DPExplainableBoostingRegressor as DPExplainableBoostingRegressor

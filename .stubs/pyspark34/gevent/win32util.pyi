@@ -1,0 +1,46 @@
+from _typeshed import Incomplete
+
+__all__ = ['formatError']
+
+class _ErrorFormatter:
+    """
+    Formatter for Windows error messages.
+
+    @ivar winError: A callable which takes one integer error number argument
+        and returns an L{exceptions.WindowsError} instance for that error (like
+        L{ctypes.WinError}).
+
+    @ivar formatMessage: A callable which takes one integer error number
+        argument and returns a C{str} giving the message for that error (like
+        L{win32api.FormatMessage}).
+
+    @ivar errorTab: A mapping from integer error numbers to C{str} messages
+        which correspond to those errors (like L{socket.errorTab}).
+    """
+    winError: Incomplete
+    formatMessage: Incomplete
+    errorTab: Incomplete
+    def __init__(self, WinError, FormatMessage, errorTab) -> None: ...
+    @classmethod
+    def fromEnvironment(cls):
+        """
+        Get as many of the platform-specific error translation objects as
+        possible and return an instance of C{cls} created with them.
+        """
+    def formatError(self, errorcode):
+        """
+        Returns the string associated with a Windows error message, such as the
+        ones found in socket.error.
+
+        Attempts direct lookup against the win32 API via ctypes and then
+        pywin32 if available), then in the error table in the socket module,
+        then finally defaulting to C{os.strerror}.
+
+        @param errorcode: the Windows error code
+        @type errorcode: C{int}
+
+        @return: The error message string
+        @rtype: C{str}
+        """
+
+formatError: Incomplete

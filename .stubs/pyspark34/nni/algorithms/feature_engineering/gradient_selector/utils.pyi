@@ -1,0 +1,19 @@
+from _typeshed import Incomplete
+
+class EMA:
+    """
+    maintains an exponential moving average
+    """
+    f_ma: Incomplete
+    fs: Incomplete
+    gamma: Incomplete
+    rel_change: Incomplete
+    valid_after: Incomplete
+    n_iters_relchange: Incomplete
+    initialized: bool
+    def __init__(self, f=..., discount_factor: float = 0.1, valid_after: Incomplete | None = None, n_iters_relchange: int = 3) -> None: ...
+    def reset(self, f) -> None: ...
+    def relchange(self): ...
+    def update(self, f_new) -> None: ...
+    def num_updates(self): ...
+    def __call__(self): ...
