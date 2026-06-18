@@ -1,0 +1,92 @@
+{
+  "meta": {
+    "version": "1.0.0",
+    "generatedAt": "2026-06-07T21:58:00Z",
+    "description": "Unified contract registry for Nexus Protocol Token DAO ecosystem."
+  },
+
+  "contracts": {
+    "NEXUS_TOKEN": {
+      "name": "NexusToken",
+      "type": "erc20",
+      "abi": "abi/NexusToken.json",
+      "addresses": {
+        "1": "0xYOUR_MAINNET_NEXUS_TOKEN",
+        "8453": "0xYOUR_BASE_NEXUS_TOKEN",
+        "31337": "0x0000000000000000000000000000000000000001"
+      },
+      "ui": {
+        "display": true,
+        "category": "token"
+      }
+    },
+
+    "GOVERNANCE_CORE": {
+      "name": "GovernanceCore",
+      "type": "governance",
+      "abi": "abi/GovernanceCore.json",
+      "addresses": {
+        "1": "0xYOUR_GOVERNANCE_CONTRACT",
+        "31337": "0x0000000000000000000000000000000000000002"
+      },
+      "events": {
+        "ProposalCreated": "ProposalCreated(uint256,address,string)",
+        "VoteCast": "VoteCast(address,uint256,uint8,uint256)",
+        "ProposalExecuted": "ProposalExecuted(uint256)"
+      },
+      "ui": {
+        "page": "governance.html",
+        "category": "governance"
+      }
+    },
+
+    "WITHDRAWAL_MANAGER": {
+      "name": "WithdrawalManager",
+      "type": "treasury",
+      "abi": "abi/WithdrawalManager.json",
+      "addresses": {
+        "1": "0xYOUR_WITHDRAWAL_MANAGER_CONTRACT",
+        "31337": "0x0000000000000000000000000000000000000003"
+      },
+      "events": {
+        "WithdrawalRequested": "WithdrawalRequested(address,uint256,string)",
+        "WithdrawalApproved": "WithdrawalApproved(address,uint256)",
+        "WithdrawalExecuted": "WithdrawalExecuted(address,uint256)"
+      },
+      "ui": {
+        "page": "withdraw.html",
+        "category": "treasury"
+      }
+    },
+
+    "TREASURY_VAULT": {
+      "name": "TreasuryVault",
+      "type": "vault",
+      "abi": "abi/TreasuryVault.json",
+      "addresses": {
+        "1": "0xYOUR_TREASURY_VAULT_CONTRACT",
+        "31337": "0x0000000000000000000000000000000000000004"
+      },
+      "roles": {
+        "owner": "0xdd0bd4453dBB446a28DF643CDD49441bc125DED3"
+      },
+      "ui": {
+        "page": "financial-ops-dashboards.html",
+        "category": "treasury"
+      }
+    },
+
+    "MULTISIG_SAFE": {
+      "name": "NexusMultisigSafe",
+      "type": "multisig",
+      "abi": "abi/MultisigSafe.json",
+      "addresses": {
+        "1": "0xYOUR_MULTISIG_SAFE",
+        "31337": "0x0000000000000000000000000000000000000005"
+      },
+      "ui": {
+        "display": false
+      }
+    }
+  }
+}
