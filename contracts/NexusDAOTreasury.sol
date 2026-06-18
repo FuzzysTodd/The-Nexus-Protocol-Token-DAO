@@ -13,6 +13,16 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 ///      funds can therefore leave the treasury without a successful on-chain
 ///      governance vote followed by the mandatory timelock delay.
 ///
+///      Large transfers (above MULTISIG_THRESHOLD) additionally require a
+///      second GUARDIAN_ROLE co-signature before the executor can complete the
+///      transfer.  This two-step approval prevents a single compromised key
+///      from draining the treasury even if it holds EXECUTOR_ROLE.
+///
+///      Flow for a large transfer:
+///        1. EXECUTOR_ROLE calls requestLargeTransfer*() — creates a pending entry.
+///        2. A GUARDIAN_ROLE (≠ msg.sender of step 1) calls confirmLargeTransfer*().
+///        3. EXECUTOR_ROLE calls executeLargeTransfer*() — funds are moved.
+///
 ///      NES: this contract is a Nexus-authored surface governed by the
 ///      Nexus Encryption Standard as documented in docs/NEXUS_ENCRYPTION_STANDARD.md.
 ///
@@ -21,7 +31,8 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 ///   - EXECUTOR_ROLE       : granted to NexusDAOTimelock; the only role that may
 ///                           transfer ETH or ERC-20 tokens out of the treasury.
 ///   - GUARDIAN_ROLE       : granted to Owner and/or Super Delegates; may pause
-///                           treasury operations in an emergency.
+///                           treasury operations in an emergency, and must co-sign
+///                           large transfers above MULTISIG_THRESHOLD.
 ///
 /// Deployment:
 ///   1. Deploy NexusDAOTreasury(admin = owner wallet).
@@ -41,7 +52,50 @@ contract NexusDAOTreasury is AccessControl, ReentrancyGuard {
 
     /// @notice Role that can pause and unpause treasury operations.
     ///         Assigned to Owner and Super Delegates for emergency response.
+    ///         Also required to co-sign large transfers.
     bytes32 public constant GUARDIAN_ROLE = keccak256("GUARDIAN_ROLE");
+
+    // -------------------------------------------------------------------------
+    // Multi-sig large-transfer configuration
+    // -------------------------------------------------------------------------
+
+    /// @notice ETH amount (in wei) above which a guardian co-signature is required.
+    ///         Default: 1 ETH. Updatable by DEFAULT_ADMIN_ROLE via governance.
+    uint256 public MULTISIG_THRESHOLD = 1 ether;
+
+    /// @notice ERC-20 amount (in token units, 18 decimals) above which a guardian
+    ///         co-signature is required.
+    uint256 public ERC20_MULTISIG_THRESHOLD = 1_000 * 10 ** 18;
+
+    // -------------------------------------------------------------------------
+    // Pending large-transfer state
+    // -------------------------------------------------------------------------
+
+    struct PendingETHTransfer {
+        address payable recipient;
+        uint256 amount;
+        string reason;
+        address requestedBy;
+        address confirmedBy;
+        uint256 requestedAt;
+        bool executed;
+    }
+
+    struct PendingERC20Transfer {
+        address token;
+        address recipient;
+        uint256 amount;
+        string reason;
+        address requestedBy;
+        address confirmedBy;
+        uint256 requestedAt;
+        bool executed;
+    }
+
+    mapping(uint256 => PendingETHTransfer) public pendingETH;
+    mapping(uint256 => PendingERC20Transfer) public pendingERC20;
+    uint256 private _pendingETHNonce;
+    uint256 private _pendingERC20Nonce;
 
     // -------------------------------------------------------------------------
     // State
@@ -71,6 +125,32 @@ contract NexusDAOTreasury is AccessControl, ReentrancyGuard {
 
     /// @notice Emitted when the treasury is unpaused by a guardian.
     event TreasuryUnpaused(address indexed guardian);
+
+    /// @notice Emitted when a large ETH transfer is requested.
+    event LargeETHTransferRequested(uint256 indexed nonce, address indexed recipient, uint256 amount, address requestedBy);
+
+    /// @notice Emitted when a large ETH transfer is confirmed by a guardian.
+    event LargeETHTransferConfirmed(uint256 indexed nonce, address indexed confirmedBy);
+
+    /// @notice Emitted when a large ETH transfer is executed after confirmation.
+    event LargeETHTransferExecuted(uint256 indexed nonce, address indexed recipient, uint256 amount);
+
+    /// @notice Emitted when a large ERC-20 transfer is requested.
+    event LargeERC20TransferRequested(
+        uint256 indexed nonce, address indexed token, address indexed recipient, uint256 amount, address requestedBy
+    );
+
+    /// @notice Emitted when a large ERC-20 transfer is confirmed by a guardian.
+    event LargeERC20TransferConfirmed(uint256 indexed nonce, address indexed confirmedBy);
+
+    /// @notice Emitted when a large ERC-20 transfer is executed after confirmation.
+    event LargeERC20TransferExecuted(uint256 indexed nonce, address indexed token, address indexed recipient, uint256 amount);
+
+    /// @notice Emitted when the multisig ETH threshold is updated.
+    event MultisigThresholdUpdated(uint256 newThreshold);
+
+    /// @notice Emitted when the multisig ERC-20 threshold is updated.
+    event ERC20MultisigThresholdUpdated(uint256 newThreshold);
 
     // -------------------------------------------------------------------------
     // Modifiers
@@ -120,11 +200,12 @@ contract NexusDAOTreasury is AccessControl, ReentrancyGuard {
     }
 
     // -------------------------------------------------------------------------
-    // ETH transfers (governance-only)
+    // ETH transfers (governance-only, with multi-sig for large amounts)
     // -------------------------------------------------------------------------
 
-    /// @notice Transfers ETH to the specified recipient.
-    ///         Can only be called by the NexusDAOTimelock (EXECUTOR_ROLE).
+    /// @notice Transfers ETH to the specified recipient (amounts ≤ MULTISIG_THRESHOLD only).
+    ///         For larger amounts use requestLargeETHTransfer / confirmLargeETHTransfer /
+    ///         executeLargeETHTransfer. Can only be called by the NexusDAOTimelock (EXECUTOR_ROLE).
     /// @param recipient Destination address.
     /// @param amount    Amount of ETH in wei.
     /// @param reason    Human-readable description for audit logging.
@@ -136,6 +217,7 @@ contract NexusDAOTreasury is AccessControl, ReentrancyGuard {
     {
         require(recipient != address(0), "NexusDAOTreasury: zero recipient");
         require(amount > 0, "NexusDAOTreasury: zero amount");
+        require(amount <= MULTISIG_THRESHOLD, "NexusDAOTreasury: amount exceeds threshold; use large-transfer flow");
         require(address(this).balance >= amount, "NexusDAOTreasury: insufficient ETH");
 
         (bool success,) = recipient.call{value: amount}("");
@@ -144,11 +226,79 @@ contract NexusDAOTreasury is AccessControl, ReentrancyGuard {
         emit ETHTransferred(recipient, amount, reason);
     }
 
+    /// @notice Requests a large ETH transfer (above MULTISIG_THRESHOLD).
+    ///         Must be confirmed by a different guardian before execution.
+    /// @param recipient Destination address.
+    /// @param amount    Amount of ETH in wei (must exceed MULTISIG_THRESHOLD).
+    /// @param reason    Human-readable description for audit logging.
+    /// @return nonce Identifier for this pending transfer.
+    function requestLargeETHTransfer(address payable recipient, uint256 amount, string calldata reason)
+        external
+        whenNotPaused
+        onlyRole(EXECUTOR_ROLE)
+        returns (uint256 nonce)
+    {
+        require(recipient != address(0), "NexusDAOTreasury: zero recipient");
+        require(amount > MULTISIG_THRESHOLD, "NexusDAOTreasury: use transferETH for small amounts");
+        require(address(this).balance >= amount, "NexusDAOTreasury: insufficient ETH");
+
+        nonce = ++_pendingETHNonce;
+        pendingETH[nonce] = PendingETHTransfer({
+            recipient: recipient,
+            amount: amount,
+            reason: reason,
+            requestedBy: msg.sender,
+            confirmedBy: address(0),
+            requestedAt: block.timestamp,
+            executed: false
+        });
+
+        emit LargeETHTransferRequested(nonce, recipient, amount, msg.sender);
+    }
+
+    /// @notice Co-signs a pending large ETH transfer.
+    ///         Must be called by a GUARDIAN_ROLE address different from the requester.
+    /// @param nonce The pending transfer identifier.
+    function confirmLargeETHTransfer(uint256 nonce) external onlyRole(GUARDIAN_ROLE) {
+        PendingETHTransfer storage transfer = pendingETH[nonce];
+        require(transfer.requestedAt > 0, "NexusDAOTreasury: unknown nonce");
+        require(!transfer.executed, "NexusDAOTreasury: already executed");
+        require(transfer.confirmedBy == address(0), "NexusDAOTreasury: already confirmed");
+        require(msg.sender != transfer.requestedBy, "NexusDAOTreasury: requester cannot confirm");
+
+        transfer.confirmedBy = msg.sender;
+        emit LargeETHTransferConfirmed(nonce, msg.sender);
+    }
+
+    /// @notice Executes a large ETH transfer that has been confirmed by a guardian.
+    /// @param nonce The pending transfer identifier.
+    function executeLargeETHTransfer(uint256 nonce)
+        external
+        nonReentrant
+        whenNotPaused
+        onlyRole(EXECUTOR_ROLE)
+    {
+        PendingETHTransfer storage transfer = pendingETH[nonce];
+        require(transfer.requestedAt > 0, "NexusDAOTreasury: unknown nonce");
+        require(!transfer.executed, "NexusDAOTreasury: already executed");
+        require(transfer.confirmedBy != address(0), "NexusDAOTreasury: not yet confirmed");
+        require(address(this).balance >= transfer.amount, "NexusDAOTreasury: insufficient ETH");
+
+        transfer.executed = true;
+
+        (bool success,) = transfer.recipient.call{value: transfer.amount}("");
+        require(success, "NexusDAOTreasury: ETH transfer failed");
+
+        emit LargeETHTransferExecuted(nonce, transfer.recipient, transfer.amount);
+        emit ETHTransferred(transfer.recipient, transfer.amount, transfer.reason);
+    }
+
     // -------------------------------------------------------------------------
-    // ERC-20 transfers (governance-only)
+    // ERC-20 transfers (governance-only, with multi-sig for large amounts)
     // -------------------------------------------------------------------------
 
     /// @notice Transfers ERC-20 tokens to the specified recipient.
+    ///         For amounts ≤ ERC20_MULTISIG_THRESHOLD, executes immediately.
     ///         Can only be called by the NexusDAOTimelock (EXECUTOR_ROLE).
     /// @param token     The ERC-20 token address.
     /// @param recipient Destination address.
@@ -163,9 +313,90 @@ contract NexusDAOTreasury is AccessControl, ReentrancyGuard {
         require(token != address(0), "NexusDAOTreasury: zero token address");
         require(recipient != address(0), "NexusDAOTreasury: zero recipient");
         require(amount > 0, "NexusDAOTreasury: zero amount");
+        require(amount <= ERC20_MULTISIG_THRESHOLD, "NexusDAOTreasury: amount exceeds threshold; use large-transfer flow");
 
         IERC20(token).safeTransfer(recipient, amount);
         emit ERC20Transferred(token, recipient, amount, reason);
+    }
+
+    /// @notice Requests a large ERC-20 transfer (above ERC20_MULTISIG_THRESHOLD).
+    /// @return nonce Identifier for this pending transfer.
+    function requestLargeERC20Transfer(
+        address token,
+        address recipient,
+        uint256 amount,
+        string calldata reason
+    ) external whenNotPaused onlyRole(EXECUTOR_ROLE) returns (uint256 nonce) {
+        require(token != address(0), "NexusDAOTreasury: zero token address");
+        require(recipient != address(0), "NexusDAOTreasury: zero recipient");
+        require(amount > ERC20_MULTISIG_THRESHOLD, "NexusDAOTreasury: use transferERC20 for small amounts");
+
+        nonce = ++_pendingERC20Nonce;
+        pendingERC20[nonce] = PendingERC20Transfer({
+            token: token,
+            recipient: recipient,
+            amount: amount,
+            reason: reason,
+            requestedBy: msg.sender,
+            confirmedBy: address(0),
+            requestedAt: block.timestamp,
+            executed: false
+        });
+
+        emit LargeERC20TransferRequested(nonce, token, recipient, amount, msg.sender);
+    }
+
+    /// @notice Co-signs a pending large ERC-20 transfer.
+    /// @param nonce The pending transfer identifier.
+    function confirmLargeERC20Transfer(uint256 nonce) external onlyRole(GUARDIAN_ROLE) {
+        PendingERC20Transfer storage transfer = pendingERC20[nonce];
+        require(transfer.requestedAt > 0, "NexusDAOTreasury: unknown nonce");
+        require(!transfer.executed, "NexusDAOTreasury: already executed");
+        require(transfer.confirmedBy == address(0), "NexusDAOTreasury: already confirmed");
+        require(msg.sender != transfer.requestedBy, "NexusDAOTreasury: requester cannot confirm");
+
+        transfer.confirmedBy = msg.sender;
+        emit LargeERC20TransferConfirmed(nonce, msg.sender);
+    }
+
+    /// @notice Executes a large ERC-20 transfer that has been confirmed by a guardian.
+    /// @param nonce The pending transfer identifier.
+    function executeLargeERC20Transfer(uint256 nonce)
+        external
+        nonReentrant
+        whenNotPaused
+        onlyRole(EXECUTOR_ROLE)
+    {
+        PendingERC20Transfer storage transfer = pendingERC20[nonce];
+        require(transfer.requestedAt > 0, "NexusDAOTreasury: unknown nonce");
+        require(!transfer.executed, "NexusDAOTreasury: already executed");
+        require(transfer.confirmedBy != address(0), "NexusDAOTreasury: not yet confirmed");
+
+        transfer.executed = true;
+
+        IERC20(transfer.token).safeTransfer(transfer.recipient, transfer.amount);
+        emit LargeERC20TransferExecuted(nonce, transfer.token, transfer.recipient, transfer.amount);
+        emit ERC20Transferred(transfer.token, transfer.recipient, transfer.amount, transfer.reason);
+    }
+
+    // -------------------------------------------------------------------------
+    // Threshold administration
+    // -------------------------------------------------------------------------
+
+    /// @notice Updates the ETH multi-sig threshold. Callable by DEFAULT_ADMIN_ROLE.
+    /// @param newThreshold New threshold in wei (must be > 0).
+    function setMultisigThreshold(uint256 newThreshold) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(newThreshold > 0, "NexusDAOTreasury: zero threshold");
+        MULTISIG_THRESHOLD = newThreshold;
+        emit MultisigThresholdUpdated(newThreshold);
+    }
+
+    /// @notice Updates the ERC-20 multi-sig threshold. Callable by DEFAULT_ADMIN_ROLE.
+    /// @param newThreshold New threshold in token units (must be > 0).
+    function setERC20MultisigThreshold(uint256 newThreshold) external onlyRole(DEFAULT_ADMIN_ROLE) {
+        require(newThreshold > 0, "NexusDAOTreasury: zero threshold");
+        ERC20_MULTISIG_THRESHOLD = newThreshold;
+        emit ERC20MultisigThresholdUpdated(newThreshold);
     }
 
     // -------------------------------------------------------------------------

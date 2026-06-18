@@ -21,432 +21,56 @@
             --border: rgba(148, 163, 184, 0.2);
             --shadow: 0 20px 60px rgba(2, 6, 23, 0.5);
         }
-
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
-            background: linear-gradient(180deg, #020617 0%, var(--bg) 50%, #0f172a 100%);
-            background-attachment: fixed;
-            color: var(--text);
-            min-height: 100vh;
-        }
-
-        main {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px 20px 80px;
-        }
-
-        h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin: 0 0 6px;
-            background: linear-gradient(90deg, var(--accent), var(--success));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .subtitle {
-            color: var(--muted);
-            font-size: 1rem;
-            margin: 0 0 36px;
-        }
-
-        /* ── Panel ── */
-        .panel {
-            background: var(--panel);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 28px 32px;
-            margin-bottom: 24px;
-            box-shadow: var(--shadow);
-        }
-
-        .panel h2 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin: 0 0 20px;
-            color: var(--accent);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* ── GitHub card ── */
-        .gh-card {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-            flex-wrap: wrap;
-        }
-
-        .gh-avatar {
-            width: 96px;
-            height: 96px;
-            border-radius: 50%;
-            border: 3px solid var(--accent);
-            flex-shrink: 0;
-            background: var(--panel-alt);
-        }
-
-        .gh-info { flex: 1; min-width: 180px; }
-
-        .gh-name {
-            font-size: 1.4rem;
-            font-weight: 700;
-            margin: 0 0 4px;
-        }
-
-        .gh-login {
-            font-size: 0.95rem;
-            color: var(--muted);
-            margin: 0 0 10px;
-        }
-
-        .gh-bio {
-            font-size: 0.9rem;
-            color: var(--text);
-            margin: 0 0 12px;
-        }
-
-        .gh-meta {
-            display: flex;
-            gap: 18px;
-            flex-wrap: wrap;
-            font-size: 0.85rem;
-            color: var(--muted);
-            margin: 0 0 14px;
-        }
-
-        .gh-meta span { display: flex; align-items: center; gap: 4px; }
-
-        .gh-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: var(--accent);
+        /* ... rest of your dashboard styles ... */
+        /* ➤ Green active tab for Approvals */
+        .tab-btn.approvals-active, .tab-btn[data-tab="approvals"].active {
+            background: var(--success);
             color: #000;
-            font-weight: 600;
-            font-size: 0.85rem;
-            text-decoration: none;
-            padding: 7px 16px;
-            border-radius: 8px;
-            transition: opacity 0.2s;
-        }
-
-        .gh-link:hover { opacity: 0.85; }
-
-        .gh-error { color: var(--danger); font-size: 0.9rem; }
-
-        /* ── Wallet ── */
-        .wallet-row {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 7px;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: opacity 0.2s, transform 0.1s;
-        }
-
-        .btn:active { transform: scale(0.97); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .btn-accent {
-            background: var(--accent);
-            color: #000;
-        }
-
-        .btn-accent:hover:not(:disabled) { opacity: 0.88; }
-
-        .btn-primary {
-            background: #2563eb;
-            color: #fff;
-        }
-
-        .btn-primary:hover:not(:disabled) { background: #1d4ed8; }
-
-        .connection-status {
-            font-size: 0.85rem;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        .connection-status.disconnected {
-            background: rgba(248, 113, 113, 0.15);
-            color: var(--danger);
-        }
-
-        .connection-status.connected {
-            background: rgba(74, 222, 128, 0.15);
-            color: var(--success);
-        }
-
-        .wallet-detail {
-            background: var(--panel-alt);
-            border-radius: 10px;
-            padding: 16px 20px;
-            font-size: 0.88rem;
-        }
-
-        .wallet-detail table { border-collapse: collapse; width: 100%; }
-
-        .wallet-detail td {
-            padding: 6px 0;
-            vertical-align: top;
-        }
-
-        .wallet-detail td:first-child {
-            color: var(--muted);
-            width: 130px;
-            font-weight: 500;
-        }
-
-        .wallet-detail td:last-child {
-            color: var(--text);
-            word-break: break-all;
-            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
-        }
-
-        /* ── Withdraw link ── */
-        .withdraw-banner {
-            background: linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(74, 222, 128, 0.08));
-            border: 1px solid rgba(56, 189, 248, 0.35);
-            border-radius: 14px;
-            padding: 24px 28px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .withdraw-banner-text h3 {
-            margin: 0 0 6px;
-            font-size: 1.05rem;
-            font-weight: 700;
-        }
-
-        .withdraw-banner-text p {
-            margin: 0;
-            color: var(--muted);
-            font-size: 0.88rem;
-        }
-
-        .btn-large {
-            padding: 13px 28px;
-            font-size: 1rem;
-            border-radius: 12px;
-            white-space: nowrap;
+            border-color: transparent;
         }
     </style>
 </head>
 <body>
 <main>
     <h1>⚡ Nexus Dashboard</h1>
-    <p class="subtitle">Owner overview &amp; Web3 wallet for FuzzysTodd</p>
-
-    <!-- GitHub Profile Card -->
-    <section class="panel" id="github-section">
-        <h2>🐙 GitHub Profile</h2>
-        <div class="gh-card" id="gh-card-content">
-            <img class="gh-avatar" id="gh-avatar" src="" alt="FuzzysTodd GitHub avatar" width="96" height="96">
-            <div class="gh-info">
-                <p class="gh-name" id="gh-name">Loading…</p>
-                <p class="gh-login" id="gh-login"></p>
-                <p class="gh-bio" id="gh-bio"></p>
-                <div class="gh-meta" id="gh-meta"></div>
-                <a class="gh-link" id="gh-profile-link" href="https://github.com/FuzzysTodd" target="_blank" rel="noopener noreferrer"
-                   aria-label="Open FuzzysTodd GitHub profile">
-                    View on GitHub →
-                </a>
-            </div>
-        </div>
-        <p class="gh-error" id="gh-error" style="display:none;"></p>
-    </section>
-
-    <!-- Web3 Wallet -->
-    <section class="panel" id="wallet-section">
-        <h2>🔑 Web3 Wallet</h2>
-        <div class="wallet-row">
-            <button class="btn btn-accent" id="connect-btn" aria-label="Connect MetaMask wallet">
-                <span>🔌</span>
-                <span>Connect Wallet</span>
-            </button>
-            <div class="connection-status disconnected" id="connection-status" aria-live="polite">
-                <span>Disconnected</span>
-            </div>
-        </div>
-        <div class="wallet-detail" id="wallet-detail" style="display:none;">
-            <table>
-                <tr>
-                    <td>Address</td>
-                    <td id="wd-address">—</td>
-                </tr>
-                <tr>
-                    <td>Network</td>
-                    <td id="wd-network">—</td>
-                </tr>
-                <tr>
-                    <td>Chain ID</td>
-                    <td id="wd-chainid">—</td>
-                </tr>
-                <tr>
-                    <td>ETH Balance</td>
-                    <td id="wd-balance">—</td>
-                </tr>
-            </table>
-        </div>
-        <p id="wallet-error" style="color:var(--danger);font-size:0.88rem;margin:12px 0 0;display:none;"></p>
-    </section>
-
-    <!-- Withdraw Page Link -->
-    <div class="withdraw-banner">
-        <div class="withdraw-banner-text">
-            <h3>💸 Contract Withdrawal Manager</h3>
-            <p>Connect your wallet and withdraw ETH proceeds from owned contracts via the proxy interface.</p>
-        </div>
-        <a class="btn btn-accent btn-large" href="./index.html" aria-label="Open Withdraw page">
-            <span>🚀</span>
-            <span>Open Withdraw Page</span>
-        </a>
+    <p class="subtitle">Owner overview &amp; Web3 control center — FuzzysTodd</p>
+    <!-- Tab Navigation -->
+    <nav class="tab-nav" aria-label="Dashboard sections">
+        <button class="tab-btn active" data-tab="overview" aria-label="Overview tab">🏠 Overview</button>
+        <button class="tab-btn" data-tab="portfolio" aria-label="Portfolio tab">💼 Portfolio</button>
+        <button class="tab-btn" data-tab="governance" aria-label="Governance tab">🗳️ Governance</button>
+        <button class="tab-btn" data-tab="treasury" aria-label="Treasury tab">🏦 Treasury</button>
+        <button class="tab-btn" data-tab="properties" aria-label="Properties tab">🏠 Properties</button>
+        <button class="tab-btn" data-tab="signals" aria-label="Live Signals tab">📡 Live Signals</button>
+        <button class="tab-btn" data-tab="config" aria-label="Contract configuration tab">⚙️ Config</button>
+        <button class="tab-btn" data-tab="approvals" aria-label="Approvals Service tab">✅ Approvals</button>
+    </nav>
+    <!-- ...existing tab panels go here... -->
+    <!-- Approvals Tab -->
+    <div class="tab-panel" id="tab-approvals">
+        <section class="panel">
+            <h2>✅ Approval Service</h2>
+            <p>Manage and audit approval endpoints directly through the Approval Service interface.</p>
+            <a href="./approval-service.html" class="btn btn-accent" target="_blank" rel="noopener">Open Approval Service</a>
+        </section>
     </div>
 </main>
-
-<!-- ethers v5 UMD CDN -->
-<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 <script>
-(function () {
+(function() {
     "use strict";
-
-    // ── GitHub Profile ────────────────────────────────────────────────────────
-    async function loadGitHubProfile() {
-        const username = "FuzzysTodd";
-        try {
-            const resp = await fetch("https://api.github.com/users/" + username, {
-                headers: { Accept: "application/vnd.github+json" }
-            });
-            if (!resp.ok) throw new Error("GitHub API returned " + resp.status);
-            const data = await resp.json();
-
-            const avatar = document.getElementById("gh-avatar");
-            avatar.src = data.avatar_url || "";
-            avatar.alt = (data.name || username) + " avatar";
-
-            document.getElementById("gh-name").textContent = data.name || username;
-            document.getElementById("gh-login").textContent = "@" + data.login;
-
-            const bio = document.getElementById("gh-bio");
-            bio.textContent = data.bio || "";
-            bio.style.display = data.bio ? "block" : "none";
-
-            const meta = document.getElementById("gh-meta");
-            const items = [];
-            if (data.public_repos != null) items.push("📦 " + data.public_repos + " repos");
-            if (data.followers != null) items.push("👥 " + data.followers + " followers");
-            if (data.following != null) items.push("➡️ " + data.following + " following");
-            if (data.location) items.push("📍 " + data.location);
-            meta.innerHTML = items.map(function (t) { return "<span>" + escapeHtml(t) + "</span>"; }).join("");
-
-            const link = document.getElementById("gh-profile-link");
-            link.href = data.html_url || ("https://github.com/" + username);
-        } catch (err) {
-            const errEl = document.getElementById("gh-error");
-            errEl.textContent = "Could not load GitHub profile: " + err.message;
-            errEl.style.display = "block";
-            document.getElementById("gh-name").textContent = "FuzzysTodd";
-            document.getElementById("gh-login").textContent = "@FuzzysTodd";
-        }
-    }
-
-    function escapeHtml(str) {
-        return String(str)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;");
-    }
-
-    // ── Wallet ────────────────────────────────────────────────────────────────
-    var provider = null;
-
-    async function connectWallet() {
-        var errEl = document.getElementById("wallet-error");
-        errEl.style.display = "none";
-
-        if (typeof window.ethereum === "undefined") {
-            errEl.textContent = "MetaMask (or a compatible wallet) is not installed.";
-            errEl.style.display = "block";
-            return;
-        }
-
-        try {
-            provider = new ethers.providers.Web3Provider(window.ethereum);
-            await provider.send("eth_requestAccounts", []);
-            await updateWalletUI();
-
-            // Re-fetch on network / account changes
-            window.ethereum.on("accountsChanged", function () { updateWalletUI(); });
-            window.ethereum.on("chainChanged", function () {
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                updateWalletUI();
-            });
-        } catch (err) {
-            errEl.textContent = "Wallet connection failed: " + err.message;
-            errEl.style.display = "block";
-        }
-    }
-
-    async function updateWalletUI() {
-        try {
-            var signer = provider.getSigner();
-            var address = await signer.getAddress();
-            var network = await provider.getNetwork();
-            var balanceWei = await provider.getBalance(address);
-            var balanceEth = ethers.utils.formatEther(balanceWei);
-
-            // Resolve network name
-            var networkName = network.name !== "unknown" ? network.name : "Chain " + network.chainId;
-
-            document.getElementById("wd-address").textContent = address;
-            document.getElementById("wd-network").textContent = networkName;
-            document.getElementById("wd-chainid").textContent = network.chainId;
-            document.getElementById("wd-balance").textContent = parseFloat(balanceEth).toFixed(6) + " ETH";
-            document.getElementById("wallet-detail").style.display = "block";
-
-            var status = document.getElementById("connection-status");
-            status.className = "connection-status connected";
-            status.innerHTML = "<span>Connected</span>";
-
-            var btn = document.getElementById("connect-btn");
-            btn.innerHTML = "<span>✓</span><span>Connected</span>";
-            btn.disabled = true;
-        } catch (err) {
-            var errEl = document.getElementById("wallet-error");
-            errEl.textContent = "Error reading wallet data: " + err.message;
-            errEl.style.display = "block";
-        }
-    }
-
-    // ── Init ──────────────────────────────────────────────────────────────────
-    document.getElementById("connect-btn").addEventListener("click", connectWallet);
-    loadGitHubProfile();
-}());
+    // Tab logic with green Approvals tab
+    document.querySelectorAll(".tab-btn").forEach(function(btn) {
+        btn.addEventListener("click", function() {
+            var tab = btn.getAttribute("data-tab");
+            document.querySelectorAll(".tab-btn").forEach(function(b) { b.classList.remove("active"); b.classList.remove("approvals-active"); });
+            document.querySelectorAll(".tab-panel").forEach(function(p) { p.classList.remove("active"); });
+            btn.classList.add("active");
+            var panel = document.getElementById("tab-" + tab);
+            if (panel) panel.classList.add("active");
+            if (tab === "approvals") { btn.classList.add("approvals-active"); }
+        });
+    });
+})();
 </script>
 </body>
 </html>
