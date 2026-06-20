@@ -1,0 +1,29 @@
+from _typeshed import Incomplete
+from pyasn1.type import univ
+from pyasn1_modules import rfc3279 as rfc3279, rfc5280 as rfc5280, rfc5652 as rfc5652
+
+MessageDigest: Incomplete
+IssuerAndSerialNumber: Incomplete
+id_pkix: Incomplete
+Dss_Sig_Value: Incomplete
+DomainParameters: Incomplete
+
+class DhSigStatic(univ.Sequence):
+    componentType: Incomplete
+
+id_dh_sig_hmac_sha1: Incomplete
+id_dhPop_static_sha1_hmac_sha1: Incomplete
+id_alg_dh_pop: Incomplete
+id_alg_dhPop_sha1: Incomplete
+id_alg_dhPop_sha224: Incomplete
+id_alg_dhPop_sha256: Incomplete
+id_alg_dhPop_sha384: Incomplete
+id_alg_dhPop_sha512: Incomplete
+id_alg_dhPop_static_sha224_hmac_sha224: Incomplete
+id_alg_dhPop_static_sha256_hmac_sha256: Incomplete
+id_alg_dhPop_static_sha384_hmac_sha384: Incomplete
+id_alg_dhPop_static_sha512_hmac_sha512: Incomplete
+id_alg_ecdhPop_static_sha224_hmac_sha224: Incomplete
+id_alg_ecdhPop_static_sha256_hmac_sha256: Incomplete
+id_alg_ecdhPop_static_sha384_hmac_sha384: Incomplete
+id_alg_ecdhPop_static_sha512_hmac_sha512: Incomplete

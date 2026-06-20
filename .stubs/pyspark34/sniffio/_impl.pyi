@@ -1,0 +1,54 @@
+import threading
+from _typeshed import Incomplete
+from contextvars import ContextVar
+
+current_async_library_cvar: ContextVar[str | None]
+
+class _ThreadLocal(threading.local):
+    name: str | None
+
+thread_local: Incomplete
+
+class AsyncLibraryNotFoundError(RuntimeError): ...
+
+def current_async_library() -> str:
+    '''Detect which async library is currently running.
+
+    The following libraries are currently supported:
+
+    ================   ===========  ============================
+    Library             Requires     Magic string
+    ================   ===========  ============================
+    **Trio**            Trio v0.6+   ``"trio"``
+    **Curio**           -            ``"curio"``
+    **asyncio**                      ``"asyncio"``
+    **Trio-asyncio**    v0.8.2+     ``"trio"`` or ``"asyncio"``,
+                                    depending on current mode
+    ================   ===========  ============================
+
+    Returns:
+      A string like ``"trio"``.
+
+    Raises:
+      AsyncLibraryNotFoundError: if called from synchronous context,
+        or if the current async library was not recognized.
+
+    Examples:
+
+        .. code-block:: python3
+
+           from sniffio import current_async_library
+
+           async def generic_sleep(seconds):
+               library = current_async_library()
+               if library == "trio":
+                   import trio
+                   await trio.sleep(seconds)
+               elif library == "asyncio":
+                   import asyncio
+                   await asyncio.sleep(seconds)
+               # ... and so on ...
+               else:
+                   raise RuntimeError(f"Unsupported library {library!r}")
+
+    '''

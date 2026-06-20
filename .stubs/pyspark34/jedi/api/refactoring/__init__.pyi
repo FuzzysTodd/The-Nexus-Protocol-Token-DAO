@@ -1,0 +1,29 @@
+from _typeshed import Incomplete
+from jedi.api.exceptions import RefactoringError as RefactoringError
+from jedi.inference.value.namespace import ImplicitNSName as ImplicitNSName
+from pathlib import Path
+from typing import Dict, Iterable, Tuple
+
+EXPRESSION_PARTS: Incomplete
+
+class ChangedFile:
+    def __init__(self, inference_state, from_path, to_path, module_node, node_to_str_map) -> None: ...
+    def get_diff(self): ...
+    def get_new_code(self): ...
+    def apply(self) -> None: ...
+
+class Refactoring:
+    def __init__(self, inference_state, file_to_node_changes, renames=()) -> None: ...
+    def get_changed_files(self) -> Dict[Path, ChangedFile]: ...
+    def get_renames(self) -> Iterable[Tuple[Path, Path]]:
+        """
+        Files can be renamed in a refactoring.
+        """
+    def get_diff(self): ...
+    def apply(self) -> None:
+        """
+        Applies the whole refactoring to the files, which includes renames.
+        """
+
+def rename(inference_state, definitions, new_name): ...
+def inline(inference_state, names): ...

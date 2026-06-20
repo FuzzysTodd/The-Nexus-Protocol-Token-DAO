@@ -1,0 +1,6 @@
+__all__ = ['get_wheel', 'download_wheel', 'pip_wheel_env_run']
+
+def get_wheel(distribution, version, for_py_version, search_dirs, download, app_data, do_periodic_update, env):
+    """Get a wheel with the given distribution-version-for_py_version trio, by using the extra search dir + download."""
+def download_wheel(distribution, version_spec, for_py_version, search_dirs, app_data, to_folder, env): ...
+def pip_wheel_env_run(search_dirs, app_data, env): ...

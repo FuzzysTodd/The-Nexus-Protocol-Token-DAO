@@ -1,0 +1,13 @@
+from . import algos_graphormer as algos_graphormer
+from ...utils import is_cython_available as is_cython_available, requires_backends as requires_backends
+from _typeshed import Incomplete
+from typing import Any, Dict, List
+
+def convert_to_single_emb(x, offset: int = 512): ...
+def preprocess_item(item, keep_features: bool = True): ...
+
+class GraphormerDataCollator:
+    spatial_pos_max: Incomplete
+    on_the_fly_processing: Incomplete
+    def __init__(self, spatial_pos_max: int = 20, on_the_fly_processing: bool = False) -> None: ...
+    def __call__(self, features: List[dict]) -> Dict[str, Any]: ...

@@ -1,0 +1,3 @@
+__all__ = ['monitored_queue']
+
+def monitored_queue(in_socket, out_socket, mon_socket, in_prefix: bytes = b'in', out_prefix: bytes = b'out') -> None: ...
