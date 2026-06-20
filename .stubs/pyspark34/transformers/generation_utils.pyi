@@ -1,0 +1,3 @@
+from .generation import GenerationMixin as GenerationMixin
+
+class GenerationMixin(GenerationMixin): ...

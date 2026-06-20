@@ -1,0 +1,12 @@
+from _typeshed import Incomplete
+
+id_pkix: Incomplete
+id_TEST: Incomplete
+id_TEST_certPolicyOne: Incomplete
+id_TEST_certPolicyTwo: Incomplete
+id_TEST_certPolicyThree: Incomplete
+id_TEST_certPolicyFour: Incomplete
+id_TEST_certPolicyFive: Incomplete
+id_TEST_certPolicySix: Incomplete
+id_TEST_certPolicySeven: Incomplete
+id_TEST_certPolicyEight: Incomplete

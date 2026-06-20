@@ -1,0 +1,3 @@
+from patsy import EvalEnvironment as EvalEnvironment, Origin as Origin, PatsyError as PatsyError, build_design_matrices as build_design_matrices, dmatrix as dmatrix
+
+def test_issue_11() -> None: ...

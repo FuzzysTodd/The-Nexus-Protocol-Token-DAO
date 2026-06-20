@@ -1,0 +1,1 @@
+from .tokenization_bartpho import BartphoTokenizer as BartphoTokenizer

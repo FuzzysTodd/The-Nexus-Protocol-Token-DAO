@@ -1,0 +1,1 @@
+from tensorflow.python.ops.data_flow_ops import FIFOQueue as FIFOQueue, PaddingFIFOQueue as PaddingFIFOQueue, PriorityQueue as PriorityQueue, QueueBase as QueueBase, RandomShuffleQueue as RandomShuffleQueue

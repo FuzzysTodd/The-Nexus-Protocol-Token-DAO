@@ -1,0 +1,21 @@
+from ..version import hdf5_built_version_tuple as hdf5_built_version_tuple
+from _typeshed import Incomplete
+
+WINDOWS_ENCODING: Incomplete
+
+def filename_encode(filename):
+    """
+    Encode filename for use in the HDF5 library.
+
+    Due to how HDF5 handles filenames on different systems, this should be
+    called on any filenames passed to the HDF5 library. See the documentation on
+    filenames in h5py for more information.
+    """
+def filename_decode(filename):
+    """
+    Decode filename used by HDF5 library.
+
+    Due to how HDF5 handles filenames on different systems, this should be
+    called on any filenames passed from the HDF5 library. See the documentation
+    on filenames in h5py for more information.
+    """

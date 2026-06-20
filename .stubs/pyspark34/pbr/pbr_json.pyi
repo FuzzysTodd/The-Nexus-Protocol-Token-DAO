@@ -1,0 +1,3 @@
+from pbr import git as git
+
+def write_pbr_json(cmd, basename, filename) -> None: ...

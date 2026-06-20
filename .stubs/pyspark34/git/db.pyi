@@ -1,0 +1,26 @@
+from git.cmd import Git
+from git.types import PathLike
+from gitdb.base import OInfo, OStream
+from gitdb.db import GitDB as GitDB, LooseObjectDB
+
+__all__ = ['GitCmdObjectDB', 'GitDB']
+
+class GitCmdObjectDB(LooseObjectDB):
+    """A database representing the default git object store, which includes loose
+    objects, pack files and an alternates file
+
+    It will create objects only in the loose object database.
+    :note: for now, we use the git command to do all the lookup, just until he
+        have packs and the other implementations
+    """
+    def __init__(self, root_path: PathLike, git: Git) -> None:
+        """Initialize this instance with the root and a git command"""
+    def info(self, binsha: bytes) -> OInfo: ...
+    def stream(self, binsha: bytes) -> OStream:
+        """For now, all lookup is done by git itself"""
+    def partial_to_complete_sha_hex(self, partial_hexsha: str) -> bytes:
+        """:return: Full binary 20 byte sha from the given partial hexsha
+        :raise AmbiguousObjectName:
+        :raise BadObject:
+        :note: currently we only raise BadObject as git does not communicate
+            AmbiguousObjects separately"""

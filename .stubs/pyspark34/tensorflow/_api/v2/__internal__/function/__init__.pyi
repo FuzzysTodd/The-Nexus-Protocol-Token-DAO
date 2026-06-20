@@ -1,0 +1,2 @@
+from tensorflow.python.eager.polymorphic_function.polymorphic_function import Function as Function
+from tensorflow.python.eager.polymorphic_function.quarantine import defun_with_attributes as defun_with_attributes

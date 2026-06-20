@@ -1,0 +1,6 @@
+from .logical_plan import LogicalPlan as LogicalPlan
+from abc import ABC
+
+class AbstractOptimizer(ABC):
+    def __init__(self) -> None: ...
+    def convert(self, logical_plan: LogicalPlan) -> None: ...
