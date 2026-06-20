@@ -21,7 +21,7 @@ on:
       - "copilot/**"
       - "agent/**"
   workflow_run:
-    workflows: ["Nexus Agent Runner", "Progress Report Email - Gantt Chart"]
+    workflows: ["Progress Report Email - Gantt Chart"]
     types: [completed]
 
 jobs:
@@ -35,10 +35,10 @@ jobs:
       agents_active: ${{ steps.init.outputs.agents }}
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Setup Python Environment
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:
           python-version: "3.11"
 
@@ -83,7 +83,7 @@ jobs:
           PYTHON
 
       - name: Upload MCP Status
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: mcp-gateway-status
           path: .mcp/status/gateway.json
@@ -97,10 +97,10 @@ jobs:
     needs: mcp-gateway-initialization
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Setup Python Environment
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:
           python-version: "3.11"
 
@@ -174,10 +174,11 @@ jobs:
           PYTHON
 
       - name: Upload GPU/FPGA Status
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: gpu-fpga-status
           path: .mcp/**/*.json
+          if-no-files-found: warn
           retention-days: 30
 
   hive-mind-coordination:
@@ -188,10 +189,10 @@ jobs:
     needs: [mcp-gateway-initialization, gpu-swarm-coordination]
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Setup Python Environment
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:
           python-version: "3.11"
 
@@ -272,7 +273,7 @@ jobs:
           PYTHON
 
       - name: Upload Hive Status
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: hive-mind-status
           path: .mcp/hive/*.json
@@ -286,10 +287,10 @@ jobs:
     needs: [mcp-gateway-initialization, gpu-swarm-coordination, hive-mind-coordination]
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Setup Python Environment
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:
           python-version: "3.11"
 
@@ -356,7 +357,7 @@ jobs:
           PYTHON
 
       - name: Upload Orchestration Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: mcp-orchestration-report
           path: .mcp/agents/*.json
@@ -369,12 +370,11 @@ jobs:
       contents: read
     needs: [mcp-agent-orchestration]
     steps:
-    steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Setup Python Environment
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:
           python-version: "3.11"
 
@@ -437,7 +437,7 @@ jobs:
           PYTHON
 
       - name: Upload Validation Report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: integration-validation-report
           path: .mcp/validation/*.json
@@ -451,11 +451,12 @@ jobs:
     needs: [workflow-integration-validation]
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Generate Completion Summary
         run: |
-          cat << 'EOF' > workflow_summary.md
+          # Unquoted EOF allows $(date) timestamp expansion in the heredoc
+          cat << EOF > workflow_summary.md
           # 🚀 MCP/MFC Gateway FPGA GPU Swarm Hive Workflow - COMPLETE
           
           ## Execution Summary
@@ -540,7 +541,7 @@ jobs:
           cat workflow_summary.md
 
       - name: Upload Summary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
           name: workflow-completion-summary
           path: workflow_summary.md

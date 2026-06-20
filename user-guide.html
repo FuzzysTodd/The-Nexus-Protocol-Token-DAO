@@ -339,39 +339,88 @@
                 padding: 1.5rem;
             }
         }
+
+        /* Skip navigation link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--primary);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 0 0 8px 0;
+            font-weight: bold;
+            z-index: 9999;
+            text-decoration: none;
+            transition: top 0.2s ease;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Screen-reader-only utility */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Focus-visible styles for interactive non-button elements */
+        .nav-card:focus-visible,
+        .faq-item:focus-visible {
+            outline: 3px solid var(--primary);
+            outline-offset: 2px;
+        }
+
+        .btn:focus-visible {
+            outline: 3px solid var(--primary);
+            outline-offset: 3px;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <main id="main-content" class="container">
         <!-- Hero Section -->
-        <div class="hero">
+        <header class="hero">
             <h1>🌟 Welcome to Nexus Protocol</h1>
             <p>Your friendly guide to navigating the decentralized future. No technical jargon, just simple steps.</p>
-        </div>
+        </header>
 
         <!-- Quick Navigation -->
-        <div class="quick-nav">
-            <div class="nav-card" onclick="scrollToSection('getting-started')">
-                <div class="icon">🚀</div>
+        <nav class="quick-nav" aria-label="Page sections">
+            <div class="nav-card" role="button" tabindex="0"
+                 data-section="getting-started" onclick="scrollToSection('getting-started')">
+                <div class="icon" aria-hidden="true">🚀</div>
                 <h3>Getting Started</h3>
                 <p>Brand new? Start here!</p>
             </div>
-            <div class="nav-card" onclick="scrollToSection('what-is-nexus')">
-                <div class="icon">💡</div>
+            <div class="nav-card" role="button" tabindex="0"
+                 data-section="what-is-nexus" onclick="scrollToSection('what-is-nexus')">
+                <div class="icon" aria-hidden="true">💡</div>
                 <h3>What is Nexus?</h3>
                 <p>Understand the basics</p>
             </div>
-            <div class="nav-card" onclick="scrollToSection('user-paths')">
-                <div class="icon">🎯</div>
+            <div class="nav-card" role="button" tabindex="0"
+                 data-section="user-paths" onclick="scrollToSection('user-paths')">
+                <div class="icon" aria-hidden="true">🎯</div>
                 <h3>Choose Your Path</h3>
                 <p>Beginner to advanced</p>
             </div>
-            <div class="nav-card" onclick="scrollToSection('faq')">
-                <div class="icon">❓</div>
+            <div class="nav-card" role="button" tabindex="0"
+                 data-section="faq" onclick="scrollToSection('faq')">
+                <div class="icon" aria-hidden="true">❓</div>
                 <h3>FAQ</h3>
                 <p>Common questions</p>
             </div>
-        </div>
+        </nav>
 
         <!-- What is Nexus Section -->
         <section class="section" id="what-is-nexus">
@@ -414,16 +463,16 @@
             <h2>🚀 Getting Started (5 Minutes)</h2>
             
             <div class="info-box warning">
-                <strong>⚠️ Before You Begin:</strong> This is an educational project. Always do your own research and never invest more than you can afford to lose in any crypto project.
+                <strong>⚠️ Before You Begin:</strong> This is a real project. Always do your own research, verify addresses and networks, and never invest more than you can afford to lose in any crypto project.
             </div>
 
             <h3>Prerequisites</h3>
             <div class="step">
                 <span class="step-number">1</span>
                 <h4>Install MetaMask Wallet</h4>
-                <p>MetaMask is a browser extension that acts as your digital wallet. Download it from <a href="https://metamask.io" target="_blank" style="color: var(--primary)">metamask.io</a></p>
+                <p>MetaMask is a browser extension that acts as your digital wallet. Download it from <a href="https://metamask.io" target="_blank" rel="noopener noreferrer" style="color: var(--primary)">metamask.io <span class="sr-only">(opens in new tab)</span></a></p>
                 <div class="action-buttons">
-                    <a href="https://metamask.io" target="_blank" class="btn">Download MetaMask</a>
+                    <a href="https://metamask.io" target="_blank" rel="noopener noreferrer" class="btn">Download MetaMask <span class="sr-only">(opens in new tab)</span></a>
                 </div>
             </div>
 
@@ -475,7 +524,7 @@
                 <div class="path-card">
                     <div class="badge" style="background: var(--warning)">Intermediate</div>
                     <h3>💼 Contract Manager</h3>
-                    <p><strong>Perfect for:</strong> Users managing smart contracts</p>
+                    <p><strong>Perfect for:</strong> Users who want to connect a wallet, add contracts they own, and withdraw ETH proceeds</p>
                     <ul class="feature-list">
                         <li>Connect your wallet</li>
                         <li>Add your contracts</li>
@@ -499,7 +548,7 @@
                     </ul>
                     <div class="action-buttons">
                         <a href="README.xml" class="btn">Technical Docs</a>
-                        <a href="https://github.com/FuzzysTodd/The-Nexus-Protocol-Token-DOA" target="_blank" class="btn btn-secondary">GitHub Repository</a>
+                        <a href="https://github.com/FuzzysTodd/The-Nexus-Protocol-Token-DOA" target="_blank" rel="noopener noreferrer" class="btn btn-secondary">GitHub Repository <span class="sr-only">(opens in new tab)</span></a>
                     </div>
                 </div>
             </div>
@@ -570,6 +619,36 @@
             </div>
         </section>
 
+        <section class="section" id="public-addresses">
+            <h2>📍 Public Addresses</h2>
+
+            <div class="info-box">
+                <strong>Use these public references to verify the repository owner and official Nexus-managed surfaces.</strong>
+            </div>
+
+            <div class="glossary">
+                <div class="glossary-term">
+                    <strong>Owner wallet</strong>
+                    <p>
+                        <code>0x33ffc308e693a5b49e0ee0241f41f03ccef495f2</code><br>
+                        <a href="https://etherscan.io/address/0x33ffc308e693a5b49e0ee0241f41f03ccef495f2" target="_blank" rel="noopener noreferrer" style="color: var(--primary)">View on Etherscan</a>
+                    </p>
+                </div>
+                <div class="glossary-term">
+                    <strong>GitHub owner</strong>
+                    <p><a href="https://github.com/FuzzysTodd" target="_blank" rel="noopener noreferrer" style="color: var(--primary)">@FuzzysTodd</a></p>
+                </div>
+                <div class="glossary-term">
+                    <strong>Canonical repository</strong>
+                    <p><a href="https://github.com/FuzzysTodd/The-Nexus-Protocol-Token-DOA" target="_blank" rel="noopener noreferrer" style="color: var(--primary)">FuzzysTodd/The-Nexus-Protocol-Token-DOA</a></p>
+                </div>
+                <div class="glossary-term">
+                    <strong>Published contract addresses</strong>
+                    <p>No additional official deployed contract addresses are published in this repository yet. Treat any others as unofficial unless they are added to the repository-authored docs.</p>
+                </div>
+            </div>
+        </section>
+
         <!-- Safety & Best Practices -->
         <section class="section" id="safety">
             <h2>🛡️ Safety & Best Practices</h2>
@@ -581,7 +660,7 @@
                     <li>Always verify contract addresses before interacting</li>
                     <li>Start with small amounts on testnets</li>
                     <li>Double-check transaction details before confirming</li>
-                    <li>This is an educational/conceptual project - not audited for mainnet</li>
+                    <li>This is a real project, but not every component has been audited for mainnet or production use</li>
                     <li>Keep your MetaMask and browser updated</li>
                 </ul>
             </div>
@@ -612,90 +691,90 @@
             <h2>❓ Frequently Asked Questions</h2>
 
             <div class="faq">
-                <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         What exactly is Nexus Protocol?
-                        <span class="faq-toggle">▼</span>
+                        <span class="faq-toggle" aria-hidden="true">▼</span>
                     </div>
                     <div class="faq-answer">
-                        Nexus Protocol is a conceptual framework combining decentralized finance (DeFi) tools, smart contract management, and DAO governance. It's designed as an educational project to demonstrate how autonomous financial systems can work on blockchain technology. The repository includes implementations of various Web3 protocols and a token ecosystem (NGTT).
+                        Nexus Protocol is a real Web3 project combining decentralized finance (DeFi) tools, smart contract management, and DAO governance. The repository includes working interfaces, documentation, protocol integrations, and a token ecosystem (NGTT).
                     </div>
                 </div>
 
-                <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         Do I need to pay to use Nexus?
-                        <span class="faq-toggle">▼</span>
+                        <span class="faq-toggle" aria-hidden="true">▼</span>
                     </div>
                     <div class="faq-answer">
                         The interfaces themselves are free to use. However, interacting with blockchain networks requires paying "gas fees" in the native cryptocurrency (like ETH on Ethereum). These fees go to network validators, not to Nexus. You can start by exploring with testnets, which use free test tokens.
                     </div>
                 </div>
 
-                <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         Is my money safe with Nexus?
-                        <span class="faq-toggle">▼</span>
+                        <span class="faq-toggle" aria-hidden="true">▼</span>
                     </div>
                     <div class="faq-answer">
-                        Important: Nexus is a conceptual/educational project and has NOT been audited for production use. Never invest money you can't afford to lose. Always use testnets for learning. If you choose to use mainnet, do so at your own risk and start with minimal amounts. Your funds are controlled by smart contracts and your wallet - not by any centralized entity.
+                        Important: Nexus is a real project, but repository surfaces and smart-contract flows may not be fully audited for production use. Never invest money you can't afford to lose. Start with small amounts or testnets when verifying a workflow. If you choose to use mainnet, do so at your own risk. Your funds are controlled by smart contracts and your wallet - not by any centralized entity.
                     </div>
                 </div>
 
-                <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         What is NGTT?
-                        <span class="faq-toggle">▼</span>
+                        <span class="faq-toggle" aria-hidden="true">▼</span>
                     </div>
                     <div class="faq-answer">
                         NGTT stands for "Nexus Game Theory Token". It's the ecosystem's utility token with features including governance rights, reward distribution, and staking capabilities. The token combines ERC20 and ERC721 functionality for unique use cases within the Nexus ecosystem.
                     </div>
                 </div>
 
-                <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         How do I get NGTT tokens?
-                        <span class="faq-toggle">▼</span>
+                        <span class="faq-toggle" aria-hidden="true">▼</span>
                     </div>
                     <div class="faq-answer">
-                        NGTT is part of a conceptual framework. To interact with tokens in this educational context, you would typically deploy the smart contracts to a testnet using tools like Remix IDE (see the technical documentation in README.xml for deployment instructions). Remember: this is for learning purposes.
+                        NGTT is part of the live Nexus project. To interact with tokens safely, review the technical documentation in README.xml, verify addresses and network settings, and prefer testnets or small-value transactions before using any mainnet flow.
                     </div>
                 </div>
 
-                <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         What's a DAO and how does it work here?
-                        <span class="faq-toggle">▼</span>
+                        <span class="faq-toggle" aria-hidden="true">▼</span>
                     </div>
                     <div class="faq-answer">
                         DAO stands for "Decentralized Autonomous Organization". It's like a company run by code and community votes instead of traditional management. In Nexus, the DAO structure (documented in GOVERNANCE.md) allows token holders to participate in decisions about the protocol's future. The governance system includes roles like Owner (FuzzysTodd), Master Project Controller (MPC), and Super Delegates.
                     </div>
                 </div>
 
-                <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         Can I contribute to the project?
-                        <span class="faq-toggle">▼</span>
+                        <span class="faq-toggle" aria-hidden="true">▼</span>
                     </div>
                     <div class="faq-answer">
                         Yes! The repository is open source on GitHub. You can contribute code, documentation, report bugs, or suggest improvements. Check the repository at github.com/FuzzysTodd/The-Nexus-Protocol-Token-DOA for contribution guidelines.
                     </div>
                 </div>
 
-                <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         What if I get stuck or need help?
-                        <span class="faq-toggle">▼</span>
+                        <span class="faq-toggle" aria-hidden="true">▼</span>
                     </div>
                     <div class="faq-answer">
                         Start by reading the documentation files (README.xml, GOVERNANCE.md). Check the FAQ sections in the repository. For technical issues, you can open an issue on GitHub. Remember: always be cautious of anyone asking for your private keys or seed phrase - legitimate help never requires this information.
                     </div>
                 </div>
 
-                <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         What's the difference between testnet and mainnet?
-                        <span class="faq-toggle">▼</span>
+                        <span class="faq-toggle" aria-hidden="true">▼</span>
                     </div>
                     <div class="faq-answer">
                         <strong>Testnet:</strong> A practice blockchain where tokens have no real value. Perfect for learning! You can get free test tokens from "faucets".<br><br>
@@ -703,10 +782,10 @@
                     </div>
                 </div>
 
-                <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-item" role="button" tabindex="0" aria-expanded="false" onclick="toggleFaq(this)">
                     <div class="faq-question">
                         What are gas fees and why do I need to pay them?
-                        <span class="faq-toggle">▼</span>
+                        <span class="faq-toggle" aria-hidden="true">▼</span>
                     </div>
                     <div class="faq-answer">
                         Gas fees are payments to the blockchain network for processing your transactions. Think of them like postage stamps for sending mail. The fees compensate miners/validators who maintain the network. Fees vary based on network congestion - they can be cheap or expensive depending on demand. You can check current gas prices before making transactions.
@@ -752,17 +831,18 @@
         </section>
 
         <!-- Footer -->
-        <div style="text-align: center; margin-top: 3rem; padding: 2rem; color: var(--text-muted);">
+        <footer style="text-align: center; margin-top: 3rem; padding: 2rem; color: var(--text-muted);">
             <p>📚 Part of The Nexus Protocol Token DAO Project</p>
             <p style="font-size: 0.9rem; margin-top: 1rem;">
-                Owner & Primary Authority: <strong style="color: var(--primary)">FuzzysTodd</strong>
+                Owner &amp; Primary Authority: <strong style="color: var(--primary)">FuzzysTodd</strong> ·
+                Public wallet: <code>0x33ffc308e693a5b49e0ee0241f41f03ccef495f2</code>
             </p>
             <p style="font-size: 0.8rem; margin-top: 1rem; max-width: 800px; margin-left: auto; margin-right: auto;">
-                ⚠️ Educational/Conceptual Project - Not audited for production use. 
+                ⚠️ Real project - repository components and on-chain flows may not be fully audited for production use. 
                 Always do your own research. Blockchain transactions are permanent and irreversible.
             </p>
-        </div>
-    </div>
+        </footer>
+    </main>
 
     <script>
         function scrollToSection(sectionId) {
@@ -773,8 +853,31 @@
         }
 
         function toggleFaq(element) {
+            const isExpanded = element.getAttribute('aria-expanded') === 'true';
             element.classList.toggle('active');
+            element.setAttribute('aria-expanded', isExpanded ? 'false' : 'true');
         }
+
+        // Centralised keyboard activation for role="button" elements
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.nav-card[data-section]').forEach(function(card) {
+                card.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        scrollToSection(card.dataset.section);
+                    }
+                });
+            });
+
+            document.querySelectorAll('.faq-item').forEach(function(item) {
+                item.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        toggleFaq(item);
+                    }
+                });
+            });
+        });
 
         // Add smooth reveal animations on scroll
         document.addEventListener('DOMContentLoaded', function() {

@@ -9,6 +9,7 @@ from nexus.super_logical import (
     LogicalReading,
     SuperLogicalResult,
     SuperLogicalWeights,
+    _confidence,
     compose_super_predict,
     render_super_logical_report,
     super_predict,
@@ -294,3 +295,71 @@ def test_super_predict_any_arbitrary_domain():
     assert result.tier in TIER_LABELS_SET
     assert "WEATHER" in result.answer
     assert len(result.reasoning_chain) >= 5
+
+
+# ---------------------------------------------------------------------------
+# _confidence helper
+# ---------------------------------------------------------------------------
+
+def test_confidence_returns_zero_when_max_score_is_zero():
+    assert _confidence(50.0, 0.0) == 0.0
+
+
+def test_confidence_returns_zero_for_zero_score():
+    assert _confidence(0.0, 100.0) == 0.0
+
+
+def test_confidence_returns_100_when_score_equals_max():
+    assert abs(_confidence(100.0, 100.0) - 100.0) < 1e-9
+
+
+def test_confidence_is_clamped_to_100_for_overflow():
+    # score > max_score should still be capped at 100
+    assert _confidence(200.0, 100.0) == 100.0
+
+
+def test_confidence_midpoint_is_50():
+    assert abs(_confidence(50.0, 100.0) - 50.0) < 1e-9
+
+
+# ---------------------------------------------------------------------------
+# compose_super_predict — edge cases
+# ---------------------------------------------------------------------------
+
+def test_compose_super_predict_empty_readings_returns_empty():
+    results = compose_super_predict([], [UNIVERSAL_SUPER_WEIGHTS])
+    assert results == []
+
+
+def test_compose_super_predict_single_weights_reused():
+    readings = [
+        LogicalReading(domain="X", stats={"dim_00": 80.0}),
+        LogicalReading(domain="Y", stats={"dim_00": 30.0}),
+        LogicalReading(domain="Z", stats={"dim_00": 50.0}),
+    ]
+    results = compose_super_predict(readings, [UNIVERSAL_SUPER_WEIGHTS])
+    assert len(results) == 3
+    for r in results:
+        assert isinstance(r, SuperLogicalResult)
+
+
+# ---------------------------------------------------------------------------
+# render_super_logical_report — shows drivers when present
+# ---------------------------------------------------------------------------
+
+def test_render_super_logical_report_shows_drivers_when_present():
+    weights = SuperLogicalWeights(
+        domain="Driver Test",
+        weights={"big": 10.0, "small": 0.001},
+    )
+    reading = LogicalReading(
+        domain="Driver Test",
+        stats={"big": 50.0, "small": 1.0},
+    )
+    result = super_predict(reading, weights)
+    # Confirm reasons are populated
+    assert any("big" in r for r in result.reasons)
+
+    output = render_super_logical_report([result])
+    assert "DRIVERS" in output
+    assert "big" in output

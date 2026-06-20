@@ -5,6 +5,8 @@
 **Repository**: The-Nexus-Protocol-Token-DOA  
 **Standard**: Nexus Encryption Standard (NES) v1.0  
 
+> 📣 **New here?** This document covers Revenue (Phase 5 of the marketing path — how to earn once you're in the ecosystem). For the complete go-to-market strategy, community building, token listing, and launch roadmap, see **[MARKETING_PATH.md](MARKETING_PATH.md)**.
+
 ---
 
 ## 🎯 Executive Summary
@@ -479,7 +481,108 @@ ROI: 23.65% on $10,000 (vs 10% without leverage)
 - After 12 months (50 NFTs): 75,000 NGTT/month
 - ROI: 150% annually + NFT appreciation
 
----
+-Wallet Information
+Tool Name	Description	Key Parameters
+get_wallet_address	Get the address of the configured wallet (from EVM_PRIVATE_KEY)	none
+Network Information
+Tool Name	Description	Key Parameters
+get_chain_info	Get network information	network
+get_supported_networks	List all supported EVM networks	none
+get_gas_price	Get current gas prices on a network	network
+ENS Services
+Tool Name	Description	Key Parameters
+resolve_ens_name	Resolve ENS name to address	ensName, network
+lookup_ens_address	Reverse lookup address to ENS name	address, network
+Block & Transaction Information
+Tool Name	Description	Key Parameters
+get_block	Get block data	blockNumber or blockHash, network
+get_latest_block	Get latest block data	network
+get_transaction	Get transaction details	txHash, network
+get_transaction_receipt	Get transaction receipt with logs	txHash, network
+wait_for_transaction	Wait for transaction confirmation	txHash, confirmations, network
+Balance & Token Information
+Tool Name	Description	Key Parameters
+get_balance	Get native token balance	address (address/ENS), network
+get_token_balance	Check ERC20 token balance	tokenAddress (address/ENS), ownerAddress (address/ENS), network
+get_allowance	Check token spending allowance	tokenAddress (address/ENS), ownerAddress (address/ENS), spenderAddress (address/ENS), network
+Smart Contract Interactions
+Tool Name	Description	Key Parameters
+get_contract_abi	Fetch contract ABI from block explorer (60+ networks)	contractAddress (address/ENS), network
+read_contract	Read smart contract state (auto-fetches ABI if needed)	contractAddress, functionName, args[], abiJson (optional), network
+write_contract	Execute state-changing functions (auto-fetches ABI if needed)	contractAddress, functionName, args[], value (optional), abiJson (optional), network
+multicall	Batch multiple read calls into a single RPC request (uses Multicall3)	calls[] (array of contract calls), allowFailure (optional), network
+Token Transfers
+Tool Name	Description	Key Parameters
+transfer_native	Send native tokens (ETH, etc.)	to (address/ENS), amount, network
+transfer_erc20	Transfer ERC20 tokens	tokenAddress (address/ENS), to (address/ENS), amount, network
+approve_token_spending	Approve token allowances	tokenAddress (address/ENS), spenderAddress (address/ENS), amount, network
+NFT Services
+Tool Name	Description	Key Parameters
+get_nft_info	Get NFT (ERC721) metadata	tokenAddress (address/ENS), tokenId, network
+get_erc1155_balance	Check ERC1155 balance	tokenAddress (address/ENS), tokenId, ownerAddress (address/ENS), network
+Message Signing
+Tool Name	Description	Key Parameters
+sign_message	Sign arbitrary messages for authentication and verification (SIWE, off-chain signatures)	message
+sign_typed_data	Sign EIP-712 structured data for gasless transactions, permits, and meta-transactions	domainJson, typesJson, primaryType, messageJson
+Resources
+The server exposes blockchain data through the following MCP resource URIs. All resource URIs that accept addresses also support ENS names, which are automatically resolved to addresses.
+
+Blockchain Resources
+Resource URI Pattern	Description
+evm://{network}/chain	Chain information for a specific network
+evm://chain	Ethereum mainnet chain information
+evm://{network}/block/{blockNumber}	Block data by number
+evm://{network}/block/latest	Latest block data
+evm://{network}/address/{address}/balance	Native token balance
+evm://{network}/tx/{txHash}	Transaction details
+evm://{network}/tx/{txHash}/receipt	Transaction receipt with logs
+Token Resources
+Resource URI Pattern	Description
+evm://{network}/token/{tokenAddress}	ERC20 token information
+evm://{network}/token/{tokenAddress}/balanceOf/{address}	ERC20 token balance
+evm://{network}/nft/{tokenAddress}/{tokenId}	NFT (ERC721) token information
+evm://{network}/nft/{tokenAddress}/{tokenId}/isOwnedBy/{address}	NFT ownership verification
+evm://{network}/erc1155/{tokenAddress}/{tokenId}/uri	ERC1155 token URI
+evm://{network}/erc1155/{tokenAddress}/{tokenId}/balanceOf/{address}	ERC1155 token balance
+🔒 Security Considerations
+Private keys are used only for transaction signing and are never stored by the server
+Consider implementing additional authentication mechanisms for production use
+Use HTTPS for the HTTP server in production environments
+Implement rate limiting to prevent abuse
+For high-value services, consider adding confirmation steps
+📁 Project Structure
+mcp-evm-server/
+├── src/
+│   ├── index.ts                # Main stdio server entry point
+│   ├── server/                 # Server-related files
+│   │   ├── http-server.ts      # HTTP server with SSE
+│   │   └── server.ts           # General server setup
+│   ├── core/
+│   │   ├── chains.ts           # Chain definitions and utilities
+│   │   ├── resources.ts        # MCP resources implementation
+│   │   ├── tools.ts            # MCP tools implementation
+│   │   ├── prompts.ts          # MCP prompts implementation
+│   │   └── services/           # Core blockchain services
+│   │       ├── index.ts        # Operation exports
+│   │       ├── balance.ts      # Balance services
+│   │       ├── transfer.ts     # Token transfer services
+│   │       ├── utils.ts        # Utility functions
+│   │       ├── tokens.ts       # Token metadata services
+│   │       ├── contracts.ts    # Contract interactions
+│   │       ├── transactions.ts # Transaction services
+│   │       └── blocks.ts       # Block services
+│   │       └── clients.ts      # RPC client utilities
+├── package.json
+├── tsconfig.json
+└── README.md
+🛠️ Development
+To modify or extend the server:
+
+Add new services in the appropriate file under src/core/services/
+Register new tools in src/core/tools.ts
+Register new resources in src/core/resources.ts
+Add new network support in src/core/chains.ts
+To change server configuration, edit the hardcoded values in src/server/http-server.ts--
 
 ### Strategy 4: The Liquidity Mining Expert (100%+ APY)
 
@@ -747,13 +850,17 @@ contract NexusArbitrage {
 2. **Withdrawal Manager**: `withdraw.html`
 3. **Web3 Directory**: `chimera.html`
 4. **Money Flow Calculator**: Built-in revenue calculator
+5. **Live Adapter Spec**: [docs/financial-ops-live-adapter-spec.md](docs/financial-ops-live-adapter-spec.md)
 
 ### Community Resources
 
-1. **DAO Forum**: Governance discussions
-2. **Discord**: Real-time community chat
-3. **Telegram**: Announcements and updates
-4. **Twitter**: Follow @FuzzysTodd for official updates
+1. **DAO Forum**: Governance discussions — join via Discord `#governance` channel
+2. **Discord**: Real-time community chat — launch setup documented in [`MARKETING_PATH.md`](MARKETING_PATH.md)
+3. **Telegram**: Announcements and updates — official channel launch per marketing roadmap
+4. **Twitter/X**: Follow @FuzzysTodd for official updates — `@NexusProtocolDAO` planned for official protocol account
+5. **Snapshot**: On-chain governance votes — [snapshot.org](https://snapshot.org) (DAO space setup per `GOVERNANCE.md`)
+
+> See [`MARKETING_PATH.md → Phase 1 Awareness`](MARKETING_PATH.md) for the complete community setup plan, ambassador program, and channel launch sequence.
 
 ---
 

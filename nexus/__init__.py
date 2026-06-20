@@ -1,6 +1,6 @@
 """Safe, read-only Nexus telemetry monitor utilities."""
 
-from .anomaly_detector import (
+from .anomaly_detector import (  # noqa: F401
     DetectionResult,
     GPUReading,
     MLWeights,
@@ -8,7 +8,7 @@ from .anomaly_detector import (
     detect_anomalies,
     invoke_ml_predictive_repair,
 )
-from .monsterball import (
+from .monsterball import (  # noqa: F401
     MONSTERBALL_WEIGHTS,
     MatchSnapshot,
     PlayerStats,
@@ -19,7 +19,7 @@ from .monsterball import (
     rank_players,
     render_match_report,
 )
-from .super_logical import (
+from .super_logical import (  # noqa: F401
     LOGICAL_CAPACITY,
     MONSTERBALL_SUPER_WEIGHTS,
     TOKEN_SUPER_WEIGHTS,
@@ -31,7 +31,7 @@ from .super_logical import (
     render_super_logical_report,
     super_predict,
 )
-from .algebra3 import (
+from .algebra3 import (  # noqa: F401
     ALGEBRA3_VERSION,
     BEHAVIOR_PROFILES,
     MONSTERBALL_A3_WEIGHTS,
@@ -45,13 +45,13 @@ from .algebra3 import (
     match_behavior,
     render_algebra3_report,
 )
-from .nexus_token_supremacy import (
+from .nexus_token_supremacy import (  # noqa: F401
     NGTT_STATS,
     SupremacyVerdict,
     analyze_ngtt_supremacy,
     render_supremacy_report,
 )
-from .signal_repair import (
+from .signal_repair import (  # noqa: F401
     EXCHANGE_SIGNAL_RANGES,
     PARTICLE_COUNT,
     DegradedSignal,
@@ -60,7 +60,7 @@ from .signal_repair import (
     repair_signal,
     render_repair_report,
 )
-from .atmosphere import (
+from .atmosphere import (  # noqa: F401
     IDEAL_SNAPSHOT,
     PARTICLE_CATALOGUE,
     AtmosphericReading,
@@ -71,7 +71,7 @@ from .atmosphere import (
     analyze_planetary_health,
     render_planetary_report,
 )
-from .family_renaissance import (
+from .family_renaissance import (  # noqa: F401
     GENERATION_GEN_X,
     GENERATION_GEN_Z,
     HEALTHY_FAMILY_BASELINE,
@@ -83,6 +83,21 @@ from .family_renaissance import (
     analyze_family_crisis,
     render_renaissance_report,
 )
+from .e2e_soundness import (  # noqa: F401
+    NEXUS_DIMENSION_RANGES,
+    SIGNAL_BUS_RULES,
+    FINANCIAL_OPS_RULES,
+    BUILDER_FUND_RULES,
+    NetworkResponse,
+    WebAnswer,
+    SoundnessRule,
+    FieldResult,
+    SoundnessResult,
+    validate_soundness,
+    validate_network_only,
+    batch_validate,
+    render_soundness_report,
+)
 
 __all__ = [
     # anomaly_detector
@@ -92,7 +107,7 @@ __all__ = [
     "TelemetrySnapshot",
     "detect_anomalies",
     "invoke_ml_predictive_repair",
-
+]
 
 
 def __getattr__(name):
