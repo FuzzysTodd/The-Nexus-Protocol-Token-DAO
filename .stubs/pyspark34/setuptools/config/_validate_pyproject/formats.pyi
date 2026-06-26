@@ -1,0 +1,49 @@
+import typing
+from _typeshed import Incomplete
+from typing_extensions import Literal
+
+VERSION_PATTERN: str
+VERSION_REGEX: Incomplete
+
+def pep440(version: str) -> bool: ...
+
+PEP508_IDENTIFIER_PATTERN: str
+PEP508_IDENTIFIER_REGEX: Incomplete
+
+def pep508_identifier(name: str) -> bool: ...
+def pep508(value: str) -> bool: ...
+def pep508_versionspec(value: str) -> bool:
+    """Expression that can be used to specify/lock versions (including ranges)"""
+def pep517_backend_reference(value: str) -> bool: ...
+
+class _TroveClassifier:
+    """The ``trove_classifiers`` package is the official way of validating classifiers,
+    however this package might not be always available.
+    As a workaround we can still download a list from PyPI.
+    We also don't want to be over strict about it, so simply skipping silently is an
+    option (classifiers will be validated anyway during the upload to PyPI).
+    """
+    downloaded: None | Literal[False] | typing.Set[str]
+    def __init__(self) -> None: ...
+    def __call__(self, value: str) -> bool: ...
+
+def trove_classifier(value: str) -> bool: ...
+
+trove_classifier: Incomplete
+
+def pep561_stub_name(value: str) -> bool: ...
+def url(value: str) -> bool: ...
+
+ENTRYPOINT_PATTERN: str
+ENTRYPOINT_REGEX: Incomplete
+RECOMMEDED_ENTRYPOINT_PATTERN: str
+RECOMMEDED_ENTRYPOINT_REGEX: Incomplete
+ENTRYPOINT_GROUP_PATTERN: str
+ENTRYPOINT_GROUP_REGEX: Incomplete
+
+def python_identifier(value: str) -> bool: ...
+def python_qualified_identifier(value: str) -> bool: ...
+def python_module_name(value: str) -> bool: ...
+def python_entrypoint_group(value: str) -> bool: ...
+def python_entrypoint_name(value: str) -> bool: ...
+def python_entrypoint_reference(value: str) -> bool: ...

@@ -1,0 +1,6 @@
+from contourpy import FillType as FillType, LineType as LineType
+from contourpy._contourpy import CoordinateArray as CoordinateArray, FillReturn as FillReturn, LineReturn as LineReturn, LineReturn_Separate as LineReturn_Separate, LineReturn_SeparateCode as LineReturn_SeparateCode
+from contourpy.util.mpl_util import mpl_codes_to_offsets as mpl_codes_to_offsets
+
+def filled_to_bokeh(filled: FillReturn, fill_type: FillType) -> tuple[list[list[CoordinateArray]], list[list[CoordinateArray]]]: ...
+def lines_to_bokeh(lines: LineReturn, line_type: LineType) -> tuple[list[CoordinateArray], list[CoordinateArray]]: ...

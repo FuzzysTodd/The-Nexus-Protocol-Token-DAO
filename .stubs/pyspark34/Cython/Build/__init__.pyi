@@ -1,0 +1,3 @@
+from .Dependencies import cythonize as cythonize
+
+def __getattr__(name): ...

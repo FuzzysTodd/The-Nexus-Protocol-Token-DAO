@@ -1,0 +1,39 @@
+import torch
+from _typeshed import Incomplete
+
+__all__ = ['MaskedTensor', 'is_masked_tensor']
+
+def is_masked_tensor(a):
+    """ Returns True if the input is a MaskedTensor, else False
+
+    Args:
+        a: any input
+
+    Examples:
+
+        >>> # xdoctest: +SKIP
+        >>> from torch.masked import MaskedTensor
+        >>> data = torch.arange(6).reshape(2,3)
+        >>> mask = torch.tensor([[True, False, False], [True, True, False]])
+        >>> mt = MaskedTensor(data, mask)
+        >>> is_masked_tensor(mt)
+        True
+    """
+
+class MaskedTensor(torch.Tensor):
+    @staticmethod
+    def __new__(cls, data, mask, requires_grad: bool = False): ...
+    def __init__(self, data, mask, requires_grad: bool = False) -> None: ...
+    @classmethod
+    def __torch_function__(cls, func, types, args=(), kwargs: Incomplete | None = None): ...
+    @classmethod
+    def unary(cls, fn, data, mask): ...
+    @classmethod
+    def __torch_dispatch__(cls, func, types, args, kwargs): ...
+    def __lt__(self, other): ...
+    def to_tensor(self, value): ...
+    def get_data(self): ...
+    def get_mask(self): ...
+    def is_sparse_coo(self): ...
+    def is_sparse_csr(self): ...
+    def is_sparse(self): ...

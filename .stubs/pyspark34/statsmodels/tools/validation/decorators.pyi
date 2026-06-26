@@ -1,0 +1,3 @@
+from _typeshed import Incomplete
+
+def array_like(pos, name, dtype=..., ndim: Incomplete | None = None, maxdim: Incomplete | None = None, shape: Incomplete | None = None, order: str = 'C', contiguous: bool = False): ...

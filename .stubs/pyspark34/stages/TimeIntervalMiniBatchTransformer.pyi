@@ -1,0 +1,53 @@
+from pyspark.ml.param.shared import *
+from synapse.ml.core.serialize.java_params_patch import *
+from synapse.ml.core.schema.Utils import *
+from _typeshed import Incomplete
+from pyspark import SQLContext as SQLContext, SparkContext as SparkContext
+from pyspark.ml.evaluation import JavaEvaluator as JavaEvaluator
+from pyspark.ml.util import JavaMLReadable, JavaMLWritable
+from pyspark.ml.wrapper import JavaEstimator as JavaEstimator, JavaModel as JavaModel, JavaTransformer
+from pyspark.sql import DataFrame as DataFrame
+from synapse.ml.core.platform import running_on_synapse_internal as running_on_synapse_internal
+from synapse.ml.core.schema.TypeConversionUtils import complexTypeConverter as complexTypeConverter, generateTypeConverter as generateTypeConverter
+
+basestring = str
+
+class TimeIntervalMiniBatchTransformer(ComplexParamsMixin, JavaMLReadable, JavaMLWritable, JavaTransformer):
+    """
+    Args:
+        maxBatchSize (int): The max size of the buffer
+        millisToWait (int): The time to wait before constructing a batch
+    """
+    maxBatchSize: Incomplete
+    millisToWait: Incomplete
+    def __init__(self, java_obj: Incomplete | None = None, maxBatchSize: int = 2147483647, millisToWait: Incomplete | None = None) -> None: ...
+    def setParams(self, maxBatchSize: int = 2147483647, millisToWait: Incomplete | None = None):
+        """
+        Set the (keyword only) parameters
+        """
+    @classmethod
+    def read(cls):
+        """ Returns an MLReader instance for this class. """
+    @staticmethod
+    def getJavaPackage():
+        """ Returns package name String. """
+    def setMaxBatchSize(self, value):
+        """
+        Args:
+            maxBatchSize: The max size of the buffer
+        """
+    def setMillisToWait(self, value):
+        """
+        Args:
+            millisToWait: The time to wait before constructing a batch
+        """
+    def getMaxBatchSize(self):
+        """
+        Returns:
+            maxBatchSize: The max size of the buffer
+        """
+    def getMillisToWait(self):
+        """
+        Returns:
+            millisToWait: The time to wait before constructing a batch
+        """
