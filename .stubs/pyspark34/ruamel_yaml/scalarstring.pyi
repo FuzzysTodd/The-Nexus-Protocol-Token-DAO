@@ -1,0 +1,29 @@
+from ruamel_yaml.compat import text_type
+from typing import Any, Text
+
+__all__ = ['ScalarString', 'LiteralScalarString', 'FoldedScalarString', 'SingleQuotedScalarString', 'DoubleQuotedScalarString', 'PreservedScalarString']
+
+class ScalarString(text_type):
+    def __new__(cls, *args: Any, **kw: Any) -> Any: ...
+    def replace(self, old: Any, new: Any, maxreplace: int = -1) -> Any: ...
+    @property
+    def anchor(self) -> Any: ...
+    def yaml_anchor(self) -> Any: ...
+    def yaml_set_anchor(self, value: Any, always_dump: bool = False) -> None: ...
+
+class LiteralScalarString(ScalarString):
+    style: str
+    def __new__(cls, value: Text) -> Any: ...
+PreservedScalarString = LiteralScalarString
+
+class FoldedScalarString(ScalarString):
+    style: str
+    def __new__(cls, value: Text) -> Any: ...
+
+class SingleQuotedScalarString(ScalarString):
+    style: str
+    def __new__(cls, value: Text) -> Any: ...
+
+class DoubleQuotedScalarString(ScalarString):
+    style: str
+    def __new__(cls, value: Text) -> Any: ...

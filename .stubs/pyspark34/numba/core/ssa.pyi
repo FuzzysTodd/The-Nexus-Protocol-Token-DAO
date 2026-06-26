@@ -1,0 +1,81 @@
+from _typeshed import Incomplete
+from numba import config as config
+from numba.core import errors as errors, ir as ir, ir_utils as ir_utils
+from numba.core.analysis import compute_cfg_from_blocks as compute_cfg_from_blocks
+
+def reconstruct_ssa(func_ir):
+    """Apply SSA reconstruction algorithm on the given IR.
+
+    Produces minimal SSA using Choi et al algorithm.
+    """
+
+class _CacheListVars:
+    def __init__(self) -> None: ...
+    def get(self, inst): ...
+
+class _BaseHandler:
+    """A base handler for all the passes used here for the SSA algorithm.
+    """
+    def on_assign(self, states, assign) -> None:
+        """
+        Called when the pass sees an ``ir.Assign``.
+
+        Subclasses should override this for custom behavior
+
+        Parameters
+        -----------
+        states : dict
+        assign : numba.ir.Assign
+
+        Returns
+        -------
+        stmt : numba.ir.Assign or None
+            For rewrite passes, the return value is used as the replacement
+            for the given statement.
+        """
+    def on_other(self, states, stmt) -> None:
+        """
+        Called when the pass sees an ``ir.Stmt`` that's not an assignment.
+
+        Subclasses should override this for custom behavior
+
+        Parameters
+        -----------
+        states : dict
+        assign : numba.ir.Stmt
+
+        Returns
+        -------
+        stmt : numba.ir.Stmt or None
+            For rewrite passes, the return value is used as the replacement
+            for the given statement.
+        """
+
+class _GatherDefsHandler(_BaseHandler):
+    """Find all defs
+
+    ``states`` is a Mapping[str, List[ir.Assign]]
+    """
+    def on_assign(self, states, assign) -> None: ...
+
+class UndefinedVariable:
+    def __init__(self) -> None: ...
+    target: Incomplete
+
+class _FreshVarHandler(_BaseHandler):
+    """Replaces assignment target with new fresh variables.
+    """
+    def on_assign(self, states, assign): ...
+    def on_other(self, states, stmt): ...
+
+class _FixSSAVars(_BaseHandler):
+    """Replace variable uses in IR nodes to the correct reaching variable
+    and introduce Phi nodes if necessary. This class contains the core of
+    the SSA reconstruction algorithm.
+
+    See Ch 5 of the Inria SSA book for reference. The method names used here
+    are similar to the names used in the pseudocode in the book.
+    """
+    def __init__(self, cache_list_vars) -> None: ...
+    def on_assign(self, states, assign): ...
+    def on_other(self, states, stmt): ...

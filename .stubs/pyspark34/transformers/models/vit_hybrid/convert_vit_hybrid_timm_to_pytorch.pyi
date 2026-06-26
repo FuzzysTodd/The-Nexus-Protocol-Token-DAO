@@ -1,0 +1,16 @@
+from _typeshed import Incomplete
+from transformers import BitConfig as BitConfig, ViTHybridConfig as ViTHybridConfig, ViTHybridForImageClassification as ViTHybridForImageClassification, ViTHybridImageProcessor as ViTHybridImageProcessor, ViTHybridModel as ViTHybridModel
+from transformers.image_utils import PILImageResampling as PILImageResampling
+from transformers.utils import logging as logging
+
+logger: Incomplete
+
+def create_rename_keys(config, base_model: bool = False): ...
+def read_in_q_k_v(state_dict, config, base_model: bool = False) -> None: ...
+def remove_classification_head_(state_dict) -> None: ...
+def rename_key(dct, old, new) -> None: ...
+def prepare_img(): ...
+def convert_vit_checkpoint(vit_name, pytorch_dump_folder_path, push_to_hub: bool = False) -> None:
+    """
+    Copy/paste/tweak model's weights to our ViT structure.
+    """

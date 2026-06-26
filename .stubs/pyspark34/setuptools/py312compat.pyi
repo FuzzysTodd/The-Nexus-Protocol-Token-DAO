@@ -1,0 +1,3 @@
+from _typeshed import Incomplete
+
+def shutil_rmtree(path, ignore_errors: bool = False, onexc: Incomplete | None = None): ...
