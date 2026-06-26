@@ -1,0 +1,63 @@
+import threading
+from .aggregators import aggregate_mean as aggregate_mean
+from .asset_registry import asset_registry as asset_registry
+from .interfaces import Interface as Interface, Metric as Metric, MetricsMonitor as MetricsMonitor
+from _typeshed import Incomplete
+from typing import Deque
+from wandb.sdk.internal.settings_static import SettingsStatic as SettingsStatic
+
+class ProcessMemoryRSS:
+    """Memory resident set size (RSS) in MB.
+
+    RSS is the portion of memory occupied by a process that is held in main memory (RAM).
+    """
+    name: str
+    samples: Deque[float]
+    pid: Incomplete
+    process: Incomplete
+    def __init__(self, pid: int) -> None: ...
+    def sample(self) -> None: ...
+    def clear(self) -> None: ...
+    def aggregate(self) -> dict: ...
+
+class ProcessMemoryPercent:
+    """Process memory usage in percent."""
+    name: str
+    samples: Deque[float]
+    pid: Incomplete
+    process: Incomplete
+    def __init__(self, pid: int) -> None: ...
+    def sample(self) -> None: ...
+    def clear(self) -> None: ...
+    def aggregate(self) -> dict: ...
+
+class MemoryPercent:
+    """Total system memory usage in percent."""
+    name: str
+    samples: Deque[float]
+    def __init__(self) -> None: ...
+    def sample(self) -> None: ...
+    def clear(self) -> None: ...
+    def aggregate(self) -> dict: ...
+
+class MemoryAvailable:
+    """Total system memory available in MB."""
+    name: str
+    samples: Deque[float]
+    def __init__(self) -> None: ...
+    def sample(self) -> None: ...
+    def clear(self) -> None: ...
+    def aggregate(self) -> dict: ...
+
+class Memory:
+    name: Incomplete
+    metrics: Incomplete
+    metrics_monitor: Incomplete
+    def __init__(self, interface: Interface, settings: SettingsStatic, shutdown_event: threading.Event) -> None: ...
+    def start(self) -> None: ...
+    def finish(self) -> None: ...
+    @classmethod
+    def is_available(cls) -> bool:
+        """Return a new instance of the CPU metrics."""
+    def probe(self) -> dict:
+        """Return a dict of the hardware information."""

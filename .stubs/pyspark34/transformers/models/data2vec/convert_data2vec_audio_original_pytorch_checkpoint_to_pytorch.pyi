@@ -1,0 +1,19 @@
+from _typeshed import Incomplete
+from transformers import Wav2Vec2Processor as Wav2Vec2Processor, logging as logging
+from transformers.models.data2vec.configuration_data2vec_audio import Data2VecAudioConfig as Data2VecAudioConfig
+from transformers.models.data2vec.modeling_data2vec_audio import Data2VecAudioForCTC as Data2VecAudioForCTC, Data2VecAudioModel as Data2VecAudioModel
+
+logger: Incomplete
+MAPPING: Incomplete
+TOP_LEVEL_KEYS: Incomplete
+
+def set_recursively(hf_pointer, key, value, full_name, weight_type) -> None: ...
+def recursively_load_weights(fairseq_model, hf_model, is_headless) -> None: ...
+def access_by_string(module, path): ...
+def set_weights(full_name, module, fsq_value, hf_weight_path) -> None: ...
+def load_conv_layer(full_name, value, feature_extractor, unused_weights) -> None: ...
+def load_pos_conv_layer(full_name, value, pos_conv_embeddings, unused_weights) -> None: ...
+def convert_wav2vec2_checkpoint(checkpoint_path, pytorch_dump_folder_path, config_path: Incomplete | None = None, dict_path: Incomplete | None = None, is_finetuned: bool = True):
+    """
+    Copy/paste/tweak model's weights to transformers design.
+    """

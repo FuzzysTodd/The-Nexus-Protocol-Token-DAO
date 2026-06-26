@@ -1,0 +1,13 @@
+from _typeshed import Incomplete
+
+__all__ = ['setproctitle', 'getproctitle', 'setthreadtitle', 'getthreadtitle']
+
+def setproctitle(title: str) -> None: ...
+def getproctitle() -> str: ...
+def setthreadtitle(title: str) -> None: ...
+def getthreadtitle() -> str: ...
+
+setproctitle: Incomplete
+getproctitle: Incomplete
+setthreadtitle: Incomplete
+getthreadtitle: Incomplete

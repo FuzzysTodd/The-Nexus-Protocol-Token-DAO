@@ -1,0 +1,21 @@
+from _typeshed import Incomplete
+
+DESCRIPTOR: Incomplete
+ServerShutdownRequest: Incomplete
+ServerShutdownResponse: Incomplete
+ServerStatusRequest: Incomplete
+ServerStatusResponse: Incomplete
+ServerInformInitRequest: Incomplete
+ServerInformInitResponse: Incomplete
+ServerInformStartRequest: Incomplete
+ServerInformStartResponse: Incomplete
+ServerInformFinishRequest: Incomplete
+ServerInformFinishResponse: Incomplete
+ServerInformAttachRequest: Incomplete
+ServerInformAttachResponse: Incomplete
+ServerInformDetachRequest: Incomplete
+ServerInformDetachResponse: Incomplete
+ServerInformTeardownRequest: Incomplete
+ServerInformTeardownResponse: Incomplete
+ServerRequest: Incomplete
+ServerResponse: Incomplete
