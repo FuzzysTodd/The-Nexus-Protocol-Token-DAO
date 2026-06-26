@@ -1,0 +1,33 @@
+from _typeshed import Incomplete
+from jedi.common import monkeypatch as monkeypatch
+from jedi.inference.base_value import NO_VALUES as NO_VALUES, ValueSet as ValueSet
+
+class AbstractLazyValue:
+    data: Incomplete
+    min: Incomplete
+    max: Incomplete
+    def __init__(self, data, min: int = 1, max: int = 1) -> None: ...
+    def infer(self) -> None: ...
+
+class LazyKnownValue(AbstractLazyValue):
+    """data is a Value."""
+    def infer(self): ...
+
+class LazyKnownValues(AbstractLazyValue):
+    """data is a ValueSet."""
+    def infer(self): ...
+
+class LazyUnknownValue(AbstractLazyValue):
+    def __init__(self, min: int = 1, max: int = 1) -> None: ...
+    def infer(self): ...
+
+class LazyTreeValue(AbstractLazyValue):
+    context: Incomplete
+    def __init__(self, context, node, min: int = 1, max: int = 1) -> None: ...
+    def infer(self): ...
+
+def get_merged_lazy_value(lazy_values): ...
+
+class MergedLazyValues(AbstractLazyValue):
+    """data is a list of lazy values."""
+    def infer(self): ...

@@ -1,0 +1,4 @@
+from _typeshed import Incomplete
+
+tensorflow_dot_tsl_dot_protobuf_dot_histogram__pb2: Incomplete
+DESCRIPTOR: Incomplete

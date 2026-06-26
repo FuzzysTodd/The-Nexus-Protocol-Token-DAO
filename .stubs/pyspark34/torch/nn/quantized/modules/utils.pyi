@@ -1,0 +1,1 @@
+from torch.ao.nn.quantized.modules.utils import WeightedQuantizedModule as WeightedQuantizedModule
