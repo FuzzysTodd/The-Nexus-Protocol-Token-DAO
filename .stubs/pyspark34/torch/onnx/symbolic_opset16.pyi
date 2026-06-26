@@ -1,0 +1,6 @@
+from torch.nn.functional import GRID_SAMPLE_INTERPOLATION_MODES as GRID_SAMPLE_INTERPOLATION_MODES, GRID_SAMPLE_PADDING_MODES as GRID_SAMPLE_PADDING_MODES
+from torch.onnx import symbolic_helper as symbolic_helper
+from torch.onnx._internal import jit_utils as jit_utils, registration as registration
+
+def grid_sampler(g: jit_utils.GraphContext, input, grid, mode_enum, padding_mode_enum, align_corners): ...
+def scatter_add(g: jit_utils.GraphContext, self, dim, index, src): ...

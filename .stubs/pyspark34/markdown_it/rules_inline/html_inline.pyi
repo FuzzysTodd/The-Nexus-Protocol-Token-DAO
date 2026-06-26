@@ -1,0 +1,6 @@
+from ..common.html_re import HTML_TAG_RE as HTML_TAG_RE
+from ..common.utils import isLinkClose as isLinkClose, isLinkOpen as isLinkOpen
+from .state_inline import StateInline as StateInline
+
+def isLetter(ch: int) -> bool: ...
+def html_inline(state: StateInline, silent: bool) -> bool: ...

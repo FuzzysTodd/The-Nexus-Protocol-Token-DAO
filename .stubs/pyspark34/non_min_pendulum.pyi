@@ -1,0 +1,29 @@
+from _typeshed import Incomplete
+
+q1: Incomplete
+q2: Incomplete
+q1_d: Incomplete
+q2_d: Incomplete
+q1_dd: Incomplete
+q2_dd: Incomplete
+l: Incomplete
+g: Incomplete
+frame_n: Incomplete
+point_pn: Incomplete
+theta1: Incomplete
+frame_a: Incomplete
+particle_p: Incomplete
+f_v: Incomplete
+force_p: Incomplete
+dependent: Incomplete
+velocity_constraints: Incomplete
+u_q1_d: Incomplete
+u_q2_d: Incomplete
+kd_eqs: Incomplete
+forceList: Incomplete
+kane: Incomplete
+fr: Incomplete
+frstar: Incomplete
+zero: Incomplete
+f_c: Incomplete
+config: Incomplete

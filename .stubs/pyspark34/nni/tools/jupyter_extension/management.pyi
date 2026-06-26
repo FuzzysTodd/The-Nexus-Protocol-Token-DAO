@@ -1,0 +1,6 @@
+from _typeshed import Incomplete
+
+jupyter_lab_major_version: Incomplete
+
+def install() -> None: ...
+def uninstall() -> None: ...
