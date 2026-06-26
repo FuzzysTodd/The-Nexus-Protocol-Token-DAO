@@ -12,6 +12,17 @@
 			],
 			"gallery": "https://api.mcp.github.com",
 			"version": "1.0.0"
+		},
+		"io.github.ChromeDevTools/chrome-devtools-mcp": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"--registry",
+				"https://registry.npmjs.org",
+				"chrome-devtools-mcp@1.0.1"
+			],
+			"gallery": "https://api.mcp.github.com",
+			"version": "1.0.1"
 		}
 	},
 	"inputs": [

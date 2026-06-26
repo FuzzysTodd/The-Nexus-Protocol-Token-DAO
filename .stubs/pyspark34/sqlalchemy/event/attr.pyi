@@ -1,0 +1,169 @@
+import weakref
+from . import legacy as legacy, registry as registry
+from .. import exc as exc, util as util
+from ..util.concurrency import AsyncAdaptedLock as AsyncAdaptedLock
+from ..util.typing import Protocol as Protocol
+from .base import _Dispatch, _DispatchCommon, _HasEventsDispatch
+from .registry import _ET, _EventKey, _ListenerFnType
+from types import TracebackType
+from typing import Any, Collection, Deque, FrozenSet, Generic, Iterator, MutableSequence, NoReturn, Sequence, Set, Tuple, Type
+
+class RefCollection(util.MemoizedSlots, Generic[_ET]):
+    ref: weakref.ref[RefCollection[_ET]]
+
+class _empty_collection(Collection[_T]):
+    def append(self, element: _T) -> None: ...
+    def appendleft(self, element: _T) -> None: ...
+    def extend(self, other: Sequence[_T]) -> None: ...
+    def remove(self, element: _T) -> None: ...
+    def __contains__(self, element: Any) -> bool: ...
+    def __iter__(self) -> Iterator[_T]: ...
+    def clear(self) -> None: ...
+    def __len__(self) -> int: ...
+
+class _ClsLevelDispatch(RefCollection[_ET]):
+    """Class-level events on :class:`._Dispatch` classes."""
+    clsname: str
+    name: str
+    arg_names: Sequence[str]
+    has_kw: bool
+    legacy_signatures: MutableSequence[legacy._LegacySignatureType]
+    def __init__(self, parent_dispatch_cls: Type[_HasEventsDispatch[_ET]], fn: _ListenerFnType) -> None: ...
+    def insert(self, event_key: _EventKey[_ET], propagate: bool) -> None: ...
+    def append(self, event_key: _EventKey[_ET], propagate: bool) -> None: ...
+    def update_subclass(self, target: Type[_ET]) -> None: ...
+    def remove(self, event_key: _EventKey[_ET]) -> None: ...
+    def clear(self) -> None:
+        """Clear all class level listeners"""
+    def for_modify(self, obj: _Dispatch[_ET]) -> _ClsLevelDispatch[_ET]:
+        """Return an event collection which can be modified.
+
+        For _ClsLevelDispatch at the class level of
+        a dispatcher, this returns self.
+
+        """
+
+class _InstanceLevelDispatch(RefCollection[_ET], Collection[_ListenerFnType]):
+    parent: _ClsLevelDispatch[_ET]
+    def __contains__(self, item: Any) -> bool: ...
+    def __len__(self) -> int: ...
+    def __iter__(self) -> Iterator[_ListenerFnType]: ...
+    def __bool__(self) -> bool: ...
+    def exec_once(self, *args: Any, **kw: Any) -> None: ...
+    def exec_once_unless_exception(self, *args: Any, **kw: Any) -> None: ...
+    def __call__(self, *args: Any, **kw: Any) -> None: ...
+    def insert(self, event_key: _EventKey[_ET], propagate: bool) -> None: ...
+    def append(self, event_key: _EventKey[_ET], propagate: bool) -> None: ...
+    def remove(self, event_key: _EventKey[_ET]) -> None: ...
+    def for_modify(self, obj: _DispatchCommon[_ET]) -> _InstanceLevelDispatch[_ET]:
+        """Return an event collection which can be modified.
+
+        For _ClsLevelDispatch at the class level of
+        a dispatcher, this returns self.
+
+        """
+
+class _EmptyListener(_InstanceLevelDispatch[_ET]):
+    """Serves as a proxy interface to the events
+    served by a _ClsLevelDispatch, when there are no
+    instance-level events present.
+
+    Is replaced by _ListenerCollection when instance-level
+    events are added.
+
+    """
+    propagate: FrozenSet[_ListenerFnType]
+    listeners: Tuple
+    parent: _ClsLevelDispatch[_ET]
+    parent_listeners: _ListenerFnSequenceType[_ListenerFnType]
+    name: str
+    def __init__(self, parent: _ClsLevelDispatch[_ET], target_cls: Type[_ET]) -> None: ...
+    def for_modify(self, obj: _DispatchCommon[_ET]) -> _ListenerCollection[_ET]:
+        """Return an event collection which can be modified.
+
+        For _EmptyListener at the instance level of
+        a dispatcher, this generates a new
+        _ListenerCollection, applies it to the instance,
+        and returns it.
+
+        """
+    def exec_once(self, *args: Any, **kw: Any) -> NoReturn: ...
+    def exec_once_unless_exception(self, *args: Any, **kw: Any) -> NoReturn: ...
+    def insert(self, *args: Any, **kw: Any) -> NoReturn: ...
+    def append(self, *args: Any, **kw: Any) -> NoReturn: ...
+    def remove(self, *args: Any, **kw: Any) -> NoReturn: ...
+    def clear(self, *args: Any, **kw: Any) -> NoReturn: ...
+    def __call__(self, *args: Any, **kw: Any) -> None:
+        """Execute this event."""
+    def __contains__(self, item: Any) -> bool: ...
+    def __len__(self) -> int: ...
+    def __iter__(self) -> Iterator[_ListenerFnType]: ...
+    def __bool__(self) -> bool: ...
+
+class _MutexProtocol(Protocol):
+    def __enter__(self) -> bool: ...
+    def __exit__(self, exc_type: Type[BaseException] | None, exc_val: BaseException | None, exc_tb: TracebackType | None) -> bool | None: ...
+
+class _CompoundListener(_InstanceLevelDispatch[_ET]):
+    parent_listeners: Collection[_ListenerFnType]
+    listeners: Collection[_ListenerFnType]
+    def exec_once(self, *args: Any, **kw: Any) -> None:
+        """Execute this event, but only if it has not been
+        executed already for this collection."""
+    def exec_once_unless_exception(self, *args: Any, **kw: Any) -> None:
+        """Execute this event, but only if it has not been
+        executed already for this collection, or was called
+        by a previous exec_once_unless_exception call and
+        raised an exception.
+
+        If exec_once was already called, then this method will never run
+        the callable regardless of whether it raised or not.
+
+        .. versionadded:: 1.3.8
+
+        """
+    def __call__(self, *args: Any, **kw: Any) -> None:
+        """Execute this event."""
+    def __contains__(self, item: Any) -> bool: ...
+    def __len__(self) -> int: ...
+    def __iter__(self) -> Iterator[_ListenerFnType]: ...
+    def __bool__(self) -> bool: ...
+
+class _ListenerCollection(_CompoundListener[_ET]):
+    """Instance-level attributes on instances of :class:`._Dispatch`.
+
+    Represents a collection of listeners.
+
+    As of 0.7.9, _ListenerCollection is only first
+    created via the _EmptyListener.for_modify() method.
+
+    """
+    parent_listeners: Collection[_ListenerFnType]
+    parent: _ClsLevelDispatch[_ET]
+    name: str
+    listeners: Deque[_ListenerFnType]
+    propagate: Set[_ListenerFnType]
+    def __init__(self, parent: _ClsLevelDispatch[_ET], target_cls: Type[_ET]) -> None: ...
+    def for_modify(self, obj: _DispatchCommon[_ET]) -> _ListenerCollection[_ET]:
+        """Return an event collection which can be modified.
+
+        For _ListenerCollection at the instance level of
+        a dispatcher, this returns self.
+
+        """
+    def insert(self, event_key: _EventKey[_ET], propagate: bool) -> None: ...
+    def append(self, event_key: _EventKey[_ET], propagate: bool) -> None: ...
+    def remove(self, event_key: _EventKey[_ET]) -> None: ...
+    def clear(self) -> None: ...
+
+class _JoinedListener(_CompoundListener[_ET]):
+    parent_dispatch: _DispatchCommon[_ET]
+    name: str
+    local: _InstanceLevelDispatch[_ET]
+    parent_listeners: Collection[_ListenerFnType]
+    def __init__(self, parent_dispatch: _DispatchCommon[_ET], name: str, local: _EmptyListener[_ET]) -> None: ...
+    def for_modify(self, obj: _DispatchCommon[_ET]) -> _JoinedListener[_ET]: ...
+    def insert(self, event_key: _EventKey[_ET], propagate: bool) -> None: ...
+    def append(self, event_key: _EventKey[_ET], propagate: bool) -> None: ...
+    def remove(self, event_key: _EventKey[_ET]) -> None: ...
+    def clear(self) -> None: ...

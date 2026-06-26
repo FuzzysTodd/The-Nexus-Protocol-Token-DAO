@@ -1,0 +1,102 @@
+from .base import Lexer
+from _typeshed import Incomplete
+from abc import ABCMeta, abstractmethod
+from prompt_toolkit.document import Document
+from prompt_toolkit.filters import FilterOrBool
+from prompt_toolkit.formatted_text.base import StyleAndTextTuples
+from pygments.lexer import Lexer as PygmentsLexerCls
+from typing import Callable, Dict, Tuple
+
+__all__ = ['PygmentsLexer', 'SyntaxSync', 'SyncFromStart', 'RegexSync']
+
+class SyntaxSync(metaclass=ABCMeta):
+    """
+    Syntax synchroniser. This is a tool that finds a start position for the
+    lexer. This is especially important when editing big documents; we don't
+    want to start the highlighting by running the lexer from the beginning of
+    the file. That is very slow when editing.
+    """
+    @abstractmethod
+    def get_sync_start_position(self, document: Document, lineno: int) -> tuple[int, int]:
+        """
+        Return the position from where we can start lexing as a (row, column)
+        tuple.
+
+        :param document: `Document` instance that contains all the lines.
+        :param lineno: The line that we want to highlight. (We need to return
+            this line, or an earlier position.)
+        """
+
+class SyncFromStart(SyntaxSync):
+    """
+    Always start the syntax highlighting from the beginning.
+    """
+    def get_sync_start_position(self, document: Document, lineno: int) -> tuple[int, int]: ...
+
+class RegexSync(SyntaxSync):
+    """
+    Synchronize by starting at a line that matches the given regex pattern.
+    """
+    MAX_BACKWARDS: int
+    FROM_START_IF_NO_SYNC_POS_FOUND: int
+    def __init__(self, pattern: str) -> None: ...
+    def get_sync_start_position(self, document: Document, lineno: int) -> tuple[int, int]:
+        """
+        Scan backwards, and find a possible position to start.
+        """
+    @classmethod
+    def from_pygments_lexer_cls(cls, lexer_cls: PygmentsLexerCls) -> RegexSync:
+        """
+        Create a :class:`.RegexSync` instance for this Pygments lexer class.
+        """
+
+class _TokenCache(Dict[Tuple[str, ...], str]):
+    """
+    Cache that converts Pygments tokens into `prompt_toolkit` style objects.
+
+    ``Token.A.B.C`` will be converted into:
+    ``class:pygments,pygments.A,pygments.A.B,pygments.A.B.C``
+    """
+    def __missing__(self, key: tuple[str, ...]) -> str: ...
+
+class PygmentsLexer(Lexer):
+    """
+    Lexer that calls a pygments lexer.
+
+    Example::
+
+        from pygments.lexers.html import HtmlLexer
+        lexer = PygmentsLexer(HtmlLexer)
+
+    Note: Don't forget to also load a Pygments compatible style. E.g.::
+
+        from prompt_toolkit.styles.from_pygments import style_from_pygments_cls
+        from pygments.styles import get_style_by_name
+        style = style_from_pygments_cls(get_style_by_name('monokai'))
+
+    :param pygments_lexer_cls: A `Lexer` from Pygments.
+    :param sync_from_start: Start lexing at the start of the document. This
+        will always give the best results, but it will be slow for bigger
+        documents. (When the last part of the document is display, then the
+        whole document will be lexed by Pygments on every key stroke.) It is
+        recommended to disable this for inputs that are expected to be more
+        than 1,000 lines.
+    :param syntax_sync: `SyntaxSync` object.
+    """
+    MIN_LINES_BACKWARDS: int
+    REUSE_GENERATOR_MAX_DISTANCE: int
+    pygments_lexer_cls: Incomplete
+    sync_from_start: Incomplete
+    pygments_lexer: Incomplete
+    syntax_sync: Incomplete
+    def __init__(self, pygments_lexer_cls: type[PygmentsLexerCls], sync_from_start: FilterOrBool = True, syntax_sync: SyntaxSync | None = None) -> None: ...
+    @classmethod
+    def from_filename(cls, filename: str, sync_from_start: FilterOrBool = True) -> Lexer:
+        """
+        Create a `Lexer` from a filename.
+        """
+    def lex_document(self, document: Document) -> Callable[[int], StyleAndTextTuples]:
+        """
+        Create a lexer function that takes a line number and returns the list
+        of (style_str, text) tuples as the Pygments lexer returns for that line.
+        """

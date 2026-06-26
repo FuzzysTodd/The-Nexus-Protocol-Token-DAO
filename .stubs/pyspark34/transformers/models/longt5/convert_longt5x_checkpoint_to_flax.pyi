@@ -1,0 +1,3 @@
+from transformers import AutoConfig as AutoConfig, FlaxAutoModelForSeq2SeqLM as FlaxAutoModelForSeq2SeqLM
+
+def convert_t5x_checkpoint_to_flax(t5x_checkpoint_path, config_name, flax_dump_folder_path) -> None: ...
