@@ -1,0 +1,3 @@
+from six.moves import queue
+
+class LifoQueue(queue.Queue): ...

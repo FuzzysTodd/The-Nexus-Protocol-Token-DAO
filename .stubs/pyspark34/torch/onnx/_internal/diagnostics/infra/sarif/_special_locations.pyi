@@ -1,0 +1,9 @@
+import dataclasses
+from torch.onnx._internal.diagnostics.infra.sarif import _artifact_location, _property_bag
+
+@dataclasses.dataclass
+class SpecialLocations:
+    """Defines locations of special significance to SARIF consumers."""
+    display_base: _artifact_location.ArtifactLocation | None = ...
+    properties: _property_bag.PropertyBag | None = ...
+    def __init__(self, display_base, properties) -> None: ...
