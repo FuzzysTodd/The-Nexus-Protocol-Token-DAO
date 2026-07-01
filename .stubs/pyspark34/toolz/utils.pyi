@@ -1,0 +1,3 @@
+def raises(err, lamda): ...
+
+no_default: str

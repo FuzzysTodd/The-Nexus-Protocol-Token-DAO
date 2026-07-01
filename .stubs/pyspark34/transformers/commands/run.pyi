@@ -1,0 +1,16 @@
+from . import BaseTransformersCLICommand as BaseTransformersCLICommand
+from ..pipelines import Pipeline as Pipeline, PipelineDataFormat as PipelineDataFormat, get_supported_tasks as get_supported_tasks, pipeline as pipeline
+from ..utils import logging as logging
+from _typeshed import Incomplete
+from argparse import ArgumentParser
+
+logger: Incomplete
+
+def try_infer_format_from_ext(path: str): ...
+def run_command_factory(args): ...
+
+class RunCommand(BaseTransformersCLICommand):
+    def __init__(self, nlp: Pipeline, reader: PipelineDataFormat) -> None: ...
+    @staticmethod
+    def register_subcommand(parser: ArgumentParser): ...
+    def run(self) -> None: ...

@@ -1,0 +1,2 @@
+from .tokenization_herbert import HerbertTokenizer as HerbertTokenizer
+from .tokenization_herbert_fast import HerbertTokenizerFast as HerbertTokenizerFast

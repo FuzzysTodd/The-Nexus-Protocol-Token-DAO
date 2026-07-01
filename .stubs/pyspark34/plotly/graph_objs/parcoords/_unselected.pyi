@@ -1,0 +1,48 @@
+from _typeshed import Incomplete
+from plotly.basedatatypes import BaseTraceHierarchyType as _BaseTraceHierarchyType
+
+class Unselected(_BaseTraceHierarchyType):
+    @property
+    def line(self):
+        '''
+        The \'line\' property is an instance of Line
+        that may be specified as:
+          - An instance of :class:`plotly.graph_objs.parcoords.unselected.Line`
+          - A dict of string/value properties that will be passed
+            to the Line constructor
+
+            Supported dict properties:
+
+                color
+                    Sets the base color of unselected lines. in
+                    connection with `unselected.line.opacity`.
+                opacity
+                    Sets the opacity of unselected lines. The
+                    default "auto" decreases the opacity smoothly
+                    as the number of lines increases. Use 1 to
+                    achieve exact `unselected.line.color`.
+
+        Returns
+        -------
+        plotly.graph_objs.parcoords.unselected.Line
+        '''
+    @line.setter
+    def line(self, val) -> None: ...
+    def __init__(self, arg: Incomplete | None = None, line: Incomplete | None = None, **kwargs) -> None:
+        """
+        Construct a new Unselected object
+
+        Parameters
+        ----------
+        arg
+            dict of properties compatible with this constructor or
+            an instance of
+            :class:`plotly.graph_objs.parcoords.Unselected`
+        line
+            :class:`plotly.graph_objects.parcoords.unselected.Line`
+            instance or dict with compatible properties
+
+        Returns
+        -------
+        Unselected
+        """

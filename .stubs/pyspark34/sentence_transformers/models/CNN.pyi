@@ -1,0 +1,23 @@
+from ..util import fullname as fullname, http_get as http_get, import_from_string as import_from_string
+from .tokenizer import WhitespaceTokenizer as WhitespaceTokenizer, WordTokenizer as WordTokenizer
+from _typeshed import Incomplete
+from torch import Tensor as Tensor, nn
+from tqdm import tqdm as tqdm
+from typing import List
+
+class CNN(nn.Module):
+    """CNN-layer with multiple kernel-sizes over the word embeddings"""
+    config_keys: Incomplete
+    in_word_embedding_dimension: Incomplete
+    out_channels: Incomplete
+    kernel_sizes: Incomplete
+    embeddings_dimension: Incomplete
+    convs: Incomplete
+    def __init__(self, in_word_embedding_dimension: int, out_channels: int = 256, kernel_sizes: List[int] = [1, 3, 5], stride_sizes: List[int] = None) -> None: ...
+    def forward(self, features): ...
+    def get_word_embedding_dimension(self) -> int: ...
+    def tokenize(self, text: str) -> List[int]: ...
+    def save(self, output_path: str): ...
+    def get_config_dict(self): ...
+    @staticmethod
+    def load(input_path: str): ...
