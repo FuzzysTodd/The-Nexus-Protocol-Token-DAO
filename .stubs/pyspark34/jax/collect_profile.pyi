@@ -1,0 +1,6 @@
+from _typeshed import Incomplete
+
+parser: Incomplete
+
+def collect_profile(port: int, duration_in_ms: int, host: str, log_dir: str | None, host_tracer_level: int, device_tracer_level: int, python_tracer_level: int, no_perfetto_link: bool): ...
+def main(args) -> None: ...

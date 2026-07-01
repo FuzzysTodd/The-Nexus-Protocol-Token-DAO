@@ -1,0 +1,39 @@
+from _typeshed import Incomplete
+from torch.distributions.distribution import Distribution
+
+__all__ = ['Uniform']
+
+class Uniform(Distribution):
+    """
+    Generates uniformly distributed random samples from the half-open interval
+    ``[low, high)``.
+
+    Example::
+
+        >>> m = Uniform(torch.tensor([0.0]), torch.tensor([5.0]))
+        >>> m.sample()  # uniformly distributed in the range [0.0, 5.0)
+        >>> # xdoctest: +SKIP
+        tensor([ 2.3418])
+
+    Args:
+        low (float or Tensor): lower range (inclusive).
+        high (float or Tensor): upper range (exclusive).
+    """
+    arg_constraints: Incomplete
+    has_rsample: bool
+    @property
+    def mean(self): ...
+    @property
+    def mode(self): ...
+    @property
+    def stddev(self): ...
+    @property
+    def variance(self): ...
+    def __init__(self, low, high, validate_args: Incomplete | None = None) -> None: ...
+    def expand(self, batch_shape, _instance: Incomplete | None = None): ...
+    def support(self): ...
+    def rsample(self, sample_shape=...): ...
+    def log_prob(self, value): ...
+    def cdf(self, value): ...
+    def icdf(self, value): ...
+    def entropy(self): ...

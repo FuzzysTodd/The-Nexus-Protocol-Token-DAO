@@ -1,0 +1,57 @@
+from . import BmpImagePlugin as BmpImagePlugin, Image as Image, ImageFile as ImageFile, PngImagePlugin as PngImagePlugin
+from ._binary import o8 as o8
+from _typeshed import Incomplete
+
+class IcoFile:
+    buf: Incomplete
+    entry: Incomplete
+    nb_items: Incomplete
+    def __init__(self, buf) -> None:
+        """
+        Parse image from file-like object containing ico file data
+        """
+    def sizes(self):
+        """
+        Get a list of all available icon sizes and color depths.
+        """
+    def getentryindex(self, size, bpp: bool = False): ...
+    def getimage(self, size, bpp: bool = False):
+        """
+        Get an image from the icon
+        """
+    def frame(self, idx):
+        """
+        Get an image from frame idx
+        """
+
+class IcoImageFile(ImageFile.ImageFile):
+    '''
+    PIL read-only image support for Microsoft Windows .ico files.
+
+    By default the largest resolution image in the file will be loaded. This
+    can be changed by altering the \'size\' attribute before calling \'load\'.
+
+    The info dictionary has a key \'sizes\' that is a list of the sizes available
+    in the icon file.
+
+    Handles classic, XP and Vista icon formats.
+
+    When saving, PNG compression is used. Support for this was only added in
+    Windows Vista. If you are unable to view the icon in Windows, convert the
+    image to "RGBA" mode before saving.
+
+    This plugin is a refactored version of Win32IconImagePlugin by Bryan Davis
+    <casadebender@gmail.com>.
+    https://code.google.com/archive/p/casadebender/wikis/Win32IconImagePlugin.wiki
+    '''
+    format: str
+    format_description: str
+    @property
+    def size(self): ...
+    @size.setter
+    def size(self, value) -> None: ...
+    im: Incomplete
+    pyaccess: Incomplete
+    mode: Incomplete
+    def load(self): ...
+    def load_seek(self) -> None: ...

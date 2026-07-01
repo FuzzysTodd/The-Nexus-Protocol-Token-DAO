@@ -1,0 +1,6 @@
+from . import base as base
+from cliff import columns as columns
+
+class ShellFormatter(base.SingleFormatter):
+    def add_argument_group(self, parser) -> None: ...
+    def emit_one(self, column_names, data, stdout, parsed_args) -> None: ...

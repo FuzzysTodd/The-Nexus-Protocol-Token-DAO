@@ -1,0 +1,16 @@
+import io
+from .ansi import AnsiDecoder as AnsiDecoder
+from .console import Console as Console
+from .text import Text as Text
+from typing import Any, IO
+
+class FileProxy(io.TextIOBase):
+    """Wraps a file (e.g. sys.stdout) and redirects writes to a console."""
+    def __init__(self, console: Console, file: IO[str]) -> None: ...
+    @property
+    def rich_proxied_file(self) -> IO[str]:
+        """Get proxied file."""
+    def __getattr__(self, name: str) -> Any: ...
+    def write(self, text: str) -> int: ...
+    def flush(self) -> None: ...
+    def fileno(self) -> int: ...
