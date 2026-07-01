@@ -1,0 +1,53 @@
+import torch
+from ...models.auto.modeling_auto import MODEL_FOR_QUESTION_ANSWERING_MAPPING as MODEL_FOR_QUESTION_ANSWERING_MAPPING
+from ...tokenization_utils import PreTrainedTokenizer as PreTrainedTokenizer
+from ...utils import logging as logging
+from ..processors.squad import SquadFeatures as SquadFeatures, SquadV1Processor as SquadV1Processor, SquadV2Processor as SquadV2Processor, squad_convert_examples_to_features as squad_convert_examples_to_features
+from _typeshed import Incomplete
+from dataclasses import dataclass
+from enum import Enum
+from torch.utils.data import Dataset
+from typing import Dict, List, Optional, Union
+
+logger: Incomplete
+MODEL_CONFIG_CLASSES: Incomplete
+MODEL_TYPES: Incomplete
+
+@dataclass
+class SquadDataTrainingArguments:
+    """
+    Arguments pertaining to what data we are going to input our model for training and eval.
+    """
+    model_type: str = ...
+    data_dir: str = ...
+    max_seq_length: int = ...
+    doc_stride: int = ...
+    max_query_length: int = ...
+    max_answer_length: int = ...
+    overwrite_cache: bool = ...
+    version_2_with_negative: bool = ...
+    null_score_diff_threshold: float = ...
+    n_best_size: int = ...
+    lang_id: int = ...
+    threads: int = ...
+    def __init__(self, model_type, data_dir, max_seq_length, doc_stride, max_query_length, max_answer_length, overwrite_cache, version_2_with_negative, null_score_diff_threshold, n_best_size, lang_id, threads) -> None: ...
+
+class Split(Enum):
+    train: str
+    dev: str
+
+class SquadDataset(Dataset):
+    """
+    This will be superseded by a framework-agnostic approach soon.
+    """
+    args: SquadDataTrainingArguments
+    features: List[SquadFeatures]
+    mode: Split
+    is_language_sensitive: bool
+    processor: Incomplete
+    old_features: Incomplete
+    dataset: Incomplete
+    examples: Incomplete
+    def __init__(self, args: SquadDataTrainingArguments, tokenizer: PreTrainedTokenizer, limit_length: Optional[int] = None, mode: Union[str, Split] = ..., is_language_sensitive: Optional[bool] = False, cache_dir: Optional[str] = None, dataset_format: Optional[str] = 'pt') -> None: ...
+    def __len__(self) -> int: ...
+    def __getitem__(self, i) -> Dict[str, torch.Tensor]: ...

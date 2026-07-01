@@ -1,0 +1,3 @@
+from . import BertConfig as BertConfig, BertGenerationConfig as BertGenerationConfig, BertGenerationDecoder as BertGenerationDecoder, BertGenerationEncoder as BertGenerationEncoder, load_tf_weights_in_bert_generation as load_tf_weights_in_bert_generation, logging as logging
+
+def convert_tf_checkpoint_to_pytorch(tf_hub_path, pytorch_dump_path, is_encoder_named_decoder, vocab_size, is_encoder) -> None: ...

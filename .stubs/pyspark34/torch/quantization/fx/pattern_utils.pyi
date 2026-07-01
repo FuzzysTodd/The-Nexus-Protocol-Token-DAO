@@ -1,0 +1,1 @@
+from torch.ao.quantization.fx.pattern_utils import QuantizeHandler as QuantizeHandler, get_default_fusion_patterns as get_default_fusion_patterns, get_default_output_activation_post_process_map as get_default_output_activation_post_process_map, get_default_quant_patterns as get_default_quant_patterns

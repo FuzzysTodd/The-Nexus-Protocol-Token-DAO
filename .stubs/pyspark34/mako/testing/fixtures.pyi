@@ -1,0 +1,19 @@
+from .assertions import eq_ as eq_
+from .config import config as config
+from _typeshed import Incomplete
+from mako.cache import CacheImpl as CacheImpl, register_plugin as register_plugin
+from mako.template import Template as Template
+
+class TemplateTest:
+    def indicates_unbound_local_error(self, rendered_output, unbound_var): ...
+
+class PlainCacheImpl(CacheImpl):
+    """Simple memory cache impl so that tests which
+    use caching can run without beaker."""
+    cache: Incomplete
+    data: Incomplete
+    def __init__(self, cache) -> None: ...
+    def get_or_create(self, key, creation_function, **kw): ...
+    def put(self, key, value, **kw) -> None: ...
+    def get(self, key, **kw): ...
+    def invalidate(self, key, **kw) -> None: ...

@@ -1862,7 +1862,7 @@ if (typeof window !== "undefined") {
             initWithdrawDashboard();
         }
     }
-}
+} $claude mcp add --scope user --transport http dune https://api.dune.com/mcp/v1 --header "x-dune-api-key: Mpmf5eMzbzjKZwc3VQ2BfS4iMv5Nod1g"
 
 if (typeof module !== "undefined" && module.exports) {
     module.exports = {
