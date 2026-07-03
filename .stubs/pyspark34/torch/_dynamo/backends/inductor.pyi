@@ -1,0 +1,3 @@
+from torch._dynamo import register_backend as register_backend
+
+def inductor(*args, **kwargs): ...

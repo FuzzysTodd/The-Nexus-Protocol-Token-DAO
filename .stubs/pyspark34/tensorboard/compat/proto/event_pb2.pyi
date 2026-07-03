@@ -1,0 +1,24 @@
+from _typeshed import Incomplete
+from tensorboard.compat.proto import summary_pb2 as tensorboard_dot_compat_dot_proto_dot_summary__pb2
+
+tensorboard_dot_compat_dot_proto_dot_histogram__pb2 = tensorboard_dot_compat_dot_proto_dot_summary__pb2.tensorboard_dot_compat_dot_proto_dot_histogram__pb2
+DESCRIPTOR: Incomplete
+WorkerHealth: Incomplete
+WorkerShutdownMode: Incomplete
+OK: int
+RECEIVED_SHUTDOWN_SIGNAL: int
+INTERNAL_ERROR: int
+SHUTTING_DOWN: int
+DEFAULT: int
+NOT_CONFIGURED: int
+WAIT_FOR_COORDINATOR: int
+SHUTDOWN_AFTER_TIMEOUT: int
+Event: Incomplete
+SourceMetadata: Incomplete
+LogMessage: Incomplete
+SessionLog: Incomplete
+TaggedRunMetadata: Incomplete
+WatchdogConfig: Incomplete
+RequestedExitCode: Incomplete
+WorkerHeartbeatRequest: Incomplete
+WorkerHeartbeatResponse: Incomplete

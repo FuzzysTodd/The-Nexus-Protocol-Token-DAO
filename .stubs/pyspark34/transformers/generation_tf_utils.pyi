@@ -1,0 +1,3 @@
+from .generation import TFGenerationMixin as TFGenerationMixin
+
+class TFGenerationMixin(TFGenerationMixin): ...

@@ -1,0 +1,193 @@
+import grpc
+from _typeshed import Incomplete
+from grpc.beta import interfaces as interfaces
+from grpc.framework.common import cardinality as cardinality
+from grpc.framework.interfaces.face import face as face
+
+ChannelCredentials = grpc.ChannelCredentials
+ssl_channel_credentials = grpc.ssl_channel_credentials
+CallCredentials = grpc.CallCredentials
+
+def metadata_call_credentials(metadata_plugin, name: Incomplete | None = None): ...
+def google_call_credentials(credentials):
+    """Construct CallCredentials from GoogleCredentials.
+
+  Args:
+    credentials: A GoogleCredentials object from the oauth2client library.
+
+  Returns:
+    A CallCredentials object for use in a GRPCCallOptions object.
+  """
+access_token_call_credentials = grpc.access_token_call_credentials
+composite_call_credentials = grpc.composite_call_credentials
+composite_channel_credentials = grpc.composite_channel_credentials
+
+class Channel:
+    '''A channel to a remote host through which RPCs may be conducted.
+
+  Only the "subscribe" and "unsubscribe" methods are supported for application
+  use. This class\' instance constructor and all other attributes are
+  unsupported.
+  '''
+    def __init__(self, channel) -> None: ...
+    def subscribe(self, callback, try_to_connect: Incomplete | None = None) -> None:
+        """Subscribes to this Channel's connectivity.
+
+    Args:
+      callback: A callable to be invoked and passed an
+        interfaces.ChannelConnectivity identifying this Channel's connectivity.
+        The callable will be invoked immediately upon subscription and again for
+        every change to this Channel's connectivity thereafter until it is
+        unsubscribed.
+      try_to_connect: A boolean indicating whether or not this Channel should
+        attempt to connect if it is not already connected and ready to conduct
+        RPCs.
+    """
+    def unsubscribe(self, callback) -> None:
+        '''Unsubscribes a callback from this Channel\'s connectivity.
+
+    Args:
+      callback: A callable previously registered with this Channel from having
+        been passed to its "subscribe" method.
+    '''
+
+def insecure_channel(host, port):
+    """Creates an insecure Channel to a remote host.
+
+  Args:
+    host: The name of the remote host to which to connect.
+    port: The port of the remote host to which to connect.
+      If None only the 'host' part will be used.
+
+  Returns:
+    A Channel to the remote host through which RPCs may be conducted.
+  """
+def secure_channel(host, port, channel_credentials):
+    """Creates a secure Channel to a remote host.
+
+  Args:
+    host: The name of the remote host to which to connect.
+    port: The port of the remote host to which to connect.
+      If None only the 'host' part will be used.
+    channel_credentials: A ChannelCredentials.
+
+  Returns:
+    A secure Channel to the remote host through which RPCs may be conducted.
+  """
+
+class StubOptions:
+    """A value encapsulating the various options for creation of a Stub.
+
+  This class and its instances have no supported interface - it exists to define
+  the type of its instances and its instances exist to be passed to other
+  functions.
+  """
+    host: Incomplete
+    request_serializers: Incomplete
+    response_deserializers: Incomplete
+    metadata_transformer: Incomplete
+    thread_pool: Incomplete
+    thread_pool_size: Incomplete
+    def __init__(self, host, request_serializers, response_deserializers, metadata_transformer, thread_pool, thread_pool_size) -> None: ...
+
+def stub_options(host: Incomplete | None = None, request_serializers: Incomplete | None = None, response_deserializers: Incomplete | None = None, metadata_transformer: Incomplete | None = None, thread_pool: Incomplete | None = None, thread_pool_size: Incomplete | None = None):
+    """Creates a StubOptions value to be passed at stub creation.
+
+  All parameters are optional and should always be passed by keyword.
+
+  Args:
+    host: A host string to set on RPC calls.
+    request_serializers: A dictionary from service name-method name pair to
+      request serialization behavior.
+    response_deserializers: A dictionary from service name-method name pair to
+      response deserialization behavior.
+    metadata_transformer: A callable that given a metadata object produces
+      another metadata object to be used in the underlying communication on the
+      wire.
+    thread_pool: A thread pool to use in stubs.
+    thread_pool_size: The size of thread pool to create for use in stubs;
+      ignored if thread_pool has been passed.
+
+  Returns:
+    A StubOptions value created from the passed parameters.
+  """
+def generic_stub(channel, options: Incomplete | None = None):
+    """Creates a face.GenericStub on which RPCs can be made.
+
+  Args:
+    channel: A Channel for use by the created stub.
+    options: A StubOptions customizing the created stub.
+
+  Returns:
+    A face.GenericStub on which RPCs can be made.
+  """
+def dynamic_stub(channel, service, cardinalities, options: Incomplete | None = None):
+    """Creates a face.DynamicStub with which RPCs can be invoked.
+
+  Args:
+    channel: A Channel for the returned face.DynamicStub to use.
+    service: The package-qualified full name of the service.
+    cardinalities: A dictionary from RPC method name to cardinality.Cardinality
+      value identifying the cardinality of the RPC method.
+    options: An optional StubOptions value further customizing the functionality
+      of the returned face.DynamicStub.
+
+  Returns:
+    A face.DynamicStub with which RPCs can be invoked.
+  """
+ServerCredentials = grpc.ServerCredentials
+ssl_server_credentials = grpc.ssl_server_credentials
+
+class ServerOptions:
+    """A value encapsulating the various options for creation of a Server.
+
+  This class and its instances have no supported interface - it exists to define
+  the type of its instances and its instances exist to be passed to other
+  functions.
+  """
+    multi_method_implementation: Incomplete
+    request_deserializers: Incomplete
+    response_serializers: Incomplete
+    thread_pool: Incomplete
+    thread_pool_size: Incomplete
+    default_timeout: Incomplete
+    maximum_timeout: Incomplete
+    def __init__(self, multi_method_implementation, request_deserializers, response_serializers, thread_pool, thread_pool_size, default_timeout, maximum_timeout) -> None: ...
+
+def server_options(multi_method_implementation: Incomplete | None = None, request_deserializers: Incomplete | None = None, response_serializers: Incomplete | None = None, thread_pool: Incomplete | None = None, thread_pool_size: Incomplete | None = None, default_timeout: Incomplete | None = None, maximum_timeout: Incomplete | None = None):
+    """Creates a ServerOptions value to be passed at server creation.
+
+  All parameters are optional and should always be passed by keyword.
+
+  Args:
+    multi_method_implementation: A face.MultiMethodImplementation to be called
+      to service an RPC if the server has no specific method implementation for
+      the name of the RPC for which service was requested.
+    request_deserializers: A dictionary from service name-method name pair to
+      request deserialization behavior.
+    response_serializers: A dictionary from service name-method name pair to
+      response serialization behavior.
+    thread_pool: A thread pool to use in stubs.
+    thread_pool_size: The size of thread pool to create for use in stubs;
+      ignored if thread_pool has been passed.
+    default_timeout: A duration in seconds to allow for RPC service when
+      servicing RPCs that did not include a timeout value when invoked.
+    maximum_timeout: A duration in seconds to allow for RPC service when
+      servicing RPCs no matter what timeout value was passed when the RPC was
+      invoked.
+
+  Returns:
+    A StubOptions value created from the passed parameters.
+  """
+def server(service_implementations, options: Incomplete | None = None):
+    """Creates an interfaces.Server with which RPCs can be serviced.
+
+  Args:
+    service_implementations: A dictionary from service name-method name pair to
+      face.MethodImplementation.
+    options: An optional ServerOptions value further customizing the
+      functionality of the returned Server.
+
+  Returns:
+    An interfaces.Server with which RPCs can be serviced.
+  """

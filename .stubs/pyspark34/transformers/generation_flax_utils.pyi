@@ -1,0 +1,3 @@
+from .generation import FlaxGenerationMixin as FlaxGenerationMixin
+
+class FlaxGenerationMixin(FlaxGenerationMixin): ...

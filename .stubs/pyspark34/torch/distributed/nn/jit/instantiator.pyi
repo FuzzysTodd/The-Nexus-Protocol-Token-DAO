@@ -1,0 +1,9 @@
+from _typeshed import Incomplete
+from torch.distributed.nn.jit.templates.remote_module_template import get_remote_module_template as get_remote_module_template
+
+logger: Incomplete
+INSTANTIATED_TEMPLATE_DIR_PATH: Incomplete
+
+def get_arg_return_types_from_interface(module_interface): ...
+def instantiate_scriptable_remote_module_template(module_interface_cls, enable_moving_cpu_tensors_to_cuda: bool = True): ...
+def instantiate_non_scriptable_remote_module_template(): ...

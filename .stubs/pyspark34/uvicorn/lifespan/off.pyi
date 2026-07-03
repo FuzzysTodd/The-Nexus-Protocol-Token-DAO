@@ -1,0 +1,9 @@
+from _typeshed import Incomplete
+from uvicorn import Config as Config
+
+class LifespanOff:
+    should_exit: bool
+    state: Incomplete
+    def __init__(self, config: Config) -> None: ...
+    async def startup(self) -> None: ...
+    async def shutdown(self) -> None: ...

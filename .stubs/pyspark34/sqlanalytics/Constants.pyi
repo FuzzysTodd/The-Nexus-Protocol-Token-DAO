@@ -1,0 +1,15 @@
+class Constants:
+    EXTERNAL: str
+    INTERNAL: str
+    USER: str
+    PASSWORD: str
+    SERVER: str
+    DATA_SOURCE: str
+    FILE_FORMAT: str
+    TEMP_FOLDER: str
+    LOCATION: str
+    PUSH_DOWN_PREDICATE: str
+    STAGING_STORAGE_ACCOUNT_KEY: str
+    QUERY: str
+    DATABASE: str
+    QUERY_TIMEOUT: str

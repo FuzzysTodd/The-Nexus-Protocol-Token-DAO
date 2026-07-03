@@ -1,0 +1,2 @@
+from tensorflow.python.ops.resource_variable_ops import is_resource_variable as is_resource_variable
+from tensorflow.python.ops.weights_broadcast_ops import broadcast_weights as broadcast_weights

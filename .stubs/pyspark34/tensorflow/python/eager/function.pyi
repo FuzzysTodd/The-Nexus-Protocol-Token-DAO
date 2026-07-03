@@ -1,0 +1,3 @@
+from tensorflow.python.eager.polymorphic_function.monomorphic_function import ConcreteFunction as ConcreteFunction
+from tensorflow.python.eager.polymorphic_function.quarantine import add_function_callback as add_function_callback, clear_function_callbacks as clear_function_callbacks, defun_with_attributes as defun_with_attributes, remove_function_callback as remove_function_callback
+from tensorflow.python.eager.polymorphic_function.tracing_compiler import TfMethodTarget as TfMethodTarget

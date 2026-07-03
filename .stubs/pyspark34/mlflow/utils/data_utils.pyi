@@ -1,0 +1,3 @@
+def parse_s3_uri(uri):
+    """Parse an S3 URI, returning (bucket, path)"""
+def is_uri(string): ...

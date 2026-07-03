@@ -1,0 +1,3 @@
+from .configuration_x_clip import XCLIPConfig as XCLIPConfig, XCLIPTextConfig as XCLIPTextConfig, XCLIPVisionConfig as XCLIPVisionConfig, XCLIP_PRETRAINED_CONFIG_ARCHIVE_MAP as XCLIP_PRETRAINED_CONFIG_ARCHIVE_MAP
+from .modeling_x_clip import XCLIPModel as XCLIPModel, XCLIPPreTrainedModel as XCLIPPreTrainedModel, XCLIPTextModel as XCLIPTextModel, XCLIPVisionModel as XCLIPVisionModel, XCLIP_PRETRAINED_MODEL_ARCHIVE_LIST as XCLIP_PRETRAINED_MODEL_ARCHIVE_LIST
+from .processing_x_clip import XCLIPProcessor as XCLIPProcessor

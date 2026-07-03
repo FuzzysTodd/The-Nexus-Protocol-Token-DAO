@@ -1,0 +1,13 @@
+from _typeshed import Incomplete
+from wandb.sdk.lib import telemetry as telemetry
+
+SessionRunHook: Incomplete
+SessionRunArgs: Incomplete
+get_global_step: Incomplete
+merge_all_summaries: Incomplete
+
+class WandbHook(SessionRunHook):
+    def __init__(self, summary_op: Incomplete | None = None, steps_per_log: int = 1000, history: Incomplete | None = None) -> None: ...
+    def begin(self) -> None: ...
+    def before_run(self, run_context): ...
+    def after_run(self, run_context, run_values) -> None: ...

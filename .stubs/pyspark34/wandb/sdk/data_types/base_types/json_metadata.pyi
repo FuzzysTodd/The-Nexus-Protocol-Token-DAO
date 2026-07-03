@@ -1,0 +1,16 @@
+from ...wandb_run import Run as LocalRun
+from .._private import MEDIA_TMP as MEDIA_TMP
+from .media import Media as Media
+from wandb import util as util
+from wandb.sdk.artifacts.artifact import Artifact as Artifact
+from wandb.sdk.lib import runid as runid
+
+class JSONMetadata(Media):
+    """JSONMetadata is a type for encoding arbitrary metadata as files."""
+    def __init__(self, val: dict) -> None: ...
+    @classmethod
+    def get_media_subdir(cls) -> str: ...
+    def to_json(self, run_or_artifact: LocalRun | Artifact) -> dict: ...
+    @classmethod
+    def type_name(cls) -> str: ...
+    def validate(self, val: dict) -> bool: ...

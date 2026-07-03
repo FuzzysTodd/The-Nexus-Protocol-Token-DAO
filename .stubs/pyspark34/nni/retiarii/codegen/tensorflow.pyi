@@ -1,0 +1,6 @@
+from ..type_utils import *
+from ..graph_v2 import Cell as Cell, Edge as Edge, Graph as Graph, IllegalGraphError as IllegalGraphError, Node as Node
+from ..operations_tf import Operation as Operation
+
+def graph_to_tensorflow_script(graph: Graph) -> str: ...
+def graph_to_tensorflow_model(graph_name: str, graph: Graph) -> str: ...

@@ -1,0 +1,2 @@
+from .configuration_sew import SEWConfig as SEWConfig, SEW_PRETRAINED_CONFIG_ARCHIVE_MAP as SEW_PRETRAINED_CONFIG_ARCHIVE_MAP
+from .modeling_sew import SEWForCTC as SEWForCTC, SEWForSequenceClassification as SEWForSequenceClassification, SEWModel as SEWModel, SEWPreTrainedModel as SEWPreTrainedModel, SEW_PRETRAINED_MODEL_ARCHIVE_LIST as SEW_PRETRAINED_MODEL_ARCHIVE_LIST

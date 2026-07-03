@@ -1,0 +1,2 @@
+from .configuration_wavlm import WAVLM_PRETRAINED_CONFIG_ARCHIVE_MAP as WAVLM_PRETRAINED_CONFIG_ARCHIVE_MAP, WavLMConfig as WavLMConfig
+from .modeling_wavlm import WAVLM_PRETRAINED_MODEL_ARCHIVE_LIST as WAVLM_PRETRAINED_MODEL_ARCHIVE_LIST, WavLMForAudioFrameClassification as WavLMForAudioFrameClassification, WavLMForCTC as WavLMForCTC, WavLMForSequenceClassification as WavLMForSequenceClassification, WavLMForXVector as WavLMForXVector, WavLMModel as WavLMModel, WavLMPreTrainedModel as WavLMPreTrainedModel

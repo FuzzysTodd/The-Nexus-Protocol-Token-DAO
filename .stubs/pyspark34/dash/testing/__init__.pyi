@@ -1,0 +1,3 @@
+from collections.abc import Generator
+
+def ignore_register_page() -> Generator[None, None, None]: ...

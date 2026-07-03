@@ -1,0 +1,101 @@
+from _typeshed import Incomplete
+from pyspark.pandas.missing import common as common, unsupported_function as unsupported_function, unsupported_property as unsupported_property
+
+class MissingPandasLikeIndex:
+    nbytes: Incomplete
+    argsort: Incomplete
+    asof_locs: Incomplete
+    format: Incomplete
+    get_indexer: Incomplete
+    get_indexer_for: Incomplete
+    get_indexer_non_unique: Incomplete
+    get_loc: Incomplete
+    get_slice_bound: Incomplete
+    groupby: Incomplete
+    is_: Incomplete
+    join: Incomplete
+    putmask: Incomplete
+    ravel: Incomplete
+    reindex: Incomplete
+    searchsorted: Incomplete
+    slice_indexer: Incomplete
+    slice_locs: Incomplete
+    sortlevel: Incomplete
+    to_flat_index: Incomplete
+    where: Incomplete
+    is_mixed: Incomplete
+    to_native_types: Incomplete
+    array: Incomplete
+    duplicated: Incomplete
+    memory_usage: Incomplete
+    __iter__: Incomplete
+
+class MissingPandasLikeDatetimeIndex(MissingPandasLikeIndex):
+    nanosecond: Incomplete
+    date: Incomplete
+    time: Incomplete
+    timetz: Incomplete
+    tz: Incomplete
+    freq: Incomplete
+    freqstr: Incomplete
+    inferred_freq: Incomplete
+    snap: Incomplete
+    tz_convert: Incomplete
+    tz_localize: Incomplete
+    to_period: Incomplete
+    to_perioddelta: Incomplete
+    to_pydatetime: Incomplete
+    mean: Incomplete
+    std: Incomplete
+
+class MissingPandasLikeTimedeltaIndex(MissingPandasLikeIndex):
+    nanoseconds: Incomplete
+    components: Incomplete
+    inferred_freq: Incomplete
+    to_pytimedelta: Incomplete
+    round: Incomplete
+    floor: Incomplete
+    ceil: Incomplete
+    mean: Incomplete
+
+class MissingPandasLikeMultiIndex:
+    argsort: Incomplete
+    asof_locs: Incomplete
+    factorize: Incomplete
+    format: Incomplete
+    get_indexer: Incomplete
+    get_indexer_for: Incomplete
+    get_indexer_non_unique: Incomplete
+    get_loc: Incomplete
+    get_loc_level: Incomplete
+    get_locs: Incomplete
+    get_slice_bound: Incomplete
+    get_value: Incomplete
+    groupby: Incomplete
+    is_: Incomplete
+    is_lexsorted: Incomplete
+    join: Incomplete
+    map: Incomplete
+    putmask: Incomplete
+    ravel: Incomplete
+    reindex: Incomplete
+    remove_unused_levels: Incomplete
+    reorder_levels: Incomplete
+    searchsorted: Incomplete
+    set_codes: Incomplete
+    set_levels: Incomplete
+    slice_indexer: Incomplete
+    slice_locs: Incomplete
+    sortlevel: Incomplete
+    to_flat_index: Incomplete
+    truncate: Incomplete
+    where: Incomplete
+    is_mixed: Incomplete
+    set_value: Incomplete
+    to_native_types: Incomplete
+    array: Incomplete
+    duplicated: Incomplete
+    codes: Incomplete
+    levels: Incomplete
+    __iter__: Incomplete
+    memory_usage: Incomplete

@@ -1,0 +1,2 @@
+from sentry_sdk.integrations.opentelemetry.propagator import SentryPropagator as SentryPropagator
+from sentry_sdk.integrations.opentelemetry.span_processor import SentrySpanProcessor as SentrySpanProcessor

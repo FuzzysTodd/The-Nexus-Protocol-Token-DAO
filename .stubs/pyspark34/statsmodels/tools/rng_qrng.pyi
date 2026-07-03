@@ -1,0 +1,29 @@
+from _typeshed import Incomplete
+
+def check_random_state(seed: Incomplete | None = None):
+    """
+    Turn `seed` into a random number generator.
+
+    Parameters
+    ----------
+    seed : {None, int, array_like[ints], `numpy.random.Generator`,
+            `numpy.random.RandomState`, `scipy.stats.qmc.QMCEngine`}, optional
+
+        If `seed` is None fresh, unpredictable entropy will be pulled
+        from the OS and `numpy.random.Generator` is used.
+        If `seed` is an int or ``array_like[ints]``, a new ``Generator``
+        instance is used, seeded with `seed`.
+        If `seed` is already a ``Generator``, ``RandomState`` or
+        `scipy.stats.qmc.QMCEngine` instance then
+        that instance is used.
+
+        `scipy.stats.qmc.QMCEngine` requires SciPy >=1.7. It also means
+        that the generator only have the method ``random``.
+
+    Returns
+    -------
+    seed : {`numpy.random.Generator`, `numpy.random.RandomState`,
+            `scipy.stats.qmc.QMCEngine`}
+
+        Random number generator.
+    """

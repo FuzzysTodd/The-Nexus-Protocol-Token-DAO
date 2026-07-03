@@ -1,0 +1,4 @@
+import _plotly_utils.basevalidators
+
+class ShowarrowValidator(_plotly_utils.basevalidators.BooleanValidator):
+    def __init__(self, plotly_name: str = 'showarrow', parent_name: str = 'layout.annotation', **kwargs) -> None: ...

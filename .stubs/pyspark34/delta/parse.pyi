@@ -1,0 +1,3 @@
+from typing import Any, Optional
+
+def parse(duration: Any, context: Optional[Any] = ...): ...

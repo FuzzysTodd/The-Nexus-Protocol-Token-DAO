@@ -1,0 +1,3 @@
+from _typeshed import Incomplete
+
+def configuration(parent_name: str = 'special', top_path: Incomplete | None = None): ...

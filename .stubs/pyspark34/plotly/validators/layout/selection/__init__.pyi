@@ -1,0 +1,12 @@
+from ._line import LineValidator as LineValidator
+from ._name import NameValidator as NameValidator
+from ._opacity import OpacityValidator as OpacityValidator
+from ._path import PathValidator as PathValidator
+from ._templateitemname import TemplateitemnameValidator as TemplateitemnameValidator
+from ._type import TypeValidator as TypeValidator
+from ._x0 import X0Validator as X0Validator
+from ._x1 import X1Validator as X1Validator
+from ._xref import XrefValidator as XrefValidator
+from ._y0 import Y0Validator as Y0Validator
+from ._y1 import Y1Validator as Y1Validator
+from ._yref import YrefValidator as YrefValidator

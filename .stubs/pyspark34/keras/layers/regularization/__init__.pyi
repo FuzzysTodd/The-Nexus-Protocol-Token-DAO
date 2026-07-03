@@ -1,0 +1,8 @@
+from keras.layers.regularization.activity_regularization import ActivityRegularization as ActivityRegularization
+from keras.layers.regularization.alpha_dropout import AlphaDropout as AlphaDropout
+from keras.layers.regularization.dropout import Dropout as Dropout
+from keras.layers.regularization.gaussian_dropout import GaussianDropout as GaussianDropout
+from keras.layers.regularization.gaussian_noise import GaussianNoise as GaussianNoise
+from keras.layers.regularization.spatial_dropout1d import SpatialDropout1D as SpatialDropout1D
+from keras.layers.regularization.spatial_dropout2d import SpatialDropout2D as SpatialDropout2D
+from keras.layers.regularization.spatial_dropout3d import SpatialDropout3D as SpatialDropout3D

@@ -1,0 +1,79 @@
+from _typeshed import Incomplete
+from datetime import date
+from holidays.calendars.custom import _CustomCalendar
+from holidays.calendars.gregorian import APR as APR, AUG as AUG, DEC as DEC, FEB as FEB, JAN as JAN, JUL as JUL, JUN as JUN, MAR as MAR, MAY as MAY, NOV as NOV, OCT as OCT, SEP as SEP
+from typing import Iterable, Tuple
+
+ALI_AL_RIDA_DEATH: str
+ALI_BIRTHDAY: str
+ALI_DEATH: str
+ARBAEEN: str
+ASHURA: str
+EID_AL_ADHA: str
+EID_AL_FITR: str
+EID_AL_GHADIR: str
+FATIMA_DEATH: str
+HARI_HOL_JOHOR: str
+HASAN_AL_ASKARI_DEATH: str
+HIJRI_NEW_YEAR: str
+IMAM_MAHDI_BIRTHDAY: str
+ISRA_AND_MIRAJ: str
+MALDIVES_EMBRACED_ISLAM_DAY: str
+MAWLID: str
+NUZUL_AL_QURAN: str
+PROPHET_DEATH: str
+QUAMEE_DHUVAS: str
+RAMADAN_BEGINNING: str
+SADIQ_BIRTHDAY: str
+SADIQ_DEATH: str
+TASUA: str
+
+class _IslamicLunar:
+    ALI_AL_RIDA_DEATH_DATES: Incomplete
+    ALI_BIRTHDAY_DATES: Incomplete
+    ALI_DEATH_DATES: Incomplete
+    ARBAEEN_DATES: Incomplete
+    ASHURA_DATES: Incomplete
+    EID_AL_ADHA_DATES: Incomplete
+    EID_AL_FITR_DATES: Incomplete
+    EID_AL_GHADIR_DATES: Incomplete
+    FATIMA_DEATH_DATES: Incomplete
+    HARI_HOL_JOHOR_DATES: Incomplete
+    HASAN_AL_ASKARI_DEATH_DATES: Incomplete
+    HIJRI_NEW_YEAR_DATES: Incomplete
+    IMAM_MAHDI_BIRTHDAY_DATES: Incomplete
+    ISRA_AND_MIRAJ_DATES: Incomplete
+    MALDIVES_EMBRACED_ISLAM_DAY_DATES: Incomplete
+    MAWLID_DATES: Incomplete
+    NUZUL_AL_QURAN_DATES: Incomplete
+    PROPHET_DEATH_DATES: Incomplete
+    QUAMEE_DHUVAS_DATES: Incomplete
+    RAMADAN_BEGINNING_DATES: Incomplete
+    SADIQ_BIRTHDAY_DATES: Incomplete
+    SADIQ_DEATH_DATES: Incomplete
+    TASUA_DATES: Incomplete
+    def ali_al_rida_death_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def ali_birthday_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def ali_death_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def arbaeen_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def ashura_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def eid_al_adha_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def eid_al_fitr_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def eid_al_ghadir_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def fatima_death_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def hari_hol_johor_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def hasan_al_askari_death_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def hijri_new_year_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def imam_mahdi_birthday_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def isra_and_miraj_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def maldives_embraced_islam_day_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def mawlid_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def nuzul_al_quran_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def prophet_death_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def quamee_dhuvas_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def ramadan_beginning_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def sadiq_birthday_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def sadiq_death_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+    def tasua_dates(self, year: int) -> Iterable[Tuple[date, bool]]: ...
+
+class _CustomIslamicHolidays(_CustomCalendar, _IslamicLunar): ...

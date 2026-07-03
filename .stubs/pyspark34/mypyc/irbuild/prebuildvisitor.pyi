@@ -1,0 +1,43 @@
+from _typeshed import Incomplete
+from mypy.nodes import Block as Block, Decorator as Decorator, Expression as Expression, FuncDef, FuncItem as FuncItem, Import, LambdaExpr as LambdaExpr, MypyFile as MypyFile, NameExpr as NameExpr, Node as Node, SymbolNode as SymbolNode, Var
+from mypy.traverser import ExtendedTraverserVisitor
+from mypyc.errors import Errors as Errors
+
+class PreBuildVisitor(ExtendedTraverserVisitor):
+    """Mypy file AST visitor run before building the IR.
+
+    This collects various things, including:
+
+    * Determine relationships between nested functions and functions that
+      contain nested functions
+    * Find non-local variables (free variables)
+    * Find property setters
+    * Find decorators of functions
+    * Find module import groups
+
+    The main IR build pass uses this information.
+    """
+    free_variables: Incomplete
+    symbols_to_funcs: Incomplete
+    funcs: Incomplete
+    prop_setters: Incomplete
+    encapsulating_funcs: Incomplete
+    nested_funcs: Incomplete
+    funcs_to_decorators: Incomplete
+    decorators_to_remove: Incomplete
+    module_import_groups: Incomplete
+    errors: Incomplete
+    current_file: Incomplete
+    def __init__(self, errors: Errors, current_file: MypyFile, decorators_to_remove: dict[FuncDef, list[int]]) -> None: ...
+    def visit(self, o: Node) -> bool: ...
+    def visit_block(self, block: Block) -> None: ...
+    def visit_decorator(self, dec: Decorator) -> None: ...
+    def visit_func_def(self, fdef: FuncDef) -> None: ...
+    def visit_lambda_expr(self, expr: LambdaExpr) -> None: ...
+    def visit_func(self, func: FuncItem) -> None: ...
+    def visit_import(self, imp: Import) -> None: ...
+    def visit_name_expr(self, expr: NameExpr) -> None: ...
+    def visit_var(self, var: Var) -> None: ...
+    def visit_symbol_node(self, symbol: SymbolNode) -> None: ...
+    def is_parent(self, fitem: FuncItem, child: FuncItem) -> bool: ...
+    def add_free_variable(self, symbol: SymbolNode) -> None: ...

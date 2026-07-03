@@ -1,0 +1,2 @@
+from sympy.core.random import random_complex_number as random_complex_number, test_derivative_numerically as test_derivative_numerically, verify_numerically as verify_numerically
+from sympy.utilities.exceptions import sympy_deprecation_warning as sympy_deprecation_warning

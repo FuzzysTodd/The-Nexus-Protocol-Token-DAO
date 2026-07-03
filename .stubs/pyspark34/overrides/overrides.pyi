@@ -1,0 +1,13 @@
+from overrides.signature import ensure_signature_is_compatible as ensure_signature_is_compatible
+from typing import overload
+
+__VERSION__: str
+
+@overload
+def overrides(method: None = None, *, check_signature: bool = True, check_at_runtime: bool = False) -> _DecoratorMethod: ...
+@overload
+def overrides(method: _WrappedMethod, *, check_signature: bool = True, check_at_runtime: bool = False) -> _WrappedMethod: ...
+@overload
+def override(method: None = None, *, check_signature: bool = True, check_at_runtime: bool = False) -> _DecoratorMethod: ...
+@overload
+def override(method: _WrappedMethod, *, check_signature: bool = True, check_at_runtime: bool = False) -> _WrappedMethod: ...

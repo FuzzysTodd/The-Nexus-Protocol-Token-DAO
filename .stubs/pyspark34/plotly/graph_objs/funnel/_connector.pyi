@@ -1,0 +1,120 @@
+from _typeshed import Incomplete
+from plotly.basedatatypes import BaseTraceHierarchyType as _BaseTraceHierarchyType
+
+class Connector(_BaseTraceHierarchyType):
+    @property
+    def fillcolor(self):
+        """
+        Sets the fill color.
+
+        The 'fillcolor' property is a color and may be specified as:
+          - A hex string (e.g. '#ff0000')
+          - An rgb/rgba string (e.g. 'rgb(255,0,0)')
+          - An hsl/hsla string (e.g. 'hsl(0,100%,50%)')
+          - An hsv/hsva string (e.g. 'hsv(0,100%,100%)')
+          - A named CSS color:
+                aliceblue, antiquewhite, aqua, aquamarine, azure,
+                beige, bisque, black, blanchedalmond, blue,
+                blueviolet, brown, burlywood, cadetblue,
+                chartreuse, chocolate, coral, cornflowerblue,
+                cornsilk, crimson, cyan, darkblue, darkcyan,
+                darkgoldenrod, darkgray, darkgrey, darkgreen,
+                darkkhaki, darkmagenta, darkolivegreen, darkorange,
+                darkorchid, darkred, darksalmon, darkseagreen,
+                darkslateblue, darkslategray, darkslategrey,
+                darkturquoise, darkviolet, deeppink, deepskyblue,
+                dimgray, dimgrey, dodgerblue, firebrick,
+                floralwhite, forestgreen, fuchsia, gainsboro,
+                ghostwhite, gold, goldenrod, gray, grey, green,
+                greenyellow, honeydew, hotpink, indianred, indigo,
+                ivory, khaki, lavender, lavenderblush, lawngreen,
+                lemonchiffon, lightblue, lightcoral, lightcyan,
+                lightgoldenrodyellow, lightgray, lightgrey,
+                lightgreen, lightpink, lightsalmon, lightseagreen,
+                lightskyblue, lightslategray, lightslategrey,
+                lightsteelblue, lightyellow, lime, limegreen,
+                linen, magenta, maroon, mediumaquamarine,
+                mediumblue, mediumorchid, mediumpurple,
+                mediumseagreen, mediumslateblue, mediumspringgreen,
+                mediumturquoise, mediumvioletred, midnightblue,
+                mintcream, mistyrose, moccasin, navajowhite, navy,
+                oldlace, olive, olivedrab, orange, orangered,
+                orchid, palegoldenrod, palegreen, paleturquoise,
+                palevioletred, papayawhip, peachpuff, peru, pink,
+                plum, powderblue, purple, red, rosybrown,
+                royalblue, rebeccapurple, saddlebrown, salmon,
+                sandybrown, seagreen, seashell, sienna, silver,
+                skyblue, slateblue, slategray, slategrey, snow,
+                springgreen, steelblue, tan, teal, thistle, tomato,
+                turquoise, violet, wheat, white, whitesmoke,
+                yellow, yellowgreen
+
+        Returns
+        -------
+        str
+        """
+    @fillcolor.setter
+    def fillcolor(self, val) -> None: ...
+    @property
+    def line(self):
+        '''
+        The \'line\' property is an instance of Line
+        that may be specified as:
+          - An instance of :class:`plotly.graph_objs.funnel.connector.Line`
+          - A dict of string/value properties that will be passed
+            to the Line constructor
+
+            Supported dict properties:
+
+                color
+                    Sets the line color.
+                dash
+                    Sets the dash style of lines. Set to a dash
+                    type string ("solid", "dot", "dash",
+                    "longdash", "dashdot", or "longdashdot") or a
+                    dash length list in px (eg "5px,10px,2px,2px").
+                width
+                    Sets the line width (in px).
+
+        Returns
+        -------
+        plotly.graph_objs.funnel.connector.Line
+        '''
+    @line.setter
+    def line(self, val) -> None: ...
+    @property
+    def visible(self):
+        """
+        Determines if connector regions and lines are drawn.
+
+        The 'visible' property must be specified as a bool
+        (either True, or False)
+
+        Returns
+        -------
+        bool
+        """
+    @visible.setter
+    def visible(self, val) -> None: ...
+    def __init__(self, arg: Incomplete | None = None, fillcolor: Incomplete | None = None, line: Incomplete | None = None, visible: Incomplete | None = None, **kwargs) -> None:
+        """
+        Construct a new Connector object
+
+        Parameters
+        ----------
+        arg
+            dict of properties compatible with this constructor or
+            an instance of
+            :class:`plotly.graph_objs.funnel.Connector`
+        fillcolor
+            Sets the fill color.
+        line
+            :class:`plotly.graph_objects.funnel.connector.Line`
+            instance or dict with compatible properties
+        visible
+            Determines if connector regions and lines are drawn.
+
+        Returns
+        -------
+        Connector
+        """

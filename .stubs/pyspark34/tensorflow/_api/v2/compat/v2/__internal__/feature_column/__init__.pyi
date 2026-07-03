@@ -1,0 +1,2 @@
+from tensorflow.python.feature_column.feature_column_v2 import DenseColumn as DenseColumn, FeatureColumn as FeatureColumn, FeatureTransformationCache as FeatureTransformationCache, SequenceDenseColumn as SequenceDenseColumn
+from tensorflow.python.feature_column.serialization import deserialize_feature_column as deserialize_feature_column, serialize_feature_column as serialize_feature_column

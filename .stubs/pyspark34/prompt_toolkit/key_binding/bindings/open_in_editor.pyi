@@ -1,0 +1,16 @@
+from ..key_bindings import KeyBindings, KeyBindingsBase
+
+__all__ = ['load_open_in_editor_bindings', 'load_emacs_open_in_editor_bindings', 'load_vi_open_in_editor_bindings']
+
+def load_open_in_editor_bindings() -> KeyBindingsBase:
+    """
+    Load both the Vi and emacs key bindings for handling edit-and-execute-command.
+    """
+def load_emacs_open_in_editor_bindings() -> KeyBindings:
+    """
+    Pressing C-X C-E will open the buffer in an external editor.
+    """
+def load_vi_open_in_editor_bindings() -> KeyBindings:
+    """
+    Pressing 'v' in navigation mode will open the buffer in an external editor.
+    """

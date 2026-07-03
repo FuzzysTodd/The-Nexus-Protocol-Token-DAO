@@ -1,0 +1,39 @@
+from _typeshed import Incomplete
+from collections.abc import Generator
+from library_metadata_cooker.ModuleVisitor import YetAnotherModuleVisitor as YetAnotherModuleVisitor
+from library_metadata_cooker.SerializationInterface import Member as Member, Package as Package
+from library_metadata_cooker.azure_blob_storage import AzureBlobStorage as AzureBlobStorage
+from library_metadata_cooker.find_sources import InvalidSourceList as InvalidSourceList, create_source_list as create_source_list
+from mypy.stubgen import Options, StubSource
+from typing import List
+
+PY_EXTENSIONS: Incomplete
+whitelist: Incomplete
+pid: Incomplete
+py: Incomplete
+ALL_BLOB_NAME: str
+all_metadata: Incomplete
+logger: Incomplete
+
+def main() -> None: ...
+def covert_dash(name): ...
+def path_to_module(name): ...
+def get_diff_map(existing_libs_path, new_libs_path): ...
+def get_files(diff_map): ...
+def get_options_for_pip(files, additional_files): ...
+def load_to_storage(storageUtil: AzureBlobStorage, options): ...
+def json_to_dict(json_obj): ...
+def dump_to_local(target_folder, options, compressed: bool = True): ...
+def generate_metadata(options, existing_libs_map: Incomplete | None = None) -> Generator[Incomplete, None, None]:
+    """Mimic generate stubs logic of mypy"""
+
+version_cache: Incomplete
+
+def get_package_version(package: str) -> str: ...
+def generate_asts_for_modules(py_modules: List[StubSource], parse_only: bool, mypy_options: Options, verbose: bool) -> None:
+    """Use mypy to parse (and optionally analyze) source files."""
+def parse_source_file(mod: StubSource, mypy_options: Options) -> None:
+    """Parse a source file.
+    """
+def get_module_base_name(module: str) -> str: ...
+def get_parent_package_name(module: str) -> str: ...

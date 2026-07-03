@@ -1,0 +1,17 @@
+BLACK: str
+RED: str
+GREEN: str
+YELLOW: str
+BLUE: str
+MAGENTA: str
+CYAN: str
+WHITE: str
+RESET: str
+BRIGHT_BLACK: str
+BRIGHT_RED: str
+BRIGHT_GREEN: str
+BRIGHT_YELLOW: str
+BRIGHT_BLUE: str
+BRIGHT_MAGENTA: str
+BRIGHT_CYAN: str
+BRIGHT_WHITE: str

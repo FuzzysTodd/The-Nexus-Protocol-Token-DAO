@@ -1,0 +1,19 @@
+from .._importlib import metadata as metadata
+from ..warnings import SetuptoolsDeprecationWarning as SetuptoolsDeprecationWarning
+from .upload import upload as upload
+from _typeshed import Incomplete
+
+class upload_docs(upload):
+    DEFAULT_REPOSITORY: str
+    description: str
+    user_options: Incomplete
+    boolean_options: Incomplete
+    def has_sphinx(self): ...
+    sub_commands: Incomplete
+    upload_dir: Incomplete
+    target_dir: Incomplete
+    def initialize_options(self) -> None: ...
+    def finalize_options(self) -> None: ...
+    def create_zipfile(self, filename) -> None: ...
+    def run(self) -> None: ...
+    def upload_file(self, filename) -> None: ...

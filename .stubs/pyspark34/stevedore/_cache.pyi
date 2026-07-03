@@ -1,0 +1,13 @@
+from _typeshed import Incomplete
+
+log: Incomplete
+
+class Cache:
+    def __init__(self, cache_dir: Incomplete | None = None) -> None: ...
+    def get_group_all(self, group, path: Incomplete | None = None): ...
+    def get_group_named(self, group, path: Incomplete | None = None): ...
+    def get_single(self, group, name, path: Incomplete | None = None): ...
+
+get_group_all: Incomplete
+get_group_named: Incomplete
+get_single: Incomplete
