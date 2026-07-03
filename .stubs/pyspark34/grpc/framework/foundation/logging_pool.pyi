@@ -1,0 +1,19 @@
+class _LoggingPool:
+    """An exception-logging futures.ThreadPoolExecutor-compatible thread pool."""
+    def __init__(self, backing_pool) -> None: ...
+    def __enter__(self): ...
+    def __exit__(self, exc_type: type[BaseException] | None, exc_val: BaseException | None, exc_tb: types.TracebackType | None) -> None: ...
+    def submit(self, fn, *args, **kwargs): ...
+    def map(self, func, *iterables, **kwargs): ...
+    def shutdown(self, wait: bool = True) -> None: ...
+
+def pool(max_workers):
+    """Creates a thread pool that logs exceptions raised by the tasks within it.
+
+  Args:
+    max_workers: The maximum number of worker threads to allow the pool.
+
+  Returns:
+    A futures.ThreadPoolExecutor-compatible thread pool that logs exceptions
+      raised by the tasks executed within it.
+  """

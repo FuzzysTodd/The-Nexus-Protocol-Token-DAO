@@ -1,0 +1,11 @@
+from _typeshed import Incomplete
+
+multidevice_strategies: Incomplete
+multiworker_strategies: Incomplete
+strategies_minus_default_minus_tpu: Incomplete
+strategies_minus_tpu: Incomplete
+multi_worker_mirrored_strategies: Incomplete
+tpu_strategies: Incomplete
+parameter_server_strategies_single_worker: Incomplete
+parameter_server_strategies_multi_worker: Incomplete
+all_strategies: Incomplete

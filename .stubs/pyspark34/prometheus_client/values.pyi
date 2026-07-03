@@ -1,0 +1,23 @@
+from .mmap_dict import MmapedDict as MmapedDict, mmap_key as mmap_key
+from _typeshed import Incomplete
+
+class MutexValue:
+    """A float protected by a mutex."""
+    def __init__(self, typ, metric_name, name, labelnames, labelvalues, help_text, **kwargs) -> None: ...
+    def inc(self, amount) -> None: ...
+    def set(self, value) -> None: ...
+    def set_exemplar(self, exemplar) -> None: ...
+    def get(self): ...
+    def get_exemplar(self): ...
+
+def MultiProcessValue(process_identifier=...):
+    """Returns a MmapedValue class based on a process_identifier function.
+
+    The 'process_identifier' function MUST comply with this simple rule:
+    when called in simultaneously running processes it MUST return distinct values.
+
+    Using a different function than the default 'os.getpid' is at your own risk.
+    """
+def get_value_class(): ...
+
+ValueClass: Incomplete

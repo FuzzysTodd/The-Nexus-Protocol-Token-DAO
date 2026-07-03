@@ -1,0 +1,9 @@
+import threading
+from _typeshed import Incomplete
+from typing import Any, Callable, Tuple
+
+class _TestableThread(threading.Thread):
+    exc: Incomplete
+    def __init__(self, target: Callable[..., Any], args: Tuple) -> None: ...
+    def run(self) -> None: ...
+    def join(self, timeout: float | None = None) -> None: ...

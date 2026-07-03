@@ -1,0 +1,4 @@
+import _plotly_utils.basevalidators
+
+class ShowoceanValidator(_plotly_utils.basevalidators.BooleanValidator):
+    def __init__(self, plotly_name: str = 'showocean', parent_name: str = 'layout.geo', **kwargs) -> None: ...

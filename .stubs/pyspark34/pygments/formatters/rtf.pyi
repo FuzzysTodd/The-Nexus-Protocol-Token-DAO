@@ -1,0 +1,51 @@
+from _typeshed import Incomplete
+from pygments.formatter import Formatter
+
+__all__ = ['RtfFormatter']
+
+class RtfFormatter(Formatter):
+    """
+    Format tokens as RTF markup. This formatter automatically outputs full RTF
+    documents with color information and other useful stuff. Perfect for Copy and
+    Paste into Microsoft(R) Word(R) documents.
+
+    Please note that ``encoding`` and ``outencoding`` options are ignored.
+    The RTF format is ASCII natively, but handles unicode characters correctly
+    thanks to escape sequences.
+
+    .. versionadded:: 0.6
+
+    Additional options accepted:
+
+    `style`
+        The style to use, can be a string or a Style subclass (default:
+        ``'default'``).
+
+    `fontface`
+        The used font family, for example ``Bitstream Vera Sans``. Defaults to
+        some generic font which is supposed to have fixed width.
+
+    `fontsize`
+        Size of the font used. Size is specified in half points. The
+        default is 24 half-points, giving a size 12 font.
+
+        .. versionadded:: 2.0
+    """
+    name: str
+    aliases: Incomplete
+    filenames: Incomplete
+    fontface: Incomplete
+    fontsize: Incomplete
+    def __init__(self, **options) -> None:
+        '''
+        Additional options accepted:
+
+        ``fontface``
+            Name of the font used. Could for example be ``\'Courier New\'``
+            to further specify the default which is ``\'\\fmodern\'``. The RTF
+            specification claims that ``\\fmodern`` are "Fixed-pitch serif
+            and sans serif fonts". Hope every RTF implementation thinks
+            the same about modern...
+
+        '''
+    def format_unencoded(self, tokensource, outfile) -> None: ...

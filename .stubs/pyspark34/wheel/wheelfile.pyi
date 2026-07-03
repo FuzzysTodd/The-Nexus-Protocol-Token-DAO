@@ -1,0 +1,23 @@
+from _typeshed import Incomplete
+from wheel.cli import WheelError as WheelError
+from wheel.util import log as log, urlsafe_b64decode as urlsafe_b64decode, urlsafe_b64encode as urlsafe_b64encode
+from zipfile import ZipFile
+
+WHEEL_INFO_RE: Incomplete
+MINIMUM_TIMESTAMP: int
+
+def get_zipinfo_datetime(timestamp: Incomplete | None = None): ...
+
+class WheelFile(ZipFile):
+    """A ZipFile derivative class that also reads SHA-256 hashes from
+    .dist-info/RECORD and checks any read files against those.
+    """
+    parsed_filename: Incomplete
+    dist_info_path: Incomplete
+    record_path: Incomplete
+    def __init__(self, file, mode: str = 'r', compression=...) -> None: ...
+    def open(self, name_or_info, mode: str = 'r', pwd: Incomplete | None = None): ...
+    def write_files(self, base_dir) -> None: ...
+    def write(self, filename, arcname: Incomplete | None = None, compress_type: Incomplete | None = None) -> None: ...
+    def writestr(self, zinfo_or_arcname, data, compress_type: Incomplete | None = None) -> None: ...
+    def close(self) -> None: ...

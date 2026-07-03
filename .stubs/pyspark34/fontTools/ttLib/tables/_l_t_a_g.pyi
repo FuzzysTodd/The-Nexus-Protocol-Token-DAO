@@ -1,0 +1,16 @@
+from . import DefaultTable as DefaultTable
+from _typeshed import Incomplete
+from fontTools.misc.textTools import bytesjoin as bytesjoin, safeEval as safeEval, tobytes as tobytes
+
+class table__l_t_a_g(DefaultTable.DefaultTable):
+    tags: Incomplete
+    def __init__(self, tag: Incomplete | None = None) -> None: ...
+    def addTag(self, tag):
+        """Add 'tag' to the list of langauge tags if not already there.
+
+        Returns the integer index of 'tag' in the list of all tags.
+        """
+    def decompile(self, data, ttFont) -> None: ...
+    def compile(self, ttFont): ...
+    def toXML(self, writer, ttFont) -> None: ...
+    def fromXML(self, name, attrs, content, ttFont) -> None: ...

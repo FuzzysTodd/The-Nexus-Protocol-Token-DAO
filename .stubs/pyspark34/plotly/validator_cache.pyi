@@ -1,0 +1,3 @@
+class ValidatorCache:
+    @staticmethod
+    def get_validator(parent_path, prop_name): ...

@@ -1,0 +1,27 @@
+from _typeshed import Incomplete
+
+def ignores_leakcheck(func):
+    """
+    Ignore the given object during leakchecks.
+
+    Can be applied to a method, in which case the method will run, but
+    will not be subject to leak checks.
+
+    If applied to a class, the entire class will be skipped during leakchecks. This
+    is intended to be used for classes that are very slow and cause problems such as
+    test timeouts; typically it will be used for classes that are subclasses of a base
+    class and specify variants of behaviour (such as pool sizes).
+    """
+
+class _RefCountChecker:
+    IGNORED_TYPES: Incomplete
+    CALLBACK_KIND: Incomplete
+    testcase: Incomplete
+    function: Incomplete
+    deltas: Incomplete
+    peak_stats: Incomplete
+    needs_setUp: bool
+    def __init__(self, testcase, function) -> None: ...
+    def __call__(self, args, kwargs) -> None: ...
+
+def wrap_refcount(method): ...

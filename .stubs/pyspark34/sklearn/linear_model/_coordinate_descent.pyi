@@ -1,0 +1,1705 @@
+import abc
+from ..base import MultiOutputMixin as MultiOutputMixin, RegressorMixin as RegressorMixin
+from ..model_selection import check_cv as check_cv
+from ..utils import check_array as check_array, check_scalar as check_scalar
+from ..utils._param_validation import Interval as Interval, StrOptions as StrOptions
+from ..utils.extmath import safe_sparse_dot as safe_sparse_dot
+from ..utils.parallel import Parallel as Parallel, delayed as delayed
+from ..utils.validation import check_consistent_length as check_consistent_length, check_is_fitted as check_is_fitted, check_random_state as check_random_state, column_or_1d as column_or_1d
+from ._base import LinearModel as LinearModel
+from _typeshed import Incomplete
+from abc import ABC, abstractmethod
+
+def lasso_path(X, y, *, eps: float = 0.001, n_alphas: int = 100, alphas: Incomplete | None = None, precompute: str = 'auto', Xy: Incomplete | None = None, copy_X: bool = True, coef_init: Incomplete | None = None, verbose: bool = False, return_n_iter: bool = False, positive: bool = False, **params):
+    """Compute Lasso path with coordinate descent.
+
+    The Lasso optimization function varies for mono and multi-outputs.
+
+    For mono-output tasks it is::
+
+        (1 / (2 * n_samples)) * ||y - Xw||^2_2 + alpha * ||w||_1
+
+    For multi-output tasks it is::
+
+        (1 / (2 * n_samples)) * ||Y - XW||^2_Fro + alpha * ||W||_21
+
+    Where::
+
+        ||W||_21 = \\sum_i \\sqrt{\\sum_j w_{ij}^2}
+
+    i.e. the sum of norm of each row.
+
+    Read more in the :ref:`User Guide <lasso>`.
+
+    Parameters
+    ----------
+    X : {array-like, sparse matrix} of shape (n_samples, n_features)
+        Training data. Pass directly as Fortran-contiguous data to avoid
+        unnecessary memory duplication. If ``y`` is mono-output then ``X``
+        can be sparse.
+
+    y : {array-like, sparse matrix} of shape (n_samples,) or         (n_samples, n_targets)
+        Target values.
+
+    eps : float, default=1e-3
+        Length of the path. ``eps=1e-3`` means that
+        ``alpha_min / alpha_max = 1e-3``.
+
+    n_alphas : int, default=100
+        Number of alphas along the regularization path.
+
+    alphas : ndarray, default=None
+        List of alphas where to compute the models.
+        If ``None`` alphas are set automatically.
+
+    precompute : 'auto', bool or array-like of shape             (n_features, n_features), default='auto'
+        Whether to use a precomputed Gram matrix to speed up
+        calculations. If set to ``'auto'`` let us decide. The Gram
+        matrix can also be passed as argument.
+
+    Xy : array-like of shape (n_features,) or (n_features, n_targets),         default=None
+        Xy = np.dot(X.T, y) that can be precomputed. It is useful
+        only when the Gram matrix is precomputed.
+
+    copy_X : bool, default=True
+        If ``True``, X will be copied; else, it may be overwritten.
+
+    coef_init : ndarray of shape (n_features, ), default=None
+        The initial values of the coefficients.
+
+    verbose : bool or int, default=False
+        Amount of verbosity.
+
+    return_n_iter : bool, default=False
+        Whether to return the number of iterations or not.
+
+    positive : bool, default=False
+        If set to True, forces coefficients to be positive.
+        (Only allowed when ``y.ndim == 1``).
+
+    **params : kwargs
+        Keyword arguments passed to the coordinate descent solver.
+
+    Returns
+    -------
+    alphas : ndarray of shape (n_alphas,)
+        The alphas along the path where models are computed.
+
+    coefs : ndarray of shape (n_features, n_alphas) or             (n_targets, n_features, n_alphas)
+        Coefficients along the path.
+
+    dual_gaps : ndarray of shape (n_alphas,)
+        The dual gaps at the end of the optimization for each alpha.
+
+    n_iters : list of int
+        The number of iterations taken by the coordinate descent optimizer to
+        reach the specified tolerance for each alpha.
+
+    See Also
+    --------
+    lars_path : Compute Least Angle Regression or Lasso path using LARS
+        algorithm.
+    Lasso : The Lasso is a linear model that estimates sparse coefficients.
+    LassoLars : Lasso model fit with Least Angle Regression a.k.a. Lars.
+    LassoCV : Lasso linear model with iterative fitting along a regularization
+        path.
+    LassoLarsCV : Cross-validated Lasso using the LARS algorithm.
+    sklearn.decomposition.sparse_encode : Estimator that can be used to
+        transform signals into sparse linear combination of atoms from a fixed.
+
+    Notes
+    -----
+    For an example, see
+    :ref:`examples/linear_model/plot_lasso_coordinate_descent_path.py
+    <sphx_glr_auto_examples_linear_model_plot_lasso_coordinate_descent_path.py>`.
+
+    To avoid unnecessary memory duplication the X argument of the fit method
+    should be directly passed as a Fortran-contiguous numpy array.
+
+    Note that in certain cases, the Lars solver may be significantly
+    faster to implement this functionality. In particular, linear
+    interpolation can be used to retrieve model coefficients between the
+    values output by lars_path
+
+    Examples
+    --------
+
+    Comparing lasso_path and lars_path with interpolation:
+
+    >>> import numpy as np
+    >>> from sklearn.linear_model import lasso_path
+    >>> X = np.array([[1, 2, 3.1], [2.3, 5.4, 4.3]]).T
+    >>> y = np.array([1, 2, 3.1])
+    >>> # Use lasso_path to compute a coefficient path
+    >>> _, coef_path, _ = lasso_path(X, y, alphas=[5., 1., .5])
+    >>> print(coef_path)
+    [[0.         0.         0.46874778]
+     [0.2159048  0.4425765  0.23689075]]
+
+    >>> # Now use lars_path and 1D linear interpolation to compute the
+    >>> # same path
+    >>> from sklearn.linear_model import lars_path
+    >>> alphas, active, coef_path_lars = lars_path(X, y, method='lasso')
+    >>> from scipy import interpolate
+    >>> coef_path_continuous = interpolate.interp1d(alphas[::-1],
+    ...                                             coef_path_lars[:, ::-1])
+    >>> print(coef_path_continuous([5., 1., .5]))
+    [[0.         0.         0.46915237]
+     [0.2159048  0.4425765  0.23668876]]
+    """
+def enet_path(X, y, *, l1_ratio: float = 0.5, eps: float = 0.001, n_alphas: int = 100, alphas: Incomplete | None = None, precompute: str = 'auto', Xy: Incomplete | None = None, copy_X: bool = True, coef_init: Incomplete | None = None, verbose: bool = False, return_n_iter: bool = False, positive: bool = False, check_input: bool = True, **params):
+    """Compute elastic net path with coordinate descent.
+
+    The elastic net optimization function varies for mono and multi-outputs.
+
+    For mono-output tasks it is::
+
+        1 / (2 * n_samples) * ||y - Xw||^2_2
+        + alpha * l1_ratio * ||w||_1
+        + 0.5 * alpha * (1 - l1_ratio) * ||w||^2_2
+
+    For multi-output tasks it is::
+
+        (1 / (2 * n_samples)) * ||Y - XW||_Fro^2
+        + alpha * l1_ratio * ||W||_21
+        + 0.5 * alpha * (1 - l1_ratio) * ||W||_Fro^2
+
+    Where::
+
+        ||W||_21 = \\sum_i \\sqrt{\\sum_j w_{ij}^2}
+
+    i.e. the sum of norm of each row.
+
+    Read more in the :ref:`User Guide <elastic_net>`.
+
+    Parameters
+    ----------
+    X : {array-like, sparse matrix} of shape (n_samples, n_features)
+        Training data. Pass directly as Fortran-contiguous data to avoid
+        unnecessary memory duplication. If ``y`` is mono-output then ``X``
+        can be sparse.
+
+    y : {array-like, sparse matrix} of shape (n_samples,) or         (n_samples, n_targets)
+        Target values.
+
+    l1_ratio : float, default=0.5
+        Number between 0 and 1 passed to elastic net (scaling between
+        l1 and l2 penalties). ``l1_ratio=1`` corresponds to the Lasso.
+
+    eps : float, default=1e-3
+        Length of the path. ``eps=1e-3`` means that
+        ``alpha_min / alpha_max = 1e-3``.
+
+    n_alphas : int, default=100
+        Number of alphas along the regularization path.
+
+    alphas : ndarray, default=None
+        List of alphas where to compute the models.
+        If None alphas are set automatically.
+
+    precompute : 'auto', bool or array-like of shape             (n_features, n_features), default='auto'
+        Whether to use a precomputed Gram matrix to speed up
+        calculations. If set to ``'auto'`` let us decide. The Gram
+        matrix can also be passed as argument.
+
+    Xy : array-like of shape (n_features,) or (n_features, n_targets),         default=None
+        Xy = np.dot(X.T, y) that can be precomputed. It is useful
+        only when the Gram matrix is precomputed.
+
+    copy_X : bool, default=True
+        If ``True``, X will be copied; else, it may be overwritten.
+
+    coef_init : ndarray of shape (n_features, ), default=None
+        The initial values of the coefficients.
+
+    verbose : bool or int, default=False
+        Amount of verbosity.
+
+    return_n_iter : bool, default=False
+        Whether to return the number of iterations or not.
+
+    positive : bool, default=False
+        If set to True, forces coefficients to be positive.
+        (Only allowed when ``y.ndim == 1``).
+
+    check_input : bool, default=True
+        If set to False, the input validation checks are skipped (including the
+        Gram matrix when provided). It is assumed that they are handled
+        by the caller.
+
+    **params : kwargs
+        Keyword arguments passed to the coordinate descent solver.
+
+    Returns
+    -------
+    alphas : ndarray of shape (n_alphas,)
+        The alphas along the path where models are computed.
+
+    coefs : ndarray of shape (n_features, n_alphas) or             (n_targets, n_features, n_alphas)
+        Coefficients along the path.
+
+    dual_gaps : ndarray of shape (n_alphas,)
+        The dual gaps at the end of the optimization for each alpha.
+
+    n_iters : list of int
+        The number of iterations taken by the coordinate descent optimizer to
+        reach the specified tolerance for each alpha.
+        (Is returned when ``return_n_iter`` is set to True).
+
+    See Also
+    --------
+    MultiTaskElasticNet : Multi-task ElasticNet model trained with L1/L2 mixed-norm     as regularizer.
+    MultiTaskElasticNetCV : Multi-task L1/L2 ElasticNet with built-in cross-validation.
+    ElasticNet : Linear regression with combined L1 and L2 priors as regularizer.
+    ElasticNetCV : Elastic Net model with iterative fitting along a regularization path.
+
+    Notes
+    -----
+    For an example, see
+    :ref:`examples/linear_model/plot_lasso_coordinate_descent_path.py
+    <sphx_glr_auto_examples_linear_model_plot_lasso_coordinate_descent_path.py>`.
+    """
+
+class ElasticNet(MultiOutputMixin, RegressorMixin, LinearModel):
+    '''Linear regression with combined L1 and L2 priors as regularizer.
+
+    Minimizes the objective function::
+
+            1 / (2 * n_samples) * ||y - Xw||^2_2
+            + alpha * l1_ratio * ||w||_1
+            + 0.5 * alpha * (1 - l1_ratio) * ||w||^2_2
+
+    If you are interested in controlling the L1 and L2 penalty
+    separately, keep in mind that this is equivalent to::
+
+            a * ||w||_1 + 0.5 * b * ||w||_2^2
+
+    where::
+
+            alpha = a + b and l1_ratio = a / (a + b)
+
+    The parameter l1_ratio corresponds to alpha in the glmnet R package while
+    alpha corresponds to the lambda parameter in glmnet. Specifically, l1_ratio
+    = 1 is the lasso penalty. Currently, l1_ratio <= 0.01 is not reliable,
+    unless you supply your own sequence of alpha.
+
+    Read more in the :ref:`User Guide <elastic_net>`.
+
+    Parameters
+    ----------
+    alpha : float, default=1.0
+        Constant that multiplies the penalty terms. Defaults to 1.0.
+        See the notes for the exact mathematical meaning of this
+        parameter. ``alpha = 0`` is equivalent to an ordinary least square,
+        solved by the :class:`LinearRegression` object. For numerical
+        reasons, using ``alpha = 0`` with the ``Lasso`` object is not advised.
+        Given this, you should use the :class:`LinearRegression` object.
+
+    l1_ratio : float, default=0.5
+        The ElasticNet mixing parameter, with ``0 <= l1_ratio <= 1``. For
+        ``l1_ratio = 0`` the penalty is an L2 penalty. ``For l1_ratio = 1`` it
+        is an L1 penalty.  For ``0 < l1_ratio < 1``, the penalty is a
+        combination of L1 and L2.
+
+    fit_intercept : bool, default=True
+        Whether the intercept should be estimated or not. If ``False``, the
+        data is assumed to be already centered.
+
+    precompute : bool or array-like of shape (n_features, n_features),                 default=False
+        Whether to use a precomputed Gram matrix to speed up
+        calculations. The Gram matrix can also be passed as argument.
+        For sparse input this option is always ``False`` to preserve sparsity.
+
+    max_iter : int, default=1000
+        The maximum number of iterations.
+
+    copy_X : bool, default=True
+        If ``True``, X will be copied; else, it may be overwritten.
+
+    tol : float, default=1e-4
+        The tolerance for the optimization: if the updates are
+        smaller than ``tol``, the optimization code checks the
+        dual gap for optimality and continues until it is smaller
+        than ``tol``, see Notes below.
+
+    warm_start : bool, default=False
+        When set to ``True``, reuse the solution of the previous call to fit as
+        initialization, otherwise, just erase the previous solution.
+        See :term:`the Glossary <warm_start>`.
+
+    positive : bool, default=False
+        When set to ``True``, forces the coefficients to be positive.
+
+    random_state : int, RandomState instance, default=None
+        The seed of the pseudo random number generator that selects a random
+        feature to update. Used when ``selection`` == \'random\'.
+        Pass an int for reproducible output across multiple function calls.
+        See :term:`Glossary <random_state>`.
+
+    selection : {\'cyclic\', \'random\'}, default=\'cyclic\'
+        If set to \'random\', a random coefficient is updated every iteration
+        rather than looping over features sequentially by default. This
+        (setting to \'random\') often leads to significantly faster convergence
+        especially when tol is higher than 1e-4.
+
+    Attributes
+    ----------
+    coef_ : ndarray of shape (n_features,) or (n_targets, n_features)
+        Parameter vector (w in the cost function formula).
+
+    sparse_coef_ : sparse matrix of shape (n_features,) or             (n_targets, n_features)
+        Sparse representation of the `coef_`.
+
+    intercept_ : float or ndarray of shape (n_targets,)
+        Independent term in decision function.
+
+    n_iter_ : list of int
+        Number of iterations run by the coordinate descent solver to reach
+        the specified tolerance.
+
+    dual_gap_ : float or ndarray of shape (n_targets,)
+        Given param alpha, the dual gaps at the end of the optimization,
+        same shape as each observation of y.
+
+    n_features_in_ : int
+        Number of features seen during :term:`fit`.
+
+        .. versionadded:: 0.24
+
+    feature_names_in_ : ndarray of shape (`n_features_in_`,)
+        Names of features seen during :term:`fit`. Defined only when `X`
+        has feature names that are all strings.
+
+        .. versionadded:: 1.0
+
+    See Also
+    --------
+    ElasticNetCV : Elastic net model with best model selection by
+        cross-validation.
+    SGDRegressor : Implements elastic net regression with incremental training.
+    SGDClassifier : Implements logistic regression with elastic net penalty
+        (``SGDClassifier(loss="log_loss", penalty="elasticnet")``).
+
+    Notes
+    -----
+    To avoid unnecessary memory duplication the X argument of the fit method
+    should be directly passed as a Fortran-contiguous numpy array.
+
+    The precise stopping criteria based on `tol` are the following: First, check that
+    that maximum coordinate update, i.e. :math:`\\max_j |w_j^{new} - w_j^{old}|`
+    is smaller than `tol` times the maximum absolute coefficient, :math:`\\max_j |w_j|`.
+    If so, then additionally check whether the dual gap is smaller than `tol` times
+    :math:`||y||_2^2 / n_{\text{samples}}`.
+
+    Examples
+    --------
+    >>> from sklearn.linear_model import ElasticNet
+    >>> from sklearn.datasets import make_regression
+
+    >>> X, y = make_regression(n_features=2, random_state=0)
+    >>> regr = ElasticNet(random_state=0)
+    >>> regr.fit(X, y)
+    ElasticNet(random_state=0)
+    >>> print(regr.coef_)
+    [18.83816048 64.55968825]
+    >>> print(regr.intercept_)
+    1.451...
+    >>> print(regr.predict([[0, 0]]))
+    [1.451...]
+    '''
+    path: Incomplete
+    alpha: Incomplete
+    l1_ratio: Incomplete
+    fit_intercept: Incomplete
+    precompute: Incomplete
+    max_iter: Incomplete
+    copy_X: Incomplete
+    tol: Incomplete
+    warm_start: Incomplete
+    positive: Incomplete
+    random_state: Incomplete
+    selection: Incomplete
+    def __init__(self, alpha: float = 1.0, *, l1_ratio: float = 0.5, fit_intercept: bool = True, precompute: bool = False, max_iter: int = 1000, copy_X: bool = True, tol: float = 0.0001, warm_start: bool = False, positive: bool = False, random_state: Incomplete | None = None, selection: str = 'cyclic') -> None: ...
+    n_iter_: Incomplete
+    coef_: Incomplete
+    dual_gap_: Incomplete
+    def fit(self, X, y, sample_weight: Incomplete | None = None, check_input: bool = True):
+        """Fit model with coordinate descent.
+
+        Parameters
+        ----------
+        X : {ndarray, sparse matrix} of (n_samples, n_features)
+            Data.
+
+        y : ndarray of shape (n_samples,) or (n_samples, n_targets)
+            Target. Will be cast to X's dtype if necessary.
+
+        sample_weight : float or array-like of shape (n_samples,), default=None
+            Sample weights. Internally, the `sample_weight` vector will be
+            rescaled to sum to `n_samples`.
+
+            .. versionadded:: 0.23
+
+        check_input : bool, default=True
+            Allow to bypass several input checking.
+            Don't use this parameter unless you know what you do.
+
+        Returns
+        -------
+        self : object
+            Fitted estimator.
+
+        Notes
+        -----
+        Coordinate descent is an algorithm that considers each column of
+        data at a time hence it will automatically convert the X input
+        as a Fortran-contiguous numpy array if necessary.
+
+        To avoid memory re-allocation it is advised to allocate the
+        initial data in memory directly using that format.
+        """
+    @property
+    def sparse_coef_(self):
+        """Sparse representation of the fitted `coef_`."""
+
+class Lasso(ElasticNet):
+    """Linear Model trained with L1 prior as regularizer (aka the Lasso).
+
+    The optimization objective for Lasso is::
+
+        (1 / (2 * n_samples)) * ||y - Xw||^2_2 + alpha * ||w||_1
+
+    Technically the Lasso model is optimizing the same objective function as
+    the Elastic Net with ``l1_ratio=1.0`` (no L2 penalty).
+
+    Read more in the :ref:`User Guide <lasso>`.
+
+    Parameters
+    ----------
+    alpha : float, default=1.0
+        Constant that multiplies the L1 term, controlling regularization
+        strength. `alpha` must be a non-negative float i.e. in `[0, inf)`.
+
+        When `alpha = 0`, the objective is equivalent to ordinary least
+        squares, solved by the :class:`LinearRegression` object. For numerical
+        reasons, using `alpha = 0` with the `Lasso` object is not advised.
+        Instead, you should use the :class:`LinearRegression` object.
+
+    fit_intercept : bool, default=True
+        Whether to calculate the intercept for this model. If set
+        to False, no intercept will be used in calculations
+        (i.e. data is expected to be centered).
+
+    precompute : bool or array-like of shape (n_features, n_features),                 default=False
+        Whether to use a precomputed Gram matrix to speed up
+        calculations. The Gram matrix can also be passed as argument.
+        For sparse input this option is always ``False`` to preserve sparsity.
+
+    copy_X : bool, default=True
+        If ``True``, X will be copied; else, it may be overwritten.
+
+    max_iter : int, default=1000
+        The maximum number of iterations.
+
+    tol : float, default=1e-4
+        The tolerance for the optimization: if the updates are
+        smaller than ``tol``, the optimization code checks the
+        dual gap for optimality and continues until it is smaller
+        than ``tol``, see Notes below.
+
+    warm_start : bool, default=False
+        When set to True, reuse the solution of the previous call to fit as
+        initialization, otherwise, just erase the previous solution.
+        See :term:`the Glossary <warm_start>`.
+
+    positive : bool, default=False
+        When set to ``True``, forces the coefficients to be positive.
+
+    random_state : int, RandomState instance, default=None
+        The seed of the pseudo random number generator that selects a random
+        feature to update. Used when ``selection`` == 'random'.
+        Pass an int for reproducible output across multiple function calls.
+        See :term:`Glossary <random_state>`.
+
+    selection : {'cyclic', 'random'}, default='cyclic'
+        If set to 'random', a random coefficient is updated every iteration
+        rather than looping over features sequentially by default. This
+        (setting to 'random') often leads to significantly faster convergence
+        especially when tol is higher than 1e-4.
+
+    Attributes
+    ----------
+    coef_ : ndarray of shape (n_features,) or (n_targets, n_features)
+        Parameter vector (w in the cost function formula).
+
+    dual_gap_ : float or ndarray of shape (n_targets,)
+        Given param alpha, the dual gaps at the end of the optimization,
+        same shape as each observation of y.
+
+    sparse_coef_ : sparse matrix of shape (n_features, 1) or             (n_targets, n_features)
+        Readonly property derived from ``coef_``.
+
+    intercept_ : float or ndarray of shape (n_targets,)
+        Independent term in decision function.
+
+    n_iter_ : int or list of int
+        Number of iterations run by the coordinate descent solver to reach
+        the specified tolerance.
+
+    n_features_in_ : int
+        Number of features seen during :term:`fit`.
+
+        .. versionadded:: 0.24
+
+    feature_names_in_ : ndarray of shape (`n_features_in_`,)
+        Names of features seen during :term:`fit`. Defined only when `X`
+        has feature names that are all strings.
+
+        .. versionadded:: 1.0
+
+    See Also
+    --------
+    lars_path : Regularization path using LARS.
+    lasso_path : Regularization path using Lasso.
+    LassoLars : Lasso Path along the regularization parameter using LARS algorithm.
+    LassoCV : Lasso alpha parameter by cross-validation.
+    LassoLarsCV : Lasso least angle parameter algorithm by cross-validation.
+    sklearn.decomposition.sparse_encode : Sparse coding array estimator.
+
+    Notes
+    -----
+    The algorithm used to fit the model is coordinate descent.
+
+    To avoid unnecessary memory duplication the X argument of the fit method
+    should be directly passed as a Fortran-contiguous numpy array.
+
+    Regularization improves the conditioning of the problem and
+    reduces the variance of the estimates. Larger values specify stronger
+    regularization. Alpha corresponds to `1 / (2C)` in other linear
+    models such as :class:`~sklearn.linear_model.LogisticRegression` or
+    :class:`~sklearn.svm.LinearSVC`. If an array is passed, penalties are
+    assumed to be specific to the targets. Hence they must correspond in
+    number.
+
+    The precise stopping criteria based on `tol` are the following: First, check that
+    that maximum coordinate update, i.e. :math:`\\max_j |w_j^{new} - w_j^{old}|`
+    is smaller than `tol` times the maximum absolute coefficient, :math:`\\max_j |w_j|`.
+    If so, then additionally check whether the dual gap is smaller than `tol` times
+    :math:`||y||_2^2 / n_{\\text{samples}}`.
+
+    The target can be a 2-dimensional array, resulting in the optimization of the
+    following objective::
+
+        (1 / (2 * n_samples)) * ||Y - XW||^2_F + alpha * ||W||_11
+
+    where :math:`||W||_{1,1}` is the sum of the magnitude of the matrix coefficients.
+    It should not be confused with :class:`~sklearn.linear_model.MultiTaskLasso` which
+    instead penalizes the :math:`L_{2,1}` norm of the coefficients, yielding row-wise
+    sparsity in the coefficients.
+
+    Examples
+    --------
+    >>> from sklearn import linear_model
+    >>> clf = linear_model.Lasso(alpha=0.1)
+    >>> clf.fit([[0,0], [1, 1], [2, 2]], [0, 1, 2])
+    Lasso(alpha=0.1)
+    >>> print(clf.coef_)
+    [0.85 0.  ]
+    >>> print(clf.intercept_)
+    0.15...
+    """
+    path: Incomplete
+    def __init__(self, alpha: float = 1.0, *, fit_intercept: bool = True, precompute: bool = False, copy_X: bool = True, max_iter: int = 1000, tol: float = 0.0001, warm_start: bool = False, positive: bool = False, random_state: Incomplete | None = None, selection: str = 'cyclic') -> None: ...
+
+class LinearModelCV(MultiOutputMixin, LinearModel, ABC, metaclass=abc.ABCMeta):
+    """Base class for iterative model fitting along a regularization path."""
+    eps: Incomplete
+    n_alphas: Incomplete
+    alphas: Incomplete
+    fit_intercept: Incomplete
+    precompute: Incomplete
+    max_iter: Incomplete
+    tol: Incomplete
+    copy_X: Incomplete
+    cv: Incomplete
+    verbose: Incomplete
+    n_jobs: Incomplete
+    positive: Incomplete
+    random_state: Incomplete
+    selection: Incomplete
+    @abstractmethod
+    def __init__(self, eps: float = 0.001, n_alphas: int = 100, alphas: Incomplete | None = None, fit_intercept: bool = True, precompute: str = 'auto', max_iter: int = 1000, tol: float = 0.0001, copy_X: bool = True, cv: Incomplete | None = None, verbose: bool = False, n_jobs: Incomplete | None = None, positive: bool = False, random_state: Incomplete | None = None, selection: str = 'cyclic'): ...
+    @staticmethod
+    @abstractmethod
+    def path(X, y, **kwargs):
+        """Compute path with coordinate descent."""
+    mse_path_: Incomplete
+    l1_ratio_: Incomplete
+    alpha_: Incomplete
+    alphas_: Incomplete
+    coef_: Incomplete
+    intercept_: Incomplete
+    dual_gap_: Incomplete
+    n_iter_: Incomplete
+    def fit(self, X, y, sample_weight: Incomplete | None = None):
+        """Fit linear model with coordinate descent.
+
+        Fit is on grid of alphas and best alpha estimated by cross-validation.
+
+        Parameters
+        ----------
+        X : {array-like, sparse matrix} of shape (n_samples, n_features)
+            Training data. Pass directly as Fortran-contiguous data
+            to avoid unnecessary memory duplication. If y is mono-output,
+            X can be sparse.
+
+        y : array-like of shape (n_samples,) or (n_samples, n_targets)
+            Target values.
+
+        sample_weight : float or array-like of shape (n_samples,),                 default=None
+            Sample weights used for fitting and evaluation of the weighted
+            mean squared error of each cv-fold. Note that the cross validated
+            MSE that is finally used to find the best model is the unweighted
+            mean over the (weighted) MSEs of each test fold.
+
+        Returns
+        -------
+        self : object
+            Returns an instance of fitted model.
+        """
+
+class LassoCV(RegressorMixin, LinearModelCV):
+    """Lasso linear model with iterative fitting along a regularization path.
+
+    See glossary entry for :term:`cross-validation estimator`.
+
+    The best model is selected by cross-validation.
+
+    The optimization objective for Lasso is::
+
+        (1 / (2 * n_samples)) * ||y - Xw||^2_2 + alpha * ||w||_1
+
+    Read more in the :ref:`User Guide <lasso>`.
+
+    Parameters
+    ----------
+    eps : float, default=1e-3
+        Length of the path. ``eps=1e-3`` means that
+        ``alpha_min / alpha_max = 1e-3``.
+
+    n_alphas : int, default=100
+        Number of alphas along the regularization path.
+
+    alphas : array-like, default=None
+        List of alphas where to compute the models.
+        If ``None`` alphas are set automatically.
+
+    fit_intercept : bool, default=True
+        Whether to calculate the intercept for this model. If set
+        to false, no intercept will be used in calculations
+        (i.e. data is expected to be centered).
+
+    precompute : 'auto', bool or array-like of shape             (n_features, n_features), default='auto'
+        Whether to use a precomputed Gram matrix to speed up
+        calculations. If set to ``'auto'`` let us decide. The Gram
+        matrix can also be passed as argument.
+
+    max_iter : int, default=1000
+        The maximum number of iterations.
+
+    tol : float, default=1e-4
+        The tolerance for the optimization: if the updates are
+        smaller than ``tol``, the optimization code checks the
+        dual gap for optimality and continues until it is smaller
+        than ``tol``.
+
+    copy_X : bool, default=True
+        If ``True``, X will be copied; else, it may be overwritten.
+
+    cv : int, cross-validation generator or iterable, default=None
+        Determines the cross-validation splitting strategy.
+        Possible inputs for cv are:
+
+        - None, to use the default 5-fold cross-validation,
+        - int, to specify the number of folds.
+        - :term:`CV splitter`,
+        - An iterable yielding (train, test) splits as arrays of indices.
+
+        For int/None inputs, :class:`KFold` is used.
+
+        Refer :ref:`User Guide <cross_validation>` for the various
+        cross-validation strategies that can be used here.
+
+        .. versionchanged:: 0.22
+            ``cv`` default value if None changed from 3-fold to 5-fold.
+
+    verbose : bool or int, default=False
+        Amount of verbosity.
+
+    n_jobs : int, default=None
+        Number of CPUs to use during the cross validation.
+        ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
+        ``-1`` means using all processors. See :term:`Glossary <n_jobs>`
+        for more details.
+
+    positive : bool, default=False
+        If positive, restrict regression coefficients to be positive.
+
+    random_state : int, RandomState instance, default=None
+        The seed of the pseudo random number generator that selects a random
+        feature to update. Used when ``selection`` == 'random'.
+        Pass an int for reproducible output across multiple function calls.
+        See :term:`Glossary <random_state>`.
+
+    selection : {'cyclic', 'random'}, default='cyclic'
+        If set to 'random', a random coefficient is updated every iteration
+        rather than looping over features sequentially by default. This
+        (setting to 'random') often leads to significantly faster convergence
+        especially when tol is higher than 1e-4.
+
+    Attributes
+    ----------
+    alpha_ : float
+        The amount of penalization chosen by cross validation.
+
+    coef_ : ndarray of shape (n_features,) or (n_targets, n_features)
+        Parameter vector (w in the cost function formula).
+
+    intercept_ : float or ndarray of shape (n_targets,)
+        Independent term in decision function.
+
+    mse_path_ : ndarray of shape (n_alphas, n_folds)
+        Mean square error for the test set on each fold, varying alpha.
+
+    alphas_ : ndarray of shape (n_alphas,)
+        The grid of alphas used for fitting.
+
+    dual_gap_ : float or ndarray of shape (n_targets,)
+        The dual gap at the end of the optimization for the optimal alpha
+        (``alpha_``).
+
+    n_iter_ : int
+        Number of iterations run by the coordinate descent solver to reach
+        the specified tolerance for the optimal alpha.
+
+    n_features_in_ : int
+        Number of features seen during :term:`fit`.
+
+        .. versionadded:: 0.24
+
+    feature_names_in_ : ndarray of shape (`n_features_in_`,)
+        Names of features seen during :term:`fit`. Defined only when `X`
+        has feature names that are all strings.
+
+        .. versionadded:: 1.0
+
+    See Also
+    --------
+    lars_path : Compute Least Angle Regression or Lasso path using LARS
+        algorithm.
+    lasso_path : Compute Lasso path with coordinate descent.
+    Lasso : The Lasso is a linear model that estimates sparse coefficients.
+    LassoLars : Lasso model fit with Least Angle Regression a.k.a. Lars.
+    LassoCV : Lasso linear model with iterative fitting along a regularization
+        path.
+    LassoLarsCV : Cross-validated Lasso using the LARS algorithm.
+
+    Notes
+    -----
+    In `fit`, once the best parameter `alpha` is found through
+    cross-validation, the model is fit again using the entire training set.
+
+    To avoid unnecessary memory duplication the `X` argument of the `fit`
+    method should be directly passed as a Fortran-contiguous numpy array.
+
+     For an example, see
+     :ref:`examples/linear_model/plot_lasso_model_selection.py
+     <sphx_glr_auto_examples_linear_model_plot_lasso_model_selection.py>`.
+
+    :class:`LassoCV` leads to different results than a hyperparameter
+    search using :class:`~sklearn.model_selection.GridSearchCV` with a
+    :class:`Lasso` model. In :class:`LassoCV`, a model for a given
+    penalty `alpha` is warm started using the coefficients of the
+    closest model (trained at the previous iteration) on the
+    regularization path. It tends to speed up the hyperparameter
+    search.
+
+    Examples
+    --------
+    >>> from sklearn.linear_model import LassoCV
+    >>> from sklearn.datasets import make_regression
+    >>> X, y = make_regression(noise=4, random_state=0)
+    >>> reg = LassoCV(cv=5, random_state=0).fit(X, y)
+    >>> reg.score(X, y)
+    0.9993...
+    >>> reg.predict(X[:1,])
+    array([-78.4951...])
+    """
+    path: Incomplete
+    def __init__(self, *, eps: float = 0.001, n_alphas: int = 100, alphas: Incomplete | None = None, fit_intercept: bool = True, precompute: str = 'auto', max_iter: int = 1000, tol: float = 0.0001, copy_X: bool = True, cv: Incomplete | None = None, verbose: bool = False, n_jobs: Incomplete | None = None, positive: bool = False, random_state: Incomplete | None = None, selection: str = 'cyclic') -> None: ...
+
+class ElasticNetCV(RegressorMixin, LinearModelCV):
+    """Elastic Net model with iterative fitting along a regularization path.
+
+    See glossary entry for :term:`cross-validation estimator`.
+
+    Read more in the :ref:`User Guide <elastic_net>`.
+
+    Parameters
+    ----------
+    l1_ratio : float or list of float, default=0.5
+        Float between 0 and 1 passed to ElasticNet (scaling between
+        l1 and l2 penalties). For ``l1_ratio = 0``
+        the penalty is an L2 penalty. For ``l1_ratio = 1`` it is an L1 penalty.
+        For ``0 < l1_ratio < 1``, the penalty is a combination of L1 and L2
+        This parameter can be a list, in which case the different
+        values are tested by cross-validation and the one giving the best
+        prediction score is used. Note that a good choice of list of
+        values for l1_ratio is often to put more values close to 1
+        (i.e. Lasso) and less close to 0 (i.e. Ridge), as in ``[.1, .5, .7,
+        .9, .95, .99, 1]``.
+
+    eps : float, default=1e-3
+        Length of the path. ``eps=1e-3`` means that
+        ``alpha_min / alpha_max = 1e-3``.
+
+    n_alphas : int, default=100
+        Number of alphas along the regularization path, used for each l1_ratio.
+
+    alphas : array-like, default=None
+        List of alphas where to compute the models.
+        If None alphas are set automatically.
+
+    fit_intercept : bool, default=True
+        Whether to calculate the intercept for this model. If set
+        to false, no intercept will be used in calculations
+        (i.e. data is expected to be centered).
+
+    precompute : 'auto', bool or array-like of shape             (n_features, n_features), default='auto'
+        Whether to use a precomputed Gram matrix to speed up
+        calculations. If set to ``'auto'`` let us decide. The Gram
+        matrix can also be passed as argument.
+
+    max_iter : int, default=1000
+        The maximum number of iterations.
+
+    tol : float, default=1e-4
+        The tolerance for the optimization: if the updates are
+        smaller than ``tol``, the optimization code checks the
+        dual gap for optimality and continues until it is smaller
+        than ``tol``.
+
+    cv : int, cross-validation generator or iterable, default=None
+        Determines the cross-validation splitting strategy.
+        Possible inputs for cv are:
+
+        - None, to use the default 5-fold cross-validation,
+        - int, to specify the number of folds.
+        - :term:`CV splitter`,
+        - An iterable yielding (train, test) splits as arrays of indices.
+
+        For int/None inputs, :class:`KFold` is used.
+
+        Refer :ref:`User Guide <cross_validation>` for the various
+        cross-validation strategies that can be used here.
+
+        .. versionchanged:: 0.22
+            ``cv`` default value if None changed from 3-fold to 5-fold.
+
+    copy_X : bool, default=True
+        If ``True``, X will be copied; else, it may be overwritten.
+
+    verbose : bool or int, default=0
+        Amount of verbosity.
+
+    n_jobs : int, default=None
+        Number of CPUs to use during the cross validation.
+        ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
+        ``-1`` means using all processors. See :term:`Glossary <n_jobs>`
+        for more details.
+
+    positive : bool, default=False
+        When set to ``True``, forces the coefficients to be positive.
+
+    random_state : int, RandomState instance, default=None
+        The seed of the pseudo random number generator that selects a random
+        feature to update. Used when ``selection`` == 'random'.
+        Pass an int for reproducible output across multiple function calls.
+        See :term:`Glossary <random_state>`.
+
+    selection : {'cyclic', 'random'}, default='cyclic'
+        If set to 'random', a random coefficient is updated every iteration
+        rather than looping over features sequentially by default. This
+        (setting to 'random') often leads to significantly faster convergence
+        especially when tol is higher than 1e-4.
+
+    Attributes
+    ----------
+    alpha_ : float
+        The amount of penalization chosen by cross validation.
+
+    l1_ratio_ : float
+        The compromise between l1 and l2 penalization chosen by
+        cross validation.
+
+    coef_ : ndarray of shape (n_features,) or (n_targets, n_features)
+        Parameter vector (w in the cost function formula).
+
+    intercept_ : float or ndarray of shape (n_targets, n_features)
+        Independent term in the decision function.
+
+    mse_path_ : ndarray of shape (n_l1_ratio, n_alpha, n_folds)
+        Mean square error for the test set on each fold, varying l1_ratio and
+        alpha.
+
+    alphas_ : ndarray of shape (n_alphas,) or (n_l1_ratio, n_alphas)
+        The grid of alphas used for fitting, for each l1_ratio.
+
+    dual_gap_ : float
+        The dual gaps at the end of the optimization for the optimal alpha.
+
+    n_iter_ : int
+        Number of iterations run by the coordinate descent solver to reach
+        the specified tolerance for the optimal alpha.
+
+    n_features_in_ : int
+        Number of features seen during :term:`fit`.
+
+        .. versionadded:: 0.24
+
+    feature_names_in_ : ndarray of shape (`n_features_in_`,)
+        Names of features seen during :term:`fit`. Defined only when `X`
+        has feature names that are all strings.
+
+        .. versionadded:: 1.0
+
+    See Also
+    --------
+    enet_path : Compute elastic net path with coordinate descent.
+    ElasticNet : Linear regression with combined L1 and L2 priors as regularizer.
+
+    Notes
+    -----
+    In `fit`, once the best parameters `l1_ratio` and `alpha` are found through
+    cross-validation, the model is fit again using the entire training set.
+
+    To avoid unnecessary memory duplication the `X` argument of the `fit`
+    method should be directly passed as a Fortran-contiguous numpy array.
+
+    The parameter `l1_ratio` corresponds to alpha in the glmnet R package
+    while alpha corresponds to the lambda parameter in glmnet.
+    More specifically, the optimization objective is::
+
+        1 / (2 * n_samples) * ||y - Xw||^2_2
+        + alpha * l1_ratio * ||w||_1
+        + 0.5 * alpha * (1 - l1_ratio) * ||w||^2_2
+
+    If you are interested in controlling the L1 and L2 penalty
+    separately, keep in mind that this is equivalent to::
+
+        a * L1 + b * L2
+
+    for::
+
+        alpha = a + b and l1_ratio = a / (a + b).
+
+    For an example, see
+    :ref:`examples/linear_model/plot_lasso_model_selection.py
+    <sphx_glr_auto_examples_linear_model_plot_lasso_model_selection.py>`.
+
+    Examples
+    --------
+    >>> from sklearn.linear_model import ElasticNetCV
+    >>> from sklearn.datasets import make_regression
+
+    >>> X, y = make_regression(n_features=2, random_state=0)
+    >>> regr = ElasticNetCV(cv=5, random_state=0)
+    >>> regr.fit(X, y)
+    ElasticNetCV(cv=5, random_state=0)
+    >>> print(regr.alpha_)
+    0.199...
+    >>> print(regr.intercept_)
+    0.398...
+    >>> print(regr.predict([[0, 0]]))
+    [0.398...]
+    """
+    path: Incomplete
+    l1_ratio: Incomplete
+    eps: Incomplete
+    n_alphas: Incomplete
+    alphas: Incomplete
+    fit_intercept: Incomplete
+    precompute: Incomplete
+    max_iter: Incomplete
+    tol: Incomplete
+    cv: Incomplete
+    copy_X: Incomplete
+    verbose: Incomplete
+    n_jobs: Incomplete
+    positive: Incomplete
+    random_state: Incomplete
+    selection: Incomplete
+    def __init__(self, *, l1_ratio: float = 0.5, eps: float = 0.001, n_alphas: int = 100, alphas: Incomplete | None = None, fit_intercept: bool = True, precompute: str = 'auto', max_iter: int = 1000, tol: float = 0.0001, cv: Incomplete | None = None, copy_X: bool = True, verbose: int = 0, n_jobs: Incomplete | None = None, positive: bool = False, random_state: Incomplete | None = None, selection: str = 'cyclic') -> None: ...
+
+class MultiTaskElasticNet(Lasso):
+    """Multi-task ElasticNet model trained with L1/L2 mixed-norm as regularizer.
+
+    The optimization objective for MultiTaskElasticNet is::
+
+        (1 / (2 * n_samples)) * ||Y - XW||_Fro^2
+        + alpha * l1_ratio * ||W||_21
+        + 0.5 * alpha * (1 - l1_ratio) * ||W||_Fro^2
+
+    Where::
+
+        ||W||_21 = sum_i sqrt(sum_j W_ij ^ 2)
+
+    i.e. the sum of norms of each row.
+
+    Read more in the :ref:`User Guide <multi_task_elastic_net>`.
+
+    Parameters
+    ----------
+    alpha : float, default=1.0
+        Constant that multiplies the L1/L2 term. Defaults to 1.0.
+
+    l1_ratio : float, default=0.5
+        The ElasticNet mixing parameter, with 0 < l1_ratio <= 1.
+        For l1_ratio = 1 the penalty is an L1/L2 penalty. For l1_ratio = 0 it
+        is an L2 penalty.
+        For ``0 < l1_ratio < 1``, the penalty is a combination of L1/L2 and L2.
+
+    fit_intercept : bool, default=True
+        Whether to calculate the intercept for this model. If set
+        to false, no intercept will be used in calculations
+        (i.e. data is expected to be centered).
+
+    copy_X : bool, default=True
+        If ``True``, X will be copied; else, it may be overwritten.
+
+    max_iter : int, default=1000
+        The maximum number of iterations.
+
+    tol : float, default=1e-4
+        The tolerance for the optimization: if the updates are
+        smaller than ``tol``, the optimization code checks the
+        dual gap for optimality and continues until it is smaller
+        than ``tol``.
+
+    warm_start : bool, default=False
+        When set to ``True``, reuse the solution of the previous call to fit as
+        initialization, otherwise, just erase the previous solution.
+        See :term:`the Glossary <warm_start>`.
+
+    random_state : int, RandomState instance, default=None
+        The seed of the pseudo random number generator that selects a random
+        feature to update. Used when ``selection`` == 'random'.
+        Pass an int for reproducible output across multiple function calls.
+        See :term:`Glossary <random_state>`.
+
+    selection : {'cyclic', 'random'}, default='cyclic'
+        If set to 'random', a random coefficient is updated every iteration
+        rather than looping over features sequentially by default. This
+        (setting to 'random') often leads to significantly faster convergence
+        especially when tol is higher than 1e-4.
+
+    Attributes
+    ----------
+    intercept_ : ndarray of shape (n_targets,)
+        Independent term in decision function.
+
+    coef_ : ndarray of shape (n_targets, n_features)
+        Parameter vector (W in the cost function formula). If a 1D y is
+        passed in at fit (non multi-task usage), ``coef_`` is then a 1D array.
+        Note that ``coef_`` stores the transpose of ``W``, ``W.T``.
+
+    n_iter_ : int
+        Number of iterations run by the coordinate descent solver to reach
+        the specified tolerance.
+
+    dual_gap_ : float
+        The dual gaps at the end of the optimization.
+
+    eps_ : float
+        The tolerance scaled scaled by the variance of the target `y`.
+
+    sparse_coef_ : sparse matrix of shape (n_features,) or             (n_targets, n_features)
+        Sparse representation of the `coef_`.
+
+    n_features_in_ : int
+        Number of features seen during :term:`fit`.
+
+        .. versionadded:: 0.24
+
+    feature_names_in_ : ndarray of shape (`n_features_in_`,)
+        Names of features seen during :term:`fit`. Defined only when `X`
+        has feature names that are all strings.
+
+        .. versionadded:: 1.0
+
+    See Also
+    --------
+    MultiTaskElasticNetCV : Multi-task L1/L2 ElasticNet with built-in
+        cross-validation.
+    ElasticNet : Linear regression with combined L1 and L2 priors as regularizer.
+    MultiTaskLasso : Multi-task L1/L2 Lasso with built-in cross-validation.
+
+    Notes
+    -----
+    The algorithm used to fit the model is coordinate descent.
+
+    To avoid unnecessary memory duplication the X and y arguments of the fit
+    method should be directly passed as Fortran-contiguous numpy arrays.
+
+    Examples
+    --------
+    >>> from sklearn import linear_model
+    >>> clf = linear_model.MultiTaskElasticNet(alpha=0.1)
+    >>> clf.fit([[0,0], [1, 1], [2, 2]], [[0, 0], [1, 1], [2, 2]])
+    MultiTaskElasticNet(alpha=0.1)
+    >>> print(clf.coef_)
+    [[0.45663524 0.45612256]
+     [0.45663524 0.45612256]]
+    >>> print(clf.intercept_)
+    [0.0872422 0.0872422]
+    """
+    l1_ratio: Incomplete
+    alpha: Incomplete
+    fit_intercept: Incomplete
+    max_iter: Incomplete
+    copy_X: Incomplete
+    tol: Incomplete
+    warm_start: Incomplete
+    random_state: Incomplete
+    selection: Incomplete
+    def __init__(self, alpha: float = 1.0, *, l1_ratio: float = 0.5, fit_intercept: bool = True, copy_X: bool = True, max_iter: int = 1000, tol: float = 0.0001, warm_start: bool = False, random_state: Incomplete | None = None, selection: str = 'cyclic') -> None: ...
+    coef_: Incomplete
+    def fit(self, X, y):
+        """Fit MultiTaskElasticNet model with coordinate descent.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features)
+            Data.
+        y : ndarray of shape (n_samples, n_targets)
+            Target. Will be cast to X's dtype if necessary.
+
+        Returns
+        -------
+        self : object
+            Fitted estimator.
+
+        Notes
+        -----
+        Coordinate descent is an algorithm that considers each column of
+        data at a time hence it will automatically convert the X input
+        as a Fortran-contiguous numpy array if necessary.
+
+        To avoid memory re-allocation it is advised to allocate the
+        initial data in memory directly using that format.
+        """
+
+class MultiTaskLasso(MultiTaskElasticNet):
+    """Multi-task Lasso model trained with L1/L2 mixed-norm as regularizer.
+
+    The optimization objective for Lasso is::
+
+        (1 / (2 * n_samples)) * ||Y - XW||^2_Fro + alpha * ||W||_21
+
+    Where::
+
+        ||W||_21 = \\sum_i \\sqrt{\\sum_j w_{ij}^2}
+
+    i.e. the sum of norm of each row.
+
+    Read more in the :ref:`User Guide <multi_task_lasso>`.
+
+    Parameters
+    ----------
+    alpha : float, default=1.0
+        Constant that multiplies the L1/L2 term. Defaults to 1.0.
+
+    fit_intercept : bool, default=True
+        Whether to calculate the intercept for this model. If set
+        to false, no intercept will be used in calculations
+        (i.e. data is expected to be centered).
+
+    copy_X : bool, default=True
+        If ``True``, X will be copied; else, it may be overwritten.
+
+    max_iter : int, default=1000
+        The maximum number of iterations.
+
+    tol : float, default=1e-4
+        The tolerance for the optimization: if the updates are
+        smaller than ``tol``, the optimization code checks the
+        dual gap for optimality and continues until it is smaller
+        than ``tol``.
+
+    warm_start : bool, default=False
+        When set to ``True``, reuse the solution of the previous call to fit as
+        initialization, otherwise, just erase the previous solution.
+        See :term:`the Glossary <warm_start>`.
+
+    random_state : int, RandomState instance, default=None
+        The seed of the pseudo random number generator that selects a random
+        feature to update. Used when ``selection`` == 'random'.
+        Pass an int for reproducible output across multiple function calls.
+        See :term:`Glossary <random_state>`.
+
+    selection : {'cyclic', 'random'}, default='cyclic'
+        If set to 'random', a random coefficient is updated every iteration
+        rather than looping over features sequentially by default. This
+        (setting to 'random') often leads to significantly faster convergence
+        especially when tol is higher than 1e-4.
+
+    Attributes
+    ----------
+    coef_ : ndarray of shape (n_targets, n_features)
+        Parameter vector (W in the cost function formula).
+        Note that ``coef_`` stores the transpose of ``W``, ``W.T``.
+
+    intercept_ : ndarray of shape (n_targets,)
+        Independent term in decision function.
+
+    n_iter_ : int
+        Number of iterations run by the coordinate descent solver to reach
+        the specified tolerance.
+
+    dual_gap_ : ndarray of shape (n_alphas,)
+        The dual gaps at the end of the optimization for each alpha.
+
+    eps_ : float
+        The tolerance scaled scaled by the variance of the target `y`.
+
+    sparse_coef_ : sparse matrix of shape (n_features,) or             (n_targets, n_features)
+        Sparse representation of the `coef_`.
+
+    n_features_in_ : int
+        Number of features seen during :term:`fit`.
+
+        .. versionadded:: 0.24
+
+    feature_names_in_ : ndarray of shape (`n_features_in_`,)
+        Names of features seen during :term:`fit`. Defined only when `X`
+        has feature names that are all strings.
+
+        .. versionadded:: 1.0
+
+    See Also
+    --------
+    Lasso: Linear Model trained with L1 prior as regularizer (aka the Lasso).
+    MultiTaskLasso: Multi-task L1/L2 Lasso with built-in cross-validation.
+    MultiTaskElasticNet: Multi-task L1/L2 ElasticNet with built-in cross-validation.
+
+    Notes
+    -----
+    The algorithm used to fit the model is coordinate descent.
+
+    To avoid unnecessary memory duplication the X and y arguments of the fit
+    method should be directly passed as Fortran-contiguous numpy arrays.
+
+    Examples
+    --------
+    >>> from sklearn import linear_model
+    >>> clf = linear_model.MultiTaskLasso(alpha=0.1)
+    >>> clf.fit([[0, 1], [1, 2], [2, 4]], [[0, 0], [1, 1], [2, 3]])
+    MultiTaskLasso(alpha=0.1)
+    >>> print(clf.coef_)
+    [[0.         0.60809415]
+    [0.         0.94592424]]
+    >>> print(clf.intercept_)
+    [-0.41888636 -0.87382323]
+    """
+    alpha: Incomplete
+    fit_intercept: Incomplete
+    max_iter: Incomplete
+    copy_X: Incomplete
+    tol: Incomplete
+    warm_start: Incomplete
+    l1_ratio: float
+    random_state: Incomplete
+    selection: Incomplete
+    def __init__(self, alpha: float = 1.0, *, fit_intercept: bool = True, copy_X: bool = True, max_iter: int = 1000, tol: float = 0.0001, warm_start: bool = False, random_state: Incomplete | None = None, selection: str = 'cyclic') -> None: ...
+
+class MultiTaskElasticNetCV(RegressorMixin, LinearModelCV):
+    """Multi-task L1/L2 ElasticNet with built-in cross-validation.
+
+    See glossary entry for :term:`cross-validation estimator`.
+
+    The optimization objective for MultiTaskElasticNet is::
+
+        (1 / (2 * n_samples)) * ||Y - XW||^Fro_2
+        + alpha * l1_ratio * ||W||_21
+        + 0.5 * alpha * (1 - l1_ratio) * ||W||_Fro^2
+
+    Where::
+
+        ||W||_21 = \\sum_i \\sqrt{\\sum_j w_{ij}^2}
+
+    i.e. the sum of norm of each row.
+
+    Read more in the :ref:`User Guide <multi_task_elastic_net>`.
+
+    .. versionadded:: 0.15
+
+    Parameters
+    ----------
+    l1_ratio : float or list of float, default=0.5
+        The ElasticNet mixing parameter, with 0 < l1_ratio <= 1.
+        For l1_ratio = 1 the penalty is an L1/L2 penalty. For l1_ratio = 0 it
+        is an L2 penalty.
+        For ``0 < l1_ratio < 1``, the penalty is a combination of L1/L2 and L2.
+        This parameter can be a list, in which case the different
+        values are tested by cross-validation and the one giving the best
+        prediction score is used. Note that a good choice of list of
+        values for l1_ratio is often to put more values close to 1
+        (i.e. Lasso) and less close to 0 (i.e. Ridge), as in ``[.1, .5, .7,
+        .9, .95, .99, 1]``.
+
+    eps : float, default=1e-3
+        Length of the path. ``eps=1e-3`` means that
+        ``alpha_min / alpha_max = 1e-3``.
+
+    n_alphas : int, default=100
+        Number of alphas along the regularization path.
+
+    alphas : array-like, default=None
+        List of alphas where to compute the models.
+        If not provided, set automatically.
+
+    fit_intercept : bool, default=True
+        Whether to calculate the intercept for this model. If set
+        to false, no intercept will be used in calculations
+        (i.e. data is expected to be centered).
+
+    max_iter : int, default=1000
+        The maximum number of iterations.
+
+    tol : float, default=1e-4
+        The tolerance for the optimization: if the updates are
+        smaller than ``tol``, the optimization code checks the
+        dual gap for optimality and continues until it is smaller
+        than ``tol``.
+
+    cv : int, cross-validation generator or iterable, default=None
+        Determines the cross-validation splitting strategy.
+        Possible inputs for cv are:
+
+        - None, to use the default 5-fold cross-validation,
+        - int, to specify the number of folds.
+        - :term:`CV splitter`,
+        - An iterable yielding (train, test) splits as arrays of indices.
+
+        For int/None inputs, :class:`KFold` is used.
+
+        Refer :ref:`User Guide <cross_validation>` for the various
+        cross-validation strategies that can be used here.
+
+        .. versionchanged:: 0.22
+            ``cv`` default value if None changed from 3-fold to 5-fold.
+
+    copy_X : bool, default=True
+        If ``True``, X will be copied; else, it may be overwritten.
+
+    verbose : bool or int, default=0
+        Amount of verbosity.
+
+    n_jobs : int, default=None
+        Number of CPUs to use during the cross validation. Note that this is
+        used only if multiple values for l1_ratio are given.
+        ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
+        ``-1`` means using all processors. See :term:`Glossary <n_jobs>`
+        for more details.
+
+    random_state : int, RandomState instance, default=None
+        The seed of the pseudo random number generator that selects a random
+        feature to update. Used when ``selection`` == 'random'.
+        Pass an int for reproducible output across multiple function calls.
+        See :term:`Glossary <random_state>`.
+
+    selection : {'cyclic', 'random'}, default='cyclic'
+        If set to 'random', a random coefficient is updated every iteration
+        rather than looping over features sequentially by default. This
+        (setting to 'random') often leads to significantly faster convergence
+        especially when tol is higher than 1e-4.
+
+    Attributes
+    ----------
+    intercept_ : ndarray of shape (n_targets,)
+        Independent term in decision function.
+
+    coef_ : ndarray of shape (n_targets, n_features)
+        Parameter vector (W in the cost function formula).
+        Note that ``coef_`` stores the transpose of ``W``, ``W.T``.
+
+    alpha_ : float
+        The amount of penalization chosen by cross validation.
+
+    mse_path_ : ndarray of shape (n_alphas, n_folds) or                 (n_l1_ratio, n_alphas, n_folds)
+        Mean square error for the test set on each fold, varying alpha.
+
+    alphas_ : ndarray of shape (n_alphas,) or (n_l1_ratio, n_alphas)
+        The grid of alphas used for fitting, for each l1_ratio.
+
+    l1_ratio_ : float
+        Best l1_ratio obtained by cross-validation.
+
+    n_iter_ : int
+        Number of iterations run by the coordinate descent solver to reach
+        the specified tolerance for the optimal alpha.
+
+    dual_gap_ : float
+        The dual gap at the end of the optimization for the optimal alpha.
+
+    n_features_in_ : int
+        Number of features seen during :term:`fit`.
+
+        .. versionadded:: 0.24
+
+    feature_names_in_ : ndarray of shape (`n_features_in_`,)
+        Names of features seen during :term:`fit`. Defined only when `X`
+        has feature names that are all strings.
+
+        .. versionadded:: 1.0
+
+    See Also
+    --------
+    MultiTaskElasticNet : Multi-task L1/L2 ElasticNet with built-in cross-validation.
+    ElasticNetCV : Elastic net model with best model selection by
+        cross-validation.
+    MultiTaskLassoCV : Multi-task Lasso model trained with L1/L2
+        mixed-norm as regularizer.
+
+    Notes
+    -----
+    The algorithm used to fit the model is coordinate descent.
+
+    In `fit`, once the best parameters `l1_ratio` and `alpha` are found through
+    cross-validation, the model is fit again using the entire training set.
+
+    To avoid unnecessary memory duplication the `X` and `y` arguments of the
+    `fit` method should be directly passed as Fortran-contiguous numpy arrays.
+
+    Examples
+    --------
+    >>> from sklearn import linear_model
+    >>> clf = linear_model.MultiTaskElasticNetCV(cv=3)
+    >>> clf.fit([[0,0], [1, 1], [2, 2]],
+    ...         [[0, 0], [1, 1], [2, 2]])
+    MultiTaskElasticNetCV(cv=3)
+    >>> print(clf.coef_)
+    [[0.52875032 0.46958558]
+     [0.52875032 0.46958558]]
+    >>> print(clf.intercept_)
+    [0.00166409 0.00166409]
+    """
+    path: Incomplete
+    l1_ratio: Incomplete
+    eps: Incomplete
+    n_alphas: Incomplete
+    alphas: Incomplete
+    fit_intercept: Incomplete
+    max_iter: Incomplete
+    tol: Incomplete
+    cv: Incomplete
+    copy_X: Incomplete
+    verbose: Incomplete
+    n_jobs: Incomplete
+    random_state: Incomplete
+    selection: Incomplete
+    def __init__(self, *, l1_ratio: float = 0.5, eps: float = 0.001, n_alphas: int = 100, alphas: Incomplete | None = None, fit_intercept: bool = True, max_iter: int = 1000, tol: float = 0.0001, cv: Incomplete | None = None, copy_X: bool = True, verbose: int = 0, n_jobs: Incomplete | None = None, random_state: Incomplete | None = None, selection: str = 'cyclic') -> None: ...
+    def fit(self, X, y):
+        """Fit MultiTaskElasticNet model with coordinate descent.
+
+        Fit is on grid of alphas and best alpha estimated by cross-validation.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features)
+            Training data.
+        y : ndarray of shape (n_samples, n_targets)
+            Training target variable. Will be cast to X's dtype if necessary.
+
+        Returns
+        -------
+        self : object
+            Returns MultiTaskElasticNet instance.
+        """
+
+class MultiTaskLassoCV(RegressorMixin, LinearModelCV):
+    """Multi-task Lasso model trained with L1/L2 mixed-norm as regularizer.
+
+    See glossary entry for :term:`cross-validation estimator`.
+
+    The optimization objective for MultiTaskLasso is::
+
+        (1 / (2 * n_samples)) * ||Y - XW||^Fro_2 + alpha * ||W||_21
+
+    Where::
+
+        ||W||_21 = \\sum_i \\sqrt{\\sum_j w_{ij}^2}
+
+    i.e. the sum of norm of each row.
+
+    Read more in the :ref:`User Guide <multi_task_lasso>`.
+
+    .. versionadded:: 0.15
+
+    Parameters
+    ----------
+    eps : float, default=1e-3
+        Length of the path. ``eps=1e-3`` means that
+        ``alpha_min / alpha_max = 1e-3``.
+
+    n_alphas : int, default=100
+        Number of alphas along the regularization path.
+
+    alphas : array-like, default=None
+        List of alphas where to compute the models.
+        If not provided, set automatically.
+
+    fit_intercept : bool, default=True
+        Whether to calculate the intercept for this model. If set
+        to false, no intercept will be used in calculations
+        (i.e. data is expected to be centered).
+
+    max_iter : int, default=1000
+        The maximum number of iterations.
+
+    tol : float, default=1e-4
+        The tolerance for the optimization: if the updates are
+        smaller than ``tol``, the optimization code checks the
+        dual gap for optimality and continues until it is smaller
+        than ``tol``.
+
+    copy_X : bool, default=True
+        If ``True``, X will be copied; else, it may be overwritten.
+
+    cv : int, cross-validation generator or iterable, default=None
+        Determines the cross-validation splitting strategy.
+        Possible inputs for cv are:
+
+        - None, to use the default 5-fold cross-validation,
+        - int, to specify the number of folds.
+        - :term:`CV splitter`,
+        - An iterable yielding (train, test) splits as arrays of indices.
+
+        For int/None inputs, :class:`KFold` is used.
+
+        Refer :ref:`User Guide <cross_validation>` for the various
+        cross-validation strategies that can be used here.
+
+        .. versionchanged:: 0.22
+            ``cv`` default value if None changed from 3-fold to 5-fold.
+
+    verbose : bool or int, default=False
+        Amount of verbosity.
+
+    n_jobs : int, default=None
+        Number of CPUs to use during the cross validation. Note that this is
+        used only if multiple values for l1_ratio are given.
+        ``None`` means 1 unless in a :obj:`joblib.parallel_backend` context.
+        ``-1`` means using all processors. See :term:`Glossary <n_jobs>`
+        for more details.
+
+    random_state : int, RandomState instance, default=None
+        The seed of the pseudo random number generator that selects a random
+        feature to update. Used when ``selection`` == 'random'.
+        Pass an int for reproducible output across multiple function calls.
+        See :term:`Glossary <random_state>`.
+
+    selection : {'cyclic', 'random'}, default='cyclic'
+        If set to 'random', a random coefficient is updated every iteration
+        rather than looping over features sequentially by default. This
+        (setting to 'random') often leads to significantly faster convergence
+        especially when tol is higher than 1e-4.
+
+    Attributes
+    ----------
+    intercept_ : ndarray of shape (n_targets,)
+        Independent term in decision function.
+
+    coef_ : ndarray of shape (n_targets, n_features)
+        Parameter vector (W in the cost function formula).
+        Note that ``coef_`` stores the transpose of ``W``, ``W.T``.
+
+    alpha_ : float
+        The amount of penalization chosen by cross validation.
+
+    mse_path_ : ndarray of shape (n_alphas, n_folds)
+        Mean square error for the test set on each fold, varying alpha.
+
+    alphas_ : ndarray of shape (n_alphas,)
+        The grid of alphas used for fitting.
+
+    n_iter_ : int
+        Number of iterations run by the coordinate descent solver to reach
+        the specified tolerance for the optimal alpha.
+
+    dual_gap_ : float
+        The dual gap at the end of the optimization for the optimal alpha.
+
+    n_features_in_ : int
+        Number of features seen during :term:`fit`.
+
+        .. versionadded:: 0.24
+
+    feature_names_in_ : ndarray of shape (`n_features_in_`,)
+        Names of features seen during :term:`fit`. Defined only when `X`
+        has feature names that are all strings.
+
+        .. versionadded:: 1.0
+
+    See Also
+    --------
+    MultiTaskElasticNet : Multi-task ElasticNet model trained with L1/L2
+        mixed-norm as regularizer.
+    ElasticNetCV : Elastic net model with best model selection by
+        cross-validation.
+    MultiTaskElasticNetCV : Multi-task L1/L2 ElasticNet with built-in
+        cross-validation.
+
+    Notes
+    -----
+    The algorithm used to fit the model is coordinate descent.
+
+    In `fit`, once the best parameter `alpha` is found through
+    cross-validation, the model is fit again using the entire training set.
+
+    To avoid unnecessary memory duplication the `X` and `y` arguments of the
+    `fit` method should be directly passed as Fortran-contiguous numpy arrays.
+
+    Examples
+    --------
+    >>> from sklearn.linear_model import MultiTaskLassoCV
+    >>> from sklearn.datasets import make_regression
+    >>> from sklearn.metrics import r2_score
+    >>> X, y = make_regression(n_targets=2, noise=4, random_state=0)
+    >>> reg = MultiTaskLassoCV(cv=5, random_state=0).fit(X, y)
+    >>> r2_score(y, reg.predict(X))
+    0.9994...
+    >>> reg.alpha_
+    0.5713...
+    >>> reg.predict(X[:1,])
+    array([[153.7971...,  94.9015...]])
+    """
+    path: Incomplete
+    def __init__(self, *, eps: float = 0.001, n_alphas: int = 100, alphas: Incomplete | None = None, fit_intercept: bool = True, max_iter: int = 1000, tol: float = 0.0001, copy_X: bool = True, cv: Incomplete | None = None, verbose: bool = False, n_jobs: Incomplete | None = None, random_state: Incomplete | None = None, selection: str = 'cyclic') -> None: ...
+    def fit(self, X, y):
+        """Fit MultiTaskLasso model with coordinate descent.
+
+        Fit is on grid of alphas and best alpha estimated by cross-validation.
+
+        Parameters
+        ----------
+        X : ndarray of shape (n_samples, n_features)
+            Data.
+        y : ndarray of shape (n_samples, n_targets)
+            Target. Will be cast to X's dtype if necessary.
+
+        Returns
+        -------
+        self : object
+            Returns an instance of fitted model.
+        """

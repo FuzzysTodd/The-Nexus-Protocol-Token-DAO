@@ -1,0 +1,12 @@
+from _typeshed import Incomplete
+
+N_SPLITS: int
+RANDOM_SEED: int
+SPLIT_RATIO: float
+MEM_THRES: Incomplete
+SMALL_LARGE_THRES: int
+MIN_SAMPLE_TRAIN: int
+CV_HOLDOUT_THRESHOLD: int
+SAMPLE_MULTIPLY_FACTOR: int
+SEARCH_THREAD_EPS: float
+PENALTY: float

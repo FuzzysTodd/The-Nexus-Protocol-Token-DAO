@@ -1,0 +1,3 @@
+from collections.abc import Generator
+
+def report_compile_source_on_error() -> Generator[None, None, None]: ...

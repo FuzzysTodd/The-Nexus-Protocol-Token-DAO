@@ -1,0 +1,13 @@
+from _typeshed import Incomplete
+
+__all__ = ['callback']
+
+class callback:
+    callback: Incomplete
+    args: Incomplete
+    def __init__(self, cb, args) -> None: ...
+    def stop(self) -> None: ...
+    close = stop
+    def __bool__(self) -> bool: ...
+    @property
+    def pending(self): ...

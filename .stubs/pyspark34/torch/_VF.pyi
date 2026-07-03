@@ -1,0 +1,6 @@
+import types
+
+class VFModule(types.ModuleType):
+    vf: types.ModuleType
+    def __init__(self, name) -> None: ...
+    def __getattr__(self, attr): ...

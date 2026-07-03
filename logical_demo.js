@@ -19,6 +19,9 @@ function notifyUser(message) {
 const nexusFinancialContractAddress = "0x...";
 const nexusGreenTokenAddress = "0x...";
 
+// Nexus personal RPC endpoint (Tatum gateway) – used as read-only fallback
+const TATUM_RPC_URL = "https://tod-29e783f1.gateway.tatum.io/";
+
 let provider;
 let signer;
 let nexusFinancialContract;
@@ -33,25 +36,46 @@ async function connectWallet() {
             provider = new ethers.providers.Web3Provider(window.ethereum);
             await provider.send("eth_requestAccounts", []);
             signer = provider.getSigner();
-
-            nexusFinancialContract = new ethers.Contract(
-                nexusFinancialContractAddress,
-                NexusFinancialContractABI.abi,
-                signer
-            );
-            nexusGreenToken = new ethers.Contract(
-                nexusGreenTokenAddress,
-                NexusGreenTokenABI.abi,
-                signer
-            );
-
-            console.log("Wallet connected:", await signer.getAddress());
         } catch (error) {
             console.error("User rejected connection:", error);
+            // Fall back to Tatum read-only provider so read calls still work
+            provider = new ethers.providers.JsonRpcProvider(TATUM_RPC_URL);
+            signer = null;
         }
     } else {
-        console.error("MetaMask is not installed!");
+        console.warn("MetaMask not installed – using Tatum read-only provider.");
+        provider = new ethers.providers.JsonRpcProvider(TATUM_RPC_URL);
+        signer = null;
     }
+
+    if (!signer) {
+        // Read-only: instantiate contracts against the Tatum provider so callers
+        // can still run view/pure functions without a connected wallet.
+        nexusFinancialContract = new ethers.Contract(
+            nexusFinancialContractAddress,
+            NexusFinancialContractABI.abi,
+            provider
+        );
+        nexusGreenToken = new ethers.Contract(
+            nexusGreenTokenAddress,
+            NexusGreenTokenABI.abi,
+            provider
+        );
+        return;
+    }
+
+    nexusFinancialContract = new ethers.Contract(
+        nexusFinancialContractAddress,
+        NexusFinancialContractABI.abi,
+        signer
+    );
+    nexusGreenToken = new ethers.Contract(
+        nexusGreenTokenAddress,
+        NexusGreenTokenABI.abi,
+        signer
+    );
+
+    console.log("Wallet connected:", await signer.getAddress());
 }
 
 /**

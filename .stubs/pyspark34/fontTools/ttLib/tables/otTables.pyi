@@ -1,0 +1,409 @@
+from .otBase import BaseTable as BaseTable, CountReference as CountReference, FormatSwitchingBaseTable as FormatSwitchingBaseTable, ValueRecord as ValueRecord, getFormatSwitchingBaseTableClass as getFormatSwitchingBaseTableClass
+from _typeshed import Incomplete
+from enum import IntEnum, IntFlag
+from fontTools.feaLib.lookupDebugInfo import LOOKUP_DEBUG_INFO_KEY as LOOKUP_DEBUG_INFO_KEY, LookupDebugInfo as LookupDebugInfo
+from fontTools.misc.arrayTools import quantizeRect as quantizeRect
+from fontTools.misc.roundTools import otRound as otRound
+from fontTools.misc.textTools import bytesjoin as bytesjoin, pad as pad, safeEval as safeEval
+from fontTools.misc.transform import DecomposedTransform as DecomposedTransform, Identity as Identity, Transform as Transform
+from fontTools.misc.vector import Vector as Vector
+from fontTools.pens.boundsPen import ControlBoundsPen as ControlBoundsPen
+from fontTools.pens.transformPen import TransformPen as TransformPen
+from fontTools.ttLib.tables.TupleVariation import TupleVariation as TupleVariation
+from fontTools.ttLib.tables.otTraverse import dfs_base_table as dfs_base_table
+from fontTools.ttLib.ttGlyphSet import _TTGlyphSet
+from typing import Iterator, List, NamedTuple
+
+log: Incomplete
+
+class VarComponentFlags(IntFlag):
+    RESET_UNSPECIFIED_AXES: Incomplete
+    HAVE_AXES: Incomplete
+    AXIS_VALUES_HAVE_VARIATION: Incomplete
+    TRANSFORM_HAS_VARIATION: Incomplete
+    HAVE_TRANSLATE_X: Incomplete
+    HAVE_TRANSLATE_Y: Incomplete
+    HAVE_ROTATION: Incomplete
+    HAVE_CONDITION: Incomplete
+    HAVE_SCALE_X: Incomplete
+    HAVE_SCALE_Y: Incomplete
+    HAVE_TCENTER_X: Incomplete
+    HAVE_TCENTER_Y: Incomplete
+    GID_IS_24BIT: Incomplete
+    HAVE_SKEW_X: Incomplete
+    HAVE_SKEW_Y: Incomplete
+    RESERVED_MASK: Incomplete
+
+class VarTransformMappingValues(NamedTuple):
+    flag: Incomplete
+    fractionalBits: Incomplete
+    scale: Incomplete
+    defaultValue: Incomplete
+
+VAR_TRANSFORM_MAPPING: Incomplete
+
+class VarComponent:
+    def __init__(self) -> None: ...
+    flags: int
+    glyphName: Incomplete
+    conditionIndex: Incomplete
+    axisIndicesIndex: Incomplete
+    axisValues: Incomplete
+    axisValuesVarIndex: Incomplete
+    transformVarIndex: Incomplete
+    transform: Incomplete
+    def populateDefaults(self, propagator: Incomplete | None = None) -> None: ...
+    def decompile(self, data, font, localState): ...
+    def compile(self, font): ...
+    def toXML(self, writer, ttFont, attrs) -> None: ...
+    def fromXML(self, name, attrs, content, ttFont) -> None: ...
+    def applyTransformDeltas(self, deltas): ...
+    def __eq__(self, other): ...
+    def __ne__(self, other): ...
+
+class VarCompositeGlyph:
+    components: Incomplete
+    def __init__(self, components: Incomplete | None = None) -> None: ...
+    def decompile(self, data, font, localState) -> None: ...
+    def compile(self, font): ...
+    def toXML(self, xmlWriter, font, attrs, name) -> None: ...
+    def fromXML(self, name, attrs, content, font) -> None: ...
+
+class AATStateTable:
+    GlyphClasses: Incomplete
+    States: Incomplete
+    PerGlyphLookups: Incomplete
+    def __init__(self) -> None: ...
+
+class AATState:
+    Transitions: Incomplete
+    def __init__(self) -> None: ...
+
+class AATAction:
+    @staticmethod
+    def compileActions(font, states): ...
+
+class RearrangementMorphAction(AATAction):
+    staticSize: int
+    actionHeaderSize: int
+    NewState: int
+    Verb: int
+    MarkFirst: bool
+    DontAdvance: bool
+    MarkLast: bool
+    ReservedFlags: int
+    def __init__(self) -> None: ...
+    def compile(self, writer, font, actionIndex) -> None: ...
+    def decompile(self, reader, font, actionReader) -> None: ...
+    def toXML(self, xmlWriter, font, attrs, name) -> None: ...
+    def fromXML(self, name, attrs, content, font) -> None: ...
+
+class ContextualMorphAction(AATAction):
+    staticSize: int
+    actionHeaderSize: int
+    NewState: int
+    ReservedFlags: int
+    def __init__(self) -> None: ...
+    def compile(self, writer, font, actionIndex) -> None: ...
+    SetMark: Incomplete
+    DontAdvance: Incomplete
+    MarkIndex: Incomplete
+    CurrentIndex: Incomplete
+    def decompile(self, reader, font, actionReader) -> None: ...
+    def toXML(self, xmlWriter, font, attrs, name) -> None: ...
+    def fromXML(self, name, attrs, content, font) -> None: ...
+
+class LigAction:
+    Store: bool
+    GlyphIndexDelta: int
+    def __init__(self) -> None: ...
+
+class LigatureMorphAction(AATAction):
+    staticSize: int
+    actionHeaderSize: int
+    NewState: int
+    ReservedFlags: int
+    Actions: Incomplete
+    def __init__(self) -> None: ...
+    def compile(self, writer, font, actionIndex) -> None: ...
+    SetComponent: Incomplete
+    DontAdvance: Incomplete
+    def decompile(self, reader, font, actionReader) -> None: ...
+    @staticmethod
+    def compileActions(font, states): ...
+    def compileLigActions(self): ...
+    def fromXML(self, name, attrs, content, font) -> None: ...
+    def toXML(self, xmlWriter, font, attrs, name) -> None: ...
+
+class InsertionMorphAction(AATAction):
+    staticSize: int
+    actionHeaderSize: int
+    NewState: int
+    ReservedFlags: int
+    def __init__(self) -> None: ...
+    def compile(self, writer, font, actionIndex) -> None: ...
+    SetMark: Incomplete
+    DontAdvance: Incomplete
+    CurrentIsKashidaLike: Incomplete
+    MarkedIsKashidaLike: Incomplete
+    CurrentInsertBefore: Incomplete
+    MarkedInsertBefore: Incomplete
+    CurrentInsertionAction: Incomplete
+    MarkedInsertionAction: Incomplete
+    def decompile(self, reader, font, actionReader) -> None: ...
+    def toXML(self, xmlWriter, font, attrs, name) -> None: ...
+    def fromXML(self, name, attrs, content, font) -> None: ...
+    @staticmethod
+    def compileActions(font, states): ...
+
+class FeatureParams(BaseTable):
+    def compile(self, writer, font) -> None: ...
+    def toXML(self, xmlWriter, font, attrs: Incomplete | None = None, name: Incomplete | None = None) -> None: ...
+
+class FeatureParamsSize(FeatureParams): ...
+class FeatureParamsStylisticSet(FeatureParams): ...
+class FeatureParamsCharacterVariants(FeatureParams): ...
+
+class Coverage(FormatSwitchingBaseTable):
+    glyphs: Incomplete
+    def populateDefaults(self, propagator: Incomplete | None = None) -> None: ...
+    def postRead(self, rawTable, font): ...
+    Format: Incomplete
+    def preWrite(self, font): ...
+    def toXML2(self, xmlWriter, font) -> None: ...
+    def fromXML(self, name, attrs, content, font) -> None: ...
+
+NO_VARIATION_INDEX: int
+
+class DeltaSetIndexMap(Incomplete):
+    mapping: Incomplete
+    def populateDefaults(self, propagator: Incomplete | None = None) -> None: ...
+    def postRead(self, rawTable, font) -> None: ...
+    @staticmethod
+    def getEntryFormat(mapping): ...
+    Format: Incomplete
+    def preWrite(self, font): ...
+    def toXML2(self, xmlWriter, font) -> None: ...
+    def fromXML(self, name, attrs, content, font) -> None: ...
+    def __getitem__(self, i): ...
+
+class VarIdxMap(BaseTable):
+    mapping: Incomplete
+    def populateDefaults(self, propagator: Incomplete | None = None) -> None: ...
+    def postRead(self, rawTable, font) -> None: ...
+    def preWrite(self, font): ...
+    def toXML2(self, xmlWriter, font) -> None: ...
+    def fromXML(self, name, attrs, content, font) -> None: ...
+    def __getitem__(self, glyphName): ...
+
+class VarRegionList(BaseTable):
+    RegionAxisCount: Incomplete
+    def preWrite(self, font): ...
+
+class SingleSubst(FormatSwitchingBaseTable):
+    mapping: Incomplete
+    def populateDefaults(self, propagator: Incomplete | None = None) -> None: ...
+    def postRead(self, rawTable, font) -> None: ...
+    Format: Incomplete
+    def preWrite(self, font): ...
+    def toXML2(self, xmlWriter, font) -> None: ...
+    def fromXML(self, name, attrs, content, font) -> None: ...
+
+class MultipleSubst(FormatSwitchingBaseTable):
+    mapping: Incomplete
+    def populateDefaults(self, propagator: Incomplete | None = None) -> None: ...
+    def postRead(self, rawTable, font) -> None: ...
+    Format: int
+    def preWrite(self, font): ...
+    def toXML2(self, xmlWriter, font) -> None: ...
+    old_coverage_: Incomplete
+    def fromXML(self, name, attrs, content, font) -> None: ...
+    @staticmethod
+    def makeSequence_(g): ...
+
+class ClassDef(FormatSwitchingBaseTable):
+    classDefs: Incomplete
+    def populateDefaults(self, propagator: Incomplete | None = None) -> None: ...
+    def postRead(self, rawTable, font) -> None: ...
+    Format: Incomplete
+    def preWrite(self, font): ...
+    def toXML2(self, xmlWriter, font) -> None: ...
+    def fromXML(self, name, attrs, content, font) -> None: ...
+
+class AlternateSubst(FormatSwitchingBaseTable):
+    alternates: Incomplete
+    def populateDefaults(self, propagator: Incomplete | None = None) -> None: ...
+    def postRead(self, rawTable, font) -> None: ...
+    Format: int
+    sortCoverageLast: int
+    def preWrite(self, font): ...
+    def toXML2(self, xmlWriter, font) -> None: ...
+    def fromXML(self, name, attrs, content, font) -> None: ...
+
+class LigatureSubst(FormatSwitchingBaseTable):
+    ligatures: Incomplete
+    def populateDefaults(self, propagator: Incomplete | None = None) -> None: ...
+    def postRead(self, rawTable, font) -> None: ...
+    Format: int
+    sortCoverageLast: int
+    def preWrite(self, font): ...
+    def toXML2(self, xmlWriter, font) -> None: ...
+    def fromXML(self, name, attrs, content, font) -> None: ...
+
+class COLR(BaseTable):
+    def decompile(self, reader, font): ...
+    LayerRecordCount: Incomplete
+    def preWrite(self, font): ...
+    ClipList: Incomplete
+    def computeClipBoxes(self, glyphSet: _TTGlyphSet, quantization: int = 1): ...
+
+class LookupList(BaseTable):
+    @property
+    def table(self): ...
+    def toXML2(self, xmlWriter, font): ...
+
+class BaseGlyphRecordArray(BaseTable):
+    BaseGlyphRecord: Incomplete
+    def preWrite(self, font): ...
+
+class BaseGlyphList(BaseTable):
+    BaseGlyphPaintRecord: Incomplete
+    def preWrite(self, font): ...
+
+class ClipBoxFormat(IntEnum):
+    Static: int
+    Variable: int
+    def is_variable(self): ...
+    def as_variable(self): ...
+
+class ClipBox(Incomplete):
+    formatEnum = ClipBoxFormat
+    def as_tuple(self): ...
+
+class ClipList(Incomplete):
+    clips: Incomplete
+    def populateDefaults(self, propagator: Incomplete | None = None) -> None: ...
+    def postRead(self, rawTable, font) -> None: ...
+    def groups(self): ...
+    def preWrite(self, font): ...
+    def toXML(self, xmlWriter, font, attrs: Incomplete | None = None, name: Incomplete | None = None): ...
+    def fromXML(self, name, attrs, content, font) -> None: ...
+
+class ExtendMode(IntEnum):
+    PAD: int
+    REPEAT: int
+    REFLECT: int
+
+class CompositeMode(IntEnum):
+    CLEAR: int
+    SRC: int
+    DEST: int
+    SRC_OVER: int
+    DEST_OVER: int
+    SRC_IN: int
+    DEST_IN: int
+    SRC_OUT: int
+    DEST_OUT: int
+    SRC_ATOP: int
+    DEST_ATOP: int
+    XOR: int
+    PLUS: int
+    SCREEN: int
+    OVERLAY: int
+    DARKEN: int
+    LIGHTEN: int
+    COLOR_DODGE: int
+    COLOR_BURN: int
+    HARD_LIGHT: int
+    SOFT_LIGHT: int
+    DIFFERENCE: int
+    EXCLUSION: int
+    MULTIPLY: int
+    HSL_HUE: int
+    HSL_SATURATION: int
+    HSL_COLOR: int
+    HSL_LUMINOSITY: int
+
+class PaintFormat(IntEnum):
+    PaintColrLayers: int
+    PaintSolid: int
+    PaintVarSolid: int
+    PaintLinearGradient: int
+    PaintVarLinearGradient: int
+    PaintRadialGradient: int
+    PaintVarRadialGradient: int
+    PaintSweepGradient: int
+    PaintVarSweepGradient: int
+    PaintGlyph: int
+    PaintColrGlyph: int
+    PaintTransform: int
+    PaintVarTransform: int
+    PaintTranslate: int
+    PaintVarTranslate: int
+    PaintScale: int
+    PaintVarScale: int
+    PaintScaleAroundCenter: int
+    PaintVarScaleAroundCenter: int
+    PaintScaleUniform: int
+    PaintVarScaleUniform: int
+    PaintScaleUniformAroundCenter: int
+    PaintVarScaleUniformAroundCenter: int
+    PaintRotate: int
+    PaintVarRotate: int
+    PaintRotateAroundCenter: int
+    PaintVarRotateAroundCenter: int
+    PaintSkew: int
+    PaintVarSkew: int
+    PaintSkewAroundCenter: int
+    PaintVarSkewAroundCenter: int
+    PaintComposite: int
+    def is_variable(self): ...
+    def as_variable(self): ...
+
+class Paint(Incomplete):
+    formatEnum = PaintFormat
+    def getFormatName(self): ...
+    def toXML(self, xmlWriter, font, attrs: Incomplete | None = None, name: Incomplete | None = None) -> None: ...
+    def iterPaintSubTables(self, colr: COLR) -> Iterator[BaseTable.SubTableEntry]: ...
+    def getChildren(self, colr) -> List['Paint']: ...
+    def traverse(self, colr: COLR, callback):
+        """Depth-first traversal of graph rooted at self, callback on each node."""
+    def getTransform(self) -> Transform: ...
+    def computeClipBox(self, colr: COLR, glyphSet: _TTGlyphSet, quantization: int = 1) -> ClipBox | None: ...
+
+def fixLookupOverFlows(ttf, overflowRecord):
+    """Either the offset from the LookupList to a lookup overflowed, or
+    an offset from a lookup to a subtable overflowed.
+    The table layout is:
+    GPSO/GUSB
+            Script List
+            Feature List
+            LookUpList
+                    Lookup[0] and contents
+                            SubTable offset list
+                                    SubTable[0] and contents
+                                    ...
+                                    SubTable[n] and contents
+                    ...
+                    Lookup[n] and contents
+                            SubTable offset list
+                                    SubTable[0] and contents
+                                    ...
+                                    SubTable[n] and contents
+    If the offset to a lookup overflowed (SubTableIndex is None)
+            we must promote the *previous*\tlookup to an Extension type.
+    If the offset from a lookup to subtable overflowed, then we must promote it
+            to an Extension Lookup type.
+    """
+def splitMultipleSubst(oldSubTable, newSubTable, overflowRecord): ...
+def splitAlternateSubst(oldSubTable, newSubTable, overflowRecord): ...
+def splitLigatureSubst(oldSubTable, newSubTable, overflowRecord): ...
+def splitPairPos(oldSubTable, newSubTable, overflowRecord): ...
+def splitMarkBasePos(oldSubTable, newSubTable, overflowRecord): ...
+
+splitTable: Incomplete
+
+def fixSubTableOverFlows(ttf, overflowRecord):
+    """
+    An offset has overflowed within a sub-table. We need to divide this subtable into smaller parts.
+    """

@@ -1,0 +1,59 @@
+from . import encode_base64 as encode_base64, url_quote as url_quote
+from .request_handlers import get_length as get_length
+from .response_handlers import return_response_headers as return_response_headers
+from .uploads import IterStreamer as IterStreamer, SubStream as SubStream
+from _typeshed import Incomplete
+from collections.abc import Generator
+from typing import AsyncGenerator
+
+async def upload_data_chunks(service: Incomplete | None = None, uploader_class: Incomplete | None = None, total_size: Incomplete | None = None, chunk_size: Incomplete | None = None, max_concurrency: Incomplete | None = None, stream: Incomplete | None = None, progress_hook: Incomplete | None = None, **kwargs): ...
+async def upload_substream_blocks(service: Incomplete | None = None, uploader_class: Incomplete | None = None, total_size: Incomplete | None = None, chunk_size: Incomplete | None = None, max_concurrency: Incomplete | None = None, stream: Incomplete | None = None, progress_hook: Incomplete | None = None, **kwargs): ...
+
+class _ChunkUploader:
+    service: Incomplete
+    total_size: Incomplete
+    chunk_size: Incomplete
+    stream: Incomplete
+    parallel: Incomplete
+    stream_lock: Incomplete
+    progress_total: int
+    progress_lock: Incomplete
+    progress_hook: Incomplete
+    encryptor: Incomplete
+    padder: Incomplete
+    response_headers: Incomplete
+    etag: Incomplete
+    last_modified: Incomplete
+    request_options: Incomplete
+    def __init__(self, service, total_size, chunk_size, stream, parallel, encryptor: Incomplete | None = None, padder: Incomplete | None = None, progress_hook: Incomplete | None = None, **kwargs) -> None: ...
+    async def get_chunk_streams(self) -> Generator[Incomplete, None, None]: ...
+    async def process_chunk(self, chunk_data): ...
+    def get_substream_blocks(self) -> Generator[Incomplete, None, None]: ...
+    async def process_substream_block(self, block_data): ...
+    def set_response_properties(self, resp) -> None: ...
+
+class BlockBlobChunkUploader(_ChunkUploader):
+    current_length: Incomplete
+    def __init__(self, *args, **kwargs) -> None: ...
+
+class PageBlobChunkUploader(_ChunkUploader): ...
+
+class AppendBlobChunkUploader(_ChunkUploader):
+    current_length: Incomplete
+    def __init__(self, *args, **kwargs) -> None: ...
+
+class DataLakeFileChunkUploader(_ChunkUploader): ...
+class FileChunkUploader(_ChunkUploader): ...
+
+class AsyncIterStreamer:
+    """
+    File-like streaming object for AsyncGenerators.
+    """
+    iterator: Incomplete
+    leftover: bytes
+    encoding: Incomplete
+    def __init__(self, generator: AsyncGenerator[bytes | str, None], encoding: str = 'UTF-8') -> None: ...
+    def seekable(self): ...
+    def tell(self, *args, **kwargs) -> None: ...
+    def seek(self, *args, **kwargs) -> None: ...
+    async def read(self, size: int) -> bytes: ...

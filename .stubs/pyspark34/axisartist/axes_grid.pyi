@@ -1,0 +1,6 @@
+import mpl_toolkits.axes_grid1.axes_grid as axes_grid_orig
+from .axislines import Axes as Axes
+
+class Grid(axes_grid_orig.Grid): ...
+class ImageGrid(axes_grid_orig.ImageGrid): ...
+AxesGrid = ImageGrid

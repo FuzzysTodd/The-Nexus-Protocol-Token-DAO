@@ -1,0 +1,6 @@
+from typing import OrderedDict
+
+simple_call_counter: OrderedDict[str, int]
+
+def count_label(label) -> None: ...
+def count(fn): ...

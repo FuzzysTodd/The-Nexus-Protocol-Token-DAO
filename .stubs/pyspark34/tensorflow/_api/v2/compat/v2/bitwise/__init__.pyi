@@ -1,0 +1,1 @@
+from tensorflow.python.ops.gen_bitwise_ops import bitwise_and as bitwise_and, bitwise_or as bitwise_or, bitwise_xor as bitwise_xor, invert as invert, left_shift as left_shift, right_shift as right_shift

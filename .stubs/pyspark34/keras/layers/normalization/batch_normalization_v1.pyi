@@ -1,0 +1,4 @@
+from keras.layers.normalization import batch_normalization as batch_normalization
+
+class BatchNormalization(batch_normalization.BatchNormalizationBase):
+    def __init__(self, *args, **kwargs) -> None: ...

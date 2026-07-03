@@ -1,0 +1,2 @@
+from tensorflow_estimator.python.estimator.inputs.numpy_io import numpy_input_fn as numpy_input_fn
+from tensorflow_estimator.python.estimator.inputs.pandas_io import pandas_input_fn as pandas_input_fn

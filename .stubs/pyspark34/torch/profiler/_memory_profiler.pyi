@@ -1,0 +1,153 @@
+import dataclasses
+import enum
+import torch
+from _typeshed import Incomplete
+from torch._C import FunctionSchema as FunctionSchema
+from torch._C._autograd import _ProfilerResult
+from torch._C._profiler import RecordScope as RecordScope, _ExtraFields_Allocation, _ExtraFields_TorchOp, _ProfilerEvent, _TensorMetadata
+from typing import Any, Dict, Iterator, Tuple
+
+TensorAndID: Incomplete
+log: Incomplete
+
+class Category(enum.Enum):
+    INPUT: Incomplete
+    TEMPORARY: Incomplete
+    ACTIVATION: Incomplete
+    GRADIENT: Incomplete
+    AUTOGRAD_DETAIL: Incomplete
+    PARAMETER: Incomplete
+    OPTIMIZER_STATE: Incomplete
+
+class Action(enum.Enum):
+    PREEXISTING: Incomplete
+    CREATE: Incomplete
+    INCREMENT_VERSION: Incomplete
+    DESTROY: Incomplete
+
+@dataclasses.dataclass
+class _Storage:
+    """Bundle storage pointer and id.
+
+    All profiling logic should use `allocation_id`, however it is useful to
+    print storage pointers for debugging and unit tests sometimes look up
+    values using the storage data pointer of a live Tensor."""
+    ptr: int
+    allocation_id: int
+    def __eq__(self, other: Any) -> bool: ...
+    def __hash__(self) -> int: ...
+    def __init__(self, ptr, allocation_id) -> None: ...
+
+@dataclasses.dataclass(eq=True, unsafe_hash=True, frozen=True)
+class TensorKey:
+    """Hashable identifier for a storage which has been asigned an ID.
+
+    A detailed description of Tensor IDs and why they are needed is given in
+    `torch/csrc/profiler/collection.h` when `TensorID` is declared. To
+    summarize, multiple Storage buffers can map to the same logical Tensor.
+    This dataclass is used to refer to a concrete in-memory StorageImpl of
+    a Tensor.
+    """
+    id: int
+    storage: _Storage
+    device: torch.device
+    def __lt__(self, other: TensorKey) -> bool: ...
+    @classmethod
+    def from_allocation(cls, alloc: _ExtraFields_Allocation) -> TensorKey | None: ...
+    @classmethod
+    def from_tensor(cls, t: _TensorMetadata | None) -> TensorKey | None: ...
+    def __init__(self, id, storage, device) -> None: ...
+
+def extract_parameters(node: _ProfilerEvent) -> Iterator[TensorKey]: ...
+def extract_gradients(node: _ProfilerEvent) -> Iterator[Tuple[TensorKey | None, TensorKey]]: ...
+def get_scopes(event: _ProfilerEvent | None) -> Tuple[RecordScope, ...]: ...
+
+class SchemaMatcher:
+    """Lookup operator schema based on profiled name.
+
+    When profiling we record the operator's name but not the schema. However
+    some analysis requires that information. Fortunately we can look up
+    registered schema from the recorded name. We do not, however, record the
+    overload and so we must compare the profiled arguments with all overloads
+    to determine viable matches.
+
+    Note: Once https://github.com/pytorch/pytorch/issues/78871 is completed
+    this code will be obsolete.
+    """
+    @classmethod
+    def inputs_are_mutable(cls, t: _ExtraFields_TorchOp) -> Tuple[bool | None, ...]:
+        """Determine which inputs may have mutated based on function schema.
+
+        Note that we don't need to resolve down to a single schema to perform
+        this analysis. An input is mutable if it is mutable in any overload. In
+        practice, however, it is overwhelmingly common to match a single
+        overload. If we cannot find any valid schema then we must be
+        conservative and assume all inputs are mutable.
+        """
+    @classmethod
+    def match_schemas(cls, t: _ExtraFields_TorchOp) -> Tuple[FunctionSchema, ...]: ...
+    @staticmethod
+    def lookup_schemas(name: str) -> Tuple[FunctionSchema, ...] | None: ...
+
+class OpTree:
+    def __init__(self, result: _ProfilerResult) -> None: ...
+    def dfs(self, *args, **kwargs) -> Iterator[_ProfilerEvent]: ...
+    @property
+    def sorted_nodes(self) -> Tuple[_ProfilerEvent, ...]: ...
+
+class SizeMap:
+    def __init__(self, op_tree: OpTree) -> None: ...
+    def __getitem__(self, key: TensorKey): ...
+
+@dataclasses.dataclass()
+class DataFlowEdge:
+    input_version: int | None = ...
+    mutated: bool | None = ...
+    @property
+    def is_allocation(self) -> bool: ...
+    @property
+    def is_deletion(self) -> bool: ...
+    def __init__(self, input_version, mutated) -> None: ...
+
+class DataFlowNode:
+    def __init__(self, event: _ProfilerEvent, graph: DataFlowGraph) -> None: ...
+    @property
+    def inputs(self) -> Dict[TensorKey, Tuple[bool, int]]: ...
+    @property
+    def outputs(self) -> Dict[TensorKey, int]: ...
+    @property
+    def intermediates(self) -> Tuple[TensorKey, ...]: ...
+    @property
+    def start_time(self) -> int: ...
+
+class DataFlowGraph:
+    def __init__(self, op_tree: OpTree) -> None: ...
+    @property
+    def flow_nodes(self) -> Tuple[DataFlowNode, ...]: ...
+    def validate(self) -> None: ...
+    @property
+    def leaf_events(self) -> Tuple[_ProfilerEvent, ...]: ...
+    def lookup(self, key: TensorKey) -> int: ...
+    def bump(self, key: TensorKey) -> None: ...
+    def delete(self, key: TensorKey) -> None: ...
+
+@dataclasses.dataclass
+class CategoryElement:
+    by_id: Category | None = ...
+    by_key: Dict[TensorKey, Category] = ...
+    by_version: Dict[TensorAndID, Category] = ...
+    def __init__(self, by_id, by_key, by_version, _by_id_keyset) -> None: ...
+
+@dataclasses.dataclass
+class CategoryDict:
+    def set_by_id(self, key: TensorKey, category: Category) -> None: ...
+    def set_by_key(self, key: TensorKey, category: Category) -> None: ...
+    def set_by_version(self, key: TensorKey, version: int, category: Category) -> None: ...
+    def setdefault_by_version(self, key: TensorKey, version: int, category: Category) -> None: ...
+    def get(self, key: TensorKey, version: int) -> Category | None: ...
+    def __init__(self, _values) -> None: ...
+
+class MemoryProfile:
+    def __init__(self, result: _ProfilerResult) -> None: ...
+    @property
+    def timeline(self) -> Tuple[Tuple[int, Action, TensorAndID, int], ...]: ...

@@ -1,0 +1,21 @@
+from _typeshed import Incomplete
+from typing import Dict, List, Set
+
+ENCODING_MARKS: Dict[str, bytes | List[bytes]]
+TOO_SMALL_SEQUENCE: int
+TOO_BIG_SEQUENCE: int
+UTF8_MAXIMAL_ALLOCATION: int
+UNICODE_RANGES_COMBINED: Dict[str, range]
+UNICODE_SECONDARY_RANGE_KEYWORD: List[str]
+RE_POSSIBLE_ENCODING_INDICATION: Incomplete
+IANA_NO_ALIASES: Incomplete
+IANA_SUPPORTED: List[str]
+IANA_SUPPORTED_COUNT: int
+IANA_SUPPORTED_SIMILAR: Dict[str, List[str]]
+CHARDET_CORRESPONDENCE: Dict[str, str]
+COMMON_SAFE_ASCII_CHARACTERS: Set[str]
+KO_NAMES: Set[str]
+ZH_NAMES: Set[str]
+TRACE: int
+FREQUENCIES: Dict[str, List[str]]
+LANGUAGE_SUPPORTED_COUNT: int

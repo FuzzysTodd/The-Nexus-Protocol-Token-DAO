@@ -1,0 +1,7 @@
+from _typeshed import Incomplete
+
+tensor_magic_methods: Incomplete
+pointwise_magic_methods_with_reverse: Incomplete
+pointwise_magic_methods: Incomplete
+pointwise_methods: Incomplete
+pointwise: Incomplete

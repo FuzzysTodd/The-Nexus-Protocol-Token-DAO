@@ -1,0 +1,3 @@
+from .state_inline import StateInline as StateInline
+
+def text(state: StateInline, silent: bool) -> bool: ...

@@ -1,0 +1,3 @@
+from mypyc.ir.ops import BasicBlock as BasicBlock, Branch as Branch, Goto as Goto
+
+def frequently_executed_blocks(entry_point: BasicBlock) -> set[BasicBlock]: ...

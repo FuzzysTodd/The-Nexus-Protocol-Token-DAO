@@ -1,0 +1,14 @@
+from openai.api_resources.audio import Audio as Audio
+from openai.api_resources.chat_completion import ChatCompletion as ChatCompletion
+from openai.api_resources.completion import Completion as Completion
+from openai.api_resources.customer import Customer as Customer
+from openai.api_resources.deployment import Deployment as Deployment
+from openai.api_resources.edit import Edit as Edit
+from openai.api_resources.embedding import Embedding as Embedding
+from openai.api_resources.engine import Engine as Engine
+from openai.api_resources.error_object import ErrorObject as ErrorObject
+from openai.api_resources.file import File as File
+from openai.api_resources.fine_tune import FineTune as FineTune
+from openai.api_resources.image import Image as Image
+from openai.api_resources.model import Model as Model
+from openai.api_resources.moderation import Moderation as Moderation

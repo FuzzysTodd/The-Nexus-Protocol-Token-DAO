@@ -1,0 +1,4 @@
+from .core import IDNABidiError as IDNABidiError, IDNAError as IDNAError, InvalidCodepoint as InvalidCodepoint, InvalidCodepointContext as InvalidCodepointContext, alabel as alabel, check_bidi as check_bidi, check_hyphen_ok as check_hyphen_ok, check_initial_combiner as check_initial_combiner, check_label as check_label, check_nfc as check_nfc, decode as decode, encode as encode, ulabel as ulabel, uts46_remap as uts46_remap, valid_contextj as valid_contextj, valid_contexto as valid_contexto, valid_label_length as valid_label_length, valid_string_length as valid_string_length
+from .intranges import intranges_contain as intranges_contain
+
+__all__ = ['IDNABidiError', 'IDNAError', 'InvalidCodepoint', 'InvalidCodepointContext', 'alabel', 'check_bidi', 'check_hyphen_ok', 'check_initial_combiner', 'check_label', 'check_nfc', 'decode', 'encode', 'intranges_contain', 'ulabel', 'uts46_remap', 'valid_contextj', 'valid_contexto', 'valid_label_length', 'valid_string_length']

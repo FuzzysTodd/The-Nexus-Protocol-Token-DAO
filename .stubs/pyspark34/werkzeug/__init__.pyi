@@ -1,0 +1,3 @@
+import typing as t
+
+def __getattr__(name: str) -> t.Any: ...

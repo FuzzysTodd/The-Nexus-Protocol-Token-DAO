@@ -1,0 +1,1 @@
+from tensorflow.python.eager.context import eager_mode as eager_mode, get_config as get_config, get_device_name as get_device_name, get_executor as get_executor, set_soft_device_placement as set_soft_device_placement
