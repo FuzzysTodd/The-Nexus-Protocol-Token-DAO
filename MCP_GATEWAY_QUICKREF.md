@@ -6,7 +6,7 @@
 
 **Manual Trigger**:
 1. Go to Actions tab in GitHub
-2. Select "MCP/MFC Gateway - FPGA GPU Swarm Hive Orchestrator"
+2. Select "MCP/MFC or mcp/mfc Gateway - FPGA GPU Swarm Hive Orchestrator"
 3. Click "Run workflow"
 4. Select mode: `full`, `mcp-only`, `gpu-only`, or `hive-only`
 5. Click "Run workflow" button
