@@ -4,3 +4,8 @@
   "activated_at": null,
   "reason": null
 }
+"failsafe": {
+  "martial_law": false,
+  "source": "../failsafe/state.json"
+}
+"disabled_when_martial_law": true
