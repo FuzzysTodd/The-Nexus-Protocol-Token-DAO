@@ -1,0 +1,22 @@
+{
+  "name": "the-nexus-protocol-token-dao",
+  "version": "1.0.0",
+  "description": "The Nexus Protocol Token DAO - Contract Withdrawal Manager",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"No tests specified\"",
+    "lint": "echo \"No linting configured\""
+  },
+  "keywords": [
+    "nexus-protocol",
+    "web3",
+    "ethereum",
+    "dao",
+    "contracts"
+  ],
+  "author": "Nexus Protocol",
+  "license": "MIT",
+  "dependencies": {
+    "@vercel/analytics": "^1.1.1"
+  }
+}
