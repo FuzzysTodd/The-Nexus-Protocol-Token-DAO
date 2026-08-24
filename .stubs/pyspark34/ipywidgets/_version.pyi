@@ -1,0 +1,7 @@
+__version__: str
+__protocol_version__: str
+__control_protocol_version__: str
+__jupyter_widgets_base_version__: str
+__jupyter_widgets_output_version__: str
+__jupyter_widgets_controls_version__: str
+__html_manager_version__: str

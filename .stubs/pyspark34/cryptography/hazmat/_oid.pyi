@@ -1,0 +1,131 @@
+from _typeshed import Incomplete
+from cryptography.hazmat.primitives import hashes as hashes
+
+class ExtensionOID:
+    SUBJECT_DIRECTORY_ATTRIBUTES: Incomplete
+    SUBJECT_KEY_IDENTIFIER: Incomplete
+    KEY_USAGE: Incomplete
+    SUBJECT_ALTERNATIVE_NAME: Incomplete
+    ISSUER_ALTERNATIVE_NAME: Incomplete
+    BASIC_CONSTRAINTS: Incomplete
+    NAME_CONSTRAINTS: Incomplete
+    CRL_DISTRIBUTION_POINTS: Incomplete
+    CERTIFICATE_POLICIES: Incomplete
+    POLICY_MAPPINGS: Incomplete
+    AUTHORITY_KEY_IDENTIFIER: Incomplete
+    POLICY_CONSTRAINTS: Incomplete
+    EXTENDED_KEY_USAGE: Incomplete
+    FRESHEST_CRL: Incomplete
+    INHIBIT_ANY_POLICY: Incomplete
+    ISSUING_DISTRIBUTION_POINT: Incomplete
+    AUTHORITY_INFORMATION_ACCESS: Incomplete
+    SUBJECT_INFORMATION_ACCESS: Incomplete
+    OCSP_NO_CHECK: Incomplete
+    TLS_FEATURE: Incomplete
+    CRL_NUMBER: Incomplete
+    DELTA_CRL_INDICATOR: Incomplete
+    PRECERT_SIGNED_CERTIFICATE_TIMESTAMPS: Incomplete
+    PRECERT_POISON: Incomplete
+    SIGNED_CERTIFICATE_TIMESTAMPS: Incomplete
+    MS_CERTIFICATE_TEMPLATE: Incomplete
+
+class OCSPExtensionOID:
+    NONCE: Incomplete
+    ACCEPTABLE_RESPONSES: Incomplete
+
+class CRLEntryExtensionOID:
+    CERTIFICATE_ISSUER: Incomplete
+    CRL_REASON: Incomplete
+    INVALIDITY_DATE: Incomplete
+
+class NameOID:
+    COMMON_NAME: Incomplete
+    COUNTRY_NAME: Incomplete
+    LOCALITY_NAME: Incomplete
+    STATE_OR_PROVINCE_NAME: Incomplete
+    STREET_ADDRESS: Incomplete
+    ORGANIZATION_NAME: Incomplete
+    ORGANIZATIONAL_UNIT_NAME: Incomplete
+    SERIAL_NUMBER: Incomplete
+    SURNAME: Incomplete
+    GIVEN_NAME: Incomplete
+    TITLE: Incomplete
+    INITIALS: Incomplete
+    GENERATION_QUALIFIER: Incomplete
+    X500_UNIQUE_IDENTIFIER: Incomplete
+    DN_QUALIFIER: Incomplete
+    PSEUDONYM: Incomplete
+    USER_ID: Incomplete
+    DOMAIN_COMPONENT: Incomplete
+    EMAIL_ADDRESS: Incomplete
+    JURISDICTION_COUNTRY_NAME: Incomplete
+    JURISDICTION_LOCALITY_NAME: Incomplete
+    JURISDICTION_STATE_OR_PROVINCE_NAME: Incomplete
+    BUSINESS_CATEGORY: Incomplete
+    POSTAL_ADDRESS: Incomplete
+    POSTAL_CODE: Incomplete
+    INN: Incomplete
+    OGRN: Incomplete
+    SNILS: Incomplete
+    UNSTRUCTURED_NAME: Incomplete
+
+class SignatureAlgorithmOID:
+    RSA_WITH_MD5: Incomplete
+    RSA_WITH_SHA1: Incomplete
+    RSA_WITH_SHA224: Incomplete
+    RSA_WITH_SHA256: Incomplete
+    RSA_WITH_SHA384: Incomplete
+    RSA_WITH_SHA512: Incomplete
+    RSA_WITH_SHA3_224: Incomplete
+    RSA_WITH_SHA3_256: Incomplete
+    RSA_WITH_SHA3_384: Incomplete
+    RSA_WITH_SHA3_512: Incomplete
+    RSASSA_PSS: Incomplete
+    ECDSA_WITH_SHA1: Incomplete
+    ECDSA_WITH_SHA224: Incomplete
+    ECDSA_WITH_SHA256: Incomplete
+    ECDSA_WITH_SHA384: Incomplete
+    ECDSA_WITH_SHA512: Incomplete
+    ECDSA_WITH_SHA3_224: Incomplete
+    ECDSA_WITH_SHA3_256: Incomplete
+    ECDSA_WITH_SHA3_384: Incomplete
+    ECDSA_WITH_SHA3_512: Incomplete
+    DSA_WITH_SHA1: Incomplete
+    DSA_WITH_SHA224: Incomplete
+    DSA_WITH_SHA256: Incomplete
+    DSA_WITH_SHA384: Incomplete
+    DSA_WITH_SHA512: Incomplete
+    ED25519: Incomplete
+    ED448: Incomplete
+    GOSTR3411_94_WITH_3410_2001: Incomplete
+    GOSTR3410_2012_WITH_3411_2012_256: Incomplete
+    GOSTR3410_2012_WITH_3411_2012_512: Incomplete
+
+class ExtendedKeyUsageOID:
+    SERVER_AUTH: Incomplete
+    CLIENT_AUTH: Incomplete
+    CODE_SIGNING: Incomplete
+    EMAIL_PROTECTION: Incomplete
+    TIME_STAMPING: Incomplete
+    OCSP_SIGNING: Incomplete
+    ANY_EXTENDED_KEY_USAGE: Incomplete
+    SMARTCARD_LOGON: Incomplete
+    KERBEROS_PKINIT_KDC: Incomplete
+    IPSEC_IKE: Incomplete
+    CERTIFICATE_TRANSPARENCY: Incomplete
+
+class AuthorityInformationAccessOID:
+    CA_ISSUERS: Incomplete
+    OCSP: Incomplete
+
+class SubjectInformationAccessOID:
+    CA_REPOSITORY: Incomplete
+
+class CertificatePoliciesOID:
+    CPS_QUALIFIER: Incomplete
+    CPS_USER_NOTICE: Incomplete
+    ANY_POLICY: Incomplete
+
+class AttributeOID:
+    CHALLENGE_PASSWORD: Incomplete
+    UNSTRUCTURED_NAME: Incomplete

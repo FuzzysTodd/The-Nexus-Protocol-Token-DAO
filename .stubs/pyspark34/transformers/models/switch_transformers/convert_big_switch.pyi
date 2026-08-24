@@ -1,0 +1,13 @@
+from transformers.modeling_utils import dtype_byte_size as dtype_byte_size
+from transformers.models.switch_transformers.convert_switch_transformers_original_flax_checkpoint_to_pytorch import rename_keys as rename_keys
+from transformers.utils import WEIGHTS_INDEX_NAME as WEIGHTS_INDEX_NAME, WEIGHTS_NAME as WEIGHTS_NAME
+from transformers.utils.hub import convert_file_size_to_int as convert_file_size_to_int
+
+def rename_base_flax_keys(flax_key_tuple, flax_tensor):
+    """
+    Post renaming of basic JAX keys to pytorch.
+    """
+def get_key_and_tensorstore_dict(layer, checkpoint_info, switch_checkpoint_path): ...
+def rename_and_save_block(current_block, save_path) -> None: ...
+def shard_on_the_fly(switch_checkpoint_path, dump_path, max_shard_size, dtype, weights_name: str = ...): ...
+def sanity_check() -> None: ...

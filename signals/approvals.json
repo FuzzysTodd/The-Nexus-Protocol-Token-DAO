@@ -1,0 +1,90 @@
+<script>
+  async function loadApprovals() {
+    const tableBody = document.querySelector('#approval-table tbody');
+    if (!tableBody) return;
+
+    try {
+      const res = await fetch('signals/approvals.json', { cache: 'no-store' });
+      if (!res.ok) throw new Error('Failed to load approvals.json');
+      const data = await res.json();
+
+      tableBody.innerHTML = '';
+
+      (data.approvals || []).forEach(item => {
+        const tr = document.createElement('tr');
+
+        // Type / chain
+        const tdType = document.createElement('td');
+        tdType.innerHTML = `
+          <span class="tag">${item.type || 'unknown'}</span><br />
+          <span class="small mono">chainId: ${item.chainId ?? 'n/a'}</span>
+        `;
+        tr.appendChild(tdType);
+
+        // Summary
+        const tdSummary = document.createElement('td');
+        let summaryHtml = '';
+
+        if (item.type === 'withdrawal') {
+          summaryHtml = `
+            Treasury withdrawal request from<br />
+            <span class="mono">${item.request?.from || 'unknown'}</span><br />
+            <span class="small">
+              Token: ${item.request?.token || 'n/a'} · Amount: ${item.request?.amount || '0'}
+            </span>
+          `;
+        } else if (item.type === 'placement') {
+          summaryHtml = `
+            Strategy allocation update for<br />
+            <span class="mono">${item.request?.strategy || 'strategy'}</span><br />
+            <span class="small">${item.request?.details || ''}</span>
+          `;
+        } else {
+          summaryHtml = `
+            <span class="mono">${item.id || 'unlabeled'}</span><br />
+            <span class="small">${item.request?.reason || ''}</span>
+          `;
+        }
+
+        tdSummary.innerHTML = summaryHtml;
+        tr.appendChild(tdSummary);
+
+        // Risk
+        const tdRisk = document.createElement('td');
+        const level = item.risk?.level || 'unknown';
+        const pillClass =
+          level === 'high' ? 'pill-error' :
+          level === 'low'  ? 'pill-ready' :
+                             'pill-waiting';
+
+        tdRisk.innerHTML = `
+          <span class="pill ${pillClass}">${level}</span><br />
+          <span class="small">Score: ${item.risk?.score ?? 'n/a'}</span>
+        `;
+        tr.appendChild(tdRisk);
+
+        // Actions
+        const tdActions = document.createElement('td');
+        tdActions.innerHTML = `
+          <div class="btn-row">
+            <button class="btn-approve" data-id="${item.id}">Approve</button>
+            <button class="btn-reject" data-id="${item.id}">Reject</button>
+            <button class="btn-details" data-id="${item.id}">Details</button>
+          </div>
+        `;
+        tr.appendChild(tdActions);
+
+        tableBody.appendChild(tr);
+      });
+    } catch (err) {
+      console.error('Error loading approvals:', err);
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="4" class="small">Failed to load approvals.json — check path and GitHub Pages build.</td>
+        </tr>
+      `;
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', loadApprovals);
+</script>

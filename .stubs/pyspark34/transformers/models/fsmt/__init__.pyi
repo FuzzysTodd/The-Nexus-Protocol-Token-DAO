@@ -1,0 +1,3 @@
+from .configuration_fsmt import FSMTConfig as FSMTConfig, FSMT_PRETRAINED_CONFIG_ARCHIVE_MAP as FSMT_PRETRAINED_CONFIG_ARCHIVE_MAP
+from .modeling_fsmt import FSMTForConditionalGeneration as FSMTForConditionalGeneration, FSMTModel as FSMTModel, PretrainedFSMTModel as PretrainedFSMTModel
+from .tokenization_fsmt import FSMTTokenizer as FSMTTokenizer

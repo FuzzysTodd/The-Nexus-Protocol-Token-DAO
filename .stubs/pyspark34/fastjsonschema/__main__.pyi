@@ -1,0 +1,3 @@
+from . import compile_to_code as compile_to_code
+
+def main() -> None: ...

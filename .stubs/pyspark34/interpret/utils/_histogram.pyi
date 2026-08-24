@@ -1,0 +1,3 @@
+from ._native import Native as Native
+
+def make_all_histogram_edges(feature_bounds, histogram_weights): ...

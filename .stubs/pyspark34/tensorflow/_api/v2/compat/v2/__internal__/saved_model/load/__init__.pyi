@@ -1,0 +1,1 @@
+from tensorflow.python.saved_model.revived_types import VersionedTypeRegistration as VersionedTypeRegistration, get_setter as get_setter, register_revived_type as register_revived_type, registered_identifiers as registered_identifiers

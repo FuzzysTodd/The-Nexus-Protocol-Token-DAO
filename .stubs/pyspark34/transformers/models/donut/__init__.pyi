@@ -1,0 +1,5 @@
+from .configuration_donut_swin import DONUT_SWIN_PRETRAINED_CONFIG_ARCHIVE_MAP as DONUT_SWIN_PRETRAINED_CONFIG_ARCHIVE_MAP, DonutSwinConfig as DonutSwinConfig
+from .feature_extraction_donut import DonutFeatureExtractor as DonutFeatureExtractor
+from .image_processing_donut import DonutImageProcessor as DonutImageProcessor
+from .modeling_donut_swin import DONUT_SWIN_PRETRAINED_MODEL_ARCHIVE_LIST as DONUT_SWIN_PRETRAINED_MODEL_ARCHIVE_LIST, DonutSwinModel as DonutSwinModel, DonutSwinPreTrainedModel as DonutSwinPreTrainedModel
+from .processing_donut import DonutProcessor as DonutProcessor

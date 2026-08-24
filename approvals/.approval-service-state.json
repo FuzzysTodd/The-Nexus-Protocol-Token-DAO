@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "wallet": {
+    "address": "",
+    "connected": false,
+    "lastNetwork": ""
+  },
+  "token": {
+    "address": "",
+    "spender": "",
+    "lastAllowance": "0",
+    "lastApprovalAmount": ""
+  },
+  "ui": {
+    "theme": "dark",
+    "autoFillEnabled": true,
+    "lastUpdated": ""
+  }
+}
+

@@ -1,0 +1,19 @@
+from _typeshed import Incomplete
+from scipy import stats
+
+class gaussian_kde_set_covariance(stats.gaussian_kde):
+    """
+    from Anne Archibald in mailinglist:
+    http://www.nabble.com/Width-of-the-gaussian-in-stats.kde.gaussian_kde---td19558924.html#a19558924
+    """
+    covariance: Incomplete
+    def __init__(self, dataset, covariance) -> None: ...
+
+class gaussian_kde_covfact(stats.gaussian_kde):
+    covfact: Incomplete
+    def __init__(self, dataset, covfact: str = 'scotts') -> None: ...
+    def covariance_factor(self): ...
+    def reset_covfact(self, covfact) -> None: ...
+
+def plotkde(covfact) -> None: ...
+def test_kde_1d() -> None: ...

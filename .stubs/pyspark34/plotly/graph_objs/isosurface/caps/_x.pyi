@@ -1,0 +1,65 @@
+from _typeshed import Incomplete
+from plotly.basedatatypes import BaseTraceHierarchyType as _BaseTraceHierarchyType
+
+class X(_BaseTraceHierarchyType):
+    @property
+    def fill(self):
+        """
+        Sets the fill ratio of the `caps`. The default fill value of
+        the `caps` is 1 meaning that they are entirely shaded. On the
+        other hand Applying a `fill` ratio less than one would allow
+        the creation of openings parallel to the edges.
+
+        The 'fill' property is a number and may be specified as:
+          - An int or float in the interval [0, 1]
+
+        Returns
+        -------
+        int|float
+        """
+    @fill.setter
+    def fill(self, val) -> None: ...
+    @property
+    def show(self):
+        """
+        Sets the fill ratio of the `slices`. The default fill value of
+        the x `slices` is 1 meaning that they are entirely shaded. On
+        the other hand Applying a `fill` ratio less than one would
+        allow the creation of openings parallel to the edges.
+
+        The 'show' property must be specified as a bool
+        (either True, or False)
+
+        Returns
+        -------
+        bool
+        """
+    @show.setter
+    def show(self, val) -> None: ...
+    def __init__(self, arg: Incomplete | None = None, fill: Incomplete | None = None, show: Incomplete | None = None, **kwargs) -> None:
+        """
+        Construct a new X object
+
+        Parameters
+        ----------
+        arg
+            dict of properties compatible with this constructor or
+            an instance of
+            :class:`plotly.graph_objs.isosurface.caps.X`
+        fill
+            Sets the fill ratio of the `caps`. The default fill
+            value of the `caps` is 1 meaning that they are entirely
+            shaded. On the other hand Applying a `fill` ratio less
+            than one would allow the creation of openings parallel
+            to the edges.
+        show
+            Sets the fill ratio of the `slices`. The default fill
+            value of the x `slices` is 1 meaning that they are
+            entirely shaded. On the other hand Applying a `fill`
+            ratio less than one would allow the creation of
+            openings parallel to the edges.
+
+        Returns
+        -------
+        X
+        """

@@ -1,0 +1,13 @@
+import typing
+from _typeshed import Incomplete
+from cryptography.hazmat.primitives import constant_time as constant_time, hmac as hmac
+from cryptography.hazmat.primitives.hashes import SHA1 as SHA1, SHA256 as SHA256, SHA512 as SHA512
+from cryptography.hazmat.primitives.twofactor import InvalidToken as InvalidToken
+
+HOTPHashTypes: Incomplete
+
+class HOTP:
+    def __init__(self, key: bytes, length: int, algorithm: HOTPHashTypes, backend: typing.Any = None, enforce_key_length: bool = True) -> None: ...
+    def generate(self, counter: int) -> bytes: ...
+    def verify(self, hotp: bytes, counter: int) -> None: ...
+    def get_provisioning_uri(self, account_name: str, counter: int, issuer: str | None) -> str: ...

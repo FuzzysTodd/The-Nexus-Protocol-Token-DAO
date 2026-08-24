@@ -1,0 +1,12 @@
+from ._bgcolor import BgcolorValidator as BgcolorValidator
+from ._bgcolorsrc import BgcolorsrcValidator as BgcolorsrcValidator
+from ._fgcolor import FgcolorValidator as FgcolorValidator
+from ._fgcolorsrc import FgcolorsrcValidator as FgcolorsrcValidator
+from ._fgopacity import FgopacityValidator as FgopacityValidator
+from ._fillmode import FillmodeValidator as FillmodeValidator
+from ._shape import ShapeValidator as ShapeValidator
+from ._shapesrc import ShapesrcValidator as ShapesrcValidator
+from ._size import SizeValidator as SizeValidator
+from ._sizesrc import SizesrcValidator as SizesrcValidator
+from ._solidity import SolidityValidator as SolidityValidator
+from ._soliditysrc import SoliditysrcValidator as SoliditysrcValidator

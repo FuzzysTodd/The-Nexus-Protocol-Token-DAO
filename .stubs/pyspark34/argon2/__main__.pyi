@@ -1,0 +1,3 @@
+from . import DEFAULT_HASH_LENGTH as DEFAULT_HASH_LENGTH, DEFAULT_MEMORY_COST as DEFAULT_MEMORY_COST, DEFAULT_PARALLELISM as DEFAULT_PARALLELISM, DEFAULT_TIME_COST as DEFAULT_TIME_COST, PasswordHasher as PasswordHasher, profiles as profiles
+
+def main(argv: list[str]) -> None: ...

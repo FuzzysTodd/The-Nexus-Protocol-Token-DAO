@@ -1,0 +1,1 @@
+from tensorflow.python.eager.polymorphic_function.polymorphic_function import Function as Function, function as function, functions_run_eagerly as functions_run_eagerly, run_functions_eagerly as run_functions_eagerly, set_dynamic_variable_creation as set_dynamic_variable_creation

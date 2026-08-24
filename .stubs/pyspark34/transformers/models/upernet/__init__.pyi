@@ -1,0 +1,2 @@
+from .configuration_upernet import UperNetConfig as UperNetConfig
+from .modeling_upernet import UperNetForSemanticSegmentation as UperNetForSemanticSegmentation, UperNetPreTrainedModel as UperNetPreTrainedModel

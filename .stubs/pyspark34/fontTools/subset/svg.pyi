@@ -1,0 +1,3 @@
+__all__ = ['subset_glyphs']
+
+def subset_glyphs(self, s) -> bool: ...

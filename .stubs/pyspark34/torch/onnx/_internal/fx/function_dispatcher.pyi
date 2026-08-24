@@ -1,0 +1,6 @@
+from _typeshed import Incomplete
+
+TORCH_ONNX_OPSET: Incomplete
+
+def prims_convert_element_type(tensor, dtype: int): ...
+def aten_getitem(self, i): ...

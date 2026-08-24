@@ -1,0 +1,6 @@
+import asyncio
+
+__all__ = ['tcp_keepalive', 'tcp_nodelay']
+
+def tcp_keepalive(transport: asyncio.Transport) -> None: ...
+def tcp_nodelay(transport: asyncio.Transport, value: bool) -> None: ...

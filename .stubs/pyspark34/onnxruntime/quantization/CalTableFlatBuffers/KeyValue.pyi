@@ -1,0 +1,26 @@
+from _typeshed import Incomplete
+
+np: Incomplete
+
+class KeyValue:
+    @classmethod
+    def GetRootAs(cls, buf, offset: int = 0): ...
+    @classmethod
+    def GetRootAsKeyValue(cls, buf, offset: int = 0):
+        """This method is deprecated. Please switch to GetRootAs."""
+    def Init(self, buf, pos) -> None: ...
+    def Key(self): ...
+    def Value(self): ...
+
+def Start(builder) -> None: ...
+def KeyValueStart(builder):
+    """This method is deprecated. Please switch to Start."""
+def AddKey(builder, key) -> None: ...
+def KeyValueAddKey(builder, key):
+    """This method is deprecated. Please switch to AddKey."""
+def AddValue(builder, value) -> None: ...
+def KeyValueAddValue(builder, value):
+    """This method is deprecated. Please switch to AddValue."""
+def End(builder): ...
+def KeyValueEnd(builder):
+    """This method is deprecated. Please switch to End."""

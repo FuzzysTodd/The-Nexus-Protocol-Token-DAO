@@ -1,0 +1,3 @@
+__all__ = ['pytree_register_structseq']
+
+def pytree_register_structseq(cls): ...

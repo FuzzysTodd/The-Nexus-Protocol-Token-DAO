@@ -1,0 +1,42 @@
+import abc
+from .interfaces import DBAPIConnection as DBAPIConnection, Dialect as Dialect
+from typing import Any, ClassVar
+
+class ConnectionCharacteristic(abc.ABC, metaclass=abc.ABCMeta):
+    """An abstract base for an object that can set, get and reset a
+    per-connection characteristic, typically one that gets reset when the
+    connection is returned to the connection pool.
+
+    transaction isolation is the canonical example, and the
+    ``IsolationLevelCharacteristic`` implementation provides this for the
+    ``DefaultDialect``.
+
+    The ``ConnectionCharacteristic`` class should call upon the ``Dialect`` for
+    the implementation of each method.   The object exists strictly to serve as
+    a dialect visitor that can be placed into the
+    ``DefaultDialect.connection_characteristics`` dictionary where it will take
+    effect for calls to :meth:`_engine.Connection.execution_options` and
+    related APIs.
+
+    .. versionadded:: 1.4
+
+    """
+    transactional: ClassVar[bool]
+    @abc.abstractmethod
+    def reset_characteristic(self, dialect: Dialect, dbapi_conn: DBAPIConnection) -> None:
+        """Reset the characteristic on the connection to its default value."""
+    @abc.abstractmethod
+    def set_characteristic(self, dialect: Dialect, dbapi_conn: DBAPIConnection, value: Any) -> None:
+        """set characteristic on the connection to a given value."""
+    @abc.abstractmethod
+    def get_characteristic(self, dialect: Dialect, dbapi_conn: DBAPIConnection) -> Any:
+        """Given a DBAPI connection, get the current value of the
+        characteristic.
+
+        """
+
+class IsolationLevelCharacteristic(ConnectionCharacteristic):
+    transactional: ClassVar[bool]
+    def reset_characteristic(self, dialect: Dialect, dbapi_conn: DBAPIConnection) -> None: ...
+    def set_characteristic(self, dialect: Dialect, dbapi_conn: DBAPIConnection, value: Any) -> None: ...
+    def get_characteristic(self, dialect: Dialect, dbapi_conn: DBAPIConnection) -> Any: ...

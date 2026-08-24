@@ -1,0 +1,9 @@
+from .engine import AbstractGraphListener
+from .graph import MetricData, Model
+
+__all__ = ['DefaultListener']
+
+class DefaultListener(AbstractGraphListener):
+    def on_metric(self, model: Model, metric: MetricData) -> None: ...
+    def on_intermediate_metric(self, model: Model, metric: MetricData) -> None: ...
+    def on_training_end(self, model: Model, success: bool) -> None: ...

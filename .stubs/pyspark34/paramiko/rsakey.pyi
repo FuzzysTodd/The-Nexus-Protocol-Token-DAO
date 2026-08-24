@@ -1,0 +1,39 @@
+from _typeshed import Incomplete
+from paramiko.message import Message as Message
+from paramiko.pkey import PKey as PKey
+from paramiko.ssh_exception import SSHException as SSHException
+
+class RSAKey(PKey):
+    """
+    Representation of an RSA key which can be used to sign and verify SSH2
+    data.
+    """
+    name: str
+    HASHES: Incomplete
+    key: Incomplete
+    public_blob: Incomplete
+    def __init__(self, msg: Incomplete | None = None, data: Incomplete | None = None, filename: Incomplete | None = None, password: Incomplete | None = None, key: Incomplete | None = None, file_obj: Incomplete | None = None) -> None: ...
+    @classmethod
+    def identifiers(cls): ...
+    @property
+    def size(self): ...
+    @property
+    def public_numbers(self): ...
+    def asbytes(self): ...
+    def get_name(self): ...
+    def get_bits(self): ...
+    def can_sign(self): ...
+    def sign_ssh_data(self, data, algorithm: Incomplete | None = None): ...
+    def verify_ssh_sig(self, data, msg): ...
+    def write_private_key_file(self, filename, password: Incomplete | None = None) -> None: ...
+    def write_private_key(self, file_obj, password: Incomplete | None = None) -> None: ...
+    @staticmethod
+    def generate(bits, progress_func: Incomplete | None = None):
+        """
+        Generate a new private RSA key.  This factory function can be used to
+        generate a new host key or authentication key.
+
+        :param int bits: number of bits the generated key should be.
+        :param progress_func: Unused
+        :return: new `.RSAKey` private key
+        """

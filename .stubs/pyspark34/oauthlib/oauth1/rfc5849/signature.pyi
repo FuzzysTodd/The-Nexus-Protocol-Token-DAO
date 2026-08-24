@@ -1,0 +1,143 @@
+from . import utils as utils
+from _typeshed import Incomplete
+from oauthlib.common import extract_params as extract_params, safe_string_equals as safe_string_equals, urldecode as urldecode
+
+log: Incomplete
+
+def signature_base_string(http_method: str, base_str_uri: str, normalized_encoded_request_parameters: str) -> str:
+    """
+    Construct the signature base string.
+
+    The *signature base string* is the value that is calculated and signed by
+    the client. It is also independently calculated by the server to verify
+    the signature, and therefore must produce the exact same value at both
+    ends or the signature won't verify.
+
+    The rules for calculating the *signature base string* are defined in
+    section 3.4.1.1`_ of RFC 5849.
+
+    .. _`section 3.4.1.1`: https://tools.ietf.org/html/rfc5849#section-3.4.1.1
+    """
+def base_string_uri(uri: str, host: str = None) -> str:
+    '''
+    Calculates the _base string URI_.
+
+    The *base string URI* is one of the components that make up the
+     *signature base string*.
+
+    The ``host`` is optional. If provided, it is used to override any host and
+    port values in the ``uri``. The value for ``host`` is usually extracted from
+    the "Host" request header from the HTTP request. Its value may be just the
+    hostname, or the hostname followed by a colon and a TCP/IP port number
+    (hostname:port). If a value for the``host`` is provided but it does not
+    contain a port number, the default port number is used (i.e. if the ``uri``
+    contained a port number, it will be discarded).
+
+    The rules for calculating the *base string URI* are defined in
+    section 3.4.1.2`_ of RFC 5849.
+
+    .. _`section 3.4.1.2`: https://tools.ietf.org/html/rfc5849#section-3.4.1.2
+
+    :param uri: URI
+    :param host: hostname with optional port number, separated by a colon
+    :return: base string URI
+    '''
+def collect_parameters(uri_query: str = '', body: Incomplete | None = None, headers: Incomplete | None = None, exclude_oauth_signature: bool = True, with_realm: bool = False):
+    """
+    Gather the request parameters from all the parameter sources.
+
+    This function is used to extract all the parameters, which are then passed
+    to ``normalize_parameters`` to produce one of the components that make up
+    the *signature base string*.
+
+    Parameters starting with `oauth_` will be unescaped.
+
+    Body parameters must be supplied as a dict, a list of 2-tuples, or a
+    form encoded query string.
+
+    Headers must be supplied as a dict.
+
+    The rules where the parameters must be sourced from are defined in
+    `section 3.4.1.3.1`_ of RFC 5849.
+
+    .. _`Sec 3.4.1.3.1`: https://tools.ietf.org/html/rfc5849#section-3.4.1.3.1
+    """
+def normalize_parameters(params) -> str:
+    """
+    Calculate the normalized request parameters.
+
+    The *normalized request parameters* is one of the components that make up
+    the *signature base string*.
+
+    The rules for parameter normalization are defined in `section 3.4.1.3.2`_ of
+    RFC 5849.
+
+    .. _`Sec 3.4.1.3.2`: https://tools.ietf.org/html/rfc5849#section-3.4.1.3.2
+    """
+def sign_hmac_sha1_with_client(sig_base_str, client): ...
+def verify_hmac_sha1(request, client_secret: Incomplete | None = None, resource_owner_secret: Incomplete | None = None): ...
+def sign_hmac_sha1(base_string, client_secret, resource_owner_secret):
+    '''
+    Deprecated function for calculating a HMAC-SHA1 signature.
+
+    This function has been replaced by invoking ``sign_hmac`` with "SHA-1"
+    as the hash algorithm name.
+
+    This function was invoked by sign_hmac_sha1_with_client and
+    test_signatures.py, but does any application invoke it directly? If not,
+    it can be removed.
+    '''
+def sign_hmac_sha256_with_client(sig_base_str, client): ...
+def verify_hmac_sha256(request, client_secret: Incomplete | None = None, resource_owner_secret: Incomplete | None = None): ...
+def sign_hmac_sha256(base_string, client_secret, resource_owner_secret):
+    '''
+    Deprecated function for calculating a HMAC-SHA256 signature.
+
+    This function has been replaced by invoking ``sign_hmac`` with "SHA-256"
+    as the hash algorithm name.
+
+    This function was invoked by sign_hmac_sha256_with_client and
+    test_signatures.py, but does any application invoke it directly? If not,
+    it can be removed.
+    '''
+def sign_hmac_sha512_with_client(sig_base_str: str, client): ...
+def verify_hmac_sha512(request, client_secret: str = None, resource_owner_secret: str = None): ...
+def sign_rsa_sha1_with_client(sig_base_str, client): ...
+def verify_rsa_sha1(request, rsa_public_key: str): ...
+def sign_rsa_sha1(base_string, rsa_private_key):
+    '''
+    Deprecated function for calculating a RSA-SHA1 signature.
+
+    This function has been replaced by invoking ``sign_rsa`` with "SHA-1"
+    as the hash algorithm name.
+
+    This function was invoked by sign_rsa_sha1_with_client and
+    test_signatures.py, but does any application invoke it directly? If not,
+    it can be removed.
+    '''
+def sign_rsa_sha256_with_client(sig_base_str: str, client): ...
+def verify_rsa_sha256(request, rsa_public_key: str): ...
+def sign_rsa_sha512_with_client(sig_base_str: str, client): ...
+def verify_rsa_sha512(request, rsa_public_key: str): ...
+def sign_plaintext_with_client(_signature_base_string, client): ...
+def sign_plaintext(client_secret, resource_owner_secret):
+    '''Sign a request using plaintext.
+
+    Per `section 3.4.4`_ of the spec.
+
+    The "PLAINTEXT" method does not employ a signature algorithm.  It
+    MUST be used with a transport-layer mechanism such as TLS or SSL (or
+    sent over a secure channel with equivalent protections).  It does not
+    utilize the signature base string or the "oauth_timestamp" and
+    "oauth_nonce" parameters.
+
+    .. _`section 3.4.4`: https://tools.ietf.org/html/rfc5849#section-3.4.4
+
+    '''
+def verify_plaintext(request, client_secret: Incomplete | None = None, resource_owner_secret: Incomplete | None = None):
+    """Verify a PLAINTEXT signature.
+
+    Per `section 3.4`_ of the spec.
+
+    .. _`section 3.4`: https://tools.ietf.org/html/rfc5849#section-3.4
+    """

@@ -1,0 +1,3 @@
+from _typeshed import Incomplete
+
+def purify(mat, densities: Incomplete | None = None, verbose: bool = False, tol: float = 1e-06, randomize: bool = False): ...

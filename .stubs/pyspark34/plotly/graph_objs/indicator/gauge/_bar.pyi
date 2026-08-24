@@ -1,0 +1,121 @@
+from _typeshed import Incomplete
+from plotly.basedatatypes import BaseTraceHierarchyType as _BaseTraceHierarchyType
+
+class Bar(_BaseTraceHierarchyType):
+    @property
+    def color(self):
+        """
+        Sets the background color of the arc.
+
+        The 'color' property is a color and may be specified as:
+          - A hex string (e.g. '#ff0000')
+          - An rgb/rgba string (e.g. 'rgb(255,0,0)')
+          - An hsl/hsla string (e.g. 'hsl(0,100%,50%)')
+          - An hsv/hsva string (e.g. 'hsv(0,100%,100%)')
+          - A named CSS color:
+                aliceblue, antiquewhite, aqua, aquamarine, azure,
+                beige, bisque, black, blanchedalmond, blue,
+                blueviolet, brown, burlywood, cadetblue,
+                chartreuse, chocolate, coral, cornflowerblue,
+                cornsilk, crimson, cyan, darkblue, darkcyan,
+                darkgoldenrod, darkgray, darkgrey, darkgreen,
+                darkkhaki, darkmagenta, darkolivegreen, darkorange,
+                darkorchid, darkred, darksalmon, darkseagreen,
+                darkslateblue, darkslategray, darkslategrey,
+                darkturquoise, darkviolet, deeppink, deepskyblue,
+                dimgray, dimgrey, dodgerblue, firebrick,
+                floralwhite, forestgreen, fuchsia, gainsboro,
+                ghostwhite, gold, goldenrod, gray, grey, green,
+                greenyellow, honeydew, hotpink, indianred, indigo,
+                ivory, khaki, lavender, lavenderblush, lawngreen,
+                lemonchiffon, lightblue, lightcoral, lightcyan,
+                lightgoldenrodyellow, lightgray, lightgrey,
+                lightgreen, lightpink, lightsalmon, lightseagreen,
+                lightskyblue, lightslategray, lightslategrey,
+                lightsteelblue, lightyellow, lime, limegreen,
+                linen, magenta, maroon, mediumaquamarine,
+                mediumblue, mediumorchid, mediumpurple,
+                mediumseagreen, mediumslateblue, mediumspringgreen,
+                mediumturquoise, mediumvioletred, midnightblue,
+                mintcream, mistyrose, moccasin, navajowhite, navy,
+                oldlace, olive, olivedrab, orange, orangered,
+                orchid, palegoldenrod, palegreen, paleturquoise,
+                palevioletred, papayawhip, peachpuff, peru, pink,
+                plum, powderblue, purple, red, rosybrown,
+                royalblue, rebeccapurple, saddlebrown, salmon,
+                sandybrown, seagreen, seashell, sienna, silver,
+                skyblue, slateblue, slategray, slategrey, snow,
+                springgreen, steelblue, tan, teal, thistle, tomato,
+                turquoise, violet, wheat, white, whitesmoke,
+                yellow, yellowgreen
+
+        Returns
+        -------
+        str
+        """
+    @color.setter
+    def color(self, val) -> None: ...
+    @property
+    def line(self):
+        """
+        The 'line' property is an instance of Line
+        that may be specified as:
+          - An instance of :class:`plotly.graph_objs.indicator.gauge.bar.Line`
+          - A dict of string/value properties that will be passed
+            to the Line constructor
+
+            Supported dict properties:
+
+                color
+                    Sets the color of the line enclosing each
+                    sector.
+                width
+                    Sets the width (in px) of the line enclosing
+                    each sector.
+
+        Returns
+        -------
+        plotly.graph_objs.indicator.gauge.bar.Line
+        """
+    @line.setter
+    def line(self, val) -> None: ...
+    @property
+    def thickness(self):
+        """
+        Sets the thickness of the bar as a fraction of the total
+        thickness of the gauge.
+
+        The 'thickness' property is a number and may be specified as:
+          - An int or float in the interval [0, 1]
+
+        Returns
+        -------
+        int|float
+        """
+    @thickness.setter
+    def thickness(self, val) -> None: ...
+    def __init__(self, arg: Incomplete | None = None, color: Incomplete | None = None, line: Incomplete | None = None, thickness: Incomplete | None = None, **kwargs) -> None:
+        """
+        Construct a new Bar object
+
+        Set the appearance of the gauge's value
+
+        Parameters
+        ----------
+        arg
+            dict of properties compatible with this constructor or
+            an instance of
+            :class:`plotly.graph_objs.indicator.gauge.Bar`
+        color
+            Sets the background color of the arc.
+        line
+            :class:`plotly.graph_objects.indicator.gauge.bar.Line`
+            instance or dict with compatible properties
+        thickness
+            Sets the thickness of the bar as a fraction of the
+            total thickness of the gauge.
+
+        Returns
+        -------
+        Bar
+        """

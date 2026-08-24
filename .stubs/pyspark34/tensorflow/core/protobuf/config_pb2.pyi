@@ -1,0 +1,5 @@
+from _typeshed import Incomplete
+from tensorflow.core.protobuf import rpc_options_pb2 as tensorflow_dot_core_dot_protobuf_dot_rpc__options__pb2
+
+tensorflow_dot_tsl_dot_protobuf_dot_rpc__options__pb2 = tensorflow_dot_core_dot_protobuf_dot_rpc__options__pb2.tensorflow_dot_tsl_dot_protobuf_dot_rpc__options__pb2
+DESCRIPTOR: Incomplete
