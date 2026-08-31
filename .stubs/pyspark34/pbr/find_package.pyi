@@ -1,2 +1,0 @@
-def smart_find_packages(package_list):
-    """Run find_packages the way we intend."""

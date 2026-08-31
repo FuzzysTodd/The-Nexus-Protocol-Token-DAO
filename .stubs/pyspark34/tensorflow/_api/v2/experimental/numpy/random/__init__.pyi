@@ -1,1 +1,0 @@
-from tensorflow.python.ops.numpy_ops.np_random import poisson as poisson, rand as rand, randint as randint, randn as randn, random as random, seed as seed, standard_normal as standard_normal, uniform as uniform

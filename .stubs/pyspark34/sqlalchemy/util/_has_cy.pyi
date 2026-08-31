@@ -1,1 +1,0 @@
-HAS_CYEXTENSION: bool
