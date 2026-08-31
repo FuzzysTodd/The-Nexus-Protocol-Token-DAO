@@ -1,9 +1,0 @@
-from collections.abc import Generator
-
-def pytest_configure(config) -> None: ...
-def pytest_unconfigure(config) -> None: ...
-def mpl_test_settings(request) -> Generator[None, None, None]: ...
-def pd():
-    """Fixture to import and configure pandas."""
-def xr():
-    """Fixture to import xarray."""

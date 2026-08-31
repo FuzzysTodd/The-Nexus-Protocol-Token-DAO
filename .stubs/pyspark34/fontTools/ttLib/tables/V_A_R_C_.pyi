@@ -1,3 +1,0 @@
-from .otBase import BaseTTXConverter as BaseTTXConverter
-
-class table_V_A_R_C_(BaseTTXConverter): ...

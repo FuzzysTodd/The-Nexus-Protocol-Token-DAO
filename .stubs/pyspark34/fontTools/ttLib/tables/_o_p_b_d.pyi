@@ -1,3 +1,0 @@
-from .otBase import BaseTTXConverter as BaseTTXConverter
-
-class table__o_p_b_d(BaseTTXConverter): ...

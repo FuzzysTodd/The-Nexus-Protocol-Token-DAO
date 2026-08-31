@@ -1,1 +1,0 @@
-from tensorflow.python.distribute.sharded_variable import FixedShardsPartitioner as FixedShardsPartitioner, MaxSizePartitioner as MaxSizePartitioner, MinSizePartitioner as MinSizePartitioner, Partitioner as Partitioner

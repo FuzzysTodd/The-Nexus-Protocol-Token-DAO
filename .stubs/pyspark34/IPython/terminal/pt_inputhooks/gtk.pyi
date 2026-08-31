@@ -1,9 +1,0 @@
-def inputhook(context):
-    """
-    When the eventloop of prompt-toolkit is idle, call this inputhook.
-
-    This will run the GTK main loop until the file descriptor
-    `context.fileno()` becomes ready.
-
-    :param context: An `InputHookContext` instance.
-    """

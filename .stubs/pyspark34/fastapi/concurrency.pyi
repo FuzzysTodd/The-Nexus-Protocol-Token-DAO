@@ -1,3 +1,0 @@
-from typing import AsyncGenerator, ContextManager
-
-async def contextmanager_in_threadpool(cm: ContextManager[_T]) -> AsyncGenerator[_T, None]: ...

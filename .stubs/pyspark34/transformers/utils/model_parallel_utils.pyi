@@ -1,3 +1,0 @@
-def assert_device_map(device_map, num_blocks) -> None: ...
-def get_device_map(n_layers, devices):
-    """Returns a dictionary of layers distributed evenly across all devices."""
