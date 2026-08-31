@@ -1,0 +1,39 @@
+name: Governance Trigger
+
+on:
+  push:
+    paths:
+      - "governance/decisions/*.json"
+
+jobs:
+  process-decision:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read decision file
+        id: decision
+        run: |
+          FILE=$(ls governance/decisions | tail -n 1)
+          echo "file=$FILE" >> $GITHUB_OUTPUT
+          cat governance/decisions/$FILE
+
+      - name: Parse decision status
+        id: parse
+        run: |
+          STATUS=$(jq -r '.status' governance/decisions/${{ steps.decision.outputs.file }})
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+
+      - name: Trigger Tier-2 routing
+        if: contains(steps.decision.outputs.file, 'gp-22.json') && steps.parse.outputs.status == 'approved'
+        run: |
+          echo "Tier-2 vote passed. Activating routing..."
+          echo "Routing file: governance/mcp/routing/build_secure.json"
+
+      - name: Trigger Tier-3 routing
+        if: contains(steps.decision.outputs.file, 'gp-22-exec.json') && steps.parse.outputs.status == 'approved'
+        run: |
+          echo "Tier-3 vote passed. Activating routing..."
+          echo "Routing file: governance/mcp/routing/build_secure_execution.json"
