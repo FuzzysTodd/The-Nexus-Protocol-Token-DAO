@@ -1,3 +1,0 @@
-from typing import BinaryIO, List
-
-def read_to_unicode(obj: BinaryIO) -> List[str]: ...

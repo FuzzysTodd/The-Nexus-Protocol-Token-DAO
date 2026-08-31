@@ -1,3 +1,0 @@
-from markdown_it.rules_inline import StateInline as StateInline
-
-def parseLinkLabel(state: StateInline, start: int, disableNested: bool = False) -> int: ...

@@ -1,9 +1,0 @@
-from .misc import Literal as Literal, moduleMember as moduleMember
-
-class ProxyMetaclass(type):
-    """ ProxyMetaclass is the meta-class for proxies. """
-    def __init__(*args) -> None:
-        """ Initialise the meta-class. """
-    def __getattribute__(cls, name): ...
-    def __or__(self, r_op): ...
-    def __eq__(self, other): ...

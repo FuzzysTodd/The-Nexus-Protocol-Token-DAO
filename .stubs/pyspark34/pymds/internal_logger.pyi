@@ -1,3 +1,0 @@
-PYMDS_VERBOSE: str
-
-def log_debug(msg) -> None: ...

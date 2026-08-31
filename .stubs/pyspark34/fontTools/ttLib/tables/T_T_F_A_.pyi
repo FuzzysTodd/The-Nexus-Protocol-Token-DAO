@@ -1,3 +1,0 @@
-from . import asciiTable as asciiTable
-
-class table_T_T_F_A_(asciiTable.asciiTable): ...
