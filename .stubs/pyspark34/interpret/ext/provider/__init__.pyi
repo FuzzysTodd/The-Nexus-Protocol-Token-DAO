@@ -1,2 +1,0 @@
-from interpret.ext.extension import PROVIDER_EXTENSION_KEY as PROVIDER_EXTENSION_KEY
-from interpret.ext.extension_utils import load_class_extensions as load_class_extensions

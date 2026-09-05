@@ -1,0 +1,140 @@
+{
+  "macro_id": "GP22-MODERNIZATION",
+  "name": "GP-22 Full Modernization Pipeline",
+  "description": "Automates GP-22 Tier-2 and Tier-3 workflow modernization until completion using repo-side checkpoints.",
+  "version": "1.0.0",
+  "checkpoints": {
+    "tier2_artifacts_generated": false,
+    "tier2_vote_submitted": false,
+    "tier2_quorum_met": false,
+    "tier2_routing_activated": false,
+    "tier3_proposal_generated": false,
+    "tier3_vote_submitted": false,
+    "tier3_quorum_met": false,
+    "tier3_routing_activated": false,
+    "pr_merged": false,
+    "ci_cd_triggered": false,
+    "modernization_logged": false
+  },
+  "steps": [
+    {
+      "id": "generate_tier2_artifacts",
+      "checkpoint": "tier2_artifacts_generated",
+      "agent": "AskOrchestrate",
+      "action": "generate_artifacts",
+      "inputs": {
+        "proposal": "GP-22",
+        "artifacts": [
+          ".github/workflows/build_secure.yml",
+          ".github/workflows/deploy_secure.yml",
+          "governance/votes/gp-22_voting_payload.json",
+          "governance/mcp/routing/build_secure.json",
+          "reports/treasury/gp-22_report.md"
+        ]
+      }
+    },
+    {
+      "id": "submit_tier2_vote",
+      "checkpoint": "tier2_vote_submitted",
+      "agent": "VoteCenter",
+      "action": "submit_vote",
+      "inputs": {
+        "payload": "governance/votes/gp-22_voting_payload.json"
+      }
+    },
+    {
+      "id": "wait_for_tier2_quorum",
+      "checkpoint": "tier2_quorum_met",
+      "agent": "VoteCenter",
+      "action": "wait_for_quorum",
+      "inputs": {
+        "proposal_id": "GP-22",
+        "quorum": 0.67
+      }
+    },
+    {
+      "id": "activate_tier2_routing",
+      "checkpoint": "tier2_routing_activated",
+      "agent": "MCPRouter",
+      "action": "activate_routing",
+      "inputs": {
+        "routing_file": "governance/mcp/routing/build_secure.json"
+      }
+    },
+    {
+      "id": "generate_tier3_execution_proposal",
+      "checkpoint": "tier3_proposal_generated",
+      "agent": "AskOrchestrate",
+      "action": "generate_execution_proposal",
+      "inputs": {
+        "proposal": "GP-22-EXEC",
+        "parent": "GP-22",
+        "routing_file": "governance/mcp/routing/build_secure_execution.json"
+      }
+    },
+    {
+      "id": "submit_tier3_vote",
+      "checkpoint": "tier3_vote_submitted",
+      "agent": "VoteCenter",
+      "action": "submit_vote",
+      "inputs": {
+        "payload": "governance/votes/gp-22-execution_payload.json"
+      }
+    },
+    {
+      "id": "wait_for_tier3_quorum",
+      "checkpoint": "tier3_quorum_met",
+      "agent": "VoteCenter",
+      "action": "wait_for_quorum",
+      "inputs": {
+        "proposal_id": "GP-22-EXEC",
+        "quorum": 0.67
+      }
+    },
+    {
+      "id": "activate_tier3_routing",
+      "checkpoint": "tier3_routing_activated",
+      "agent": "MCPRouter",
+      "action": "activate_routing",
+      "inputs": {
+        "routing_file": "governance/mcp/routing/build_secure_execution.json"
+      }
+    },
+    {
+      "id": "merge_pr",
+      "checkpoint": "pr_merged",
+      "agent": "NexusOpsAgent",
+      "action": "merge_pull_request",
+      "inputs": {
+        "pull_request": "modernization/build-secure"
+      }
+    },
+    {
+      "id": "trigger_ci_cd",
+      "checkpoint": "ci_cd_triggered",
+      "agent": "NexusOpsAgent",
+      "action": "trigger_workflows",
+      "inputs": {
+        "workflows": [
+          "Secure Build (Nexus DAO)",
+          "Secure Deploy (Nexus DAO)"
+        ]
+      }
+    },
+    {
+      "id": "log_modernization",
+      "checkpoint": "modernization_logged",
+      "agent": "OrbitAgent",
+      "action": "record_event",
+      "inputs": {
+        "proposal_id": "GP-22-EXEC",
+        "artifacts": [
+          ".github/workflows/build_secure.yml",
+          ".github/workflows/deploy_secure.yml",
+          "docs/workflows/security_baseline.md",
+          "docs/workflows/modernization_overview.md"
+        ]
+      }
+    }
+  ]
+}

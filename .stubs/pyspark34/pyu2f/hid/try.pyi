@@ -1,3 +1,0 @@
-from pyu2f import hid as hid
-
-def main() -> None: ...
