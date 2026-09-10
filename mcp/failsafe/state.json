@@ -1,0 +1,4 @@
+from failsafe import failsafe_active
+
+if failsafe_active():
+    # do not load AI agents

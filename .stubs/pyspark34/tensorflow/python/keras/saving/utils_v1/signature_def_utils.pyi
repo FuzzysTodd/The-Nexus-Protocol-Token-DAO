@@ -1,0 +1,6 @@
+from _typeshed import Incomplete
+from tensorflow.python.keras.saving.utils_v1 import unexported_constants as unexported_constants
+from tensorflow.python.saved_model import signature_def_utils as signature_def_utils
+
+def supervised_train_signature_def(inputs, loss, predictions: Incomplete | None = None, metrics: Incomplete | None = None): ...
+def supervised_eval_signature_def(inputs, loss, predictions: Incomplete | None = None, metrics: Incomplete | None = None): ...

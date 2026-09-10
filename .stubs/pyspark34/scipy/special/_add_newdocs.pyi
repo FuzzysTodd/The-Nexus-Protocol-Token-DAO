@@ -1,0 +1,6 @@
+from typing import Dict
+
+docdict: Dict[str, str]
+
+def get(name): ...
+def add_newdoc(name, doc) -> None: ...

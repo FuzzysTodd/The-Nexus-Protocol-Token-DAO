@@ -1,0 +1,29 @@
+import torch
+from ..utils import cached_property as cached_property, is_torch_available as is_torch_available, is_torch_tpu_available as is_torch_tpu_available, logging as logging, requires_backends as requires_backends
+from .benchmark_args_utils import BenchmarkArguments as BenchmarkArguments
+from _typeshed import Incomplete
+from dataclasses import dataclass
+
+logger: Incomplete
+
+@dataclass
+class PyTorchBenchmarkArguments(BenchmarkArguments):
+    deprecated_args = ...
+    torchscript = ...
+    torch_xla_tpu_print_metrics = ...
+    fp16_opt_level = ...
+    def __init__(self, **kwargs) -> None:
+        """
+        This __init__ is there for legacy code. When removing deprecated args completely, the class can simply be
+        deleted
+        """
+    @property
+    def is_tpu(self): ...
+    @property
+    def device_idx(self) -> int: ...
+    @property
+    def device(self) -> torch.device: ...
+    @property
+    def n_gpu(self): ...
+    @property
+    def is_gpu(self): ...

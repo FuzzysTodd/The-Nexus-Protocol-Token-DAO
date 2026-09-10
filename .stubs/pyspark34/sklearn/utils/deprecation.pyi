@@ -1,0 +1,35 @@
+from _typeshed import Incomplete
+
+__all__ = ['deprecated']
+
+class deprecated:
+    """Decorator to mark a function or class as deprecated.
+
+    Issue a warning when the function is called/the class is instantiated and
+    adds a warning to the docstring.
+
+    The optional extra argument will be appended to the deprecation message
+    and the docstring. Note: to use this with the default value for extra, put
+    in an empty of parentheses:
+
+    >>> from sklearn.utils import deprecated
+    >>> deprecated()
+    <sklearn.utils.deprecation.deprecated object at ...>
+
+    >>> @deprecated()
+    ... def some_function(): pass
+
+    Parameters
+    ----------
+    extra : str, default=''
+          To be added to the deprecation messages.
+    """
+    extra: Incomplete
+    def __init__(self, extra: str = '') -> None: ...
+    def __call__(self, obj):
+        """Call method
+
+        Parameters
+        ----------
+        obj : object
+        """

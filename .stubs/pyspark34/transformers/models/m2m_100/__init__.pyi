@@ -1,0 +1,4 @@
+from ...utils import is_tokenizers_available as is_tokenizers_available
+from .configuration_m2m_100 import M2M100Config as M2M100Config, M2M100OnnxConfig as M2M100OnnxConfig, M2M_100_PRETRAINED_CONFIG_ARCHIVE_MAP as M2M_100_PRETRAINED_CONFIG_ARCHIVE_MAP
+from .modeling_m2m_100 import M2M100ForConditionalGeneration as M2M100ForConditionalGeneration, M2M100Model as M2M100Model, M2M100PreTrainedModel as M2M100PreTrainedModel, M2M_100_PRETRAINED_MODEL_ARCHIVE_LIST as M2M_100_PRETRAINED_MODEL_ARCHIVE_LIST
+from .tokenization_m2m_100 import M2M100Tokenizer as M2M100Tokenizer

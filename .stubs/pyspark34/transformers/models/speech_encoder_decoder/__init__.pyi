@@ -1,0 +1,3 @@
+from .configuration_speech_encoder_decoder import SpeechEncoderDecoderConfig as SpeechEncoderDecoderConfig
+from .modeling_flax_speech_encoder_decoder import FlaxSpeechEncoderDecoderModel as FlaxSpeechEncoderDecoderModel
+from .modeling_speech_encoder_decoder import SpeechEncoderDecoderModel as SpeechEncoderDecoderModel

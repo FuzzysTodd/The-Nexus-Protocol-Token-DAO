@@ -1,0 +1,159 @@
+from ...tokenization_utils import AddedToken as AddedToken, PreTrainedTokenizer as PreTrainedTokenizer
+from ...utils import logging as logging
+from _typeshed import Incomplete
+from typing import List, Optional, Tuple
+
+logger: Incomplete
+VOCAB_FILES_NAMES: Incomplete
+PRETRAINED_VOCAB_FILES_MAP: Incomplete
+PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES: Incomplete
+PRETRAINED_INIT_CONFIGURATION: Incomplete
+
+def bytes_to_unicode():
+    """
+    Returns list of utf-8 byte and a mapping to unicode strings. We specifically avoids mapping to whitespace/control
+    characters the bpe code barfs on.
+
+    The reversible bpe codes work on unicode strings. This means you need a large # of unicode characters in your vocab
+    if you want to avoid UNKs. When you're at something like a 10B token dataset you end up needing around 5K for
+    decent coverage. This is a significant percentage of your normal, say, 32K bpe vocab. To avoid that, we want lookup
+    tables between utf-8 bytes and unicode strings.
+    """
+def get_pairs(word):
+    """
+    Return set of symbol pairs in a word.
+
+    Word is represented as tuple of symbols (symbols being variable-length strings).
+    """
+def whitespace_clean(text): ...
+def whitespace_tokenize(text):
+    """Runs basic whitespace cleaning and splitting on a piece of text."""
+
+class BasicTokenizer:
+    """
+    Constructs a BasicTokenizer that will run basic tokenization (punctuation splitting, lower casing, etc.).
+
+    Args:
+        do_lower_case (`bool`, *optional*, defaults to `True`):
+            Whether or not to lowercase the input when tokenizing.
+        never_split (`Iterable`, *optional*):
+            Collection of tokens which will never be split during tokenization. Only has an effect when
+            `do_basic_tokenize=True`
+        tokenize_chinese_chars (`bool`, *optional*, defaults to `True`):
+            Whether or not to tokenize Chinese characters.
+
+            This should likely be deactivated for Japanese (see this
+            [issue](https://github.com/huggingface/transformers/issues/328)).
+        strip_accents (`bool`, *optional*):
+            Whether or not to strip all accents. If this option is not specified, then it will be determined by the
+            value for `lowercase` (as in the original BERT).
+    """
+    do_lower_case: Incomplete
+    never_split: Incomplete
+    tokenize_chinese_chars: Incomplete
+    strip_accents: Incomplete
+    def __init__(self, do_lower_case: bool = True, never_split: Incomplete | None = None, tokenize_chinese_chars: bool = True, strip_accents: Incomplete | None = None) -> None: ...
+    def tokenize(self, text, never_split: Incomplete | None = None):
+        '''
+        Basic Tokenization of a piece of text. Split on "white spaces" only, for sub-word tokenization, see
+        WordPieceTokenizer.
+
+        Args:
+            never_split (`List[str]`, *optional*)
+                Kept for backward compatibility purposes. Now implemented directly at the base class level (see
+                [`PreTrainedTokenizer.tokenize`]) List of token not to split.
+        '''
+
+class CLIPTokenizer(PreTrainedTokenizer):
+    '''
+    Construct a CLIP tokenizer. Based on byte-level Byte-Pair-Encoding.
+
+    This tokenizer inherits from [`PreTrainedTokenizer`] which contains most of the main methods. Users should refer to
+    this superclass for more information regarding those methods.
+
+    Args:
+        vocab_file (`str`):
+            Path to the vocabulary file.
+        merges_file (`str`):
+            Path to the merges file.
+        errors (`str`, *optional*, defaults to `"replace"`):
+            Paradigm to follow when decoding bytes to UTF-8. See
+            [bytes.decode](https://docs.python.org/3/library/stdtypes.html#bytes.decode) for more information.
+        unk_token (`str`, *optional*, defaults to `<|endoftext|>`):
+            The unknown token. A token that is not in the vocabulary cannot be converted to an ID and is set to be this
+            token instead.
+        bos_token (`str`, *optional*, defaults to `<|startoftext|>`):
+            The beginning of sequence token.
+        eos_token (`str`, *optional*, defaults to `<|endoftext|>`):
+            The end of sequence token.
+    '''
+    vocab_files_names = VOCAB_FILES_NAMES
+    pretrained_vocab_files_map = PRETRAINED_VOCAB_FILES_MAP
+    max_model_input_sizes = PRETRAINED_POSITIONAL_EMBEDDINGS_SIZES
+    model_input_names: Incomplete
+    fix_text: Incomplete
+    nlp: Incomplete
+    encoder: Incomplete
+    decoder: Incomplete
+    errors: Incomplete
+    byte_encoder: Incomplete
+    byte_decoder: Incomplete
+    bpe_ranks: Incomplete
+    cache: Incomplete
+    pat: Incomplete
+    def __init__(self, vocab_file, merges_file, errors: str = 'replace', unk_token: str = '<|endoftext|>', bos_token: str = '<|startoftext|>', eos_token: str = '<|endoftext|>', pad_token: str = '<|endoftext|>', **kwargs) -> None: ...
+    @property
+    def vocab_size(self): ...
+    def get_vocab(self): ...
+    def build_inputs_with_special_tokens(self, token_ids_0: List[int], token_ids_1: Optional[List[int]] = None) -> List[int]:
+        """
+        Build model inputs from a sequence or a pair of sequence for sequence classification tasks by concatenating and
+        adding special tokens. A CLIP sequence has the following format:
+
+        - single sequence: `<|startoftext|> X <|endoftext|>`
+
+        Pairs of sequences are not the expected use case, but they will be handled without a separator.
+
+        Args:
+            token_ids_0 (`List[int]`):
+                List of IDs to which the special tokens will be added.
+            token_ids_1 (`List[int]`, *optional*):
+                Optional second list of IDs for sequence pairs.
+
+        Returns:
+            `List[int]`: List of [input IDs](../glossary#input-ids) with the appropriate special tokens.
+        """
+    def get_special_tokens_mask(self, token_ids_0: List[int], token_ids_1: Optional[List[int]] = None, already_has_special_tokens: bool = False) -> List[int]:
+        """
+        Retrieve sequence ids from a token list that has no special tokens added. This method is called when adding
+        special tokens using the tokenizer `prepare_for_model` method.
+
+        Args:
+            token_ids_0 (`List[int]`):
+                List of IDs.
+            token_ids_1 (`List[int]`, *optional*):
+                Optional second list of IDs for sequence pairs.
+            already_has_special_tokens (`bool`, *optional*, defaults to `False`):
+                Whether or not the token list is already formatted with special tokens for the model.
+
+        Returns:
+            `List[int]`: A list of integers in the range [0, 1]: 1 for a special token, 0 for a sequence token.
+        """
+    def create_token_type_ids_from_sequences(self, token_ids_0: List[int], token_ids_1: Optional[List[int]] = None) -> List[int]:
+        """
+        Create a mask from the two sequences passed. CLIP does not make use of token type ids, therefore a list of
+        zeros is returned.
+
+        Args:
+            token_ids_0 (`List[int]`):
+                List of IDs.
+            token_ids_1 (`List[int]`, *optional*):
+                Optional second list of IDs for sequence pairs.
+
+        Returns:
+            `List[int]`: List of zeros.
+        """
+    def bpe(self, token): ...
+    def convert_tokens_to_string(self, tokens):
+        """Converts a sequence of tokens (string) in a single string."""
+    def save_vocabulary(self, save_directory: str, filename_prefix: Optional[str] = None) -> Tuple[str]: ...

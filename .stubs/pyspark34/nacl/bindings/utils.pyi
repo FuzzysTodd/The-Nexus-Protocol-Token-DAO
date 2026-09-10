@@ -1,0 +1,58 @@
+from nacl._sodium import ffi as ffi, lib as lib
+from nacl.exceptions import ensure as ensure
+
+def sodium_memcmp(inp1: bytes, inp2: bytes) -> bool:
+    """
+    Compare contents of two memory regions in constant time
+    """
+def sodium_pad(s: bytes, blocksize: int) -> bytes:
+    """
+    Pad the input bytearray ``s`` to a multiple of ``blocksize``
+    using the ISO/IEC 7816-4 algorithm
+
+    :param s: input bytes string
+    :type s: bytes
+    :param blocksize:
+    :type blocksize: int
+    :return: padded string
+    :rtype: bytes
+    """
+def sodium_unpad(s: bytes, blocksize: int) -> bytes:
+    """
+    Remove ISO/IEC 7816-4 padding from the input byte array ``s``
+
+    :param s: input bytes string
+    :type s: bytes
+    :param blocksize:
+    :type blocksize: int
+    :return: unpadded string
+    :rtype: bytes
+    """
+def sodium_increment(inp: bytes) -> bytes:
+    """
+    Increment the value of a byte-sequence interpreted
+    as the little-endian representation of a unsigned big integer.
+
+    :param inp: input bytes buffer
+    :type inp: bytes
+    :return: a byte-sequence representing, as a little-endian
+             unsigned big integer, the value ``to_int(inp)``
+             incremented by one.
+    :rtype: bytes
+
+    """
+def sodium_add(a: bytes, b: bytes) -> bytes:
+    """
+    Given a couple of *same-sized* byte sequences, interpreted as the
+    little-endian representation of two unsigned integers, compute
+    the modular addition of the represented values, in constant time for
+    a given common length of the byte sequences.
+
+    :param a: input bytes buffer
+    :type a: bytes
+    :param b: input bytes buffer
+    :type b: bytes
+    :return: a byte-sequence representing, as a little-endian big integer,
+             the integer value of ``(to_int(a) + to_int(b)) mod 2^(8*len(a))``
+    :rtype: bytes
+    """

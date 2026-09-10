@@ -1,0 +1,9 @@
+from transformers import CLIPProcessor as CLIPProcessor, GroupViTConfig as GroupViTConfig, GroupViTModel as GroupViTModel
+
+def rename_key(name): ...
+def convert_state_dict(orig_state_dict, config): ...
+def prepare_img(): ...
+def convert_groupvit_checkpoint(checkpoint_path, pytorch_dump_folder_path, model_name: str = 'groupvit-gcc-yfcc', push_to_hub: bool = False) -> None:
+    """
+    Copy/paste/tweak model's weights to the Transformers design.
+    """

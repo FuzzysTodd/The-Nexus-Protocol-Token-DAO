@@ -1,0 +1,9 @@
+from torchgen.api.types import kernel_signature as kernel_signature
+from torchgen.context import with_native_function_and_index as with_native_function_and_index
+from torchgen.model import BackendIndex as BackendIndex, NativeFunction as NativeFunction, NativeFunctionsGroup as NativeFunctionsGroup
+from torchgen.utils import mapMaybe as mapMaybe
+from typing import List
+
+def gen_unstructured(f: NativeFunction, backend_index: BackendIndex) -> str | None: ...
+def gen_structured(g: NativeFunctionsGroup, backend_index: BackendIndex) -> List[str]: ...
+def compute_native_function_declaration(g: NativeFunctionsGroup | NativeFunction, backend_index: BackendIndex) -> List[str]: ...

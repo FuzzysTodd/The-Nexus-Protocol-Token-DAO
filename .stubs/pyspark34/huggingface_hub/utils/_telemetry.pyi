@@ -1,0 +1,48 @@
+from . import build_hf_headers as build_hf_headers, get_session as get_session, hf_raise_for_status as hf_raise_for_status
+from .. import constants as constants, logging as logging
+from _typeshed import Incomplete
+from typing import Dict
+
+logger: Incomplete
+
+def send_telemetry(topic: str, *, library_name: str | None = None, library_version: str | None = None, user_agent: Dict | str | None = None) -> None:
+    '''
+    Sends telemetry that helps tracking usage of different HF libraries.
+
+    This usage data helps us debug issues and prioritize new features. However, we understand that not everyone wants
+    to share additional information, and we respect your privacy. You can disable telemetry collection by setting the
+    `HF_HUB_DISABLE_TELEMETRY=1` as environment variable. Telemetry is also disabled in offline mode (i.e. when setting
+    `HF_HUB_OFFLINE=1`).
+
+    Telemetry collection is run in a separate thread to minimize impact for the user.
+
+    Args:
+        topic (`str`):
+            Name of the topic that is monitored. The topic is directly used to build the URL. If you want to monitor
+            subtopics, just use "/" separation. Examples: "gradio", "transformers/examples",...
+        library_name (`str`, *optional*):
+            The name of the library that is making the HTTP request. Will be added to the user-agent header.
+        library_version (`str`, *optional*):
+            The version of the library that is making the HTTP request. Will be added to the user-agent header.
+        user_agent (`str`, `dict`, *optional*):
+            The user agent info in the form of a dictionary or a single string. It will be completed with information about the installed packages.
+
+    Example:
+    ```py
+    >>> from huggingface_hub.utils import send_telemetry
+
+    # Send telemetry without library information
+    >>> send_telemetry("ping")
+
+    # Send telemetry to subtopic with library information
+    >>> send_telemetry("gradio/local_link", library_name="gradio", library_version="3.22.1")
+
+    # Send telemetry with additional data
+    >>> send_telemetry(
+    ...     topic="examples",
+    ...     library_name="transformers",
+    ...     library_version="4.26.0",
+    ...     user_agent={"pipeline": "text_classification", "framework": "flax"},
+    ... )
+    ```
+    '''

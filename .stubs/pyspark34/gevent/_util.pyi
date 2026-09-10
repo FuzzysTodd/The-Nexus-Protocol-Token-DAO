@@ -1,0 +1,137 @@
+from _typeshed import Incomplete
+from gevent._compat import iteritems as iteritems
+
+class _NONE:
+    """
+    A special object you must never pass to any gevent API.
+    Used as a marker object for keyword arguments that cannot have the
+    builtin None (because that might be a valid value).
+    """
+
+WRAPPER_ASSIGNMENTS: Incomplete
+WRAPPER_UPDATES: Incomplete
+
+def update_wrapper(wrapper, wrapped, assigned=..., updated=...):
+    """
+    Based on code from the standard library ``functools``, but
+    doesn't perform any of the troublesome imports.
+
+    functools imports RLock from _thread for purposes of the
+    ``lru_cache``, making it problematic to use from gevent.
+
+    The other imports are somewhat heavy: abc, collections, types.
+    """
+def copy_globals(source, globs, only_names: Incomplete | None = None, ignore_missing_names: bool = False, names_to_ignore=(), dunder_names_to_keep=('__implements__', '__all__', '__imports__'), cleanup_globs: bool = True):
+    """
+    Copy attributes defined in ``source.__dict__`` to the dictionary
+    in globs (which should be the caller's :func:`globals`).
+
+    Names that start with ``__`` are ignored (unless they are in
+    *dunder_names_to_keep*). Anything found in *names_to_ignore* is
+    also ignored.
+
+    If *only_names* is given, only those attributes will be
+    considered. In this case, *ignore_missing_names* says whether or
+    not to raise an :exc:`AttributeError` if one of those names can't
+    be found.
+
+    If *cleanup_globs* has a true value, then common things imported but
+    not used at runtime are removed, including this function.
+
+    Returns a list of the names copied; this should be assigned to ``__imports__``.
+    """
+def import_c_accel(globs, cname) -> None:
+    """
+    Import the C-accelerator for the *cname*
+    and copy its globals.
+
+    The *cname* should be hardcoded to match the expected
+    C accelerator module.
+
+    Unless PURE_PYTHON is set (in the environment or automatically
+    on PyPy), then the C-accelerator is required.
+    """
+
+class Lazy:
+    """
+    A non-data descriptor used just like @property. The
+    difference is the function value is assigned to the instance
+    dict the first time it is accessed and then the function is never
+    called again.
+
+    Contrast with `readproperty`.
+    """
+    data: Incomplete
+    def __init__(self, func) -> None: ...
+    def __get__(self, inst, class_): ...
+
+class readproperty:
+    """
+    A non-data descriptor similar to :class:`property`.
+
+    The difference is that the property can be assigned to directly,
+    without invoking a setter function. When the property is assigned
+    to, it is cached in the instance and the function is not called on
+    that instance again.
+
+    Contrast with `Lazy`, which caches the result of the function in the
+    instance the first time it is called and never calls the function on that
+    instance again.
+    """
+    func: Incomplete
+    def __init__(self, func) -> None: ...
+    def __get__(self, inst, class_): ...
+
+class LazyOnClass:
+    """
+    Similar to `Lazy`, but stores the value in the class.
+
+    This is useful when the getter is expensive and conceptually
+    a shared class value, but we don't want import-time side-effects
+    such as expensive imports because it may not always be used.
+
+    Probably doesn't mix well with inheritance?
+    """
+    @classmethod
+    def lazy(cls, cls_dict, func) -> None:
+        """Put a LazyOnClass object in *cls_dict* with the same name as *func*"""
+    name: Incomplete
+    func: Incomplete
+    def __init__(self, func, name: Incomplete | None = None) -> None: ...
+    def __get__(self, inst, klass): ...
+
+def gmctime():
+    """
+    Returns the current time as a string in RFC3339 format.
+    """
+def prereleaser_middle(data) -> None:
+    """
+    zest.releaser prerelease middle hook for gevent.
+
+    The prerelease step:
+
+        asks you for a version number
+        updates the setup.py or version.txt and the
+        CHANGES/HISTORY/CHANGELOG file (with either
+        this new version
+        number and offers to commit those changes to git
+
+    The middle hook:
+
+        All data dictionary items are available and some questions
+        (like new version number) have been asked.
+        No filesystem changes have been made yet.
+
+    It is our job to finish up the filesystem changes needed, including:
+
+    - Calling towncrier to handle CHANGES.rst
+    - Add the version number to ``versionadded``, ``versionchanged`` and
+      ``deprecated`` directives in Python source.
+    """
+def postreleaser_before(data) -> None:
+    """
+    Prevents zest.releaser from modifying the CHANGES.rst to add the
+    'no changes yet' section; towncrier is in charge of CHANGES.rst.
+
+    Needs zest.releaser 6.15.0.
+    """

@@ -1,0 +1,6 @@
+from .constants import AVG_POOL_3X3 as AVG_POOL_3X3, CONV_1X1 as CONV_1X1, CONV_3X3 as CONV_3X3, NONE as NONE, SKIP_CONNECT as SKIP_CONNECT
+from .model import Nb201IntermediateStats as Nb201IntermediateStats, Nb201TrialConfig as Nb201TrialConfig, Nb201TrialStats as Nb201TrialStats
+from nni.nas.benchmarks.utils import load_benchmark as load_benchmark
+
+def parse_arch_str(arch_str): ...
+def main() -> None: ...

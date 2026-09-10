@@ -1,0 +1,2 @@
+from .tokenization_barthez import BarthezTokenizer as BarthezTokenizer
+from .tokenization_barthez_fast import BarthezTokenizerFast as BarthezTokenizerFast

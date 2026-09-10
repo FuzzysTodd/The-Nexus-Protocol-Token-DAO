@@ -1,0 +1,52 @@
+from _typeshed import Incomplete
+from pyspark.pandas.missing import unsupported_function as unsupported_function, unsupported_property as unsupported_property
+
+class MissingPandasLikeDataFrameResampler:
+    groups: Incomplete
+    indices: Incomplete
+    get_group: Incomplete
+    apply: Incomplete
+    aggregate: Incomplete
+    transform: Incomplete
+    pipe: Incomplete
+    ffill: Incomplete
+    bfill: Incomplete
+    nearest: Incomplete
+    fillna: Incomplete
+    asfreq: Incomplete
+    interpolate: Incomplete
+    count: Incomplete
+    nunique: Incomplete
+    first: Incomplete
+    last: Incomplete
+    median: Incomplete
+    ohlc: Incomplete
+    prod: Incomplete
+    size: Incomplete
+    sem: Incomplete
+    quantile: Incomplete
+
+class MissingPandasLikeSeriesResampler:
+    groups: Incomplete
+    indices: Incomplete
+    get_group: Incomplete
+    apply: Incomplete
+    aggregate: Incomplete
+    transform: Incomplete
+    pipe: Incomplete
+    ffill: Incomplete
+    bfill: Incomplete
+    nearest: Incomplete
+    fillna: Incomplete
+    asfreq: Incomplete
+    interpolate: Incomplete
+    count: Incomplete
+    nunique: Incomplete
+    first: Incomplete
+    last: Incomplete
+    median: Incomplete
+    ohlc: Incomplete
+    prod: Incomplete
+    size: Incomplete
+    sem: Incomplete
+    quantile: Incomplete

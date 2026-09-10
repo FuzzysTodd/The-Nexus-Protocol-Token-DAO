@@ -1,0 +1,25 @@
+from IPython.utils.importstring import import_item as import_item
+from IPython.utils.path import compress_user as compress_user, ensure_dir_exists as ensure_dir_exists, get_home_dir as get_home_dir, get_xdg_cache_dir as get_xdg_cache_dir, get_xdg_dir as get_xdg_dir
+
+def get_ipython_dir() -> str:
+    """Get the IPython directory for this platform and user.
+
+    This uses the logic in `get_home_dir` to find the home directory
+    and then adds .ipython to the end of the path.
+    """
+def get_ipython_cache_dir() -> str:
+    """Get the cache directory it is created if it does not exist."""
+def get_ipython_package_dir() -> str:
+    """Get the base directory where IPython itself is installed."""
+def get_ipython_module_path(module_str):
+    """Find the path to an IPython module in this version of IPython.
+
+    This will always find the version of the module that is in this importable
+    IPython package. This will always return the path to the ``.py``
+    version of the module.
+    """
+def locate_profile(profile: str = 'default'):
+    """Find the path to the folder associated with a given profile.
+
+    I.e. find $IPYTHONDIR/profile_whatever.
+    """

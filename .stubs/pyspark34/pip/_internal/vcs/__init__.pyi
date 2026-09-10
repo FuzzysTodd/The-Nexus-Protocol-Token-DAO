@@ -1,0 +1,1 @@
+from pip._internal.vcs.versioncontrol import RemoteNotFoundError as RemoteNotFoundError, RemoteNotValidError as RemoteNotValidError, is_url as is_url, make_vcs_requirement_url as make_vcs_requirement_url, vcs as vcs

@@ -1,0 +1,9 @@
+from holidays.groups.buddhist import BuddhistCalendarHolidays as BuddhistCalendarHolidays
+from holidays.groups.chinese import ChineseCalendarHolidays as ChineseCalendarHolidays
+from holidays.groups.christian import ChristianHolidays as ChristianHolidays
+from holidays.groups.custom import StaticHolidays as StaticHolidays
+from holidays.groups.hindu import HinduCalendarHolidays as HinduCalendarHolidays
+from holidays.groups.international import InternationalHolidays as InternationalHolidays
+from holidays.groups.islamic import IslamicHolidays as IslamicHolidays
+from holidays.groups.persian import PersianCalendarHolidays as PersianCalendarHolidays
+from holidays.groups.thai import ThaiCalendarHolidays as ThaiCalendarHolidays

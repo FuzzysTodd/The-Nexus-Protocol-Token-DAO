@@ -1,0 +1,4 @@
+import _plotly_utils.basevalidators
+
+class ColorValidator(_plotly_utils.basevalidators.DataArrayValidator):
+    def __init__(self, plotly_name: str = 'color', parent_name: str = 'histogram2dcontour.marker', **kwargs) -> None: ...

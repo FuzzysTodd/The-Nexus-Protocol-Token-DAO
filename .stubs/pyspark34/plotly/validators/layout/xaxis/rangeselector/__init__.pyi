@@ -1,0 +1,12 @@
+from ._activecolor import ActivecolorValidator as ActivecolorValidator
+from ._bgcolor import BgcolorValidator as BgcolorValidator
+from ._bordercolor import BordercolorValidator as BordercolorValidator
+from ._borderwidth import BorderwidthValidator as BorderwidthValidator
+from ._buttondefaults import ButtondefaultsValidator as ButtondefaultsValidator
+from ._buttons import ButtonsValidator as ButtonsValidator
+from ._font import FontValidator as FontValidator
+from ._visible import VisibleValidator as VisibleValidator
+from ._x import XValidator as XValidator
+from ._xanchor import XanchorValidator as XanchorValidator
+from ._y import YValidator as YValidator
+from ._yanchor import YanchorValidator as YanchorValidator

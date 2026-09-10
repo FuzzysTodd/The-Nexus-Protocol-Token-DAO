@@ -1,0 +1,6 @@
+from absl.testing import absltest
+from rouge_score import tokenizers as tokenizers
+
+class TokenizersTest(absltest.TestCase):
+    def test_default_tokenizer_no_stemmer_init(self) -> None: ...
+    def test_default_tokenizer_with_stemmer_init(self) -> None: ...

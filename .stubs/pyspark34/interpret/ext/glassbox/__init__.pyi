@@ -1,0 +1,2 @@
+from interpret.ext.extension import GLASSBOX_EXTENSION_KEY as GLASSBOX_EXTENSION_KEY
+from interpret.ext.extension_utils import load_class_extensions as load_class_extensions

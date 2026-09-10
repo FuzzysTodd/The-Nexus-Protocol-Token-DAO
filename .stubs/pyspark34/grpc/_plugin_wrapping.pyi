@@ -1,0 +1,23 @@
+import grpc
+from _typeshed import Incomplete
+from grpc._cython import cygrpc as cygrpc
+from grpc._typing import MetadataType as MetadataType
+from typing import Callable, NamedTuple, Type
+
+class _AuthMetadataContext(NamedTuple('AuthMetadataContext', [('service_url', Incomplete), ('method_name', Incomplete)]), grpc.AuthMetadataContext): ...
+
+class _CallbackState:
+    lock: Incomplete
+    called: bool
+    exception: Incomplete
+    def __init__(self) -> None: ...
+
+class _AuthMetadataPluginCallback(grpc.AuthMetadataPluginCallback):
+    def __init__(self, state: _CallbackState, callback: Callable) -> None: ...
+    def __call__(self, metadata: MetadataType, error: Type[BaseException] | None): ...
+
+class _Plugin:
+    def __init__(self, metadata_plugin: grpc.AuthMetadataPlugin) -> None: ...
+    def __call__(self, service_url: str, method_name: str, callback: Callable): ...
+
+def metadata_plugin_call_credentials(metadata_plugin: grpc.AuthMetadataPlugin, name: str | None) -> grpc.CallCredentials: ...

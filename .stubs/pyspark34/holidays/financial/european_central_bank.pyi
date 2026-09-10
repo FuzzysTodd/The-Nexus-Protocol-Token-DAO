@@ -1,0 +1,9 @@
+from holidays.groups import ChristianHolidays as ChristianHolidays, InternationalHolidays as InternationalHolidays
+from holidays.holiday_base import HolidayBase as HolidayBase
+
+class EuropeanCentralBank(HolidayBase, ChristianHolidays, InternationalHolidays):
+    market: str
+    def __init__(self, *args, **kwargs) -> None: ...
+
+class ECB(EuropeanCentralBank): ...
+class TAR(EuropeanCentralBank): ...

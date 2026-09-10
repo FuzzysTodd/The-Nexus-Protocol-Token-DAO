@@ -1,0 +1,10 @@
+from ._categoryarray import CategoryarrayValidator as CategoryarrayValidator
+from ._categoryarraysrc import CategoryarraysrcValidator as CategoryarraysrcValidator
+from ._categoryorder import CategoryorderValidator as CategoryorderValidator
+from ._displayindex import DisplayindexValidator as DisplayindexValidator
+from ._label import LabelValidator as LabelValidator
+from ._ticktext import TicktextValidator as TicktextValidator
+from ._ticktextsrc import TicktextsrcValidator as TicktextsrcValidator
+from ._values import ValuesValidator as ValuesValidator
+from ._valuessrc import ValuessrcValidator as ValuessrcValidator
+from ._visible import VisibleValidator as VisibleValidator

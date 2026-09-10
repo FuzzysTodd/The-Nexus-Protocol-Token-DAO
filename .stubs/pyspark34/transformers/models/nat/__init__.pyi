@@ -1,0 +1,2 @@
+from .configuration_nat import NAT_PRETRAINED_CONFIG_ARCHIVE_MAP as NAT_PRETRAINED_CONFIG_ARCHIVE_MAP, NatConfig as NatConfig
+from .modeling_nat import NAT_PRETRAINED_MODEL_ARCHIVE_LIST as NAT_PRETRAINED_MODEL_ARCHIVE_LIST, NatBackbone as NatBackbone, NatForImageClassification as NatForImageClassification, NatModel as NatModel, NatPreTrainedModel as NatPreTrainedModel

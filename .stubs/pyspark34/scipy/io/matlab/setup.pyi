@@ -1,0 +1,3 @@
+from _typeshed import Incomplete
+
+def configuration(parent_package: str = 'io', top_path: Incomplete | None = None): ...

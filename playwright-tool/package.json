@@ -29,7 +29,7 @@
   "author": "Nexus Protocol",
   "license": "MIT",
   "dependencies": {
-    "@playwright/test": "^1.40.0"
-  },
-  "devDependencies": {}
+    "@playwright/test": "^1.40.0",
+    "@vercel/speed-insights": "^2.0.0"
+  }
 }

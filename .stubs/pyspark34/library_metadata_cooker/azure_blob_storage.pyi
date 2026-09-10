@@ -1,0 +1,13 @@
+from _typeshed import Incomplete
+from azure.storage.blob import ContainerClient as ContainerClient
+
+class AzureBlobStorage:
+    spark_pool_name: Incomplete
+    container_name: str
+    container_client: Incomplete
+    logger: Incomplete
+    def __init__(self, spark_pool_name, account_name: Incomplete | None = None, sas_token: Incomplete | None = None, endpoint: str = '.blob.core.windows.net') -> None: ...
+    def getStorageAccount(self, account_name: Incomplete | None = None, sas_token: Incomplete | None = None, endpoint: str = '.blob.core.windows.net') -> ContainerClient | None: ...
+    def uploadBlob(self, blobname, text) -> None: ...
+
+def main() -> None: ...

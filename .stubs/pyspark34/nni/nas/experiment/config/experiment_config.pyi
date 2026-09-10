@@ -1,0 +1,16 @@
+from .engine_config import ExecutionEngineConfig
+from dataclasses import dataclass
+from nni.experiment.config import ExperimentConfig, utils
+from typing import Any
+from typing_extensions import Literal
+
+__all__ = ['RetiariiExeConfig']
+
+@dataclass(init=False)
+class RetiariiExeConfig(ExperimentConfig):
+    experiment_type: Literal['nas'] = ...
+    search_space: Any = ...
+    trial_code_directory: utils.PathLike = ...
+    trial_command: str = ...
+    execution_engine: str | ExecutionEngineConfig
+    def __init__(self, training_service_platform: str | None = None, execution_engine: str | ExecutionEngineConfig = 'py', **kwargs) -> None: ...

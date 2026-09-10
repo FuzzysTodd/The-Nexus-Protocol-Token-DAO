@@ -1,0 +1,9 @@
+from .FeatureUsagePayload import FeatureUsagePayload as FeatureUsagePayload
+from .UsageConstants import EMIT_USAGE as EMIT_USAGE
+from typing import Dict
+
+FABRIC_FAKE_TELEMETRY_REPORT_CALLS: str
+
+def fire_and_forget(f): ...
+def reportUsage(payload: FeatureUsagePayload): ...
+def report_usage_telemetry(feature_name: str, activity_name: str, attributes: Dict[str, str] = {}): ...

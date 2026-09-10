@@ -1,0 +1,2 @@
+SIP_VERSION: int
+SIP_VERSION_STR: str

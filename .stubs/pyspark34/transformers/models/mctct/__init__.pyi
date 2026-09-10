@@ -1,0 +1,4 @@
+from .configuration_mctct import MCTCTConfig as MCTCTConfig, MCTCT_PRETRAINED_CONFIG_ARCHIVE_MAP as MCTCT_PRETRAINED_CONFIG_ARCHIVE_MAP
+from .feature_extraction_mctct import MCTCTFeatureExtractor as MCTCTFeatureExtractor
+from .modeling_mctct import MCTCTForCTC as MCTCTForCTC, MCTCTModel as MCTCTModel, MCTCTPreTrainedModel as MCTCTPreTrainedModel, MCTCT_PRETRAINED_MODEL_ARCHIVE_LIST as MCTCT_PRETRAINED_MODEL_ARCHIVE_LIST
+from .processing_mctct import MCTCTProcessor as MCTCTProcessor

@@ -1,0 +1,15 @@
+from _typeshed import Incomplete
+
+DESCRIPTOR: Incomplete
+VariableSynchronization: Incomplete
+VariableAggregation: Incomplete
+VARIABLE_SYNCHRONIZATION_AUTO: int
+VARIABLE_SYNCHRONIZATION_NONE: int
+VARIABLE_SYNCHRONIZATION_ON_WRITE: int
+VARIABLE_SYNCHRONIZATION_ON_READ: int
+VARIABLE_AGGREGATION_NONE: int
+VARIABLE_AGGREGATION_SUM: int
+VARIABLE_AGGREGATION_MEAN: int
+VARIABLE_AGGREGATION_ONLY_FIRST_REPLICA: int
+VariableDef: Incomplete
+SaveSliceInfoDef: Incomplete
