@@ -1,0 +1,2 @@
+from .configuration_dinat import DINAT_PRETRAINED_CONFIG_ARCHIVE_MAP as DINAT_PRETRAINED_CONFIG_ARCHIVE_MAP, DinatConfig as DinatConfig
+from .modeling_dinat import DINAT_PRETRAINED_MODEL_ARCHIVE_LIST as DINAT_PRETRAINED_MODEL_ARCHIVE_LIST, DinatBackbone as DinatBackbone, DinatForImageClassification as DinatForImageClassification, DinatModel as DinatModel, DinatPreTrainedModel as DinatPreTrainedModel

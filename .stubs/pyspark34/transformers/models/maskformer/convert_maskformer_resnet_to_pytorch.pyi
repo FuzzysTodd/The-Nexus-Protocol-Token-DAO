@@ -1,0 +1,16 @@
+import torch
+from _typeshed import Incomplete
+from transformers import MaskFormerConfig as MaskFormerConfig, MaskFormerFeatureExtractor as MaskFormerFeatureExtractor, MaskFormerForInstanceSegmentation as MaskFormerForInstanceSegmentation, ResNetConfig as ResNetConfig
+from transformers.utils import logging as logging
+
+logger: Incomplete
+
+def get_maskformer_config(model_name: str): ...
+def create_rename_keys(config): ...
+def rename_key(dct, old, new) -> None: ...
+def read_in_decoder_q_k_v(state_dict, config) -> None: ...
+def prepare_img() -> torch.Tensor: ...
+def convert_maskformer_checkpoint(model_name: str, checkpoint_path: str, pytorch_dump_folder_path: str, push_to_hub: bool = False):
+    """
+    Copy/paste/tweak model's weights to our MaskFormer structure.
+    """

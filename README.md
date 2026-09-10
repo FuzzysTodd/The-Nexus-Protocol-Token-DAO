@@ -178,4 +178,3 @@ Repository-authored content maintained by FuzzysTodd and The-Nexus-Protocol-Toke
 ---
 
 **Ready to start?** 🚀 **[Open the User Guide →](user-guide.html)**
-

@@ -1,0 +1,178 @@
+from _typeshed import Incomplete
+
+class DescriptorPool:
+    """A collection of protobufs dynamically constructed by descriptor protos."""
+    def __new__(cls, descriptor_db: Incomplete | None = None): ...
+    def __init__(self, descriptor_db: Incomplete | None = None) -> None:
+        """Initializes a Pool of proto buffs.
+
+    The descriptor_db argument to the constructor is provided to allow
+    specialized file descriptor proto lookup code to be triggered on demand. An
+    example would be an implementation which will read and compile a file
+    specified in a call to FindFileByName() and not require the call to Add()
+    at all. Results from this database will be cached internally here as well.
+
+    Args:
+      descriptor_db: A secondary source of file descriptors.
+    """
+    def Add(self, file_desc_proto) -> None:
+        """Adds the FileDescriptorProto and its types to this pool.
+
+    Args:
+      file_desc_proto (FileDescriptorProto): The file descriptor to add.
+    """
+    def AddSerializedFile(self, serialized_file_desc_proto):
+        """Adds the FileDescriptorProto and its types to this pool.
+
+    Args:
+      serialized_file_desc_proto (bytes): A bytes string, serialization of the
+        :class:`FileDescriptorProto` to add.
+
+    Returns:
+      FileDescriptor: Descriptor for the added file.
+    """
+    def AddDescriptor(self, desc) -> None: ...
+    def AddEnumDescriptor(self, enum_desc) -> None: ...
+    def AddServiceDescriptor(self, service_desc) -> None: ...
+    def AddExtensionDescriptor(self, extension) -> None: ...
+    def AddFileDescriptor(self, file_desc) -> None: ...
+    def FindFileByName(self, file_name):
+        """Gets a FileDescriptor by file name.
+
+    Args:
+      file_name (str): The path to the file to get a descriptor for.
+
+    Returns:
+      FileDescriptor: The descriptor for the named file.
+
+    Raises:
+      KeyError: if the file cannot be found in the pool.
+    """
+    def FindFileContainingSymbol(self, symbol):
+        """Gets the FileDescriptor for the file containing the specified symbol.
+
+    Args:
+      symbol (str): The name of the symbol to search for.
+
+    Returns:
+      FileDescriptor: Descriptor for the file that contains the specified
+      symbol.
+
+    Raises:
+      KeyError: if the file cannot be found in the pool.
+    """
+    def FindMessageTypeByName(self, full_name):
+        """Loads the named descriptor from the pool.
+
+    Args:
+      full_name (str): The full name of the descriptor to load.
+
+    Returns:
+      Descriptor: The descriptor for the named type.
+
+    Raises:
+      KeyError: if the message cannot be found in the pool.
+    """
+    def FindEnumTypeByName(self, full_name):
+        """Loads the named enum descriptor from the pool.
+
+    Args:
+      full_name (str): The full name of the enum descriptor to load.
+
+    Returns:
+      EnumDescriptor: The enum descriptor for the named type.
+
+    Raises:
+      KeyError: if the enum cannot be found in the pool.
+    """
+    def FindFieldByName(self, full_name):
+        """Loads the named field descriptor from the pool.
+
+    Args:
+      full_name (str): The full name of the field descriptor to load.
+
+    Returns:
+      FieldDescriptor: The field descriptor for the named field.
+
+    Raises:
+      KeyError: if the field cannot be found in the pool.
+    """
+    def FindOneofByName(self, full_name):
+        """Loads the named oneof descriptor from the pool.
+
+    Args:
+      full_name (str): The full name of the oneof descriptor to load.
+
+    Returns:
+      OneofDescriptor: The oneof descriptor for the named oneof.
+
+    Raises:
+      KeyError: if the oneof cannot be found in the pool.
+    """
+    def FindExtensionByName(self, full_name):
+        """Loads the named extension descriptor from the pool.
+
+    Args:
+      full_name (str): The full name of the extension descriptor to load.
+
+    Returns:
+      FieldDescriptor: The field descriptor for the named extension.
+
+    Raises:
+      KeyError: if the extension cannot be found in the pool.
+    """
+    def FindExtensionByNumber(self, message_descriptor, number):
+        """Gets the extension of the specified message with the specified number.
+
+    Extensions have to be registered to this pool by calling :func:`Add` or
+    :func:`AddExtensionDescriptor`.
+
+    Args:
+      message_descriptor (Descriptor): descriptor of the extended message.
+      number (int): Number of the extension field.
+
+    Returns:
+      FieldDescriptor: The descriptor for the extension.
+
+    Raises:
+      KeyError: when no extension with the given number is known for the
+        specified message.
+    """
+    def FindAllExtensions(self, message_descriptor):
+        """Gets all the known extensions of a given message.
+
+    Extensions have to be registered to this pool by build related
+    :func:`Add` or :func:`AddExtensionDescriptor`.
+
+    Args:
+      message_descriptor (Descriptor): Descriptor of the extended message.
+
+    Returns:
+      list[FieldDescriptor]: Field descriptors describing the extensions.
+    """
+    def FindServiceByName(self, full_name):
+        """Loads the named service descriptor from the pool.
+
+    Args:
+      full_name (str): The full name of the service descriptor to load.
+
+    Returns:
+      ServiceDescriptor: The service descriptor for the named service.
+
+    Raises:
+      KeyError: if the service cannot be found in the pool.
+    """
+    def FindMethodByName(self, full_name):
+        """Loads the named service method descriptor from the pool.
+
+    Args:
+      full_name (str): The full name of the method descriptor to load.
+
+    Returns:
+      MethodDescriptor: The method descriptor for the service method.
+
+    Raises:
+      KeyError: if the method cannot be found in the pool.
+    """
+
+def Default(): ...

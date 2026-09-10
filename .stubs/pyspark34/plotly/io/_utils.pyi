@@ -1,0 +1,6 @@
+from plotly.offline import get_plotlyjs_version as get_plotlyjs_version
+
+def validate_coerce_fig_to_dict(fig, validate): ...
+def validate_coerce_output_type(output_type): ...
+def plotly_cdn_url(cdn_ver=...):
+    """Return a valid plotly CDN url."""

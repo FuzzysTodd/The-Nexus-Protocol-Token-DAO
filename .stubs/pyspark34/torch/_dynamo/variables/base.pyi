@@ -1,0 +1,76 @@
+from .. import variables as variables
+from ..exc import unimplemented as unimplemented
+from ..source import AttrSource as AttrSource, Source as Source
+from ..utils import dict_values as dict_values, identity as identity, istype as istype, odict_values as odict_values
+from _typeshed import Incomplete
+from typing import Any, Callable, Dict, List, Set
+
+class MutableLocal:
+    """
+    Marker used to indicate this (list, iter, etc) was constructed in
+    local scope and can be mutated safely in analysis without leaking
+    state.
+    """
+    def __hash__(self): ...
+    def __eq__(self, other): ...
+
+class HasPostInit(type):
+    def __call__(cls, *args, **kwargs): ...
+
+class VariableTracker(metaclass=HasPostInit):
+    """
+    Base class for tracked locals and stack values
+
+    VariableTracker instances are immutable and should be copied in
+    order to change them.
+    """
+    @staticmethod
+    def propagate(*vars: List[List['VariableTracker']]):
+        """Combine the guards from many VariableTracker into **kwargs for a new instance"""
+    def clone(self, **kwargs):
+        """Shallow copy with some (optional) changes"""
+    @classmethod
+    def copy(cls, value):
+        """Deeper (but not full) copy, leaving FX and user objects alone"""
+    @classmethod
+    def apply(cls, fn: Callable[[VariableTracker], 'VariableTracker'], value, cache: Incomplete | None = None, skip_fn=...):
+        """
+        Walk this object and call fn on all the VariableTracker
+        instances to produce a new VariableTracker with the results.
+        """
+    def add_guard(self, guard): ...
+    def add_guards(self, guards): ...
+    def add_options(self, options, *more): ...
+    def python_type(self) -> None: ...
+    def as_python_constant(self) -> None:
+        """For constants"""
+    def is_python_constant(self): ...
+    def as_specialized(self, tx):
+        """
+        For specialized variables, return itself,
+        For unspecialized variables, convert to constant variable and return.
+        """
+    def can_make_guard(self): ...
+    def make_guard(self, fn): ...
+    def replace_guards(self, guards, *fns): ...
+    def const_getattr(self, tx, name: str) -> Any:
+        """getattr(self, name) returning a python constant"""
+    def var_getattr(self, tx, name: str) -> VariableTracker:
+        """getattr(self, name) returning a new variable"""
+    def is_proxy(self): ...
+    def as_proxy(self) -> None: ...
+    def reconstruct(self, codegen) -> None: ...
+    def unpack_var_sequence(self, tx) -> None: ...
+    def has_unpack_var_sequence(self, tx): ...
+    def num_parameters(self) -> None: ...
+    def call_hasattr(self, tx, name: str) -> VariableTracker: ...
+    def call_function(self, tx, args: List[VariableTracker], kwargs: Dict[str, VariableTracker]) -> VariableTracker: ...
+    def call_method(self, tx, name, args: List[VariableTracker], kwargs: Dict[str, VariableTracker]) -> VariableTracker: ...
+    guards: Incomplete
+    source: Incomplete
+    mutable_local: Incomplete
+    recursively_contains: Incomplete
+    def __init__(self, guards: Set | None = None, source: Source = None, mutable_local: MutableLocal = None, recursively_contains: Set | None = None) -> None: ...
+    def __post_init__(self, *args, **kwargs): ...
+
+def typestr(*objs): ...

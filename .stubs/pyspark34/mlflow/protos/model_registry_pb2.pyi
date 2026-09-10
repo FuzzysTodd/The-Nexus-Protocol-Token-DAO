@@ -1,0 +1,35 @@
+from _typeshed import Incomplete
+
+DESCRIPTOR: Incomplete
+ModelVersionStatus: Incomplete
+PENDING_REGISTRATION: int
+FAILED_REGISTRATION: int
+READY: int
+RegisteredModel: Incomplete
+ModelVersion: Incomplete
+CreateRegisteredModel: Incomplete
+RenameRegisteredModel: Incomplete
+UpdateRegisteredModel: Incomplete
+DeleteRegisteredModel: Incomplete
+GetRegisteredModel: Incomplete
+SearchRegisteredModels: Incomplete
+GetLatestVersions: Incomplete
+CreateModelVersion: Incomplete
+UpdateModelVersion: Incomplete
+TransitionModelVersionStage: Incomplete
+DeleteModelVersion: Incomplete
+GetModelVersion: Incomplete
+SearchModelVersions: Incomplete
+GetModelVersionDownloadUri: Incomplete
+ModelVersionTag: Incomplete
+RegisteredModelTag: Incomplete
+SetRegisteredModelTag: Incomplete
+SetModelVersionTag: Incomplete
+DeleteRegisteredModelTag: Incomplete
+DeleteModelVersionTag: Incomplete
+RegisteredModelAlias: Incomplete
+SetRegisteredModelAlias: Incomplete
+DeleteRegisteredModelAlias: Incomplete
+GetModelVersionByAlias: Incomplete
+ModelRegistryService: Incomplete
+ModelRegistryService_Stub: Incomplete

@@ -1,0 +1,16 @@
+import torch
+from _typeshed import Incomplete
+from transformers import YolosConfig as YolosConfig, YolosFeatureExtractor as YolosFeatureExtractor, YolosForObjectDetection as YolosForObjectDetection
+from transformers.utils import logging as logging
+
+logger: Incomplete
+
+def get_yolos_config(yolos_name: str) -> YolosConfig: ...
+def read_in_q_k_v(state_dict: dict, config: YolosConfig, base_model: bool = False): ...
+def rename_key(name: str) -> str: ...
+def convert_state_dict(orig_state_dict: dict, model: YolosForObjectDetection) -> dict: ...
+def prepare_img() -> torch.Tensor: ...
+def convert_yolos_checkpoint(yolos_name: str, checkpoint_path: str, pytorch_dump_folder_path: str, push_to_hub: bool = False):
+    """
+    Copy/paste/tweak model's weights to our YOLOS structure.
+    """

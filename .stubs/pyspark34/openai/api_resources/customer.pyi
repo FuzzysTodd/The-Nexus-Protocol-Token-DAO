@@ -1,0 +1,9 @@
+from openai.openai_object import OpenAIObject as OpenAIObject
+
+class Customer(OpenAIObject):
+    @classmethod
+    def get_url(cls, customer, endpoint): ...
+    @classmethod
+    def create(cls, customer, endpoint, **params): ...
+    @classmethod
+    def acreate(cls, customer, endpoint, **params): ...

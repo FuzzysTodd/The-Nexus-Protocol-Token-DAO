@@ -1,0 +1,4 @@
+from ...utils import is_sentencepiece_available as is_sentencepiece_available, is_speech_available as is_speech_available
+from .configuration_trocr import TROCR_PRETRAINED_CONFIG_ARCHIVE_MAP as TROCR_PRETRAINED_CONFIG_ARCHIVE_MAP, TrOCRConfig as TrOCRConfig
+from .modeling_trocr import TROCR_PRETRAINED_MODEL_ARCHIVE_LIST as TROCR_PRETRAINED_MODEL_ARCHIVE_LIST, TrOCRForCausalLM as TrOCRForCausalLM, TrOCRPreTrainedModel as TrOCRPreTrainedModel
+from .processing_trocr import TrOCRProcessor as TrOCRProcessor

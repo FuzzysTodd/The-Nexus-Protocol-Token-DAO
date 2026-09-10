@@ -1,0 +1,12 @@
+from _typeshed import Incomplete
+from pyasn1_modules import rfc5280 as rfc5280
+
+class KeyEncryptionAlgorithmIdentifier(rfc5280.AlgorithmIdentifier): ...
+class KeyWrapAlgorithmIdentifier(rfc5280.AlgorithmIdentifier): ...
+
+dhSinglePass_stdDH_sha256kdf_scheme: Incomplete
+dhSinglePass_stdDH_sha384kdf_scheme: Incomplete
+dhSinglePass_stdDH_sha512kdf_scheme: Incomplete
+dhSinglePass_stdDH_hkdf_sha256_scheme: Incomplete
+dhSinglePass_stdDH_hkdf_sha384_scheme: Incomplete
+dhSinglePass_stdDH_hkdf_sha512_scheme: Incomplete

@@ -1,0 +1,13 @@
+from _typeshed import Incomplete
+from debugpy import launcher as launcher
+from debugpy.common import log as log, messaging as messaging
+from debugpy.launcher import output as output
+
+process: Incomplete
+job_handle: Incomplete
+wait_on_exit_predicates: Incomplete
+
+def describe(): ...
+def spawn(process_name, cmdline, env, redirect_output) -> None: ...
+def kill() -> None: ...
+def wait_for_exit() -> None: ...

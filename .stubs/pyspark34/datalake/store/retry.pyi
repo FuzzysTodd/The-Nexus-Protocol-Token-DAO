@@ -1,0 +1,19 @@
+from _typeshed import Incomplete
+
+logger: Incomplete
+
+class RetryPolicy:
+    def should_retry(self, *args) -> None: ...
+
+class NoRetryPolicy(RetryPolicy):
+    def should_retry(self, *args): ...
+
+class ExponentialRetryPolicy(RetryPolicy):
+    exponential_factor: Incomplete
+    max_retries: Incomplete
+    exponential_retry_interval: Incomplete
+    def __init__(self, max_retries: Incomplete | None = None, exponential_retry_interval: Incomplete | None = None, exponential_factor: Incomplete | None = None) -> None: ...
+    def should_retry(self, response, last_exception, retry_count): ...
+
+def retry_decorator_for_auth(retry_policy: Incomplete | None = None): ...
+def response_from_adal_exception(e): ...

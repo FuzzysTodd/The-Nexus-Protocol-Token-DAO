@@ -1,0 +1,6 @@
+from statsmodels.compat.scipy import SP_LT_15 as SP_LT_15, SP_LT_17 as SP_LT_17
+from typing import Any, Sequence
+
+def check_kwargs(kwargs: dict[str, Any], allowed: Sequence[str], method: str): ...
+
+class Optimizer: ...

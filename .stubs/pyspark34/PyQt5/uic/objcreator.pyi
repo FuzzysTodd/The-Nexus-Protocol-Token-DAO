@@ -1,0 +1,23 @@
+from .exceptions import NoSuchWidgetError as NoSuchWidgetError, WidgetPluginError as WidgetPluginError
+from _typeshed import Incomplete
+
+widgetPluginPath: Incomplete
+MATCH: bool
+NO_MATCH: bool
+MODULE: int
+CW_FILTER: int
+
+class QObjectCreator:
+    def __init__(self, creatorPolicy) -> None: ...
+    def createQObject(self, classname, *args, **kwargs): ...
+    def invoke(self, rname, method, args=()): ...
+    def findQObjectType(self, classname): ...
+    def getSlot(self, obj, slotname): ...
+    def asString(self, s): ...
+    def addCustomWidget(self, widgetClass, baseClass, module) -> None: ...
+    @staticmethod
+    def load_plugin(filename, plugin_globals, plugin_locals):
+        """ Load the plugin from the given file.  Return True if the plugin was
+        loaded, or False if it wanted to be ignored.  Raise an exception if
+        there was an error.
+        """

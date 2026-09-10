@@ -1,0 +1,3 @@
+from .configuration_hubert import HUBERT_PRETRAINED_CONFIG_ARCHIVE_MAP as HUBERT_PRETRAINED_CONFIG_ARCHIVE_MAP, HubertConfig as HubertConfig
+from .modeling_hubert import HUBERT_PRETRAINED_MODEL_ARCHIVE_LIST as HUBERT_PRETRAINED_MODEL_ARCHIVE_LIST, HubertForCTC as HubertForCTC, HubertForSequenceClassification as HubertForSequenceClassification, HubertModel as HubertModel, HubertPreTrainedModel as HubertPreTrainedModel
+from .modeling_tf_hubert import TFHubertForCTC as TFHubertForCTC, TFHubertModel as TFHubertModel, TFHubertPreTrainedModel as TFHubertPreTrainedModel, TF_HUBERT_PRETRAINED_MODEL_ARCHIVE_LIST as TF_HUBERT_PRETRAINED_MODEL_ARCHIVE_LIST

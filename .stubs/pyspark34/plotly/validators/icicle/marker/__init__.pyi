@@ -1,0 +1,14 @@
+from ._autocolorscale import AutocolorscaleValidator as AutocolorscaleValidator
+from ._cauto import CautoValidator as CautoValidator
+from ._cmax import CmaxValidator as CmaxValidator
+from ._cmid import CmidValidator as CmidValidator
+from ._cmin import CminValidator as CminValidator
+from ._coloraxis import ColoraxisValidator as ColoraxisValidator
+from ._colorbar import ColorbarValidator as ColorbarValidator
+from ._colors import ColorsValidator as ColorsValidator
+from ._colorscale import ColorscaleValidator as ColorscaleValidator
+from ._colorssrc import ColorssrcValidator as ColorssrcValidator
+from ._line import LineValidator as LineValidator
+from ._pattern import PatternValidator as PatternValidator
+from ._reversescale import ReversescaleValidator as ReversescaleValidator
+from ._showscale import ShowscaleValidator as ShowscaleValidator

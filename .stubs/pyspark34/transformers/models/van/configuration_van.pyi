@@ -1,0 +1,72 @@
+from ...configuration_utils import PretrainedConfig as PretrainedConfig
+from ...utils import logging as logging
+from _typeshed import Incomplete
+
+logger: Incomplete
+VAN_PRETRAINED_CONFIG_ARCHIVE_MAP: Incomplete
+
+class VanConfig(PretrainedConfig):
+    '''
+    This is the configuration class to store the configuration of a [`VanModel`]. It is used to instantiate a VAN model
+    according to the specified arguments, defining the model architecture. Instantiating a configuration with the
+    defaults will yield a similar configuration to that of the VAN
+    [Visual-Attention-Network/van-base](https://huggingface.co/Visual-Attention-Network/van-base) architecture.
+
+    Configuration objects inherit from [`PretrainedConfig`] and can be used to control the model outputs. Read the
+    documentation from [`PretrainedConfig`] for more information.
+
+    Args:
+        image_size (`int`, *optional*, defaults to 224):
+            The size (resolution) of each image.
+        num_channels (`int`, *optional*, defaults to 3):
+            The number of input channels.
+        patch_sizes (`List[int]`, *optional*, defaults to `[7, 3, 3, 3]`):
+            Patch size to use in each stage\'s embedding layer.
+        strides (`List[int]`, *optional*, defaults to `[4, 2, 2, 2]`):
+            Stride size to use in each stage\'s embedding layer to downsample the input.
+        hidden_sizes (`List[int]`, *optional*, defaults to `[64, 128, 320, 512]`):
+            Dimensionality (hidden size) at each stage.
+        depths (`List[int]`, *optional*, defaults to `[3, 3, 12, 3]`):
+            Depth (number of layers) for each stage.
+        mlp_ratios (`List[int]`, *optional*, defaults to `[8, 8, 4, 4]`):
+            The expansion ratio for mlp layer at each stage.
+        hidden_act (`str` or `function`, *optional*, defaults to `"gelu"`):
+            The non-linear activation function (function or string) in each layer. If string, `"gelu"`, `"relu"`,
+            `"selu"` and `"gelu_new"` are supported.
+        initializer_range (`float`, *optional*, defaults to 0.02):
+            The standard deviation of the truncated_normal_initializer for initializing all weight matrices.
+        layer_norm_eps (`float`, *optional*, defaults to 1e-12):
+            The epsilon used by the layer normalization layers.
+        layer_scale_init_value (`float`, *optional*, defaults to 1e-2):
+            The initial value for layer scaling.
+        drop_path_rate (`float`, *optional*, defaults to 0.0):
+            The dropout probability for stochastic depth.
+        dropout_rate (`float`, *optional*, defaults to 0.0):
+            The dropout probability for dropout.
+
+    Example:
+    ```python
+    >>> from transformers import VanModel, VanConfig
+
+    >>> # Initializing a VAN van-base style configuration
+    >>> configuration = VanConfig()
+    >>> # Initializing a model from the van-base style configuration
+    >>> model = VanModel(configuration)
+    >>> # Accessing the model configuration
+    >>> configuration = model.config
+    ```'''
+    model_type: str
+    image_size: Incomplete
+    num_channels: Incomplete
+    patch_sizes: Incomplete
+    strides: Incomplete
+    hidden_sizes: Incomplete
+    depths: Incomplete
+    mlp_ratios: Incomplete
+    hidden_act: Incomplete
+    initializer_range: Incomplete
+    layer_norm_eps: Incomplete
+    layer_scale_init_value: Incomplete
+    drop_path_rate: Incomplete
+    dropout_rate: Incomplete
+    def __init__(self, image_size: int = 224, num_channels: int = 3, patch_sizes=[7, 3, 3, 3], strides=[4, 2, 2, 2], hidden_sizes=[64, 128, 320, 512], depths=[3, 3, 12, 3], mlp_ratios=[8, 8, 4, 4], hidden_act: str = 'gelu', initializer_range: float = 0.02, layer_norm_eps: float = 1e-06, layer_scale_init_value: float = 0.01, drop_path_rate: float = 0.0, dropout_rate: float = 0.0, **kwargs) -> None: ...

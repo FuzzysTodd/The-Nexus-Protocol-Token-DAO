@@ -1,0 +1,43 @@
+from _typeshed import Incomplete
+
+g: Incomplete
+lb: Incomplete
+w: Incomplete
+h: Incomplete
+theta: Incomplete
+phi: Incomplete
+omega: Incomplete
+alpha: Incomplete
+theta_d: Incomplete
+phi_d: Incomplete
+omega_d: Incomplete
+alpha_d: Incomplete
+theta_dd: Incomplete
+phi_dd: Incomplete
+frame_n: Incomplete
+body_a_cm: Incomplete
+body_a_f: Incomplete
+body_a: Incomplete
+body_b_cm: Incomplete
+body_b_f: Incomplete
+body_b: Incomplete
+point_o: Incomplete
+la: Incomplete
+ma: Incomplete
+mb: Incomplete
+iaxx: Incomplete
+iayy = iaxx
+iazz: int
+ibxx: Incomplete
+ibyy: Incomplete
+ibzz: Incomplete
+force_a: Incomplete
+force_b: Incomplete
+kd_eqs: Incomplete
+forceList: Incomplete
+kane: Incomplete
+fr: Incomplete
+frstar: Incomplete
+zero: Incomplete
+sys: Incomplete
+y: Incomplete

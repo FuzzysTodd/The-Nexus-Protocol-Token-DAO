@@ -1,0 +1,26 @@
+from _typeshed import Incomplete
+from keras.integration_test.models.input_spec import InputSpec as InputSpec
+from tensorflow import keras
+
+SEQUENCE_LENGTH: int
+VOCAB_SIZE: int
+EMBED_DIM: int
+NUM_HEAD: int
+FF_DIM: int
+NUM_LAYERS: int
+
+def get_data_spec(batch_size): ...
+def get_input_preprocessor(): ...
+def bert_module(query, key, value, i): ...
+def get_pos_encoding_matrix(max_len, d_emb): ...
+
+loss_fn: Incomplete
+loss_tracker: Incomplete
+
+class MaskedLanguageModel(keras.Model):
+    def train_step(self, inputs): ...
+    @property
+    def metrics(self): ...
+
+def get_model(build: bool = False, compile: bool = False, jit_compile: bool = False, include_preprocessing: bool = True): ...
+def get_custom_objects(): ...

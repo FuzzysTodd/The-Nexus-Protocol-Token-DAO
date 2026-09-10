@@ -1,0 +1,4 @@
+import _plotly_utils.basevalidators
+
+class AutomarginValidator(_plotly_utils.basevalidators.BooleanValidator):
+    def __init__(self, plotly_name: str = 'automargin', parent_name: str = 'pie', **kwargs) -> None: ...

@@ -1,0 +1,70 @@
+from . import get_data_home as get_data_home
+from ..utils import Bunch as Bunch, check_random_state as check_random_state
+from ..utils._param_validation import validate_params as validate_params
+from ._base import RemoteFileMetadata as RemoteFileMetadata, load_descr as load_descr
+from _typeshed import Incomplete
+
+FACES: Incomplete
+
+def fetch_olivetti_faces(*, data_home: Incomplete | None = None, shuffle: bool = False, random_state: int = 0, download_if_missing: bool = True, return_X_y: bool = False):
+    """Load the Olivetti faces data-set from AT&T (classification).
+
+    Download it if necessary.
+
+    =================   =====================
+    Classes                                40
+    Samples total                         400
+    Dimensionality                       4096
+    Features            real, between 0 and 1
+    =================   =====================
+
+    Read more in the :ref:`User Guide <olivetti_faces_dataset>`.
+
+    Parameters
+    ----------
+    data_home : str, default=None
+        Specify another download and cache folder for the datasets. By default
+        all scikit-learn data is stored in '~/scikit_learn_data' subfolders.
+
+    shuffle : bool, default=False
+        If True the order of the dataset is shuffled to avoid having
+        images of the same person grouped.
+
+    random_state : int, RandomState instance or None, default=0
+        Determines random number generation for dataset shuffling. Pass an int
+        for reproducible output across multiple function calls.
+        See :term:`Glossary <random_state>`.
+
+    download_if_missing : bool, default=True
+        If False, raise an OSError if the data is not locally available
+        instead of trying to download the data from the source site.
+
+    return_X_y : bool, default=False
+        If True, returns `(data, target)` instead of a `Bunch` object. See
+        below for more information about the `data` and `target` object.
+
+        .. versionadded:: 0.22
+
+    Returns
+    -------
+    data : :class:`~sklearn.utils.Bunch`
+        Dictionary-like object, with the following attributes.
+
+        data: ndarray, shape (400, 4096)
+            Each row corresponds to a ravelled
+            face image of original size 64 x 64 pixels.
+        images : ndarray, shape (400, 64, 64)
+            Each row is a face image
+            corresponding to one of the 40 subjects of the dataset.
+        target : ndarray, shape (400,)
+            Labels associated to each face image.
+            Those labels are ranging from 0-39 and correspond to the
+            Subject IDs.
+        DESCR : str
+            Description of the modified Olivetti Faces Dataset.
+
+    (data, target) : tuple if `return_X_y=True`
+        Tuple with the `data` and `target` objects described above.
+
+        .. versionadded:: 0.22
+    """

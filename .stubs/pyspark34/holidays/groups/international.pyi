@@ -1,0 +1,4 @@
+class InternationalHolidays:
+    """
+    International holidays.
+    """

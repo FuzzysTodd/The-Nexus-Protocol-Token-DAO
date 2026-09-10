@@ -1,0 +1,23 @@
+from _typeshed import Incomplete
+from flaml.automl.task.task import MULTICHOICECLASSIFICATION as MULTICHOICECLASSIFICATION, SEQCLASSIFICATION as SEQCLASSIFICATION, SEQREGRESSION as SEQREGRESSION, SUMMARIZATION as SUMMARIZATION, TOKENCLASSIFICATION as TOKENCLASSIFICATION
+from typing import Dict
+
+def load_default_huggingface_metric_for_task(task): ...
+def is_a_list_of_str(this_obj): ...
+def format_vars(resolved_vars: Dict) -> str:
+    """Formats the resolved variable dict into a single string."""
+
+counter: int
+
+def date_str(): ...
+def get_logdir_name(dirname, local_dir): ...
+
+class Counter:
+    counter: int
+    @staticmethod
+    def get_trial_fold_name(local_dir, trial_config, trial_id): ...
+
+class LabelEncoderforTokenClassification:
+    label_list: Incomplete
+    def fit_transform(self, y): ...
+    def transform(self, y): ...

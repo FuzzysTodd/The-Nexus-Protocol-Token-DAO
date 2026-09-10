@@ -1,0 +1,9 @@
+from . import VENDORED_ROOT as VENDORED_ROOT
+from ._util import cwd as cwd, iter_all_files as iter_all_files
+from _typeshed import Incomplete
+
+INCLUDES: Incomplete
+
+def iter_files(): ...
+def prune_dir(dirname, basename): ...
+def exclude_file(dirname, basename): ...

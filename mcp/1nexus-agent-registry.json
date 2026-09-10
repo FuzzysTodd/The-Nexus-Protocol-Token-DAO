@@ -1,0 +1,59 @@
+{
+  "failsafe": {
+    "martial_law": false,
+    "source": "../failsafe/state.json",
+    "description": "Global emergency mode; disables AI/automation agents when true."
+  },
+
+  "agents": [
+    {
+      "id": "nexus-governance-agent",
+      "role": "governance",
+      "endpoint": "https://...",
+      "automation": true,
+
+      "disabled_when_martial_law": true,
+      "mode": "ai"
+    },
+
+    {
+      "id": "nexus-treasury-agent",
+      "role": "treasury",
+      "endpoint": "https://...",
+      "automation": true,
+
+      "disabled_when_martial_law": true,
+      "mode": "ai"
+    },
+
+    {
+      "id": "nexus-builder-fund-agent",
+      "role": "builder-fund",
+      "endpoint": "https://...",
+      "automation": true,
+
+      "disabled_when_martial_law": true,
+      "mode": "ai"
+    },
+
+    {
+      "id": "nexus-contract-verification-agent",
+      "role": "verification",
+      "endpoint": "https://...",
+      "automation": true,
+
+      "disabled_when_martial_law": true,
+      "mode": "ai"
+    },
+
+    {
+      "id": "nexus-telemetry-agent",
+      "role": "telemetry",
+      "endpoint": "https://...",
+      "automation": true,
+
+      "disabled_when_martial_law": false,
+      "mode": "manual-only"
+    }
+  ]
+}

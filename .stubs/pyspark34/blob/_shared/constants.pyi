@@ -1,0 +1,8 @@
+from _typeshed import Incomplete
+
+X_MS_VERSION: Incomplete
+CONNECTION_TIMEOUT: int
+READ_TIMEOUT: int
+DEFAULT_OAUTH_SCOPE: str
+STORAGE_OAUTH_SCOPE: str
+SERVICE_HOST_BASE: str

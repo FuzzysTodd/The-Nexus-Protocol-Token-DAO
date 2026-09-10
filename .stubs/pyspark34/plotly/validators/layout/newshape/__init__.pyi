@@ -1,0 +1,15 @@
+from ._drawdirection import DrawdirectionValidator as DrawdirectionValidator
+from ._fillcolor import FillcolorValidator as FillcolorValidator
+from ._fillrule import FillruleValidator as FillruleValidator
+from ._label import LabelValidator as LabelValidator
+from ._layer import LayerValidator as LayerValidator
+from ._legend import LegendValidator as LegendValidator
+from ._legendgroup import LegendgroupValidator as LegendgroupValidator
+from ._legendgrouptitle import LegendgrouptitleValidator as LegendgrouptitleValidator
+from ._legendrank import LegendrankValidator as LegendrankValidator
+from ._legendwidth import LegendwidthValidator as LegendwidthValidator
+from ._line import LineValidator as LineValidator
+from ._name import NameValidator as NameValidator
+from ._opacity import OpacityValidator as OpacityValidator
+from ._showlegend import ShowlegendValidator as ShowlegendValidator
+from ._visible import VisibleValidator as VisibleValidator

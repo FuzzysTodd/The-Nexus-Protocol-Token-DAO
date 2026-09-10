@@ -1,0 +1,77 @@
+from _typeshed import Incomplete
+from plotly.basedatatypes import BaseLayoutHierarchyType as _BaseLayoutHierarchyType
+
+class Newselection(_BaseLayoutHierarchyType):
+    @property
+    def line(self):
+        '''
+        The \'line\' property is an instance of Line
+        that may be specified as:
+          - An instance of :class:`plotly.graph_objs.layout.newselection.Line`
+          - A dict of string/value properties that will be passed
+            to the Line constructor
+
+            Supported dict properties:
+
+                color
+                    Sets the line color. By default uses either
+                    dark grey or white to increase contrast with
+                    background color.
+                dash
+                    Sets the dash style of lines. Set to a dash
+                    type string ("solid", "dot", "dash",
+                    "longdash", "dashdot", or "longdashdot") or a
+                    dash length list in px (eg "5px,10px,2px,2px").
+                width
+                    Sets the line width (in px).
+
+        Returns
+        -------
+        plotly.graph_objs.layout.newselection.Line
+        '''
+    @line.setter
+    def line(self, val) -> None: ...
+    @property
+    def mode(self):
+        """
+        Describes how a new selection is created. If `immediate`, a new
+        selection is created after first mouse up. If `gradual`, a new
+        selection is not created after first mouse. By adding to and
+        subtracting from the initial selection, this option allows
+        declaring extra outlines of the selection.
+
+        The 'mode' property is an enumeration that may be specified as:
+          - One of the following enumeration values:
+                ['immediate', 'gradual']
+
+        Returns
+        -------
+        Any
+        """
+    @mode.setter
+    def mode(self, val) -> None: ...
+    def __init__(self, arg: Incomplete | None = None, line: Incomplete | None = None, mode: Incomplete | None = None, **kwargs) -> None:
+        """
+        Construct a new Newselection object
+
+        Parameters
+        ----------
+        arg
+            dict of properties compatible with this constructor or
+            an instance of
+            :class:`plotly.graph_objs.layout.Newselection`
+        line
+            :class:`plotly.graph_objects.layout.newselection.Line`
+            instance or dict with compatible properties
+        mode
+            Describes how a new selection is created. If
+            `immediate`, a new selection is created after first
+            mouse up. If `gradual`, a new selection is not created
+            after first mouse. By adding to and subtracting from
+            the initial selection, this option allows declaring
+            extra outlines of the selection.
+
+        Returns
+        -------
+        Newselection
+        """

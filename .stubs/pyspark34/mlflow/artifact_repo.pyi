@@ -1,0 +1,29 @@
+from .synapse_mlflow_utils import get_mlflow_env_config as get_mlflow_env_config, record_all_public_functions as record_all_public_functions
+from _typeshed import Incomplete
+from azure.storage.filedatalake import PathProperties as PathProperties
+from mlflow.entities import FileInfo as FileInfo
+from mlflow.exceptions import MlflowException as MlflowException
+from mlflow.store.artifact.artifact_repo import ArtifactRepository as ArtifactRepository
+from synapse.ml.pymds import get_mds_logger as get_mds_logger
+from typing import List
+
+logger: Incomplete
+
+class TridentMLflowArtifactRepository(Incomplete):
+    workspace_id: Incomplete
+    onelake_base_path: Incomplete
+    artifact_id: Incomplete
+    artifact_path: Incomplete
+    client: Incomplete
+    def __init__(self, artifact_uri) -> None: ...
+    def log_artifact(self, local_file, artifact_path: Incomplete | None = None) -> None: ...
+    def log_artifacts(self, local_dir, artifact_path: Incomplete | None = None) -> None: ...
+    def list_artifacts(self, path: Incomplete | None = None, recursive: bool = False) -> List[FileInfo]: ...
+    def delete_artifacts(self, artifact_path: Incomplete | None = None) -> None: ...
+    def get_paths(self, path: Incomplete | None = None, recursive: bool = True, max_results: Incomplete | None = None, **kwargs): ...
+    @staticmethod
+    def parse_onelake_tridentml(uri): ...
+    @staticmethod
+    def parse_onelake_abfss(uri): ...
+    @staticmethod
+    def parse_onelake_path(onelake_path): ...

@@ -1,0 +1,265 @@
+from _typeshed import Incomplete
+from fontTools.pens.basePen import BasePen
+from typing import NamedTuple
+
+__all__ = ['FreeTypePen']
+
+class Contour(NamedTuple):
+    points: Incomplete
+    tags: Incomplete
+
+class FreeTypePen(BasePen):
+    '''Pen to rasterize paths with FreeType. Requires `freetype-py` module.
+
+    Constructs ``FT_Outline`` from the paths, and renders it within a bitmap
+    buffer.
+
+    For ``array()`` and ``show()``, `numpy` and `matplotlib` must be installed.
+    For ``image()``, `Pillow` is required. Each module is lazily loaded when the
+    corresponding method is called.
+
+    Args:
+        glyphSet: a dictionary of drawable glyph objects keyed by name
+            used to resolve component references in composite glyphs.
+
+    :Examples:
+        If `numpy` and `matplotlib` is available, the following code will
+        show the glyph image of `fi` in a new window::
+
+            from fontTools.ttLib import TTFont
+            from fontTools.pens.freetypePen import FreeTypePen
+            from fontTools.misc.transform import Offset
+            pen = FreeTypePen(None)
+            font = TTFont(\'SourceSansPro-Regular.otf\')
+            glyph = font.getGlyphSet()[\'fi\']
+            glyph.draw(pen)
+            width, ascender, descender = glyph.width, font[\'OS/2\'].usWinAscent, -font[\'OS/2\'].usWinDescent
+            height = ascender - descender
+            pen.show(width=width, height=height, transform=Offset(0, -descender))
+
+        Combining with `uharfbuzz`, you can typeset a chunk of glyphs in a pen::
+
+            import uharfbuzz as hb
+            from fontTools.pens.freetypePen import FreeTypePen
+            from fontTools.pens.transformPen import TransformPen
+            from fontTools.misc.transform import Offset
+
+            en1, en2, ar, ja = \'Typesetting\', \'Jeff\', \'صف الحروف\', \'たいぷせっと\'
+            for text, font_path, direction, typo_ascender, typo_descender, vhea_ascender, vhea_descender, contain, features in (
+                (en1, \'NotoSans-Regular.ttf\',       \'ltr\', 2189, -600, None, None, False, {"kern": True, "liga": True}),
+                (en2, \'NotoSans-Regular.ttf\',       \'ltr\', 2189, -600, None, None, True,  {"kern": True, "liga": True}),
+                (ar,  \'NotoSansArabic-Regular.ttf\', \'rtl\', 1374, -738, None, None, False, {"kern": True, "liga": True}),
+                (ja,  \'NotoSansJP-Regular.otf\',     \'ltr\', 880,  -120, 500,  -500, False, {"palt": True, "kern": True}),
+                (ja,  \'NotoSansJP-Regular.otf\',     \'ttb\', 880,  -120, 500,  -500, False, {"vert": True, "vpal": True, "vkrn": True})
+            ):
+                blob = hb.Blob.from_file_path(font_path)
+                face = hb.Face(blob)
+                font = hb.Font(face)
+                buf = hb.Buffer()
+                buf.direction = direction
+                buf.add_str(text)
+                buf.guess_segment_properties()
+                hb.shape(font, buf, features)
+
+                x, y = 0, 0
+                pen = FreeTypePen(None)
+                for info, pos in zip(buf.glyph_infos, buf.glyph_positions):
+                    gid = info.codepoint
+                    transformed = TransformPen(pen, Offset(x + pos.x_offset, y + pos.y_offset))
+                    font.draw_glyph_with_pen(gid, transformed)
+                    x += pos.x_advance
+                    y += pos.y_advance
+
+                offset, width, height = None, None, None
+                if direction in (\'ltr\', \'rtl\'):
+                    offset = (0, -typo_descender)
+                    width  = x
+                    height = typo_ascender - typo_descender
+                else:
+                    offset = (-vhea_descender, -y)
+                    width  = vhea_ascender - vhea_descender
+                    height = -y
+                pen.show(width=width, height=height, transform=Offset(*offset), contain=contain)
+
+        For Jupyter Notebook, the rendered image will be displayed in a cell if
+        you replace ``show()`` with ``image()`` in the examples.
+    '''
+    contours: Incomplete
+    def __init__(self, glyphSet) -> None: ...
+    def outline(self, transform: Incomplete | None = None, evenOdd: bool = False):
+        """Converts the current contours to ``FT_Outline``.
+
+        Args:
+            transform: An optional 6-tuple containing an affine transformation,
+                or a ``Transform`` object from the ``fontTools.misc.transform``
+                module.
+            evenOdd: Pass ``True`` for even-odd fill instead of non-zero.
+        """
+    def buffer(self, width: Incomplete | None = None, height: Incomplete | None = None, transform: Incomplete | None = None, contain: bool = False, evenOdd: bool = False):
+        """Renders the current contours within a bitmap buffer.
+
+        Args:
+            width: Image width of the bitmap in pixels. If omitted, it
+                automatically fits to the bounding box of the contours.
+            height: Image height of the bitmap in pixels. If omitted, it
+                automatically fits to the bounding box of the contours.
+            transform: An optional 6-tuple containing an affine transformation,
+                or a ``Transform`` object from the ``fontTools.misc.transform``
+                module. The bitmap size is not affected by this matrix.
+            contain: If ``True``, the image size will be automatically expanded
+                so that it fits to the bounding box of the paths. Useful for
+                rendering glyphs with negative sidebearings without clipping.
+            evenOdd: Pass ``True`` for even-odd fill instead of non-zero.
+
+        Returns:
+            A tuple of ``(buffer, size)``, where ``buffer`` is a ``bytes``
+            object of the resulted bitmap and ``size`` is a 2-tuple of its
+            dimension.
+
+        :Notes:
+            The image size should always be given explicitly if you need to get
+            a proper glyph image. When ``width`` and ``height`` are omitted, it
+            forcifully fits to the bounding box and the side bearings get
+            cropped. If you pass ``0`` to both ``width`` and ``height`` and set
+            ``contain`` to ``True``, it expands to the bounding box while
+            maintaining the origin of the contours, meaning that LSB will be
+            maintained but RSB won’t. The difference between the two becomes
+            more obvious when rotate or skew transformation is applied.
+
+        :Example:
+            .. code-block::
+
+                >> pen = FreeTypePen(None)
+                >> glyph.draw(pen)
+                >> buf, size = pen.buffer(width=500, height=1000)
+                >> type(buf), len(buf), size
+                (<class 'bytes'>, 500000, (500, 1000))
+
+        """
+    def array(self, width: Incomplete | None = None, height: Incomplete | None = None, transform: Incomplete | None = None, contain: bool = False, evenOdd: bool = False):
+        """Returns the rendered contours as a numpy array. Requires `numpy`.
+
+        Args:
+            width: Image width of the bitmap in pixels. If omitted, it
+                automatically fits to the bounding box of the contours.
+            height: Image height of the bitmap in pixels. If omitted, it
+                automatically fits to the bounding box of the contours.
+            transform: An optional 6-tuple containing an affine transformation,
+                or a ``Transform`` object from the ``fontTools.misc.transform``
+                module. The bitmap size is not affected by this matrix.
+            contain: If ``True``, the image size will be automatically expanded
+                so that it fits to the bounding box of the paths. Useful for
+                rendering glyphs with negative sidebearings without clipping.
+            evenOdd: Pass ``True`` for even-odd fill instead of non-zero.
+
+        Returns:
+            A ``numpy.ndarray`` object with a shape of ``(height, width)``.
+            Each element takes a value in the range of ``[0.0, 1.0]``.
+
+        :Notes:
+            The image size should always be given explicitly if you need to get
+            a proper glyph image. When ``width`` and ``height`` are omitted, it
+            forcifully fits to the bounding box and the side bearings get
+            cropped. If you pass ``0`` to both ``width`` and ``height`` and set
+            ``contain`` to ``True``, it expands to the bounding box while
+            maintaining the origin of the contours, meaning that LSB will be
+            maintained but RSB won’t. The difference between the two becomes
+            more obvious when rotate or skew transformation is applied.
+
+        :Example:
+            .. code-block::
+
+                >> pen = FreeTypePen(None)
+                >> glyph.draw(pen)
+                >> arr = pen.array(width=500, height=1000)
+                >> type(a), a.shape
+                (<class 'numpy.ndarray'>, (1000, 500))
+        """
+    def show(self, width: Incomplete | None = None, height: Incomplete | None = None, transform: Incomplete | None = None, contain: bool = False, evenOdd: bool = False) -> None:
+        """Plots the rendered contours with `pyplot`. Requires `numpy` and
+        `matplotlib`.
+
+        Args:
+            width: Image width of the bitmap in pixels. If omitted, it
+                automatically fits to the bounding box of the contours.
+            height: Image height of the bitmap in pixels. If omitted, it
+                automatically fits to the bounding box of the contours.
+            transform: An optional 6-tuple containing an affine transformation,
+                or a ``Transform`` object from the ``fontTools.misc.transform``
+                module. The bitmap size is not affected by this matrix.
+            contain: If ``True``, the image size will be automatically expanded
+                so that it fits to the bounding box of the paths. Useful for
+                rendering glyphs with negative sidebearings without clipping.
+            evenOdd: Pass ``True`` for even-odd fill instead of non-zero.
+
+        :Notes:
+            The image size should always be given explicitly if you need to get
+            a proper glyph image. When ``width`` and ``height`` are omitted, it
+            forcifully fits to the bounding box and the side bearings get
+            cropped. If you pass ``0`` to both ``width`` and ``height`` and set
+            ``contain`` to ``True``, it expands to the bounding box while
+            maintaining the origin of the contours, meaning that LSB will be
+            maintained but RSB won’t. The difference between the two becomes
+            more obvious when rotate or skew transformation is applied.
+
+        :Example:
+            .. code-block::
+
+                >> pen = FreeTypePen(None)
+                >> glyph.draw(pen)
+                >> pen.show(width=500, height=1000)
+        """
+    def image(self, width: Incomplete | None = None, height: Incomplete | None = None, transform: Incomplete | None = None, contain: bool = False, evenOdd: bool = False):
+        """Returns the rendered contours as a PIL image. Requires `Pillow`.
+        Can be used to display a glyph image in Jupyter Notebook.
+
+        Args:
+            width: Image width of the bitmap in pixels. If omitted, it
+                automatically fits to the bounding box of the contours.
+            height: Image height of the bitmap in pixels. If omitted, it
+                automatically fits to the bounding box of the contours.
+            transform: An optional 6-tuple containing an affine transformation,
+                or a ``Transform`` object from the ``fontTools.misc.transform``
+                module. The bitmap size is not affected by this matrix.
+            contain: If ``True``, the image size will be automatically expanded
+                so that it fits to the bounding box of the paths. Useful for
+                rendering glyphs with negative sidebearings without clipping.
+            evenOdd: Pass ``True`` for even-odd fill instead of non-zero.
+
+        Returns:
+            A ``PIL.image`` object. The image is filled in black with alpha
+            channel obtained from the rendered bitmap.
+
+        :Notes:
+            The image size should always be given explicitly if you need to get
+            a proper glyph image. When ``width`` and ``height`` are omitted, it
+            forcifully fits to the bounding box and the side bearings get
+            cropped. If you pass ``0`` to both ``width`` and ``height`` and set
+            ``contain`` to ``True``, it expands to the bounding box while
+            maintaining the origin of the contours, meaning that LSB will be
+            maintained but RSB won’t. The difference between the two becomes
+            more obvious when rotate or skew transformation is applied.
+
+        :Example:
+            .. code-block::
+
+                >> pen = FreeTypePen(None)
+                >> glyph.draw(pen)
+                >> img = pen.image(width=500, height=1000)
+                >> type(img), img.size
+                (<class 'PIL.Image.Image'>, (500, 1000))
+        """
+    @property
+    def bbox(self):
+        """Computes the exact bounding box of an outline.
+
+        Returns:
+            A tuple of ``(xMin, yMin, xMax, yMax)``.
+        """
+    @property
+    def cbox(self):
+        """Returns an outline's ‘control box’.
+
+        Returns:
+            A tuple of ``(xMin, yMin, xMax, yMax)``.
+        """

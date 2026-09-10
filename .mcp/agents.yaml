@@ -1,0 +1,207 @@
+version: 1
+last_updated: 2026-06-17
+owner: "Nexus Protocol DAO"
+description: >
+  Central manifest defining all MCP agents, their responsibilities,
+  permissions, workflow entrypoints, failure modes, and escalation paths.
+  This file is the single source of truth for agent orchestration.
+
+agents:
+
+  # ────────────────────────────────────────────────────────────────
+  #  CORE SYSTEM AGENTS
+  # ────────────────────────────────────────────────────────────────
+
+  - id: repo-guardian
+    name: Repository Guardian
+    role: >
+      Ensures repository integrity, workflow consistency, and compliance
+      with DAO governance rules.
+    responsibilities:
+      - Validate workflow files (.github/workflows)
+      - Enforce commit signoff and contributor rules
+      - Detect drift in CI, instructions, or agent manifests
+      - Monitor for deprecated patterns (pytest, flake8, actions)
+    permissions:
+      - read: repo
+      - read: workflows
+      - read: instructions
+    entrypoints:
+      - on_push
+      - on_pull_request
+      - scheduled_daily
+    failure_modes:
+      - workflow_drift_detected
+      - invalid_permissions
+      - deprecated_pattern_detected
+    escalation:
+      - notify: mcp-ops
+      - create_issue: true
+      - label: ["workflow-drift", "compliance"]
+
+  - id: diagnostics-injector
+    name: Diagnostics Injector
+    role: >
+      Injects runtime diagnostics into workflows, PRs, and CI summaries.
+    responsibilities:
+      - Generate structured diagnostics JSON
+      - Attach diagnostics to workflow runs
+      - Provide dry-run previews for PRs
+    permissions:
+      - read: repo
+      - write: artifacts
+    entrypoints:
+      - workflow_call
+      - manual_trigger
+    failure_modes:
+      - malformed_diagnostics
+      - artifact_write_failure
+    escalation:
+      - notify: mcp-ops
+      - fallback: minimal_diagnostics
+
+  # ────────────────────────────────────────────────────────────────
+  #  DEVELOPMENT + TESTING AGENTS
+  # ────────────────────────────────────────────────────────────────
+
+  - id: python-linter
+    name: Python Linter & Standards Agent
+    role: >
+      Enforces Python style, removes unused imports, and ensures
+      compatibility with pytest 9/10 and future deprecations.
+    responsibilities:
+      - Run flake8, black, isort
+      - Detect deprecated pytest APIs
+      - Suggest modernization patches
+    permissions:
+      - read: repo
+      - read: tests
+    entrypoints:
+      - on_pull_request
+      - on_push
+    failure_modes:
+      - lint_failure
+      - deprecated_api_usage
+    escalation:
+      - comment_on_pr: true
+      - label: ["lint", "pytest-modernization"]
+
+  - id: solidity-auditor
+    name: Solidity Auditor Agent
+    role: >
+      Performs static analysis on smart contracts and ensures compliance
+      with NGTT, Cobra, and DAO governance rules.
+    responsibilities:
+      - Detect unsafe patterns
+      - Validate NatSpec completeness
+      - Verify contract structure against DAO standards
+    permissions:
+      - read: contracts
+    entrypoints:
+      - on_pull_request
+      - scheduled_weekly
+    failure_modes:
+      - unsafe_pattern_detected
+      - missing_natspec
+    escalation:
+      - notify: security-ops
+      - create_issue: true
+
+  # ────────────────────────────────────────────────────────────────
+  #  GOVERNANCE + DAO AGENTS
+  # ────────────────────────────────────────────────────────────────
+
+  - id: governance-oracle
+    name: Governance Oracle Agent
+    role: >
+      Tracks governance proposals, NGTT supply, treasury state, and
+      cross-chain verification requirements.
+    responsibilities:
+      - Pull governance state
+      - Validate proposal metadata
+      - Track contract verification across chains
+    permissions:
+      - read: governance
+      - read: chain_state
+    entrypoints:
+      - scheduled_hourly
+      - manual_trigger
+    failure_modes:
+      - stale_chain_data
+      - invalid_proposal_format
+    escalation:
+      - notify: dao-core
+      - open_discussion: true
+
+  - id: cobra-reserve-monitor
+    name: Bitcoin Cobra Reserve Monitor
+    role: >
+      Monitors BTC reserve oracle values, update timestamps, and
+      Cobra health metrics.
+    responsibilities:
+      - Validate oracle updates
+      - Detect stale reserve data
+      - Compute reserve ratio vs NGTT supply
+    permissions:
+      - read: chain_state
+      - read: oracle
+    entrypoints:
+      - scheduled_hourly
+    failure_modes:
+      - stale_oracle
+      - invalid_reserve_value
+    escalation:
+      - notify: dao-core
+      - label: ["cobra", "oracle"]
+
+  # ────────────────────────────────────────────────────────────────
+  #  FRONTEND + DASHBOARD AGENTS
+  # ────────────────────────────────────────────────────────────────
+
+  - id: dashboard-sync
+    name: Dashboard Sync Agent
+    role: >
+      Ensures the Nexus Protocol dashboard (Vercel/Azure) stays in sync
+      with repo state, telemetry, and contract data.
+    responsibilities:
+      - Validate build artifacts
+      - Sync telemetry endpoints
+      - Detect stale dashboard components
+    permissions:
+      - read: repo
+      - read: telemetry
+    entrypoints:
+      - on_deploy
+      - scheduled_daily
+    failure_modes:
+      - telemetry_mismatch
+      - build_artifact_missing
+    escalation:
+      - notify: frontend-ops
+      - rollback: true
+
+  # ────────────────────────────────────────────────────────────────
+  #  META + OPERATIONS AGENTS
+  # ────────────────────────────────────────────────────────────────
+
+  - id: mcp-ops
+    name: MCP Operations Coordinator
+    role: >
+      Central coordinator for all MCP agents. Handles escalations,
+      resolves conflicts, and maintains system-wide reliability.
+    responsibilities:
+      - Receive escalations
+      - Route issues to correct teams
+      - Maintain agent health metrics
+    permissions:
+      - read: all
+      - write: issues
+    entrypoints:
+      - system_event
+      - escalation
+    failure_modes:
+      - escalation_loop
+      - invalid_agent_state
+    escalation:
+      - notify: owner
+      - halt_agent: true

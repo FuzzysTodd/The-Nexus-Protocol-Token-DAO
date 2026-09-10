@@ -1,0 +1,46 @@
+from ...utils import logging as logging
+from .auto_factory import _BaseAutoModelClass, auto_class_update as auto_class_update
+from .configuration_auto import CONFIG_MAPPING_NAMES as CONFIG_MAPPING_NAMES
+from _typeshed import Incomplete
+
+logger: Incomplete
+FLAX_MODEL_MAPPING_NAMES: Incomplete
+FLAX_MODEL_FOR_PRETRAINING_MAPPING_NAMES: Incomplete
+FLAX_MODEL_FOR_MASKED_LM_MAPPING_NAMES: Incomplete
+FLAX_MODEL_FOR_SEQ_TO_SEQ_CAUSAL_LM_MAPPING_NAMES: Incomplete
+FLAX_MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING_NAMES: Incomplete
+FLAX_MODEL_FOR_VISION_2_SEQ_MAPPING_NAMES: Incomplete
+FLAX_MODEL_FOR_CAUSAL_LM_MAPPING_NAMES: Incomplete
+FLAX_MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING_NAMES: Incomplete
+FLAX_MODEL_FOR_QUESTION_ANSWERING_MAPPING_NAMES: Incomplete
+FLAX_MODEL_FOR_TOKEN_CLASSIFICATION_MAPPING_NAMES: Incomplete
+FLAX_MODEL_FOR_MULTIPLE_CHOICE_MAPPING_NAMES: Incomplete
+FLAX_MODEL_FOR_NEXT_SENTENCE_PREDICTION_MAPPING_NAMES: Incomplete
+FLAX_MODEL_FOR_SPEECH_SEQ_2_SEQ_MAPPING_NAMES: Incomplete
+FLAX_MODEL_MAPPING: Incomplete
+FLAX_MODEL_FOR_PRETRAINING_MAPPING: Incomplete
+FLAX_MODEL_FOR_MASKED_LM_MAPPING: Incomplete
+FLAX_MODEL_FOR_SEQ_TO_SEQ_CAUSAL_LM_MAPPING: Incomplete
+FLAX_MODEL_FOR_IMAGE_CLASSIFICATION_MAPPING: Incomplete
+FLAX_MODEL_FOR_VISION_2_SEQ_MAPPING: Incomplete
+FLAX_MODEL_FOR_CAUSAL_LM_MAPPING: Incomplete
+FLAX_MODEL_FOR_SEQUENCE_CLASSIFICATION_MAPPING: Incomplete
+FLAX_MODEL_FOR_QUESTION_ANSWERING_MAPPING: Incomplete
+FLAX_MODEL_FOR_TOKEN_CLASSIFICATION_MAPPING: Incomplete
+FLAX_MODEL_FOR_MULTIPLE_CHOICE_MAPPING: Incomplete
+FLAX_MODEL_FOR_NEXT_SENTENCE_PREDICTION_MAPPING: Incomplete
+FLAX_MODEL_FOR_SPEECH_SEQ_2_SEQ_MAPPING: Incomplete
+
+class FlaxAutoModel(_BaseAutoModelClass): ...
+class FlaxAutoModelForPreTraining(_BaseAutoModelClass): ...
+class FlaxAutoModelForCausalLM(_BaseAutoModelClass): ...
+class FlaxAutoModelForMaskedLM(_BaseAutoModelClass): ...
+class FlaxAutoModelForSeq2SeqLM(_BaseAutoModelClass): ...
+class FlaxAutoModelForSequenceClassification(_BaseAutoModelClass): ...
+class FlaxAutoModelForQuestionAnswering(_BaseAutoModelClass): ...
+class FlaxAutoModelForTokenClassification(_BaseAutoModelClass): ...
+class FlaxAutoModelForMultipleChoice(_BaseAutoModelClass): ...
+class FlaxAutoModelForNextSentencePrediction(_BaseAutoModelClass): ...
+class FlaxAutoModelForImageClassification(_BaseAutoModelClass): ...
+class FlaxAutoModelForVision2Seq(_BaseAutoModelClass): ...
+class FlaxAutoModelForSpeechSeq2Seq(_BaseAutoModelClass): ...

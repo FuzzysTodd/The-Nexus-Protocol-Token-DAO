@@ -1,0 +1,46 @@
+from _typeshed import Incomplete
+from abc import ABCMeta, abstractmethod
+from collections.abc import Generator
+
+__all__ = ['ContentStore', 'AppData']
+
+class AppData(metaclass=ABCMeta):
+    """Abstract storage interface for the virtualenv application."""
+    @abstractmethod
+    def close(self):
+        """Called before virtualenv exits."""
+    @abstractmethod
+    def reset(self):
+        """Called when the user passes in the reset app data."""
+    @abstractmethod
+    def py_info(self, path): ...
+    @abstractmethod
+    def py_info_clear(self): ...
+    @property
+    def can_update(self) -> None: ...
+    @abstractmethod
+    def embed_update_log(self, distribution, for_py_version): ...
+    @property
+    def house(self) -> None: ...
+    @property
+    def transient(self) -> None: ...
+    @abstractmethod
+    def wheel_image(self, for_py_version, name): ...
+    def ensure_extracted(self, path, to_folder: Incomplete | None = None) -> Generator[Incomplete, None, None]:
+        """Some paths might be within the zipapp, unzip these to a path on the disk."""
+    @abstractmethod
+    def extract(self, path, to_folder): ...
+    @abstractmethod
+    def locked(self, path): ...
+
+class ContentStore(metaclass=ABCMeta):
+    @abstractmethod
+    def exists(self): ...
+    @abstractmethod
+    def read(self): ...
+    @abstractmethod
+    def write(self, content): ...
+    @abstractmethod
+    def remove(self): ...
+    @abstractmethod
+    def locked(self): ...

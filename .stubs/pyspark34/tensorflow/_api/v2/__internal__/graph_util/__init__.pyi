@@ -1,0 +1,1 @@
+from tensorflow.python.framework.graph_util_impl import graph_defs_equal as graph_defs_equal

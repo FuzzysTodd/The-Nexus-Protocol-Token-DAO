@@ -1,0 +1,80 @@
+from .extension import ExtensionManager as ExtensionManager
+from _typeshed import Incomplete
+
+LOG: Incomplete
+
+class NamedExtensionManager(ExtensionManager):
+    """Loads only the named extensions.
+
+    This is useful for explicitly enabling extensions in a
+    configuration file, for example.
+
+    :param namespace: The namespace for the entry points.
+    :type namespace: str
+    :param names: The names of the extensions to load.
+    :type names: list(str)
+    :param invoke_on_load: Boolean controlling whether to invoke the
+        object returned by the entry point after the driver is loaded.
+    :type invoke_on_load: bool
+    :param invoke_args: Positional arguments to pass when invoking
+        the object returned by the entry point. Only used if invoke_on_load
+        is True.
+    :type invoke_args: tuple
+    :param invoke_kwds: Named arguments to pass when invoking
+        the object returned by the entry point. Only used if invoke_on_load
+        is True.
+    :type invoke_kwds: dict
+    :param name_order: If true, sort the loaded extensions to match the
+        order used in ``names``.
+    :type name_order: bool
+    :param propagate_map_exceptions: Boolean controlling whether exceptions
+        are propagated up through the map call or whether they are logged and
+        then ignored
+    :type propagate_map_exceptions: bool
+    :param on_load_failure_callback: Callback function that will be called when
+        an entrypoint can not be loaded. The arguments that will be provided
+        when this is called (when an entrypoint fails to load) are
+        (manager, entrypoint, exception)
+    :type on_load_failure_callback: function
+    :param on_missing_entrypoints_callback: Callback function that will be
+        called when one or more names cannot be found. The provided argument
+        will be a subset of the 'names' parameter.
+    :type on_missing_entrypoints_callback: function
+    :param verify_requirements: Use setuptools to enforce the
+        dependencies of the plugin(s) being loaded. Defaults to False.
+    :type verify_requirements: bool
+    :param warn_on_missing_entrypoint: Flag to control whether failing
+        to load a plugin is reported via a log mess. Only applies if
+        on_missing_entrypoints_callback is None.
+    :type warn_on_missing_entrypoint: bool
+
+    """
+    def __init__(self, namespace, names, invoke_on_load: bool = False, invoke_args=(), invoke_kwds={}, name_order: bool = False, propagate_map_exceptions: bool = False, on_load_failure_callback: Incomplete | None = None, on_missing_entrypoints_callback: Incomplete | None = None, verify_requirements: bool = False, warn_on_missing_entrypoint: bool = True) -> None: ...
+    @classmethod
+    def make_test_instance(cls, extensions, namespace: str = 'TESTING', propagate_map_exceptions: bool = False, on_load_failure_callback: Incomplete | None = None, verify_requirements: bool = False):
+        """Construct a test NamedExtensionManager
+
+        Test instances are passed a list of extensions to use rather than
+        loading them from entry points.
+
+        :param extensions: Pre-configured Extension instances
+        :type extensions: list of :class:`~stevedore.extension.Extension`
+        :param namespace: The namespace for the manager; used only for
+            identification since the extensions are passed in.
+        :type namespace: str
+        :param propagate_map_exceptions: Boolean controlling whether exceptions
+            are propagated up through the map call or whether they are logged
+            and then ignored
+        :type propagate_map_exceptions: bool
+        :param on_load_failure_callback: Callback function that will
+            be called when an entrypoint can not be loaded. The
+            arguments that will be provided when this is called (when
+            an entrypoint fails to load) are (manager, entrypoint,
+            exception)
+        :type on_load_failure_callback: function
+        :param verify_requirements: Use setuptools to enforce the
+            dependencies of the plugin(s) being loaded. Defaults to False.
+        :type verify_requirements: bool
+        :return: The manager instance, initialized for testing
+
+        """

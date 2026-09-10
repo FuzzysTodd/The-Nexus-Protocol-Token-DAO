@@ -1,0 +1,89 @@
+import codeop
+from _typeshed import Incomplete
+from collections.abc import Generator
+
+PyCF_MASK: Incomplete
+
+def code_name(code, number: int = 0):
+    """ Compute a (probably) unique name for code for caching.
+
+    This now expects code to be unicode.
+    """
+
+class CachingCompiler(codeop.Compile):
+    """A compiler that caches code compiled from interactive statements.
+    """
+    def __init__(self) -> None: ...
+    def ast_parse(self, source, filename: str = '<unknown>', symbol: str = 'exec'):
+        """Parse code to an AST with the current compiler flags active.
+
+        Arguments are exactly the same as ast.parse (in the standard library),
+        and are passed to the built-in compile function."""
+    flags: Incomplete
+    def reset_compiler_flags(self) -> None:
+        """Reset compiler flags to default state."""
+    @property
+    def compiler_flags(self):
+        """Flags currently active in the compilation process.
+        """
+    def get_code_name(self, raw_code, transformed_code, number):
+        """Compute filename given the code, and the cell number.
+
+        Parameters
+        ----------
+        raw_code : str
+            The raw cell code.
+        transformed_code : str
+            The executable Python source code to cache and compile.
+        number : int
+            A number which forms part of the code's name. Used for the execution
+            counter.
+
+        Returns
+        -------
+        The computed filename.
+        """
+    def format_code_name(self, name):
+        """Return a user-friendly label and name for a code block.
+
+        Parameters
+        ----------
+        name : str
+            The name for the code block returned from get_code_name
+
+        Returns
+        -------
+        A (label, name) pair that can be used in tracebacks, or None if the default formatting should be used.
+        """
+    def cache(self, transformed_code, number: int = 0, raw_code: Incomplete | None = None):
+        """Make a name for a block of code, and cache the code.
+
+        Parameters
+        ----------
+        transformed_code : str
+            The executable Python source code to cache and compile.
+        number : int
+            A number which forms part of the code's name. Used for the execution
+            counter.
+        raw_code : str
+            The raw code before transformation, if None, set to `transformed_code`.
+
+        Returns
+        -------
+        The name of the cached code (as a string). Pass this as the filename
+        argument to compilation, so that tracebacks are correctly hooked up.
+        """
+    def extra_flags(self, flags) -> Generator[None, None, None]: ...
+
+def check_linecache_ipython(*args) -> None:
+    """Deprecated since IPython 8.6.  Call linecache.checkcache() directly.
+
+    It was already not necessary to call this function directly.  If no
+    CachingCompiler had been created, this function would fail badly.  If
+    an instance had been created, this function would've been monkeypatched
+    into place.
+
+    As of IPython 8.6, the monkeypatching has gone away entirely.  But there
+    were still internal callers of this function, so maybe external callers
+    also existed?
+    """

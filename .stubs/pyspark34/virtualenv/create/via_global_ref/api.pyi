@@ -1,0 +1,26 @@
+from _typeshed import Incomplete
+from abc import ABCMeta
+from virtualenv.create.creator import Creator, CreatorMeta
+
+__all__ = ['ViaGlobalRefMeta', 'ViaGlobalRefApi']
+
+class ViaGlobalRefMeta(CreatorMeta):
+    copy_error: Incomplete
+    symlink_error: Incomplete
+    def __init__(self) -> None: ...
+    @property
+    def can_copy(self): ...
+    @property
+    def can_symlink(self): ...
+
+class ViaGlobalRefApi(Creator, metaclass=ABCMeta):
+    symlinks: Incomplete
+    enable_system_site_package: Incomplete
+    def __init__(self, options, interpreter) -> None: ...
+    @classmethod
+    def add_parser_arguments(cls, parser, interpreter, meta, app_data) -> None: ...
+    def create(self) -> None: ...
+    def install_patch(self) -> None: ...
+    def env_patch_text(self):
+        """Patch the distutils package to not be derailed by its configuration files."""
+    def set_pyenv_cfg(self) -> None: ...

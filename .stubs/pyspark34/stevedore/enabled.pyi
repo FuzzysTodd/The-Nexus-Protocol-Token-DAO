@@ -1,0 +1,44 @@
+from .extension import ExtensionManager as ExtensionManager
+from _typeshed import Incomplete
+
+LOG: Incomplete
+
+class EnabledExtensionManager(ExtensionManager):
+    """Loads only plugins that pass a check function.
+
+    The check_func argument should return a boolean, with ``True``
+    indicating that the extension should be loaded and made available
+    and ``False`` indicating that the extension should be ignored.
+
+    :param namespace: The namespace for the entry points.
+    :type namespace: str
+    :param check_func: Function to determine which extensions to load.
+    :type check_func: callable, taking an :class:`Extension`
+        instance as argument
+    :param invoke_on_load: Boolean controlling whether to invoke the
+        object returned by the entry point after the driver is loaded.
+    :type invoke_on_load: bool
+    :param invoke_args: Positional arguments to pass when invoking
+        the object returned by the entry point. Only used if invoke_on_load
+        is True.
+    :type invoke_args: tuple
+    :param invoke_kwds: Named arguments to pass when invoking
+        the object returned by the entry point. Only used if invoke_on_load
+        is True.
+    :type invoke_kwds: dict
+    :param propagate_map_exceptions: Boolean controlling whether exceptions
+        are propagated up through the map call or whether they are logged and
+        then ignored
+    :type propagate_map_exceptions: bool
+    :param on_load_failure_callback: Callback function that will be called when
+        an entrypoint can not be loaded. The arguments that will be provided
+        when this is called (when an entrypoint fails to load) are
+        (manager, entrypoint, exception)
+    :type on_load_failure_callback: function
+    :param verify_requirements: Use setuptools to enforce the
+        dependencies of the plugin(s) being loaded. Defaults to False.
+    :type verify_requirements: bool
+
+    """
+    check_func: Incomplete
+    def __init__(self, namespace, check_func, invoke_on_load: bool = False, invoke_args=(), invoke_kwds={}, propagate_map_exceptions: bool = False, on_load_failure_callback: Incomplete | None = None, verify_requirements: bool = False) -> None: ...

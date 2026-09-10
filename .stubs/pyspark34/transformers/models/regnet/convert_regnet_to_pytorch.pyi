@@ -1,0 +1,59 @@
+import torch.nn as nn
+from _typeshed import Incomplete
+from dataclasses import dataclass
+from pathlib import Path
+from torch import Tensor as Tensor
+from transformers import AutoFeatureExtractor as AutoFeatureExtractor, RegNetConfig as RegNetConfig, RegNetForImageClassification as RegNetForImageClassification, RegNetModel as RegNetModel
+from transformers.utils import logging as logging
+from typing import Callable, Dict, List, Tuple
+
+logger: Incomplete
+
+@dataclass
+class Tracker:
+    module: nn.Module
+    traced: List[nn.Module] = ...
+    handles: list = ...
+    def __call__(self, x: Tensor): ...
+    @property
+    def parametrized(self): ...
+    def __init__(self, module, traced, handles) -> None: ...
+
+@dataclass
+class ModuleTransfer:
+    src: nn.Module
+    dest: nn.Module
+    verbose: int = ...
+    src_skip: List = ...
+    dest_skip: List = ...
+    raise_if_mismatch: bool = ...
+    def __call__(self, x: Tensor):
+        """
+        Transfer the weights of `self.src` to `self.dest` by performing a forward pass using `x` as input. Under the
+        hood we tracked all the operations in both modules.
+        """
+    def __init__(self, src, dest, verbose, src_skip, dest_skip, raise_if_mismatch) -> None: ...
+
+class FakeRegNetVisslWrapper(nn.Module):
+    """
+    Fake wrapper for RegNet that mimics what vissl does without the need to pass a config file.
+    """
+    def __init__(self, model: nn.Module) -> None: ...
+    def forward(self, x: Tensor): ...
+
+class NameToFromModelFuncMap(dict):
+    """
+    A Dictionary with some additional logic to return a function that creates the correct original model.
+    """
+    def convert_name_to_timm(self, x: str) -> str: ...
+    def __getitem__(self, x: str) -> Callable[[], Tuple[nn.Module, Dict]]: ...
+
+class NameToOurModelFuncMap(dict):
+    """
+    A Dictionary with some additional logic to return the correct hugging face RegNet class reference.
+    """
+    def __getitem__(self, x: str) -> Callable[[], nn.Module]: ...
+
+def manually_copy_vissl_head(from_state_dict, to_state_dict, keys: List[Tuple[str, str]]): ...
+def convert_weight_and_push(name: str, from_model_func: Callable[[], nn.Module], our_model_func: Callable[[], nn.Module], config: RegNetConfig, save_directory: Path, push_to_hub: bool = True): ...
+def convert_weights_and_push(save_directory: Path, model_name: str = None, push_to_hub: bool = True): ...
