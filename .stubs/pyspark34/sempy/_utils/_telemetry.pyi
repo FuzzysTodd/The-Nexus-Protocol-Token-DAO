@@ -1,3 +1,0 @@
-REPORT_USAGE_TELEMETRY_ENV: str
-
-def log_telemetry(activity_name: str = ''): ...

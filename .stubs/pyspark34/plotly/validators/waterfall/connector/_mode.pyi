@@ -1,4 +1,0 @@
-import _plotly_utils.basevalidators
-
-class ModeValidator(_plotly_utils.basevalidators.EnumeratedValidator):
-    def __init__(self, plotly_name: str = 'mode', parent_name: str = 'waterfall.connector', **kwargs) -> None: ...

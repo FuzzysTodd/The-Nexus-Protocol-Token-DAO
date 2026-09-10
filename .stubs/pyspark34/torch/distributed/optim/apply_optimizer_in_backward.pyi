@@ -1,4 +1,0 @@
-from _typeshed import Incomplete
-
-param_to_optim_hook_handle_map: Incomplete
-param_to_acc_grad_map: Incomplete

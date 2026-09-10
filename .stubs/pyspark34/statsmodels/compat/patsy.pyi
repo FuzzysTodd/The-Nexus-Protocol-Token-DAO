@@ -1,3 +1,0 @@
-from statsmodels.compat.pandas import PD_LT_2 as PD_LT_2
-
-def monkey_patch_cat_dtype() -> None: ...

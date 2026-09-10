@@ -1,3 +1,0 @@
-from torchgen.model import NativeFunctionsGroup as NativeFunctionsGroup
-
-def name(g: NativeFunctionsGroup) -> str: ...

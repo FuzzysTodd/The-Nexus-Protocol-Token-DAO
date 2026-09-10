@@ -1,1 +1,0 @@
-from .tokenization_bert_japanese import BertJapaneseTokenizer as BertJapaneseTokenizer, CharacterTokenizer as CharacterTokenizer, MecabTokenizer as MecabTokenizer

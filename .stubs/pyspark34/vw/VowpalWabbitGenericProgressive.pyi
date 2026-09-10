@@ -1,4 +1,0 @@
-from synapse.ml.vw.VowpalWabbitPythonBase import VowpalWabbitPythonBase
-from synapse.ml.vw._VowpalWabbitGenericProgressive import _VowpalWabbitGenericProgressive
-
-class VowpalWabbitGenericProgressive(_VowpalWabbitGenericProgressive, VowpalWabbitPythonBase): ...

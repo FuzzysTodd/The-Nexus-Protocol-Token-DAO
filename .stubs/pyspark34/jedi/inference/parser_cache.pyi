@@ -1,3 +1,0 @@
-from jedi.inference.cache import inference_state_function_cache as inference_state_function_cache
-
-def get_yield_exprs(inference_state, funcdef): ...

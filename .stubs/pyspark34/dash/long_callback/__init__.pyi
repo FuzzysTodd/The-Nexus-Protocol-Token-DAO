@@ -1,2 +1,0 @@
-from .managers.celery_manager import CeleryLongCallbackManager as CeleryLongCallbackManager, CeleryManager as CeleryManager
-from .managers.diskcache_manager import DiskcacheLongCallbackManager as DiskcacheLongCallbackManager, DiskcacheManager as DiskcacheManager

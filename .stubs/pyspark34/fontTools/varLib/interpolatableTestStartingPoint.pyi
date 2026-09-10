@@ -1,3 +1,0 @@
-from .interpolatableHelpers import *
-
-def test_starting_point(glyph0, glyph1, ix, tolerance, matching): ...

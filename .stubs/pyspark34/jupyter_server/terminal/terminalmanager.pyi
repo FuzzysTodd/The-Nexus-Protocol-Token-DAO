@@ -1,1 +1,0 @@
-from jupyter_server_terminals.terminalmanager import TerminalManager as TerminalManager

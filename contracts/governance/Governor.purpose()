@@ -1,0 +1,63 @@
+Proposal #1: Adopt GOVERNANCE.md as the binding governance framework for Nexus DAO and transfer ownership of core contracts (NGTT, protocol controllers, and treasury Safe where applicable) to the Nexus Timelock, so that all privileged actions are executed only via DAO-approved proposals and timelocked execution.
+Reference: https://github.com/FuzzysTodd/The-Nexus-Protocol-Token-DAO/blob/main/GOVERNANCE.md
+
+Function (address[] memory targets = new address[](2);
+uint256[] memory values = new uint256[](2);
+bytes[] memory calldatas = new bytes[](2);
+
+string memory description = "Proposal #1: Adopt GOVERNANCE.md and transfer ownership of core contracts to the Nexus Timelock.";
+
+// 1) Transfer NGTT ownership to Timelock
+targets[0] = address(ngtt);
+values[0] = 0;
+calldatas[0] = abi.encodeWithSignature(
+    "transferOwnership(address)",
+    timelock
+);
+
+// 2) Transfer protocol controller ownership to Timelock
+targets[1] = address(protocol);
+values[1] = 0;
+calldatas[1] = abi.encodeWithSignature(
+    "transferOwnership(address)",
+    timelock
+);
+
+// Submit proposal
+uint256 proposalId = governor.propose(
+    targets,
+    values,
+    calldatas,
+    description
+);
+
+
+address[0x0000000000000000000000000000000000000000] memory targets = new address[](2);
+uint256[] memory values = new uint256[](2);
+bytes[] memory calldatas = new bytes[](2);
+
+string memory description = "Proposal #1: Adopt GOVERNANCE.md and transfer ownership of core contracts to the Nexus Timelock.";
+
+// 1) Transfer NGTT ownership to Timelock
+targets[0] = address(ngtt);
+values[0] = 0;
+calldatas[0] = abi.encodeWithSignature(
+    "transferOwnership(address)",
+    timelock
+);
+
+// 2) Transfer protocol controller ownership to Timelock
+targets[1] = address(protocol);
+values[1] = 0;
+calldatas[1] = abi.encodeWithSignature(
+    "transferOwnership(address)",
+    timelock
+);
+
+// Submit proposal
+uint256 proposalId = governor.propose(
+    targets,
+    values,
+    calldatas,
+    description
+);

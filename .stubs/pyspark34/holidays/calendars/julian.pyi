@@ -1,1 +1,0 @@
-JULIAN_CALENDAR: str
