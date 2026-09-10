@@ -1,7 +1,7 @@
 # Nexus AI Dapp Expert Blueprint
 
 ## Goal
-Build an expert AI operator for the Nexus dapp that can reason across governance, treasury, signal reliability, routing rails, token metadata, and source trust.
+Build an expert AI operator for the Nexus dapp that can reason across governance, treasury, signal reliability, routing rails, token metadata, and source belief.
 
 ## Core Capabilities
 - Source-of-truth reasoning from canonical repository and governed manifest entries.

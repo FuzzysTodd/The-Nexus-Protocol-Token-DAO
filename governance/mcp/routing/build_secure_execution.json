@@ -1,0 +1,10 @@
+{
+  "proposal_id": "GP-22-EXEC",
+  "parent": "GP-22",
+  "tier": 3,
+  "source_discussion": 416,
+  "agents": ["NexusOps", "DevSecOps", "Orbit"],
+  "requires_vote": true,
+  "category": "workflow-modernization",
+  "risk": "medium"
+}
