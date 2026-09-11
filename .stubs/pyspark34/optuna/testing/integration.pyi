@@ -1,9 +1,0 @@
-import optuna
-from _typeshed import Incomplete
-
-class DeterministicPruner(optuna.pruners.BasePruner):
-    is_pruning: Incomplete
-    def __init__(self, is_pruning: bool) -> None: ...
-    def prune(self, study: optuna.study.Study, trial: optuna.trial.FrozenTrial) -> bool: ...
-
-def create_running_trial(study: optuna.study.Study, value: float) -> optuna.trial.Trial: ...

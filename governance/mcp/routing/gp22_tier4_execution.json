@@ -1,0 +1,66 @@
+{
+  "proposal_id": "GP-22-TIER4",
+  "parent_proposal": "GP-22-EXEC",
+  "tier": 4,
+  "description": "Authorize on-chain execution for GP-22 modernization deployment.",
+  "quorum": 0.67,
+  "routing": {
+    "sequence": [
+      {
+        "target_agent": "ChainOpsAgent",
+        "task": "prepare_onchain_payload",
+        "inputs": {
+          "contract": "NexusDAOExecutor",
+          "method": "executeModernization",
+          "params": {
+            "version": "1.0.0",
+            "workflow_hash": "sha256:3f9b8c1d2e7a4f0c9b1a6d3e8f4c2a7d"
+          }
+        },
+        "gp14_tier": 4
+      },
+      {
+        "target_agent": "TreasuryMultisigAgent",
+        "task": "sign_transaction",
+        "inputs": {
+          "transaction_type": "dao_execution",
+          "required_signers": 5,
+          "threshold": 3
+        },
+        "gp14_tier": 4
+      },
+      {
+        "target_agent": "ChainOpsAgent",
+        "task": "broadcast_transaction",
+        "inputs": {
+          "network": "ethereum",
+          "gas_limit": 250000,
+          "priority_fee": "auto"
+        },
+        "gp14_tier": 4
+      },
+      {
+        "target_agent": "OrbitAgent",
+        "task": "record_onchain_event",
+        "inputs": {
+          "proposal_id": "GP-22-TIER4",
+          "network": "ethereum",
+          "action": "modernization_execution"
+        },
+        "gp14_tier": 2
+      }
+    ]
+  },
+  "constraints": {
+    "allowed_tiers": [4],
+    "forbidden_actions": [
+      "merge_pull_request",
+      "trigger_ci_cd"
+    ]
+  },
+  "audit": {
+    "log_to_chain": true,
+    "log_to_repo": "decisions/gp-22-tier4.json",
+    "timestamp": "pending"
+  }
+}

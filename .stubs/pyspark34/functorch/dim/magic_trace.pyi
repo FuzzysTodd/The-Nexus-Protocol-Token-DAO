@@ -1,3 +1,0 @@
-from collections.abc import Generator
-
-def magic_trace(output: str = 'trace.fxt', magic_trace_cache: str = '/tmp/magic-trace') -> Generator[None, None, None]: ...

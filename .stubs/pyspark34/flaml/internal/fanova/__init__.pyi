@@ -1,1 +1,0 @@
-from ._evaluator import FanovaImportanceEvaluator as FanovaImportanceEvaluator

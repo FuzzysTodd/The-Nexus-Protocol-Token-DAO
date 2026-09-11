@@ -1,6 +1,0 @@
-from _typeshed import Incomplete
-
-IMAGENET_DEFAULT_MEAN: Incomplete
-IMAGENET_DEFAULT_STD: Incomplete
-IMAGENET_STANDARD_MEAN: Incomplete
-IMAGENET_STANDARD_STD: Incomplete

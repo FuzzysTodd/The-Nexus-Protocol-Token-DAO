@@ -1,3 +1,0 @@
-from logging import Logger
-
-def safe_run(logger: Logger = None): ...

@@ -1,3 +1,0 @@
-from mdurl._url import URL as URL
-
-def format(url: URL) -> str: ...
