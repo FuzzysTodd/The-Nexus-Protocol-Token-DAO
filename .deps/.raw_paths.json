@@ -1,3 +1,9 @@
 {
   "Delegate@3.2.0/@openzeppelin/contracts/utils/structs/EnumerableSet.sol": ".deps/npm/Delegate@3.2.0/@openzeppelin/contracts/utils/structs/EnumerableSet.sol"
+  "@openzeppelin/contracts@5.6.1/access/AccessControl.sol": ".deps/npm/@openzeppelin/contracts@5.6.1/access/AccessControl.sol",
+  "@openzeppelin/contracts@5.6.1/access/IAccessControl.sol": ".deps/npm/@openzeppelin/contracts@5.6.1/access/IAccessControl.sol",
+  "@openzeppelin/contracts@5.6.1/utils/Context.sol": ".deps/npm/@openzeppelin/contracts@5.6.1/utils/Context.sol",
+  "@openzeppelin/contracts@5.6.1/utils/introspection/ERC165.sol": ".deps/npm/@openzeppelin/contracts@5.6.1/utils/introspection/ERC165.sol",
+  "@openzeppelin/contracts@5.6.1/utils/introspection/IERC165.sol": ".deps/npm/@openzeppelin/contracts@5.6.1/utils/introspection/IERC165.sol",
+  "@openzeppelin/contracts@5.6.1/security/ReentrancyGuard.sol": ".deps/npm/@openzeppelin/contracts@5.6.1/security/ReentrancyGuard.sol"
 }
