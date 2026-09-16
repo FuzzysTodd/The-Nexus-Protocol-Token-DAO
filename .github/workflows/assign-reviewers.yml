@@ -1,5 +1,5 @@
 name: Auto-assign reviewers based on subsystem
-
+[![Auto-assign reviewers based on subsystem](https://github.com/FuzzysTodd/The-Nexus-Protocol-Token-DAO/actions/workflows/assign-reviewers.yml/badge.svg)](https://github.com/FuzzysTodd/The-Nexus-Protocol-Token-DAO/actions/workflows/assign-reviewers.yml)
 on:
   pull_request:
     types:
