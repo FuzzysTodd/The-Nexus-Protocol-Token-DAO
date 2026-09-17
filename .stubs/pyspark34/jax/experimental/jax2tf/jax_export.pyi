@@ -1,1 +1,0 @@
-from jax.experimental.export.export import default_lowering_platform as default_lowering_platform

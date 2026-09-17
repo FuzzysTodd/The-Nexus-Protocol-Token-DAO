@@ -1,4 +1,0 @@
-import _plotly_utils.basevalidators
-
-class FramesValidator(_plotly_utils.basevalidators.CompoundArrayValidator):
-    def __init__(self, plotly_name: str = 'frames', parent_name: str = '', **kwargs) -> None: ...

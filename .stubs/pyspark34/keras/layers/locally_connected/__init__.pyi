@@ -1,2 +1,0 @@
-from keras.layers.locally_connected.locally_connected1d import LocallyConnected1D as LocallyConnected1D
-from keras.layers.locally_connected.locally_connected2d import LocallyConnected2D as LocallyConnected2D

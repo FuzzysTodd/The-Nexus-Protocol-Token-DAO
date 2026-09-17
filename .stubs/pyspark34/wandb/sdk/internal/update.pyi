@@ -1,3 +1,0 @@
-from typing import Dict
-
-def check_available(current_version: str) -> Dict[str, str | None] | None: ...

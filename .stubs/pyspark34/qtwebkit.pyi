@@ -1,3 +1,0 @@
-pluginType = MODULE
-
-def moduleInformation(): ...

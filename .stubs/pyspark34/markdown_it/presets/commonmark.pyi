@@ -1,3 +1,0 @@
-from ..utils import PresetType as PresetType
-
-def make() -> PresetType: ...

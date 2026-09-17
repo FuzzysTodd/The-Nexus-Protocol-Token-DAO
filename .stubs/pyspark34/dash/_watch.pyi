@@ -1,3 +1,0 @@
-from _typeshed import Incomplete
-
-def watch(folders, on_change, pattern: Incomplete | None = None, sleep_time: float = 0.1): ...

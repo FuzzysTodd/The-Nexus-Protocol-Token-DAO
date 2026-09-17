@@ -1,3 +1,0 @@
-from ..util import strip_end as strip_end
-
-def render_list(renderer, token, state) -> str: ...

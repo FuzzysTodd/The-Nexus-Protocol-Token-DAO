@@ -1,3 +1,0 @@
-from .constants import OAuth2DeviceCodeResponseParameters as OAuth2DeviceCodeResponseParameters
-
-def validate_user_code_info(user_code_info) -> None: ...

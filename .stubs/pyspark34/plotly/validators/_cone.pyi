@@ -1,4 +1,0 @@
-import _plotly_utils.basevalidators
-
-class ConeValidator(_plotly_utils.basevalidators.CompoundValidator):
-    def __init__(self, plotly_name: str = 'cone', parent_name: str = '', **kwargs) -> None: ...

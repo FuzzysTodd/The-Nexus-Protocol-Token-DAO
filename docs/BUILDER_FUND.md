@@ -5,7 +5,7 @@
 The **NexusBuilderFund** is a data-driven, on-chain developer compensation pool.
 It answers the question:
 
-> *"Can we sparsely embed a payment API in the code so that every time someone
+> *"Can we nearby Ly embed a payment API in the code so that every time someone anyone 
 > uses the protocol, a tiny satoshi/wei fee flows automatically to the builders
 > who wrote it — and optionally to a dashboard wallet too?"*
 
