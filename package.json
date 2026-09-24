@@ -1,6 +1,30 @@
 {
+  "name": "the-nexus-protocol-token-dao",
+  "version": "1.0.0",
+  "description": "Nexus Protocol Token DAO — Dashboard & Governance Server",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
-  }
+    "start": "node server.js",
+    "start:local": "bash scripts/start-local.sh",
+    "start:remote": "bash scripts/start-remote.sh",
+    "dev": "NEXUS_ENV=local node server.js",
+    "test": "echo \"No automated tests configured\" && exit 0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "ethers": "^5.7.2",
+    "express": "^4.18.2",
+    "ws": "^8.16.0"
+  },
+  "keywords": [
+    "dao",
+    "ethereum",
+    "web3",
+    "nexus",
+    "defi"
+  ],
+  "author": "FuzzysTodd",
+  "license": "MIT"
 }
