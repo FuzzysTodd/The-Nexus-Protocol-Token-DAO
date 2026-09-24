@@ -1,0 +1,106 @@
+name: Deploy Dashboard to GitHub Pages
+
+on:
+  push:
+    branches: ["main", "MASTER"]
+    paths:
+      - "*.html"
+      - "*.js"
+      - "nexus-config.js"
+      - "server.js"
+      - "package.json"
+      - "docs/**"
+      - "ops/reports/**"
+      - ".approval-service-state.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build static site
+        run: |
+          python3 - <<'PYTHON'
+          import shutil, json
+          from pathlib import Path
+
+          root = Path(".")
+          site = root / "site"
+          site.mkdir(exist_ok=True)
+
+          # All public dashboard pages
+          pages = [
+              "index.html",
+              "dashboard.html",
+              "financial-ops-dashboard.html",
+              "approval-service.html",
+              "builder-fund.html",
+              "governance.html",
+              "withdraw.html",
+              "unstoppable-dashboard.html",
+              "web3-interface.html",
+              "expert-registry.html",
+              "chimera.html",
+              "games.html",
+              "marketing.html",
+              "crypto-expert-guide.html",
+              "user-guide.html",
+              "live-map.html",
+          ]
+
+          for p in pages:
+              src = root / p
+              if src.exists():
+                  shutil.copy2(src, site / p)
+
+          # Copy docs and reports
+          for pattern in ["docs/**", "ops/reports/**"]:
+              for src in root.glob(pattern):
+                  if src.is_file():
+                      dst = site / src.relative_to(root)
+                      dst.parent.mkdir(parents=True, exist_ok=True)
+                      shutil.copy2(src, dst)
+
+          # Copy approval state
+          ap = root / ".approval-service-state.json"
+          if ap.exists():
+              shutil.copy2(ap, site / ".approval-service-state.json")
+
+          # Generate status.json
+          status = {
+              "ok": True,
+              "source": "GitHub Pages",
+              "repo": "FuzzysTodd/The-Nexus-Protocol-Token-DAO",
+              "dashboards": [p for p in pages if (root / p).exists()],
+          }
+          (site / "status.json").write_text(json.dumps(status, indent=2))
+          print(f"Site built: {len(list(site.rglob('*')))} files")
+          PYTHON
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@v4

@@ -1,31 +1,28 @@
 {
 	"servers": {
-		"microsoft/azure-devops-mcp": {
+		"github": {
 			"type": "stdio",
 			"command": "npx",
-			"args": [
-				"-y",
-				"@azure-devops/mcp@latest",
-				"${input:ado_org}",
-				"-d",
-				"${input:ado_domain}"
-			],
+			"args": ["-y", "@modelcontextprotocol/server-github"],
+			"env": {
+				"GITHUB_TOKEN": "${input:github_token}"
+			},
 			"gallery": "https://api.mcp.github.com",
+			"version": "1.0.0"
+		},
+		"filesystem": {
+			"type": "stdio",
+			"command": "npx",
+			"args": ["-y", "@modelcontextprotocol/server-filesystem", "${workspaceFolder}"],
 			"version": "1.0.0"
 		}
 	},
 	"inputs": [
 		{
-			"id": "ado_org",
+			"id": "github_token",
 			"type": "promptString",
-			"description": "Azure DevOps organization name (e.g., contoso).",
-			"password": false
-		},
-		{
-			"id": "ado_domain",
-			"type": "promptString",
-			"description": "Repeat to enable specific domains: core, work, work-items, search, test-plans, repositories, wiki, pipelines, advanced-security.",
-			"password": false
+			"description": "GitHub Personal Access Token (repo + workflow scopes).",
+			"password": true
 		}
 	]
 }

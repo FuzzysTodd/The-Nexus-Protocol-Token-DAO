@@ -1,0 +1,33 @@
+{
+  "version": 2,
+  "name": "nexus-protocol-dao",
+  "builds": [
+    {
+      "src": "*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/server.js" },
+    { "src": "/dashboard(.*)", "dest": "/dashboard.html" },
+    { "src": "/financial-ops(.*)", "dest": "/financial-ops-dashboard.html" },
+    { "src": "/approval(.*)", "dest": "/approval-service.html" },
+    { "src": "/builder-fund(.*)", "dest": "/builder-fund.html" },
+    { "src": "/governance(.*)", "dest": "/governance.html" },
+    { "src": "/withdraw(.*)", "dest": "/withdraw.html" },
+    { "src": "/web3(.*)", "dest": "/web3-interface.html" },
+    { "src": "/expert(.*)", "dest": "/expert-registry.html" },
+    { "src": "/unstoppable(.*)", "dest": "/unstoppable-dashboard.html" },
+    { "src": "/", "dest": "/dashboard.html" }
+  ],
+  "env": {
+    "NEXUS_ENV": "remote"
+  },
+  "github": {
+    "silent": true
+  }
+}
