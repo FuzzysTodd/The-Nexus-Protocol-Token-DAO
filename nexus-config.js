@@ -35,9 +35,18 @@ module.exports = {
     token:       process.env.NEXUS_TOKEN_ADDRESS         || null,
   },
 
-  // ── Azure / remote ────────────────────────────────────────────────────────
-  azure: {
-    appServiceUrl: "https://the-nexus-protocol-token-doa.azurewebsites.net",
+  // ── Hosting ────────────────────────────────────────────────────────────────
+  // Self-hosted: set NEXUS_HOST_URL to your domain / IP
+  // GitHub Pages (free static):  https://fuzzystodd.github.io/The-Nexus-Protocol-Token-DAO
+  // Vercel (free):                set NEXUS_VERCEL_URL after `vercel --prod`
+  hosting: {
+    pagesUrl:   "https://fuzzystodd.github.io/The-Nexus-Protocol-Token-DAO",
+    selfHosted: process.env.NEXUS_HOST_URL  || null,
+    vercel:     process.env.NEXUS_VERCEL_URL || null,
+    // Primary public URL — first non-null wins
+    get publicUrl() {
+      return this.selfHosted || this.vercel || this.pagesUrl;
+    },
   },
 
   isLocal:  env === "local",

@@ -7,6 +7,11 @@
     "start": "node server.js",
     "start:local": "bash scripts/start-local.sh",
     "start:remote": "bash scripts/start-remote.sh",
+    "start:pm2": "pm2 start ecosystem.config.js",
+    "start:docker": "docker-compose up -d",
+    "stop:pm2": "pm2 stop all",
+    "logs:pm2": "pm2 logs",
+    "deploy:vercel": "vercel --prod",
     "dev": "NEXUS_ENV=local node server.js",
     "test": "echo \"No automated tests configured\" && exit 0"
   },

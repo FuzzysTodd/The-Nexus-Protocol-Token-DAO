@@ -1,0 +1,59 @@
+# Nexus Protocol — DAO Completion Supervisor Summary
+# Updated: 2026-06-10
+
+## Infrastructure State: OPERATIONAL
+
+### Active Nodes
+
+| Node ID | Type | Status | Services |
+|---------|------|--------|----------|
+| node-local-dev | local | Configured | :8787 :8788 :8790 :8545 |
+| node-azure-appservice | remote | Deployed (Spot VM nexuspusus) | Azure App Service |
+| node-codespaces | remote | Configured | Ports auto-forwarded via devcontainer |
+
+### Service Matrix
+
+| Service | Local URL | Remote URL | Script |
+|---------|-----------|------------|--------|
+| Approval Service | http://localhost:8787 | https://the-nexus-protocol-token-doa.azurewebsites.net | approval-service-server.js |
+| Financial Ops REST | http://localhost:8788 | https://the-nexus-protocol-token-doa.azurewebsites.net | financial-ops-rest-server.js |
+| Signal Bus (WS) | ws://localhost:8790 | wss://the-nexus-protocol-token-doa.azurewebsites.net | nexus-signal-bus.js |
+| Hardhat RPC | http://localhost:8545 | — (chain-specific) | npx hardhat node |
+
+### Agent Coverage
+
+| Agent ID | Domain | Status |
+|----------|--------|--------|
+| nexus-crypto-core | EVM Cryptography | Registered |
+| nexus-defi-architect | DeFi Protocol Design | Registered |
+| nexus-dao-counsel | DAO Governance | Registered |
+| nexus-nft-studio | NFT & RWA | Registered |
+| nexus-oracle-feed | Price Oracles | Registered |
+| nexus-treasury-ops | Treasury Management | Registered |
+| nexus-security-audit | Smart Contract Security | Registered (block-and-escalate) |
+| nexus-frontend-ux | Web3 UI | Registered |
+| nexus-signal-engine | Transaction Signaling | Registered |
+| nexus-forex-quant | Forex & Quant Finance | Registered |
+| nexus-builder-fund | Developer Micropayments | Registered |
+| samy | Infrastructure (local+remote) | Active |
+
+### Financial Bots
+
+| Bot ID | Role | Approval Gate |
+|--------|------|---------------|
+| mcp-fin-011 | Pre-Error Remediation | Human-gated |
+| mcp-fin-012 | Withdrawal Placement Scanner | Human-gated |
+| mcp-fin-013 | Success Documentation Reporter | Human-gated |
+
+### Cost Posture
+
+- External API spend: $0/month (stub mode default)
+- Azure Spot VM: pay-as-used, eviction-safe (Deallocate policy)
+- CI/CD: GitHub Actions free tier (public repo)
+- RPC: public endpoints by default; Infura/Alchemy via env var when needed
+
+### Owner / Escalation Chain
+
+FuzzysTodd (0x33ffc308e693a5b49e0ee0241f41f03ccef495f2)
+  → nexus-security-audit
+  → Super Delegates

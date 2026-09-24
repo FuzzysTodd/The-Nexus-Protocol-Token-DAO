@@ -1,0 +1,41 @@
+# Nexus Protocol — Infrastructure Setup Success Report
+# Generated: 2026-06-10
+
+## Status: COMPLETE
+
+### Local + Remote Stack Wiring
+
+| Task | File | Result |
+|------|------|--------|
+| Unified config (local/remote/production profiles) | `nexus-config.js` | ✅ |
+| Devcontainer post-create (Node, Python, Hardhat, .env) | `.devcontainer/post-create.sh` | ✅ |
+| NPM scripts for all services | `package.json` | ✅ |
+| Network topology nodes (local-dev, azure, codespaces) | `mcp/agents/mig-network-config.json` | ✅ |
+| One-command local launcher (start/stop/status) | `scripts/start-local.sh` | ✅ |
+| Remote launcher with systemd unit installer | `scripts/start-remote.sh` | ✅ |
+| Samy infrastructure agent definition | `.github/agents/samy-agent.agents.md` | ✅ |
+| devcontainer forwardPorts for all services | `.devcontainer/devcontainer.json` | ✅ |
+
+### Cost Impact
+
+All changes maintain the zero-external-cost-by-default design:
+- Local profile uses `http://127.0.0.1:8545` (Hardhat node, free)
+- Stub mode activates automatically when `NEXUS_RPC_URL` is unset
+- Azure Spot VM (`nexuspusus`) continues on Spot/Deallocate pricing
+- No new paid API dependencies introduced
+
+### Quick Start
+
+```
+# Local dev (zero cost)
+npm run start:local
+
+# Remote (Azure VM / Codespaces)
+npm run start:remote
+
+# Check status
+bash scripts/start-local.sh status
+```
+
+### Owner
+FuzzysTodd / Nexus Protocol DAO

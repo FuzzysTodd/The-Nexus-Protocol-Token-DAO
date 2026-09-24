@@ -15,9 +15,7 @@
         "ms-vscode-remote.remote-ssh",
         "fabric.vscode-fabric-functions",
         "spylogsster.app-debug-helper",
-        "ms-azure-load-testing.microsoft-testing",
         "ms-kubernetes-tools.vscode-kubernetes-tools",
-        "ms-dotnettools.csdevkit",
         "genieai.chatgpt-vscode",
         "k9982874.github-gist-explorer",
         "visualstudioexptteam.vscodeintellicode",
@@ -27,8 +25,6 @@
         "7finney.sol-exec",
         "armurai.sol-armur-ai-audit",
         "beaugunderson.solidity-extended",
-        "obigo.obigowebsimulatorlinux",
-        "ms-windows-ai-studio.windows-ai-studio",
-        "scrudix.scrudix"
+        "obigo.obigowebsimulatorlinux"
     ]
 }
