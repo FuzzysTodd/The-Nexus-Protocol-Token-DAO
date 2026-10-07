@@ -1,5 +1,4 @@
 name: Auto-assign reviewers based on subsystem
-
 on:
   pull_request:
     types:
