@@ -33,10 +33,8 @@ fi
 git config user.name  "Todd Stephens"
 git config user.email "157565446+FuzzysTodd@users.noreply.github.com"
 
-# ── Run bots (they write reports/) ────────────────────────────────────────────
-node bots/health-bot.js
-node bots/dao-accounting-bot.js
-node bots/registry-sync-bot.js
+# ── Run the full agent fleet (7 tools, all $0 — no Actions, no AI credits) ──
+node bots/fleet-runner.js
 
 # ── Commit ONLY the reports, then push ────────────────────────────────────────
 # Explicit pathspec commit: nothing outside reports/ is ever included,

@@ -31,11 +31,7 @@ exit /b 1
 git config user.name  "Todd Stephens"
 git config user.email "157565446+FuzzysTodd@users.noreply.github.com"
 
-node bots\health-bot.js
-if errorlevel 1 goto :fail
-node bots\dao-accounting-bot.js
-if errorlevel 1 goto :fail
-node bots\registry-sync-bot.js
+node bots\fleet-runner.js
 if errorlevel 1 goto :fail
 
 REM Commit ONLY reports (explicit pathspec), then push

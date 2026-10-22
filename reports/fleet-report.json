@@ -1,0 +1,114 @@
+{
+  "generatedBy": "fleet-runner",
+  "generatedAt": "2026-10-22T22:19:46.321Z",
+  "owner": "@FuzzysTodd",
+  "mode": "local $0 runtime — no GitHub Actions, no AI credits",
+  "summary": {
+    "total": 7,
+    "passed": 7,
+    "failed": 0
+  },
+  "results": [
+    {
+      "id": "dao-health-bot",
+      "label": "Health Bot",
+      "ok": true,
+      "exitCode": 0,
+      "durationMs": 198,
+      "creditsUsed": 0,
+      "note": ""
+    },
+    {
+      "id": "dao-accounting-bot",
+      "label": "File-Accounting Bot",
+      "ok": true,
+      "exitCode": 0,
+      "durationMs": 180,
+      "creditsUsed": 0,
+      "note": ""
+    },
+    {
+      "id": "dao-registry-sync-bot",
+      "label": "Registry Sync Bot",
+      "ok": true,
+      "exitCode": 0,
+      "durationMs": 71,
+      "creditsUsed": 0,
+      "note": ""
+    },
+    {
+      "id": "finance-ops-reporter",
+      "label": "Financial Ops Reporter (nexus/finance_ops_report.py)",
+      "ok": true,
+      "exitCode": 0,
+      "durationMs": 2240,
+      "creditsUsed": 0,
+      "note": "Writes ops/reports/financial-ops-report.{json,md} — the reporting side of the financial-ops bots, at $0."
+    },
+    {
+      "id": "repo-assessor",
+      "label": "Repo Assessor (nexus/repo_assessment.py)",
+      "ok": true,
+      "exitCode": 0,
+      "durationMs": 177,
+      "creditsUsed": 0,
+      "note": ""
+    },
+    {
+      "id": "asset-finder",
+      "label": "Asset Finder (nexus/asset_finder.py)",
+      "ok": true,
+      "exitCode": 0,
+      "durationMs": 616,
+      "creditsUsed": 0,
+      "note": ""
+    },
+    {
+      "id": "telemetry-monitor",
+      "label": "Telemetry Monitor (nexus.telemetry_monitor)",
+      "ok": true,
+      "exitCode": 0,
+      "durationMs": 68,
+      "creditsUsed": 0,
+      "note": ""
+    }
+  ],
+  "manifest": {
+    "generatedBy": "fleet-runner",
+    "generatedAt": "2026-10-22T22:19:46.321Z",
+    "owner": "@FuzzysTodd",
+    "policy": "Everything that runs locally is deterministic code — zero AI credits, zero cloud cost. Agents needing an execution engine or human gating are classified as such and are never run automatically.",
+    "runByFleetRunner": [
+      "dao-health-bot",
+      "dao-accounting-bot",
+      "dao-registry-sync-bot",
+      "finance-ops-reporter",
+      "repo-assessor",
+      "asset-finder",
+      "telemetry-monitor"
+    ],
+    "notRun": [
+      {
+        "group": "MCP registry agents",
+        "count": 11,
+        "runtime": "definition-only",
+        "cost": "$0 unless wired to a paid model — these are registry entries describing duties, tools, and authority; they execute only when an engine invokes them.",
+        "source": "mcp/nexus-agent-registry.json"
+      },
+      {
+        "group": "Financial-ops bots",
+        "count": 3,
+        "runtime": "human-gated definitions",
+        "cost": "$0 — by design they never execute autonomously; their reporting side runs via finance-ops-reporter above.",
+        "source": "mcp/agents/financial-ops-bots.json"
+      },
+      {
+        "group": "Skills library",
+        "count": 87,
+        "runtime": "reference definitions",
+        "cost": "$0 — a library of skill definitions agents can consult; no runtime cost until used.",
+        "source": "skills/"
+      }
+    ]
+  }
+}

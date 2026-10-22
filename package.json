@@ -31,7 +31,8 @@
     "bots:sync": "node bots/registry-sync-bot.js",
     "bots:all": "node bots/health-bot.js && node bots/dao-accounting-bot.js && node bots/registry-sync-bot.js",
     "hooks:install": "bash scripts/install-hooks.sh",
-    "bots:daily": "bash scripts/bots-daily.sh"
+    "bots:daily": "bash scripts/bots-daily.sh",
+    "agents:run": "node bots/fleet-runner.js"
   },
   "engines": {
     "node": ">=18.0.0"

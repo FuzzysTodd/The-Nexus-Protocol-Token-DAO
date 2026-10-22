@@ -1,11 +1,11 @@
 # Financial Ops Automation Report
 
-- Generated at: 2026-04-06T18:45:30+00:00
-- Files scanned: 3720
-- Pre-error findings: 0
+- Generated at: 2026-10-22T22:19:45+00:00
+- Files scanned: 4052
+- Pre-error findings: 3
 - Pre-error scope: first-party automation, docs, mcp, nexus, ops, and top-level repo files
-- Withdrawal signals: 2028
-- Placement signals: 2826
+- Withdrawal signals: 2397
+- Placement signals: 2896
 - Approval gate: required for any fund movement or treasury action
 
 ## Bot Status
@@ -16,7 +16,9 @@
 
 ## Top Findings
 
-- No high-confidence pre-errors were detected by the static scan.
+- [high] dashwall.py: Syntax error at line 2: unexpected indent
+- [medium] .github/agents/samy-agent.agent.md: Missing YAML frontmatter start delimiter.
+- [medium] DAO_BOT_TOKEN.json: JSON parse error at line 1: Expecting value
 
 ## Recommended Actions
 

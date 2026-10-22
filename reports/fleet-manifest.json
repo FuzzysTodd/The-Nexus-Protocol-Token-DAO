@@ -1,0 +1,38 @@
+{
+  "generatedBy": "fleet-runner",
+  "generatedAt": "2026-10-22T22:19:46.321Z",
+  "owner": "@FuzzysTodd",
+  "policy": "Everything that runs locally is deterministic code — zero AI credits, zero cloud cost. Agents needing an execution engine or human gating are classified as such and are never run automatically.",
+  "runByFleetRunner": [
+    "dao-health-bot",
+    "dao-accounting-bot",
+    "dao-registry-sync-bot",
+    "finance-ops-reporter",
+    "repo-assessor",
+    "asset-finder",
+    "telemetry-monitor"
+  ],
+  "notRun": [
+    {
+      "group": "MCP registry agents",
+      "count": 11,
+      "runtime": "definition-only",
+      "cost": "$0 unless wired to a paid model — these are registry entries describing duties, tools, and authority; they execute only when an engine invokes them.",
+      "source": "mcp/nexus-agent-registry.json"
+    },
+    {
+      "group": "Financial-ops bots",
+      "count": 3,
+      "runtime": "human-gated definitions",
+      "cost": "$0 — by design they never execute autonomously; their reporting side runs via finance-ops-reporter above.",
+      "source": "mcp/agents/financial-ops-bots.json"
+    },
+    {
+      "group": "Skills library",
+      "count": 87,
+      "runtime": "reference definitions",
+      "cost": "$0 — a library of skill definitions agents can consult; no runtime cost until used.",
+      "source": "skills/"
+    }
+  ]
+}

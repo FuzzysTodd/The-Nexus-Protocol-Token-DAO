@@ -1,6 +1,6 @@
 {
   "generatedBy": "dao-accounting-bot",
-  "generatedAt": "2026-10-22T22:15:34.462Z",
+  "generatedAt": "2026-10-22T22:19:43.116Z",
   "owner": "@FuzzysTodd",
   "totals": {
     "trackedFiles": 4080,
@@ -18201,7 +18201,7 @@
       "category": "docs",
       "purpose": "Project entry point — links to every major surface",
       "disposition": "keep",
-      "bytes": 10976
+      "bytes": 12531
     },
     {
       "file": "README.xml",
@@ -25180,21 +25180,21 @@
       "category": "app-code",
       "purpose": "DAO File-Accounting Bot (this file)",
       "disposition": "keep",
-      "bytes": 16703
+      "bytes": 17566
     },
     {
       "file": "bots/health-bot.js",
       "category": "app-code",
       "purpose": "DAO Health Bot — deterministic repo health checks",
       "disposition": "keep",
-      "bytes": 6376
+      "bytes": 6599
     },
     {
       "file": "bots/registry-sync-bot.js",
       "category": "app-code",
       "purpose": "DAO Registry Sync Bot — feeds dashboard agent data",
       "disposition": "keep",
-      "bytes": 4750
+      "bytes": 6423
     },
     {
       "file": "builder-fund.html",
@@ -25880,14 +25880,14 @@
       "category": "known-directory",
       "purpose": "Git hooks (pre-commit / pre-push) that run the DAO bots locally — Actions-free mode",
       "disposition": "keep",
-      "bytes": 854
+      "bytes": 865
     },
     {
       "file": "githooks/pre-push",
       "category": "known-directory",
       "purpose": "Git hooks (pre-commit / pre-push) that run the DAO bots locally — Actions-free mode",
       "disposition": "keep",
-      "bytes": 729
+      "bytes": 837
     },
     {
       "file": "githubprice.gh",
@@ -26657,14 +26657,14 @@
       "category": "config-data",
       "purpose": "Operations runbooks",
       "disposition": "keep",
-      "bytes": 10210
+      "bytes": 10520
     },
     {
       "file": "ops/reports/financial-ops-report.md",
       "category": "docs",
       "purpose": "Operations runbooks",
       "disposition": "keep",
-      "bytes": 874
+      "bytes": 1036
     },
     {
       "file": "package-lock.json",
@@ -26678,7 +26678,7 @@
       "category": "config-data",
       "purpose": "Node package manifest + bot runner scripts",
       "disposition": "keep",
-      "bytes": 1728
+      "bytes": 1775
     },
     {
       "file": "playwright-tool/.gitignore",
@@ -26888,14 +26888,14 @@
       "category": "known-directory",
       "purpose": "Daily DAO bot run without GitHub Actions (Windows Task Scheduler)",
       "disposition": "keep",
-      "bytes": 1328
+      "bytes": 1809
     },
     {
       "file": "scripts/bots-daily.sh",
       "category": "automation",
       "purpose": "Daily DAO bot run without GitHub Actions (cron / manual)",
       "disposition": "keep",
-      "bytes": 1358
+      "bytes": 2397
     },
     {
       "file": "scripts/deploy_dao.js",

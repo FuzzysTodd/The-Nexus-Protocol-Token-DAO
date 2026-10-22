@@ -112,6 +112,36 @@ Run all three at once with `npm run bots:all`. The financial-ops bots keep
 their human-gated approval model — no bot can move treasury funds or sign
 anything on its own.
 
+## 🚀 The Full Agent Fleet — Running at $0
+
+Todd's bots and agents across the file sets now operate **without the
+cloud/AI cost**. `npm run agents:run` (or `node bots/fleet-runner.js`) runs
+the whole fleet locally — every tool is deterministic code, no model calls,
+no GitHub Actions:
+
+| Fleet member | What it does | Output |
+|---|---|---|
+| Health Bot | Repo health checks | `reports/health-report.json` |
+| File-Accounting Bot | Full-tree file accounting | `reports/file-accounting.*` |
+| Registry Sync Bot | Dashboard agent data | `reports/agents.json` |
+| Financial Ops Reporter | Financial-ops report (the reporting side of the fin-ops bots) | `ops/reports/financial-ops-report.*` |
+| Repo Assessor | Read-only repo assessment | `reports/repo-assessment.json` |
+| Asset Finder | Token/contract inventory | `reports/asset-finder.txt` |
+| Telemetry Monitor | Read-only telemetry snapshot | `reports/telemetry-snapshot.json` |
+
+The full classification lives in `reports/fleet-manifest.json`:
+
+- **Run at $0 locally:** the 7 tools above (Node + stdlib-only Python).
+- **Definition-only:** the 11 MCP registry agents — they execute only when
+  wired to an engine, and cost nothing until then.
+- **Human-gated:** the 3 financial-ops bots — by design they never move
+  funds autonomously.
+- **Reference library:** the 87 skill definitions in `skills/` — no runtime
+  cost until an agent consults them.
+
+The daily scripts (`scripts/bots-daily.sh` / `.cmd`) run this whole fleet on
+schedule — same zero-cost mechanism as the maintenance bots.
+
 While GitHub Actions is blocked by the account's billing lock, run them
 without Actions:
 
