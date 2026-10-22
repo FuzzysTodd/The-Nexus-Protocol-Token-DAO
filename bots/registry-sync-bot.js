@@ -19,6 +19,9 @@
 
 "use strict";
 
+// --check: read-only mode used by git hooks — validate, write nothing.
+const CHECK_ONLY = process.argv.includes("--check");
+
 const fs = require("fs");
 const path = require("path");
 
@@ -103,6 +106,11 @@ function main() {
     agents,
     bots: localBots,
   };
+
+  if (CHECK_ONLY) {
+    console.log(`✓ agents.json (check-only): ${agents.length} MCP agents (defined), ${localBots.length} DAO bots — nothing written`);
+    return;
+  }
 
   fs.mkdirSync(REPORTS_DIR, { recursive: true });
   const changed = writeIfChanged(

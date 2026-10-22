@@ -1,28 +1,27 @@
 #!/bin/sh
 # pre-commit — Nexus Protocol DAO Bots (local, zero AI credits)
 #
-# Replaces the GitHub Actions run while the account's billing lock is active.
-# Runs the deterministic DAO bots before every commit. Fast (well under a
-# second) and quiet when everything passes.
+# Read-only validation before every commit: the bots CHECK but never write,
+# so a commit can't ship half-updated reports. Report generation happens in
+# scripts/bots-daily.sh (or npm run bots:all), which commits them explicitly.
 #
-# Block only on hard errors; warnings pass. In a hurry? Skip with:
-#   git commit --no-verify -m "..."
+# Quiet on success. Bypass once with:  git commit --no-verify -m "..."
 
 ROOT=$(git rev-parse --show-toplevel)
 
-run_bot() {
+run_check() {
   # $1 = bot script, $2 = display name
-  if ! node "$ROOT/bots/$1" --hook >/dev/null 2>&1; then
+  if ! node "$ROOT/bots/$1" --check >/dev/null 2>&1; then
     echo ""
     echo "✗ $2 found problems:"
-    node "$ROOT/bots/$1" --hook 2>&1 | grep -E '✗|error|Error' | head -5
+    node "$ROOT/bots/$1" --check 2>&1 | grep -E '✗|error|Error' | head -5
     echo ""
     echo "  Fix the above, or bypass once with:  git commit --no-verify"
     exit 1
   fi
 }
 
-run_bot health-bot.js        "Health Bot"
-run_bot dao-accounting-bot.js "File-Accounting Bot"
+run_check health-bot.js         "Health Bot"
+run_check dao-accounting-bot.js "File-Accounting Bot"
 
 exit 0

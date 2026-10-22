@@ -16,6 +16,10 @@
 
 "use strict";
 
+// --check: read-only mode used by git hooks — run every check, write nothing
+// (a pre-push generator cannot ship files with the push it is part of).
+const CHECK_ONLY = process.argv.includes("--check");
+
 const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
@@ -271,7 +275,7 @@ function main() {
     errors.push(`manifest unreadable: ${e.message}`);
   }
 
-  // ── Write reports (errors included) ────────────────────────────────────────
+  // ── Write reports (errors included) — skipped in --check mode ─────────────
   fs.mkdirSync(REPORTS_DIR, { recursive: true });
 
   const report = {
@@ -290,7 +294,7 @@ function main() {
     errors,
   };
 
-  const changedJson = writeIfChanged(
+  const changedJson = CHECK_ONLY ? false : writeIfChanged(
     path.join(REPORTS_DIR, "file-accounting.json"),
     JSON.stringify(report, null, 2) + "\n",
     /"generatedAt": "[^"]+"/
@@ -315,12 +319,12 @@ function main() {
       ...unaccounted.map((f) => `- ${f.file} — ${f.purpose}`), "");
   }
   if (errors.length) md.push("## Errors", "", ...errors.map((e) => `- ${e}`), "");
-  fs.writeFileSync(path.join(REPORTS_DIR, "file-accounting.md"), md.join("\n"));
+  if (!CHECK_ONLY) fs.writeFileSync(path.join(REPORTS_DIR, "file-accounting.md"), md.join("\n"));
 
   console.log(`✓ file-accounting: ${inventory.length} tracked files inventoried`);
   console.log(`  loose root: ${loose.length} — needs review: ${unaccounted.length}`);
-  console.log(`  reports/file-accounting.json ${changedJson ? "(updated)" : "(unchanged)"}`);
-  console.log(`  reports/file-accounting.md`);
+  if (!CHECK_ONLY) console.log(`  reports/file-accounting.json ${changedJson ? "(updated)" : "(unchanged)"}`);
+  if (!CHECK_ONLY) console.log(`  reports/file-accounting.md`);
 
   const hardFail = errors.length > 0 || !manifestOk;
   if (hardFail) {

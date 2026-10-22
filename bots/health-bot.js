@@ -23,6 +23,9 @@ const { execSync } = require("child_process");
 const ROOT = path.resolve(__dirname, "..");
 const REPORTS_DIR = path.join(ROOT, "reports");
 const ci = process.argv.includes("--ci");
+// --check: read-only mode used by git hooks — validate everything but
+// write NO files (a pre-push generator can't ship files with that push).
+const checkOnly = process.argv.includes("--check");
 
 // Change-aware write: skip the file when only the timestamp would differ —
 // keeps local hook runs from churning reports on every commit.
@@ -135,8 +138,10 @@ const report = {
   status: errors.length ? "FAIL" : (warnings.length ? "WARN" : "PASS"),
   errors, warnings,
 };
-const healthChanged = writeIfChanged(path.join(REPORTS_DIR, "health-report.json"),
-  JSON.stringify(report, null, 2) + "\n");
+if (!checkOnly) {
+  const healthChanged = writeIfChanged(path.join(REPORTS_DIR, "health-report.json"),
+    JSON.stringify(report, null, 2) + "\n");
+}
 
 console.log(`\n${report.status === "PASS" ? "✓" : "✗"} Health: ${report.status}` +
   ` (${errors.length} errors, ${warnings.length} warnings)`);
