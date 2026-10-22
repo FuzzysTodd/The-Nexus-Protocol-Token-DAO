@@ -186,6 +186,15 @@ service.
 
 ### Fedora 44 quickstart — GPU machine (2× RTX 5060 Ti 16GB)
 
+The one-command path (idempotent — safe to re-run, and it sets up your
+repo `.env` too):
+
+```bash
+./scripts/setup-fedora.sh
+```
+
+It does everything below. The manual equivalent, for reference:
+
 ```bash
 # 1. NVIDIA driver (RPM Fusion). RTX 50-series needs the open kernel module —
 #    the current akmod-nvidia branch builds it automatically for Blackwell.
@@ -217,6 +226,8 @@ npm run agents:run   # status line should say: thinking: local-gpu
 crontab -e
 # add:  30 6 * * * cd /path/to/The-Nexus-Protocol-Token-DAO && ./scripts/bots-daily.sh
 ```
+
+(The script prints your exact cron line at the end — paste it into `crontab -e`.)
 
 Notes: with Secure Boot enabled, the rebuilt NVIDIA module needs MOK
 enrollment/signing — if `nvidia-smi` fails after a kernel update, check
