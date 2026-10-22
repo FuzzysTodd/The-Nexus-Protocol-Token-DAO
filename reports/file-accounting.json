@@ -1,11 +1,11 @@
 {
   "generatedBy": "dao-accounting-bot",
-  "generatedAt": "2026-10-22T22:15:26.818Z",
+  "generatedAt": "2026-10-22T22:15:34.462Z",
   "owner": "@FuzzysTodd",
   "totals": {
-    "trackedFiles": 4075,
+    "trackedFiles": 4080,
     "looseRootFiles": 85,
-    "accounted": 4075,
+    "accounted": 4080,
     "needsReview": 0
   },
   "policy": "Every tracked file appears below with category, purpose, and disposition. 'review' items need a documented purpose before they can be marked 'keep'.",
@@ -25876,6 +25876,20 @@
       "bytes": 23506
     },
     {
+      "file": "githooks/pre-commit",
+      "category": "known-directory",
+      "purpose": "Git hooks (pre-commit / pre-push) that run the DAO bots locally — Actions-free mode",
+      "disposition": "keep",
+      "bytes": 854
+    },
+    {
+      "file": "githooks/pre-push",
+      "category": "known-directory",
+      "purpose": "Git hooks (pre-commit / pre-push) that run the DAO bots locally — Actions-free mode",
+      "disposition": "keep",
+      "bytes": 729
+    },
+    {
       "file": "githubprice.gh",
       "category": "loose-root-file",
       "purpose": "GitHub CLI snippet — quest-synthesis / price-lookup experiment (operator notes)",
@@ -26776,21 +26790,21 @@
       "category": "config-data",
       "purpose": "Dashboard agent/bot payload (registry-sync bot output)",
       "disposition": "keep",
-      "bytes": 12506
+      "bytes": 12629
     },
     {
       "file": "reports/file-accounting.json",
       "category": "config-data",
       "purpose": "Machine-readable accounting inventory (this bot's output)",
       "disposition": "keep",
-      "bytes": 977507
+      "bytes": 980393
     },
     {
       "file": "reports/file-accounting.md",
       "category": "docs",
       "purpose": "Human-readable accounting report (this bot's output)",
       "disposition": "keep",
-      "bytes": 549505
+      "bytes": 551131
     },
     {
       "file": "reports/health-report.json",
@@ -26870,6 +26884,20 @@
       "bytes": 4762
     },
     {
+      "file": "scripts/bots-daily.cmd",
+      "category": "known-directory",
+      "purpose": "Daily DAO bot run without GitHub Actions (Windows Task Scheduler)",
+      "disposition": "keep",
+      "bytes": 1328
+    },
+    {
+      "file": "scripts/bots-daily.sh",
+      "category": "automation",
+      "purpose": "Daily DAO bot run without GitHub Actions (cron / manual)",
+      "disposition": "keep",
+      "bytes": 1358
+    },
+    {
       "file": "scripts/deploy_dao.js",
       "category": "app-code",
       "purpose": "Operational and deployment scripts",
@@ -26882,6 +26910,13 @@
       "purpose": "Operational and deployment scripts",
       "disposition": "keep",
       "bytes": 1626
+    },
+    {
+      "file": "scripts/install-hooks.sh",
+      "category": "automation",
+      "purpose": "Installs the DAO-bot git hooks (Actions-free automation)",
+      "disposition": "keep",
+      "bytes": 1251
     },
     {
       "file": "scripts/nexus-run-harness.ts",
