@@ -97,6 +97,52 @@ flake8 .
 pytest -q
 ```
 
+## 🤖 Personal DAO Bots — Zero AI Credits
+
+The DAO now runs its own deterministic bots that handle routine repo upkeep
+with **plain Node.js — no paid models, no AI credits**. They run locally
+(`npm run bots:all`) and automatically in CI (`.github/workflows/dao-bots.yml`)
+on every push and daily at 06:00 UTC:
+
+| Bot | Duty | Command |
+|---|---|---|
+| **Health Bot** | Validates JSON configs, verifies npm script targets, detects junk files, confirms git identity is set so commits never prompt | `npm run bots:health` |
+| **File-Accounting Bot** | Accounts for every tracked file — especially loose root files — in `reports/file-accounting.json` / `.md`; the DAO file set stays complete | `npm run bots:accounting` |
+| **Registry Sync Bot** | Feeds the dashboard's Agents & Bots tab from the MCP registries (`reports/agents.json`) | `npm run bots:sync` |
+
+The financial-ops bots (`mcp-fin-011/012/013`) keep their human-gated approval
+model — no bot can move treasury funds or sign anything on its own.
+
+## 🧾 One-Time Identity Setup (never re-enter your info)
+
+Run once per machine/clone — after that every commit, pull, and push in this
+repo carries your identity automatically:
+
+```bash
+npm run identity        # runs scripts/setup-identity.sh
+```
+
+This sets your git name/email (repo-local only), frictionless pull/rebase
+behavior, and credential caching. It's idempotent — safe to re-run anytime.
+
+## 📁 DAO File Accounting
+
+`dao-data-source-manifest.json` is the source of truth for the DAO's file set.
+Its `fileAccounting` policy requires **every tracked file — including all
+loose root files — to appear in the accounting inventory** with a category,
+purpose, and disposition. The File-Accounting Bot enforces this and fails CI
+if anything is unaccounted for:
+
+- Inventory (JSON): `reports/file-accounting.json`
+- Human-readable table: `reports/file-accounting.md`
+
+## 🤖 MCP Agents & Their Duties
+
+Every AI/automation agent's domain, tools, and authority level is defined in
+[`mcp/nexus-agent-registry.json`](mcp/nexus-agent-registry.json) — 11 agents
+crypto-core through treasury-ops. The dashboard's **Agents & Bots** tab renders
+them live via the Registry Sync Bot, so duties are always current.
+
 ## Important Notes
 
 ⚠️ **Audit Status** - This is a real project, but repository components and on-chain flows may not all be audited for production use.

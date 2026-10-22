@@ -1,0 +1,615 @@
+{
+  "generatedBy": "dao-accounting-bot",
+  "generatedAt": "2026-10-22T22:02:34.823Z",
+  "owner": "@FuzzysTodd",
+  "totals": {
+    "trackedFiles": 4069,
+    "looseRootFiles": 86,
+    "accountedFor": 86
+  },
+  "files": [
+    {
+      "file": "\"01_prebuild.yml\\342\\200\\224PrebuildStabilizationWorkflow.yaml\"",
+      "category": "root-file",
+      "purpose": "Loose root file — see accounting report",
+      "disposition": "keep",
+      "bytes": 0
+    },
+    {
+      "file": "\"NexusProtocolDAO\\342\\200\\224GovernanceChangelogSchemae.json\"",
+      "category": "root-file",
+      "purpose": "Loose root file — see accounting report",
+      "disposition": "keep",
+      "bytes": 0
+    },
+    {
+      "file": ".approval-service-state.json",
+      "category": "config-data",
+      "purpose": "Configuration or data file",
+      "disposition": "keep",
+      "bytes": 1886
+    },
+    {
+      "file": ".env.example",
+      "category": "repo-config",
+      "purpose": "Environment variable template (secrets never committed)",
+      "disposition": "keep",
+      "bytes": 1825
+    },
+    {
+      "file": ".flake8",
+      "category": "repo-config",
+      "purpose": "Python lint config",
+      "disposition": "keep",
+      "bytes": 72
+    },
+    {
+      "file": ".gitattributes",
+      "category": "repo-config",
+      "purpose": "Line-ending / diff attributes",
+      "disposition": "keep",
+      "bytes": 2518
+    },
+    {
+      "file": ".gitignore",
+      "category": "repo-config",
+      "purpose": "Ignore rules",
+      "disposition": "keep",
+      "bytes": 6238
+    },
+    {
+      "file": ".mcp.json",
+      "category": "config-data",
+      "purpose": "MCP server configuration",
+      "disposition": "keep",
+      "bytes": 7934
+    },
+    {
+      "file": ".solhint.json",
+      "category": "config-data",
+      "purpose": "Solidity lint config",
+      "disposition": "keep",
+      "bytes": 402
+    },
+    {
+      "file": "02_test.yml",
+      "category": "automation",
+      "purpose": "Workflow / automation definition",
+      "disposition": "keep",
+      "bytes": 440
+    },
+    {
+      "file": "03_lint.yml",
+      "category": "automation",
+      "purpose": "Workflow / automation definition",
+      "disposition": "keep",
+      "bytes": 322
+    },
+    {
+      "file": "04_sync-main.yml",
+      "category": "automation",
+      "purpose": "Workflow / automation definition",
+      "disposition": "keep",
+      "bytes": 422
+    },
+    {
+      "file": "05_deploy.yml",
+      "category": "automation",
+      "purpose": "Workflow / automation definition",
+      "disposition": "keep",
+      "bytes": 1129
+    },
+    {
+      "file": "06_ci-health.yml",
+      "category": "automation",
+      "purpose": "Workflow / automation definition",
+      "disposition": "keep",
+      "bytes": 498
+    },
+    {
+      "file": "CLOUDFLARE_PRIVATE_DEPLOY.md",
+      "category": "docs",
+      "purpose": "Cloudflare private deployment guide",
+      "disposition": "keep",
+      "bytes": 6067
+    },
+    {
+      "file": "CODEOWNERS",
+      "category": "root-file",
+      "purpose": "Auto-requested reviewers per path (FuzzysTodd + Co-Pilot)",
+      "disposition": "keep",
+      "bytes": 2167
+    },
+    {
+      "file": "CODE_OF_CONDUCT.md",
+      "category": "docs",
+      "purpose": "Community conduct rules",
+      "disposition": "keep",
+      "bytes": 5216
+    },
+    {
+      "file": "CRYPTO_REVENUE_GUIDE.md",
+      "category": "docs",
+      "purpose": "Documentation of all 10 NGTT revenue streams",
+      "disposition": "keep",
+      "bytes": 32385
+    },
+    {
+      "file": "DAO_BOT_TOKEN.json",
+      "category": "config-data",
+      "purpose": "DAO bot GitHub API helper (token via env only)",
+      "disposition": "keep",
+      "bytes": 378
+    },
+    {
+      "file": "Dockerfile",
+      "category": "root-file",
+      "purpose": "Container build",
+      "disposition": "keep",
+      "bytes": 543
+    },
+    {
+      "file": "FUNDING.yml",
+      "category": "automation",
+      "purpose": "GitHub Sponsors configuration for DAO contributors",
+      "disposition": "keep",
+      "bytes": 57
+    },
+    {
+      "file": "GOVERNANCE.md",
+      "category": "docs",
+      "purpose": "DAO authority structure and operating mandate",
+      "disposition": "keep",
+      "bytes": 4679
+    },
+    {
+      "file": "IMPLEMENTATION_SUMMARY.md",
+      "category": "docs",
+      "purpose": "Implementation notes",
+      "disposition": "keep",
+      "bytes": 12650
+    },
+    {
+      "file": "LICENSE",
+      "category": "root-file",
+      "purpose": "Loose root file — see accounting report",
+      "disposition": "keep",
+      "bytes": 1083
+    },
+    {
+      "file": "MARKETING_PATH.md",
+      "category": "docs",
+      "purpose": "Canonical go-to-market strategy",
+      "disposition": "keep",
+      "bytes": 25153
+    },
+    {
+      "file": "MARKETING_STRATEGY.md",
+      "category": "docs",
+      "purpose": "Digital marketing & legal strategy",
+      "disposition": "keep",
+      "bytes": 10661
+    },
+    {
+      "file": "MCP_GATEWAY_DOCUMENTATION.md",
+      "category": "docs",
+      "purpose": "MCP gateway documentation",
+      "disposition": "keep",
+      "bytes": 17800
+    },
+    {
+      "file": "MCP_GATEWAY_QUICKREF.md",
+      "category": "docs",
+      "purpose": "MCP gateway quick reference",
+      "disposition": "keep",
+      "bytes": 4891
+    },
+    {
+      "file": "MilestoneMapping.yaml",
+      "category": "automation",
+      "purpose": "Workflow / automation definition",
+      "disposition": "keep",
+      "bytes": 207
+    },
+    {
+      "file": "ProjectBoardAutomation.yaml",
+      "category": "automation",
+      "purpose": "Workflow / automation definition",
+      "disposition": "keep",
+      "bytes": 12413
+    },
+    {
+      "file": "Project_board.yaml",
+      "category": "automation",
+      "purpose": "Workflow / automation definition",
+      "disposition": "keep",
+      "bytes": 2403
+    },
+    {
+      "file": "README.md",
+      "category": "docs",
+      "purpose": "Project entry point — links to every major surface",
+      "disposition": "keep",
+      "bytes": 9615
+    },
+    {
+      "file": "README.xml",
+      "category": "docs",
+      "purpose": "Technical architecture documentation",
+      "disposition": "keep",
+      "bytes": 6125
+    },
+    {
+      "file": "RESOLUTION_APPROVAL.md",
+      "category": "docs",
+      "purpose": "Resolution approval policy",
+      "disposition": "keep",
+      "bytes": 3076
+    },
+    {
+      "file": "SECURITY.md",
+      "category": "docs",
+      "purpose": "Security policy and disclosure process",
+      "disposition": "keep",
+      "bytes": 1456
+    },
+    {
+      "file": "Snippets_Importing_libraries.ipynb",
+      "category": "python-tools",
+      "purpose": "Python utility or notebook",
+      "disposition": "keep",
+      "bytes": 27919
+    },
+    {
+      "file": "_prebuild.yml",
+      "category": "automation",
+      "purpose": "Workflow / automation definition",
+      "disposition": "keep",
+      "bytes": 647
+    },
+    {
+      "file": "addProjectV2ItemById.yaml",
+      "category": "automation",
+      "purpose": "Workflow / automation definition",
+      "disposition": "keep",
+      "bytes": 1437
+    },
+    {
+      "file": "approval-service-server.js",
+      "category": "app-code",
+      "purpose": "Human-gated approval service API",
+      "disposition": "keep",
+      "bytes": 11424
+    },
+    {
+      "file": "approval-service.html",
+      "category": "dashboard-surface",
+      "purpose": "Human-gated approval service front-end",
+      "disposition": "keep",
+      "bytes": 23394
+    },
+    {
+      "file": "automation.yaml",
+      "category": "automation",
+      "purpose": "Workflow / automation definition",
+      "disposition": "keep",
+      "bytes": 149
+    },
+    {
+      "file": "builder-fund.html",
+      "category": "dashboard-surface",
+      "purpose": "Builder fund front-end",
+      "disposition": "keep",
+      "bytes": 49279
+    },
+    {
+      "file": "chimera.html",
+      "category": "dashboard-surface",
+      "purpose": "Web3 directory — protocol ecosystem browser",
+      "disposition": "keep",
+      "bytes": 16631
+    },
+    {
+      "file": "crypto-expert-guide.html",
+      "category": "dashboard-surface",
+      "purpose": "Crypto expert guide (HTML)",
+      "disposition": "keep",
+      "bytes": 36730
+    },
+    {
+      "file": "dao-data-source-manifest.json",
+      "category": "config-data",
+      "purpose": "DAO source-of-truth manifest — accounts for every data source and loose file",
+      "disposition": "keep",
+      "bytes": 2392
+    },
+    {
+      "file": "dap",
+      "category": "root-file",
+      "purpose": "Loose root file — see accounting report",
+      "disposition": "keep",
+      "bytes": 5012
+    },
+    {
+      "file": "dashboard.html",
+      "category": "dashboard-surface",
+      "purpose": "Primary owner dashboard (Overview / Portfolio / Governance / Treasury / Properties / Signals / Config / Agents)",
+      "disposition": "keep",
+      "bytes": 52302
+    },
+    {
+      "file": "dashwall.py",
+      "category": "python-tools",
+      "purpose": "Python dashboard wall utility",
+      "disposition": "keep",
+      "bytes": 47364
+    },
+    {
+      "file": "dependabot.yml",
+      "category": "automation",
+      "purpose": "Workflow / automation definition",
+      "disposition": "keep",
+      "bytes": 493
+    },
+    {
+      "file": "docker-compose.yml",
+      "category": "automation",
+      "purpose": "Local orchestration",
+      "disposition": "keep",
+      "bytes": 1683
+    },
+    {
+      "file": "dura.json",
+      "category": "config-data",
+      "purpose": "Configuration or data file",
+      "disposition": "keep",
+      "bytes": 2166
+    },
+    {
+      "file": "ecosystem.config.js",
+      "category": "app-code",
+      "purpose": "PM2 process config",
+      "disposition": "keep",
+      "bytes": 1648
+    },
+    {
+      "file": "expert-registry-server.js",
+      "category": "app-code",
+      "purpose": "Expert registry API",
+      "disposition": "keep",
+      "bytes": 26762
+    },
+    {
+      "file": "expert-registry.html",
+      "category": "dashboard-surface",
+      "purpose": "Expert registry front-end",
+      "disposition": "keep",
+      "bytes": 36383
+    },
+    {
+      "file": "financial-ops-dashboard.html",
+      "category": "dashboard-surface",
+      "purpose": "Financial operations dashboard",
+      "disposition": "keep",
+      "bytes": 23925
+    },
+    {
+      "file": "financial-ops-rest-server.js",
+      "category": "app-code",
+      "purpose": "Financial ops REST API",
+      "disposition": "keep",
+      "bytes": 40799
+    },
+    {
+      "file": "games.html",
+      "category": "dashboard-surface",
+      "purpose": "Games arcade front-end",
+      "disposition": "keep",
+      "bytes": 23975
+    },
+    {
+      "file": "games.js",
+      "category": "app-code",
+      "purpose": "Games arcade logic",
+      "disposition": "keep",
+      "bytes": 23506
+    },
+    {
+      "file": "githubprice.gh",
+      "category": "root-file",
+      "purpose": "Loose root file — see accounting report",
+      "disposition": "keep",
+      "bytes": 3261
+    },
+    {
+      "file": "governance.html",
+      "category": "dashboard-surface",
+      "purpose": "Governance surface — proposals and voting",
+      "disposition": "keep",
+      "bytes": 44972
+    },
+    {
+      "file": "index.html",
+      "category": "dashboard-surface",
+      "purpose": "Public landing page",
+      "disposition": "keep",
+      "bytes": 40909
+    },
+    {
+      "file": "live-map.html",
+      "category": "dashboard-surface",
+      "purpose": "Live network map visualization",
+      "disposition": "keep",
+      "bytes": 36864
+    },
+    {
+      "file": "logical.js",
+      "category": "app-code",
+      "purpose": "Logic/rules engine used by dashboards",
+      "disposition": "keep",
+      "bytes": 38561
+    },
+    {
+      "file": "logical_demo.js",
+      "category": "app-code",
+      "purpose": "Demo harness for logical.js",
+      "disposition": "keep",
+      "bytes": 4553
+    },
+    {
+      "file": "marketing.html",
+      "category": "dashboard-surface",
+      "purpose": "NGTT digital campaign landing page",
+      "disposition": "keep",
+      "bytes": 69346
+    },
+    {
+      "file": "mcp-fin-011.sol",
+      "category": "contracts",
+      "purpose": "On-chain bot governance guard (mcp-fin-011)",
+      "disposition": "keep",
+      "bytes": 39949
+    },
+    {
+      "file": "mcp-gateway-orchestrator.yaml",
+      "category": "automation",
+      "purpose": "Workflow / automation definition",
+      "disposition": "keep",
+      "bytes": 306
+    },
+    {
+      "file": "money-flow.js",
+      "category": "app-code",
+      "purpose": "Money-flow analytics engine",
+      "disposition": "keep",
+      "bytes": 25251
+    },
+    {
+      "file": "network-registry.json",
+      "category": "config-data",
+      "purpose": "Chain/network registry",
+      "disposition": "keep",
+      "bytes": 4171
+    },
+    {
+      "file": "nexus-config.js",
+      "category": "app-code",
+      "purpose": "Runtime configuration — ports, RPC, contracts, hosting",
+      "disposition": "keep",
+      "bytes": 2849
+    },
+    {
+      "file": "nexus-signal-bus.js",
+      "category": "app-code",
+      "purpose": "Live signal bus (WebSocket fan-out)",
+      "disposition": "keep",
+      "bytes": 16092
+    },
+    {
+      "file": "package-lock.json",
+      "category": "config-data",
+      "purpose": "Dependency lockfile",
+      "disposition": "keep",
+      "bytes": 79873
+    },
+    {
+      "file": "package.json",
+      "category": "config-data",
+      "purpose": "Node package manifest + bot runner scripts",
+      "disposition": "keep",
+      "bytes": 1599
+    },
+    {
+      "file": "remix.config.json",
+      "category": "config-data",
+      "purpose": "Remix IDE config",
+      "disposition": "keep",
+      "bytes": 2563
+    },
+    {
+      "file": "requirements-dev.txt",
+      "category": "root-file",
+      "purpose": "Python dev dependencies",
+      "disposition": "keep",
+      "bytes": 44
+    },
+    {
+      "file": "requirements.txt",
+      "category": "root-file",
+      "purpose": "Python runtime dependencies",
+      "disposition": "keep",
+      "bytes": 69
+    },
+    {
+      "file": "server.js",
+      "category": "app-code",
+      "purpose": "Main dashboard server (express)",
+      "disposition": "keep",
+      "bytes": 4774
+    },
+    {
+      "file": "string.yaml",
+      "category": "automation",
+      "purpose": "Workflow / automation definition",
+      "disposition": "keep",
+      "bytes": 1604
+    },
+    {
+      "file": "test_web3_dashboard.py",
+      "category": "python-tools",
+      "purpose": "Web3 dashboard integration tests (Python)",
+      "disposition": "keep",
+      "bytes": 2949
+    },
+    {
+      "file": "universal_quantum_law.ipynb",
+      "category": "python-tools",
+      "purpose": "Python utility or notebook",
+      "disposition": "keep",
+      "bytes": 4456850
+    },
+    {
+      "file": "unstoppable-dashboard.html",
+      "category": "dashboard-surface",
+      "purpose": "Static dashboard surface served from repo root",
+      "disposition": "keep",
+      "bytes": 109099
+    },
+    {
+      "file": "user-guide.html",
+      "category": "dashboard-surface",
+      "purpose": "Beginner-friendly walkthrough of the ecosystem",
+      "disposition": "keep",
+      "bytes": 38194
+    },
+    {
+      "file": "vercel.json",
+      "category": "config-data",
+      "purpose": "Vercel deployment config",
+      "disposition": "keep",
+      "bytes": 984
+    },
+    {
+      "file": "web3-interface.html",
+      "category": "dashboard-surface",
+      "purpose": "Web3 interface surface",
+      "disposition": "keep",
+      "bytes": 131367
+    },
+    {
+      "file": "withdraw.html",
+      "category": "dashboard-surface",
+      "purpose": "Withdrawal Manager — wallet-based ETH withdrawal UI",
+      "disposition": "keep",
+      "bytes": 39543
+    },
+    {
+      "file": "withdraw.js",
+      "category": "app-code",
+      "purpose": "Withdrawal Manager logic",
+      "disposition": "keep",
+      "bytes": 75198
+    }
+  ],
+  "errors": []
+}

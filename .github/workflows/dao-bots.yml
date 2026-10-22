@@ -1,0 +1,48 @@
+name: DAO Bots — deterministic upkeep (zero AI credits)
+
+# Todd's personal DAO bots run here automatically. No paid models are used:
+# every bot is plain Node.js, so routine repo upkeep costs $0 in AI credits.
+# Commits are authored with Todd's pre-configured identity — nothing to enter.
+
+on:
+  push:
+    branches: [MASTER, master, main]
+  schedule:
+    - cron: "0 6 * * *"   # daily at 06:00 UTC
+  workflow_dispatch:      # manual run button in the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  run-dao-bots:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Health Bot — validate configs, scripts, junk, git identity
+        run: node bots/health-bot.js
+
+      - name: Accounting Bot — account for every loose file
+        run: node bots/dao-accounting-bot.js
+
+      - name: Registry Sync Bot — feed the dashboard agent data
+        run: node bots/registry-sync-bot.js
+
+      - name: Commit reports as Todd (identity pre-configured, no prompts)
+        run: |
+          git config user.name  "Todd Stephens"
+          git config user.email "157565446+FuzzysTodd@users.noreply.github.com"
+          git add reports/ || true
+          if git diff --cached --quiet; then
+            echo "No report changes — bots already up to date."
+          else
+            git commit -m "🤖 DAO bots: deterministic upkeep report (zero AI credits)"
+            git push
+          fi

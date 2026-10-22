@@ -1,8 +1,19 @@
 {
   "name": "the-nexus-protocol-token-dao",
-  "version": "1.0.0",
-  "description": "Nexus Protocol Token DAO — Dashboard & Governance Server",
+  "version": "2.0.0",
+  "description": "Nexus Protocol Token DAO — Dashboard, Governance & Personal DAO Bots (deterministic, zero-AI-credit operations)",
   "main": "server.js",
+  "author": {
+    "name": "Todd Stephens",
+    "login": "FuzzysTodd",
+    "email": "157565446+FuzzysTodd@users.noreply.github.com",
+    "url": "https://github.com/FuzzysTodd"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FuzzysTodd/The-Nexus-Protocol-Token-DAO.git"
+  },
+  "homepage": "https://fuzzystodd.github.io/The-Nexus-Protocol-Token-DAO",
   "scripts": {
     "start": "node server.js",
     "start:local": "bash scripts/start-local.sh",
@@ -13,28 +24,23 @@
     "logs:pm2": "pm2 logs",
     "deploy:vercel": "vercel --prod",
     "dev": "NEXUS_ENV=local node server.js",
-    "test": "echo \"No automated tests configured\" && exit 0"
+    "test": "node bots/health-bot.js --ci",
+    "identity": "bash scripts/setup-identity.sh",
+    "bots:health": "node bots/health-bot.js",
+    "bots:accounting": "node bots/dao-accounting-bot.js",
+    "bots:sync": "node bots/registry-sync-bot.js",
+    "bots:all": "node bots/health-bot.js && node bots/dao-accounting-bot.js && node bots/registry-sync-bot.js"
   },
   "engines": {
     "node": ">=18.0.0"
   },
   "dependencies": {
-    "ethers": "^5.7.2",
-    "express": "^4.18.2",
-    "ws": "^8.16.0"
-    "express": "^5.2.1",
-    "ws": "^8.16.0"
     "ethers": "^6.17.0",
-    "express": "^4.18.2",
+    "express": "^5.2.1",
     "ws": "^8.22.0"
   },
   "keywords": [
-    "dao",
-    "ethereum",
-    "web3",
-    "nexus",
-    "defi"
+    "dao", "ethereum", "web3", "nexus", "defi", "mcp-agents", "dao-bots"
   ],
-  "author": "FuzzysTodd",
   "license": "MIT"
 }
