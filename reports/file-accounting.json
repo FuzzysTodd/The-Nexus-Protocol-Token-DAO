@@ -1,22 +1,15 @@
 {
   "generatedBy": "dao-accounting-bot",
-  "generatedAt": "2026-10-22T22:02:34.823Z",
+  "generatedAt": "2026-10-22T22:05:56.647Z",
   "owner": "@FuzzysTodd",
   "totals": {
-    "trackedFiles": 4069,
-    "looseRootFiles": 86,
-    "accountedFor": 86
+    "trackedFiles": 4072,
+    "looseRootFiles": 85,
+    "accountedFor": 85
   },
   "files": [
     {
       "file": "\"01_prebuild.yml\\342\\200\\224PrebuildStabilizationWorkflow.yaml\"",
-      "category": "root-file",
-      "purpose": "Loose root file — see accounting report",
-      "disposition": "keep",
-      "bytes": 0
-    },
-    {
-      "file": "\"NexusProtocolDAO\\342\\200\\224GovernanceChangelogSchemae.json\"",
       "category": "root-file",
       "purpose": "Loose root file — see accounting report",
       "disposition": "keep",
