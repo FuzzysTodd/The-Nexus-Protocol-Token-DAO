@@ -184,6 +184,45 @@ fleet plus one optional reasoning step — the 11 MCP registry agents remain
 definitions, and this is not yet an MCP-connected persistent reasoning
 service.
 
+### Fedora 44 quickstart — GPU machine (2× RTX 5060 Ti 16GB)
+
+```bash
+# 1. NVIDIA driver (RPM Fusion). RTX 50-series needs the open kernel module —
+#    the current akmod-nvidia branch builds it automatically for Blackwell.
+sudo dnf install \
+  https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
+  https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
+sudo dnf install akmod-nvidia xorg-x11-drv-nvidia-cuda
+# Wait for the module build to finish (a few minutes), then verify, then reboot:
+modinfo -F version nvidia
+sudo reboot
+
+# 2. Ollama — official installer writes a systemd service on 127.0.0.1:11434
+curl -fsSL https://ollama.com/install.sh | sh
+# (Fedora dnf5 workaround if that errors on the repo step: 
+#  curl -fsSL https://ollama.com/install.sh | sed s/--add-repo/addrepo/ | sh )
+sudo systemctl enable --now ollama
+
+# 3. Pull the sweet-spot model for 16GB cards
+ollama pull qwen3:14b
+
+# 4. In your repo checkout's .env (copy from .env.example):
+#    NEXUS_THINK=local
+#    NEXUS_MODEL_NAME=qwen3:14b
+
+# 5. Verify: nvidia-smi shows both cards, then
+npm run agents:run   # status line should say: thinking: local-gpu
+
+# 6. Daily run — cron (systemd timer works too):
+crontab -e
+# add:  30 6 * * * cd /path/to/The-Nexus-Protocol-Token-DAO && ./scripts/bots-daily.sh
+```
+
+Notes: with Secure Boot enabled, the rebuilt NVIDIA module needs MOK
+enrollment/signing — if `nvidia-smi` fails after a kernel update, check
+`sudo akmods` output. Keep Ollama on loopback (default) unless other fleet
+machines need it — then bind to the LAN behind a firewall, never the internet.
+
 The full classification lives in `reports/fleet-manifest.json`:
 
 - **Run locally by the fleet runner:** the 8 tools above — deterministic code
