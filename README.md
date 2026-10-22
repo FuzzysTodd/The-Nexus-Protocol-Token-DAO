@@ -146,11 +146,23 @@ automatically:
    [Ollama](https://ollama.com) on the GPU machine. The bot auto-detects it
    at `http://localhost:11434` and reasons on your own hardware — you pay only
    electricity. Set `NEXUS_THINK=local` explicitly; if the server is down it
-   reports UNAVAILABLE and never falls back to a paid provider. Which models
-   fit depends on your cards' VRAM (the RTX 5060 Ti comes in 8GB and 16GB
-   variants) — pick from Ollama's model library accordingly, and note that a
-   GPU accelerates model inference speed; it does not automatically make
-   every bot smarter or speed up arbitrary Python/Node/git work. "Always
+   reports UNAVAILABLE and never falls back to a paid provider. The
+   16GB RTX 5060 Ti (device ID 0x2d05) handles the 14B-class models — the
+   sweet spot for this card. Verified picks (October 2026), all one `ollama
+   pull` away:
+
+   | Ollama pull | VRAM | Best for |
+   |---|---|---|
+   | `qwen3:14b` (Q4_K_M) | ~9 GB | all-round reasoning — the sweet spot |
+   | `gpt-oss:20b` | ~12 GB | agent work, long context, fast |
+   | `gemma3:12b` or newer Gemma | ~8 GB | quality writing, multilingual |
+   | `deepseek-r1:14b` | ~9 GB | visible chain-of-thought reasoning |
+   | `llama3.1:8b` | ~5 GB | fastest, latency-light analysis |
+
+   With your TWO cards, Ollama can either split one model's layers across
+   both GPUs or serve two models in parallel — plenty for the fleet. A GPU
+   accelerates model inference speed; it does not automatically make every
+   bot smarter or speed up arbitrary Python/Node/git work. "Always
    available" means the server waits and reasons when triggered — it does not
    burn GPU cycles continuously.
 
