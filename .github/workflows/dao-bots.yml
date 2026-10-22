@@ -7,8 +7,6 @@ name: DAO Bots — deterministic upkeep (zero AI credits)
 on:
   push:
     branches: [MASTER, master, main]
-  schedule:
-    - cron: "0 6 * * *"   # daily at 06:00 UTC
   workflow_dispatch:      # manual run button in the Actions tab
 
 permissions:
@@ -21,6 +19,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Configure identity BEFORE the health bot runs — it verifies identity.
+      - name: Configure Todd's git identity (prevents commit prompts)
+        run: |
+          git config user.name  "Todd Stephens"
+          git config user.email "157565446+FuzzysTodd@users.noreply.github.com"
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -29,16 +33,16 @@ jobs:
       - name: Health Bot — validate configs, scripts, junk, git identity
         run: node bots/health-bot.js
 
-      - name: Accounting Bot — account for every loose file
+      - name: Accounting Bot — account for every tracked file
         run: node bots/dao-accounting-bot.js
 
       - name: Registry Sync Bot — feed the dashboard agent data
         run: node bots/registry-sync-bot.js
 
-      - name: Commit reports as Todd (identity pre-configured, no prompts)
+      # Reports are written change-aware: unchanged content (ignoring the
+      # generatedAt timestamp) does not produce a commit.
+      - name: Commit reports only if content changed
         run: |
-          git config user.name  "Todd Stephens"
-          git config user.email "157565446+FuzzysTodd@users.noreply.github.com"
           git add reports/ || true
           if git diff --cached --quiet; then
             echo "No report changes — bots already up to date."

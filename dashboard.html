@@ -611,7 +611,7 @@
     <div class="tab-panel" id="tab-agents">
         <section class="panel">
             <h2>🤖 MCP Agents & Their Duties</h2>
-            <p style="color:var(--muted);font-size:0.88rem;">Live from <code>mcp/nexus-agent-registry.json</code> via the registry-sync bot. Every agent's domain, tools, and authority level.</p>
+            <p style="color:var(--muted);font-size:0.88rem;">Generated snapshot from <code>mcp/nexus-agent-registry.json</code> via the registry-sync bot — each agent's domain, duties, tools, and authority level. <em>Defined specialists: their registry entry describes duties and scope; implementation is separate.</em></p>
             <div id="agent-cards" class="agent-grid"><p style="color:var(--muted);">Loading agents…</p></div>
         </section>
         <section class="panel">
@@ -695,9 +695,10 @@
         var box = document.getElementById("agent-cards");
         box.innerHTML = agents.map(function (a) {
             var duties = (a.duties || []).map(function (d) { return "<li>" + escapeHtml(d) + "</li>"; }).join("");
+            var notes = a.notes ? "<p style='font-size:0.8rem;margin:0 0 8px;color:var(--text);'>" + escapeHtml(a.notes) + "</p>" : "";
             return "<div class='agent-card'><h3>" + escapeHtml(a.id) + "</h3>" +
-                "<p class='agent-domain'>" + escapeHtml(a.domain || "") + "</p>" +
-                "<ul>" + duties + "</ul>" +
+                "<p class='agent-domain'>" + escapeHtml(a.domain || "") + " · " + escapeHtml(a.status || "defined") + "</p>" +
+                "<ul>" + duties + "</ul>" + notes +
                 "<p class='agent-meta'><span class='authority'>Authority: " + escapeHtml(a.authority || "") + "</span>" +
                 "<span>Tools: " + escapeHtml((a.tools || []).join(", ")) + "</span></p></div>";
         }).join("");
@@ -708,11 +709,11 @@
         box.innerHTML = bots.map(function (b) {
             var outs = (b.outputs || []).map(function (o) { return "<li>" + escapeHtml(o) + "</li>"; }).join("");
             return "<div class='agent-card'><h3>" + escapeHtml(b.name || b.id) + "</h3>" +
-                "<p class='agent-domain'>" + escapeHtml(b.id) + "</p>" +
+                "<p class='agent-domain'>" + escapeHtml(b.id) + " · " + escapeHtml(b.status || "") + "</p>" +
                 "<p style='font-size:0.85rem;margin:0 0 8px;'>" + escapeHtml(b.role || "") + "</p>" +
                 (outs ? "<ul>" + outs + "</ul>" : "") +
-                "<p class='agent-meta'><span>Runs: " + escapeHtml(b.runs || "CI") + "</span>" +
-                "<span class='credits'>Credits: " + escapeHtml(b.creditsUsed || "0") + "</span></p></div>";
+                "<p class='agent-meta'><span>Runs: " + escapeHtml(b.runs || "—") + "</span>" +
+                "<span class='credits'>Model API calls: " + escapeHtml(b.creditsUsed || "0") + "</span></p></div>";
         }).join("");
     }
     loadAgentsAndBots();

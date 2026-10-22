@@ -102,7 +102,7 @@ pytest -q
 The DAO now runs its own deterministic bots that handle routine repo upkeep
 with **plain Node.js — no paid models, no AI credits**. They run locally
 (`npm run bots:all`) and automatically in CI (`.github/workflows/dao-bots.yml`)
-on every push and daily at 06:00 UTC:
+on every push (plus a manual run button in the Actions tab):
 
 | Bot | Duty | Command |
 |---|---|---|
@@ -115,15 +115,17 @@ model — no bot can move treasury funds or sign anything on its own.
 
 ## 🧾 One-Time Identity Setup (never re-enter your info)
 
-Run once per machine/clone — after that every commit, pull, and push in this
-repo carries your identity automatically:
+Run once per machine/clone — after that every commit and pull in this repo
+carries your identity automatically (for prompt-free pushes, log in once with
+`gh auth login`):
 
 ```bash
 npm run identity        # runs scripts/setup-identity.sh
 ```
 
-This sets your git name/email (repo-local only), frictionless pull/rebase
-behavior, and credential caching. It's idempotent — safe to re-run anytime.
+This sets your git name/email (repo-local only, and it never overwrites an
+identity you already configured) and frictionless pull/rebase behavior.
+It's idempotent — safe to re-run anytime.
 
 ## 📁 DAO File Accounting
 

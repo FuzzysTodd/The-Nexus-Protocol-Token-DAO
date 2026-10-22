@@ -1,13 +1,15 @@
 {
   "generatedBy": "registry-sync-bot",
-  "generatedAt": "2026-10-22T22:05:56.712Z",
+  "generatedAt": "2026-10-22T22:09:34.249Z",
   "owner": "@FuzzysTodd",
+  "note": "Generated snapshot of registry definitions and duties — not live execution telemetry.",
   "agentCount": 11,
   "botCount": 6,
   "agents": [
     {
       "id": "nexus-crypto-core",
       "domain": "EVM Cryptography",
+      "status": "defined",
       "duties": [
         "ECDSA",
         "EIP-712 typed signatures",
@@ -31,6 +33,7 @@
     {
       "id": "nexus-defi-architect",
       "domain": "DeFi Protocol Design",
+      "status": "defined",
       "duties": [
         "AMM constant-product formula (x·y=k)",
         "ERC-4626 vaults",
@@ -61,6 +64,7 @@
     {
       "id": "nexus-dao-counsel",
       "domain": "DAO Governance",
+      "status": "defined",
       "duties": [
         "OpenZeppelin Governor patterns",
         "quorum mathematics",
@@ -86,6 +90,7 @@
     {
       "id": "nexus-nft-studio",
       "domain": "NFT & Real-World Asset Tokenization",
+      "status": "defined",
       "duties": [
         "ERC-721A",
         "ERC-1155",
@@ -114,6 +119,7 @@
     {
       "id": "nexus-oracle-feed",
       "domain": "Price Oracles & Data Feeds",
+      "status": "defined",
       "duties": [
         "Chainlink Data Feeds",
         "TWAP (time-weighted average price)",
@@ -138,6 +144,7 @@
     {
       "id": "nexus-treasury-ops",
       "domain": "Treasury Management",
+      "status": "defined",
       "duties": [
         "ERC-4626 vaults",
         "multi-sig protocols",
@@ -164,6 +171,7 @@
     {
       "id": "nexus-security-audit",
       "domain": "Smart Contract Security",
+      "status": "defined",
       "duties": [
         "reentrancy guards",
         "integer overflow/underflow",
@@ -187,6 +195,7 @@
     {
       "id": "nexus-frontend-ux",
       "domain": "Web3 User Interface",
+      "status": "defined",
       "duties": [
         "ethers.js v5",
         "MetaMask integration",
@@ -212,6 +221,7 @@
     {
       "id": "nexus-signal-engine",
       "domain": "Transaction Signaling & Event Bus",
+      "status": "defined",
       "duties": [
         "ethers.js event listeners",
         "WebSocket server",
@@ -236,6 +246,7 @@
     {
       "id": "nexus-forex-quant",
       "domain": "Forex & Quantitative Finance",
+      "status": "defined",
       "duties": [
         "MQL5 algorithmic trading",
         "Black-Scholes options pricing",
@@ -261,6 +272,7 @@
     {
       "id": "nexus-builder-fund",
       "domain": "Developer Micropayment & Builder Compensation",
+      "status": "defined",
       "duties": [
         "Protocol Guild share-weight pool pattern",
         "Chainlink AggregatorV3 ETH/USD and BTC/USD price feeds",
@@ -288,59 +300,65 @@
     {
       "id": "dao-health-bot",
       "name": "Health Bot",
-      "role": "Pre-flight the repository: validate configs, verify script targets, detect junk files, confirm git identity so commits never prompt. Replaces routine AI review.",
-      "runs": "npm run bots:health — also runs in CI on every push",
-      "creditsUsed": "0 (deterministic Node.js)"
+      "status": "implemented",
+      "role": "Pre-flight the repository: validate configs, verify script targets, detect junk files, confirm git identity is set so commits never prompt.",
+      "runs": "npm run bots:health — also wired into .github/workflows/dao-bots.yml on push",
+      "creditsUsed": "0 (deterministic Node.js — makes no model API calls)"
     },
     {
       "id": "dao-accounting-bot",
       "name": "File-Accounting Bot",
-      "role": "Account for every tracked file — especially loose root files — in reports/file-accounting.json/.md. The DAO file set stays complete without any AI audit.",
-      "runs": "npm run bots:accounting — also runs in CI on every push",
-      "creditsUsed": "0 (deterministic Node.js)"
+      "status": "implemented",
+      "role": "Account for every tracked file in the repository (full tree, not just root) with category, purpose, and disposition. Unrecognized files are flagged for review, never silently approved.",
+      "runs": "npm run bots:accounting — also wired into .github/workflows/dao-bots.yml on push",
+      "creditsUsed": "0 (deterministic Node.js — makes no model API calls)"
     },
     {
       "id": "dao-registry-sync-bot",
       "name": "Registry Sync Bot",
+      "status": "implemented",
       "role": "Feed the dashboard Agents & Bots panel from the MCP registries. Updates flow to the UI with zero manual editing.",
-      "runs": "npm run bots:sync — also runs in CI on every push",
-      "creditsUsed": "0 (deterministic Node.js)"
+      "runs": "npm run bots:sync — also wired into .github/workflows/dao-bots.yml on push",
+      "creditsUsed": "0 (deterministic Node.js — makes no model API calls)"
     },
     {
       "id": "mcp-fin-011",
       "name": "Pre-Error Remediation Bot",
+      "status": "defined",
       "role": "Detect early failures, malformed configs, syntax drift, and low-risk workflow regressions before they become blocking incidents.",
       "outputs": [
         "pre-error queue",
         "low-risk autofix candidates",
         "validation results"
       ],
-      "runs": "GitHub Actions — financial-ops-automation workflow (human-gated)",
-      "creditsUsed": "0 (scripted checks; approvals stay human-gated)"
+      "runs": "Duty defined in mcp/agents/financial-ops-bots.json — human-gated approval model; no autonomous execution",
+      "creditsUsed": "0 when run as scripted checks (approvals stay human-gated)"
     },
     {
       "id": "mcp-fin-012",
       "name": "Withdrawal Placement Scanner",
+      "status": "defined",
       "role": "Track withdrawal paths, payout logic, capital-allocation opportunities, and financial automation gaps across the repository.",
       "outputs": [
         "withdrawal inventory",
         "placement opportunity log",
         "approval-gated recommendations"
       ],
-      "runs": "GitHub Actions — financial-ops-automation workflow (human-gated)",
-      "creditsUsed": "0 (scripted checks; approvals stay human-gated)"
+      "runs": "Duty defined in mcp/agents/financial-ops-bots.json — human-gated approval model; no autonomous execution",
+      "creditsUsed": "0 when run as scripted checks (approvals stay human-gated)"
     },
     {
       "id": "mcp-fin-013",
       "name": "Success Documentation Reporter",
+      "status": "defined",
       "role": "Convert successful scans and fixes into markdown reports, dashboard payloads, and operator-ready documentation.",
       "outputs": [
         "markdown summary",
         "dashboard JSON",
         "success journal"
       ],
-      "runs": "GitHub Actions — financial-ops-automation workflow (human-gated)",
-      "creditsUsed": "0 (scripted checks; approvals stay human-gated)"
+      "runs": "Duty defined in mcp/agents/financial-ops-bots.json — human-gated approval model; no autonomous execution",
+      "creditsUsed": "0 when run as scripted checks (approvals stay human-gated)"
     }
   ]
 }

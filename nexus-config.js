@@ -38,6 +38,7 @@ module.exports = {
   // ── Azure / remote ────────────────────────────────────────────────────────
   azure: {
     appServiceUrl: "https://the-nexus-protocol-token-doa.azurewebsites.net",
+  },
   // ── Hosting ────────────────────────────────────────────────────────────────
   // Self-hosted: set NEXUS_HOST_URL to your domain / IP
   // GitHub Pages (free static):  https://fuzzystodd.github.io/The-Nexus-Protocol-Token-DAO

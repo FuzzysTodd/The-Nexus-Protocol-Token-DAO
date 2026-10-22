@@ -4,12 +4,17 @@
  * ------------------------------------------------------------
  * One of Todd's personal DAO bots. Deterministic, zero AI credits.
  *
- * Duty: Keep the dashboard's Agents & Bots panel fed with live data.
- * Reads the MCP agent registry and bot duty definitions, then writes a
- * single unified payload the dashboard fetches. No AI, no manual edits.
+ * Duty: Feed the dashboard's Agents & Bots panel from the MCP registries.
+ * Reads the agent registry and bot duty definitions, then writes a single
+ * payload the dashboard fetches. No AI, no manual edits.
+ *
+ * IMPORTANT: this payload is a *generated snapshot* of registry definitions
+ * and duty descriptions — it is not live execution telemetry. The registry
+ * agents are defined specialists; the three maintenance bots in this repo
+ * are implemented and run deterministically.
  *
  * Usage:  node bots/registry-sync-bot.js
- * Output: reports/agents.json
+ * Output: reports/agents.json (written only when content changes)
  */
 
 "use strict";
@@ -24,14 +29,25 @@ function readJson(p) {
   return JSON.parse(fs.readFileSync(path.join(ROOT, p), "utf8"));
 }
 
+// Change-aware write: skip the file when only the timestamp would differ.
+function writeIfChanged(filePath, content) {
+  let existing = null;
+  try { existing = fs.readFileSync(filePath, "utf8"); } catch { /* absent */ }
+  const strip = (s) => s.replace(/"generatedAt": "[^"]+"/, '"generatedAt": "<ts>"');
+  if (existing !== null && strip(existing) === strip(content)) return false;
+  fs.writeFileSync(filePath, content);
+  return true;
+}
+
 function main() {
   const registry = readJson("mcp/nexus-agent-registry.json");
   const botsDef = readJson("mcp/agents/financial-ops-bots.json");
 
-  // MCP agents — flatten duties for the dashboard
+  // MCP agents — registry definitions (not implementations)
   const agents = (registry.agents || []).map((a) => ({
     id: a.id,
     domain: a.domain,
+    status: "defined",   // defined in the registry; implementation is separate
     duties: a.primaryExpertise || [],
     scope: a.scope || [],
     authority: a.authorityLevel,
@@ -39,37 +55,41 @@ function main() {
     notes: a.notes || "",
   }));
 
-  // Personal DAO bots — financial ops bots + this repo's deterministic bots
+  // Personal DAO bots — implemented & exercised in this repo
   const finBots = (botsDef.financialOpsBots && botsDef.financialOpsBots.bots) || [];
   const localBots = [
     {
       id: "dao-health-bot",
       name: "Health Bot",
-      role: "Pre-flight the repository: validate configs, verify script targets, detect junk files, confirm git identity so commits never prompt. Replaces routine AI review.",
-      runs: "npm run bots:health — also runs in CI on every push",
-      creditsUsed: "0 (deterministic Node.js)",
+      status: "implemented",
+      role: "Pre-flight the repository: validate configs, verify script targets, detect junk files, confirm git identity is set so commits never prompt.",
+      runs: "npm run bots:health — also wired into .github/workflows/dao-bots.yml on push",
+      creditsUsed: "0 (deterministic Node.js — makes no model API calls)",
     },
     {
       id: "dao-accounting-bot",
       name: "File-Accounting Bot",
-      role: "Account for every tracked file — especially loose root files — in reports/file-accounting.json/.md. The DAO file set stays complete without any AI audit.",
-      runs: "npm run bots:accounting — also runs in CI on every push",
-      creditsUsed: "0 (deterministic Node.js)",
+      status: "implemented",
+      role: "Account for every tracked file in the repository (full tree, not just root) with category, purpose, and disposition. Unrecognized files are flagged for review, never silently approved.",
+      runs: "npm run bots:accounting — also wired into .github/workflows/dao-bots.yml on push",
+      creditsUsed: "0 (deterministic Node.js — makes no model API calls)",
     },
     {
       id: "dao-registry-sync-bot",
       name: "Registry Sync Bot",
+      status: "implemented",
       role: "Feed the dashboard Agents & Bots panel from the MCP registries. Updates flow to the UI with zero manual editing.",
-      runs: "npm run bots:sync — also runs in CI on every push",
-      creditsUsed: "0 (deterministic Node.js)",
+      runs: "npm run bots:sync — also wired into .github/workflows/dao-bots.yml on push",
+      creditsUsed: "0 (deterministic Node.js — makes no model API calls)",
     },
     ...finBots.map((b) => ({
       id: b.id,
       name: b.name,
+      status: "defined",  // duty definitions; execution stays human-gated
       role: b.role,
       outputs: b.outputs || [],
-      runs: "GitHub Actions — financial-ops-automation workflow (human-gated)",
-      creditsUsed: "0 (scripted checks; approvals stay human-gated)",
+      runs: "Duty defined in mcp/agents/financial-ops-bots.json — human-gated approval model; no autonomous execution",
+      creditsUsed: "0 when run as scripted checks (approvals stay human-gated)",
     })),
   ];
 
@@ -77,6 +97,7 @@ function main() {
     generatedBy: "registry-sync-bot",
     generatedAt: new Date().toISOString(),
     owner: "@FuzzysTodd",
+    note: "Generated snapshot of registry definitions and duties — not live execution telemetry.",
     agentCount: agents.length,
     botCount: localBots.length,
     agents,
@@ -84,10 +105,12 @@ function main() {
   };
 
   fs.mkdirSync(REPORTS_DIR, { recursive: true });
-  fs.writeFileSync(path.join(REPORTS_DIR, "agents.json"),
-    JSON.stringify(payload, null, 2) + "\n");
+  const changed = writeIfChanged(
+    path.join(REPORTS_DIR, "agents.json"),
+    JSON.stringify(payload, null, 2) + "\n"
+  );
 
-  console.log(`✓ agents.json written: ${agents.length} MCP agents, ${localBots.length} DAO bots`);
+  console.log(`✓ agents.json ${changed ? "updated" : "unchanged"}: ${agents.length} MCP agents (defined), ${localBots.length} DAO bots`);
   console.log("  reports/agents.json — dashboard fetches this for the Agents & Bots tab");
 }
 

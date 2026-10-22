@@ -106,6 +106,20 @@ PUBLIC_HTML.forEach((file) => {
   }
 });
 
+// ── Bot-generated reports (public JSON payloads — no secrets) ────────────────
+const PUBLIC_REPORTS = [
+  "reports/agents.json",
+  "reports/file-accounting.json",
+  "reports/health-report.json",
+];
+
+PUBLIC_REPORTS.forEach((rel) => {
+  const filePath = path.join(ROOT, rel);
+  if (fs.existsSync(filePath)) {
+    app.get(`/${rel}`, (_req, res) => res.sendFile(filePath));
+  }
+});
+
 // ── Root → dashboard ─────────────────────────────────────────────────────────
 app.get("/", (_req, res) => {
   const dashPath = path.join(ROOT, "dashboard.html");
