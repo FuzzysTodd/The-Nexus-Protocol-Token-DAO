@@ -137,15 +137,31 @@ The Intel Bot gives the fleet real internet access at no cost: it fetches
 public, no-key APIs (Coinbase spot prices, GitHub repo stats). It records
 failures gracefully — a daily run never dies because the internet was down.
 
-### Thinking models — opt-in, and never free
+### Thinking models — local GPUs (free of API credits) vs paid APIs
 
-The Intel Bot has an OPTIONAL thinking step. By default it is OFF and the
-fleet is fully deterministic ($0). If you set `NEXUS_MODEL_API_KEY` in `.env`,
-the bot sends its intel to a model API for analysis — and that call costs
-whatever your provider charges, every time it runs. "Thinking at all times"
-(continuous model inference) means paying for inference around the clock —
-there is no free version of that. The honest default here: deterministic
-collection always, thinking only when you explicitly enable and pay for it.
+The Intel Bot has an optional thinking step with three modes, resolved
+automatically:
+
+1. **Local GPU (recommended — free of API credits).** Run
+   [Ollama](https://ollama.com) on the GPU machine. The bot auto-detects it
+   at `http://localhost:11434` and reasons on your own hardware — you pay only
+   electricity. With your 2× RTX 5060 Ti, quantized 7–9B-parameter models run
+   comfortably on one card; Ollama can use both cards for bigger models or
+   parallel requests. "Always available" here means the server waits for
+   events and reasons when needed — it does not burn GPU cycles continuously.
+
+2. **Remote hooks (your GPU box serving the whole fleet).** Start Ollama
+   listening on the LAN (`OLLAMA_HOST=0.0.0.0`), then on each other machine
+   set `NEXUS_MODEL_URL=http://<gpu-machine-ip>:11434/v1/chat/completions`.
+   Keep it LAN-only — never expose an unauthenticated model server to the
+   internet.
+
+3. **Paid remote API.** Only if you set `NEXUS_MODEL_API_KEY` — that call is
+   billed by your provider, every time. Off by default.
+
+The honest bottom line: thinking on your own GPUs costs electricity, not API
+credits; paid APIs cost per call; "continuously thinking around the clock"
+has no free version in any form.
 
 The full classification lives in `reports/fleet-manifest.json`:
 

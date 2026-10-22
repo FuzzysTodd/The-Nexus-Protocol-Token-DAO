@@ -1,19 +1,23 @@
 {
   "generatedBy": "intel-bot",
-  "generatedAt": "2026-10-22T22:25:25.031Z",
+  "generatedAt": "2026-10-22T22:28:28.340Z",
   "owner": "@FuzzysTodd",
-  "networkStatus": "degraded (some fetches failed — recorded below)",
+  "networkStatus": "online",
   "data": {
-    "fetchedAt": "2026-10-22T22:25:25.030Z",
-    "ethUsd": "2382.075",
-    "btcUsd": "81263.745",
-    "repo": null
+    "fetchedAt": "2026-10-22T22:28:28.338Z",
+    "ethUsd": "2382.52",
+    "btcUsd": "81254.535",
+    "repo": {
+      "stars": 1,
+      "forks": 0,
+      "openIssues": 2,
+      "pushedAt": "2026-10-22T22:25:27Z"
+    }
   },
-  "fetchErrors": [
-    "repo stats: HTTP 403"
-  ],
+  "fetchErrors": [],
   "thinking": {
     "enabled": false,
-    "note": "Thinking disabled — no NEXUS_MODEL_API_KEY set. Deterministic mode, $0. Set the key in .env to enable model analysis (costs per call, billed by your provider)."
+    "mode": "off",
+    "note": "Thinking off — deterministic mode, $0. To think for free on your own GPUs, run Ollama on your machine (see README); for paid cloud models set NEXUS_MODEL_API_KEY in .env."
   }
 }

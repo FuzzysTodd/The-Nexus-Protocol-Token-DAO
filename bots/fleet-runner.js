@@ -27,6 +27,17 @@
 
 "use strict";
 
+// ── .env loader (no dependencies) — applies to the whole fleet ────────────────
+function loadEnv() {
+  const envPath = require("path").join(__dirname, "..", ".env");
+  if (!require("fs").existsSync(envPath)) return;
+  for (const line of require("fs").readFileSync(envPath, "utf8").split("\n")) {
+    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
+    if (m && !(m[1] in process.env)) process.env[m[1]] = m[2];
+  }
+}
+loadEnv();
+
 const fs = require("fs");
 const path = require("path");
 const { spawnSync } = require("child_process");
@@ -240,7 +251,20 @@ function main() {
   } catch { /* ignore */ }
 
   console.log(`\n✓ Fleet run complete: ${report.summary.passed}/${report.summary.total} tools OK`);
-  console.log("  Charges for these local commands: $0 (no model APIs, no Actions).");
+
+  // Honest status: reflect the ACTUAL thinking mode used by the intel bot
+  let mode = "off";
+  try {
+    const intel = JSON.parse(fs.readFileSync(path.join(ROOT, "reports/intel.json"), "utf8"));
+    mode = (intel.thinking && intel.thinking.mode) || "off";
+  } catch { /* intel report absent */ }
+  if (mode === "local-gpu") {
+    console.log("  Thinking: LOCAL GPU (your hardware + electricity — no API credits, no Actions).");
+  } else if (mode === "remote-api") {
+    console.log("  Thinking: PAID remote API — charges apply per call, billed by your provider.");
+  } else {
+    console.log("  No model API calls, no Actions charges for these commands ($0).");
+  }
   if (report.summary.failed > 0) process.exit(1);
 }
 

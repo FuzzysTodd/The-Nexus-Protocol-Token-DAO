@@ -28,7 +28,53 @@ const path = require("path");
 const ROOT = path.resolve(__dirname, "..");
 const OUT = path.join(ROOT, "reports", "intel.json");
 
+// ── .env loader (so 'set it in .env' actually works — no dependencies) ───────
+function loadEnv() {
+  const envPath = path.join(ROOT, ".env");
+  if (!fs.existsSync(envPath)) return;
+  for (const line of fs.readFileSync(envPath, "utf8").split("\n")) {
+    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
+    if (m && !(m[1] in process.env)) process.env[m[1]] = m[2];
+  }
+}
+loadEnv();
+
 const TIMEOUT_MS = 10000;
+
+// ── Thinking mode resolution ──────────────────────────────────────────────────
+// Priority: explicit remote key → local GPU (Ollama) → off.
+//   local-gpu   : free of API credits — your own hardware + electricity only
+//   remote-api  : paid — billed by your provider per call
+//   off         : deterministic, $0
+async function resolveThinking() {
+  const key = process.env.NEXUS_MODEL_API_KEY;
+  const url = process.env.NEXUS_MODEL_URL || "";
+  if (key) {
+    return {
+      mode: "remote-api",
+      url: url || "https://api.openai.com/v1/chat/completions",
+      model: process.env.NEXUS_MODEL_NAME || "gpt-4o-mini",
+      key,
+    };
+  }
+  // Local GPU inference (Ollama's OpenAI-compatible endpoint). No key, no
+  // API charges — your RTX cards + electricity only. Works over the LAN too
+  // (point NEXUS_MODEL_URL at http://<gpu-machine-ip>:11434/v1/chat/completions).
+  const localUrl = url || "http://localhost:11434/v1/chat/completions";
+  try {
+    const probe = await fetch(localUrl.replace("/v1/chat/completions", "/api/tags"), {
+      signal: AbortSignal.timeout(2000),
+    });
+    if (probe.ok) {
+      return {
+        mode: "local-gpu",
+        url: localUrl,
+        model: process.env.NEXUS_MODEL_NAME || "llama3.1:8b",
+      };
+    }
+  } catch { /* no local server — fall through to off */ }
+  return { mode: "off" };
+}
 
 async function fetchJson(url) {
   const resp = await fetch(url, {
@@ -39,26 +85,24 @@ async function fetchJson(url) {
   return resp.json();
 }
 
-// ── Optional thinking step (only when a key is present — costs money) ────────
-async function think(intel) {
-  const key = process.env.NEXUS_MODEL_API_KEY;
-  const url = process.env.NEXUS_MODEL_URL || "https://api.openai.com/v1/chat/completions";
-  if (!key) {
+// ── Thinking step (mode-resolved: local-gpu free / remote-api paid) ─────────
+async function think(intel, engine) {
+  if (engine.mode === "off") {
     return {
       enabled: false,
-      note: "Thinking disabled — no NEXUS_MODEL_API_KEY set. Deterministic mode, $0. Set the key in .env to enable model analysis (costs per call, billed by your provider).",
+      mode: "off",
+      note: "Thinking off — deterministic mode, $0. To think for free on your own GPUs, run Ollama on your machine (see README); for paid cloud models set NEXUS_MODEL_API_KEY in .env.",
     };
   }
   try {
-    const resp = await fetch(url, {
+    const headers = { "Content-Type": "application/json" };
+    if (engine.key) headers["Authorization"] = `Bearer ${engine.key}`;
+    const resp = await fetch(engine.url, {
       method: "POST",
-      signal: AbortSignal.timeout(30000),
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${key}`,
-      },
+      signal: AbortSignal.timeout(60000),
+      headers,
       body: JSON.stringify({
-        model: process.env.NEXUS_MODEL_NAME || "gpt-4o-mini",
+        model: engine.model,
         messages: [
           { role: "system", content: "You are the Nexus DAO analyst. Be brief and factual." },
           { role: "user", content: "Analyze this DAO intel snapshot in 3 bullets:\n" + JSON.stringify(intel.data, null, 2) },
@@ -69,10 +113,12 @@ async function think(intel) {
     const body = await resp.json();
     return {
       enabled: true,
+      mode: engine.mode,
+      cost: engine.mode === "local-gpu" ? "your electricity/hardware only — no API credits" : "billed by your provider per call",
       analysis: (body.choices && body.choices[0] && body.choices[0].message && body.choices[0].message.content) || "(empty response)",
     };
   } catch (e) {
-    return { enabled: true, error: `model call failed: ${e.message}` };
+    return { enabled: true, mode: engine.mode, error: `model call failed: ${e.message}` };
   }
 }
 
@@ -98,7 +144,8 @@ async function main() {
     repo: fetched.repo,
   };
 
-  const thinking = await think({ data });
+  const engine = await resolveThinking();
+  const thinking = await think({ data }, engine);
 
   const report = {
     generatedBy: "intel-bot",
@@ -116,7 +163,7 @@ async function main() {
   console.log(`  ${errors.length ? "⚠" : "✓"} Intel Bot: online=${!errors.length}` +
     ` ETH=$${data.ethUsd || "?"} BTC=$${data.btcUsd || "?"}` +
     ` stars=${data.repo ? data.repo.stars : "?"}` +
-    (thinking.enabled ? " (thinking: ON — paid model call)" : " (thinking: off — $0)"));
+    ` (thinking: ${engine.mode}${engine.mode === "local-gpu" ? " — your GPUs, no API credits" : engine.mode === "remote-api" ? " — paid API" : " — $0"})`);
   if (errors.length) errors.forEach((e) => console.log(`    ⚠ ${e}`));
   // Network failures are recorded, never fatal — a daily run must not die
   // just because the internet was down.
