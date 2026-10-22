@@ -114,8 +114,8 @@ anything on its own.
 
 ## 🚀 The Agent Fleet — Running Locally at No Charge
 
-`npm run agents:run` (or `node bots/fleet-runner.js`) runs **seven
-maintenance/reporting commands** from your file sets locally — no GitHub
+`npm run agents:run` (or `node bots/fleet-runner.js`) runs **eight
+maintenance/reporting/intel commands** from your file sets locally — no GitHub
 Actions charges and no model API calls for these commands (your hardware,
 electricity, and any on-chain gas are separate). The 4 Python tools need a
 Python interpreter (python3 / python / py -3 — auto-detected):
@@ -125,16 +125,33 @@ Python interpreter (python3 / python / py -3 — auto-detected):
 | Health Bot | Repo health checks | `reports/health-report.json` |
 | File-Accounting Bot | Full-tree file accounting | `reports/file-accounting.*` |
 | Registry Sync Bot | Dashboard agent data | `reports/agents.json` |
+| **Intel Bot** | **Internet access: public market prices + repo stats (no API keys, $0)** | `reports/intel.json` |
 | Financial Ops Reporter | Financial-ops REPORT — the reporting side of the fin-ops bots only | `ops/reports/financial-ops-report.*` |
 | Repo Assessor | Read-only repo assessment | `reports/repo-assessment.json` |
 | Asset Finder | Token/contract inventory | `reports/asset-finder.txt` |
-| Telemetry Monitor | Read-only local hardware snapshot | `reports/telemetry-snapshot.json` |
+| Telemetry Monitor | Read-only local hardware snapshot | `reports/telemetry-snapshot.txt` |
+
+### Internet access — free
+
+The Intel Bot gives the fleet real internet access at no cost: it fetches
+public, no-key APIs (Coinbase spot prices, GitHub repo stats). It records
+failures gracefully — a daily run never dies because the internet was down.
+
+### Thinking models — opt-in, and never free
+
+The Intel Bot has an OPTIONAL thinking step. By default it is OFF and the
+fleet is fully deterministic ($0). If you set `NEXUS_MODEL_API_KEY` in `.env`,
+the bot sends its intel to a model API for analysis — and that call costs
+whatever your provider charges, every time it runs. "Thinking at all times"
+(continuous model inference) means paying for inference around the clock —
+there is no free version of that. The honest default here: deterministic
+collection always, thinking only when you explicitly enable and pay for it.
 
 The full classification lives in `reports/fleet-manifest.json`:
 
-- **Run locally by the fleet runner:** the 7 tools above — deterministic code
-  (verified: local file reads, local git, local hardware queries only; no
-  external network requests).
+- **Run locally by the fleet runner:** the 8 tools above — deterministic code
+  (verified: local file reads, local git, local hardware queries, and public
+  no-key internet APIs only; no paid services).
 - **Definition-only:** the 11 MCP registry agents — they execute only when
   wired to an engine, and incur no charges until then. This runner does NOT
   implement their duties.

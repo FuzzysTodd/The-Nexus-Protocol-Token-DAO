@@ -110,6 +110,14 @@ function main() {
       creditsUsed: "0 (deterministic Python, stdlib only)",
     },
     {
+      id: "intel-bot",
+      name: "Intel Bot",
+      status: "implemented",
+      role: "Internet-connected intel: public market prices (Coinbase) and repo stats (GitHub) — no API keys, no model calls. Optional thinking step only if you set a paid model key.",
+      runs: "npm run agents:run — part of the local fleet runner",
+      creditsUsed: "0 for data fetches; model analysis only if you enable a paid API key (opt-in)",
+    },
+    {
       id: "telemetry-monitor",
       name: "Telemetry Monitor",
       status: "implemented",

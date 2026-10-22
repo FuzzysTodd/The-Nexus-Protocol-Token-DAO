@@ -1,10 +1,10 @@
 {
   "generatedBy": "registry-sync-bot",
-  "generatedAt": "2026-10-22T22:19:43.209Z",
+  "generatedAt": "2026-10-22T22:25:25.283Z",
   "owner": "@FuzzysTodd",
   "note": "Generated snapshot of registry definitions and duties — not live execution telemetry.",
   "agentCount": 11,
-  "botCount": 10,
+  "botCount": 11,
   "agents": [
     {
       "id": "nexus-crypto-core",
@@ -344,6 +344,14 @@
       "role": "Locates every token/contract asset in the repository → reports/asset-finder.txt.",
       "runs": "npm run agents:run — part of the local fleet runner",
       "creditsUsed": "0 (deterministic Python, stdlib only)"
+    },
+    {
+      "id": "intel-bot",
+      "name": "Intel Bot",
+      "status": "implemented",
+      "role": "Internet-connected intel: public market prices (Coinbase) and repo stats (GitHub) — no API keys, no model calls. Optional thinking step only if you set a paid model key.",
+      "runs": "npm run agents:run — part of the local fleet runner",
+      "creditsUsed": "0 for data fetches; model analysis only if you enable a paid API key (opt-in)"
     },
     {
       "id": "telemetry-monitor",

@@ -1,10 +1,10 @@
 # Financial Ops Automation Report
 
-- Generated at: 2026-10-22T22:19:45+00:00
-- Files scanned: 4052
+- Generated at: 2026-10-22T22:25:23+00:00
+- Files scanned: 4053
 - Pre-error findings: 3
 - Pre-error scope: first-party automation, docs, mcp, nexus, ops, and top-level repo files
-- Withdrawal signals: 2397
+- Withdrawal signals: 2398
 - Placement signals: 2896
 - Approval gate: required for any fund movement or treasury action
 

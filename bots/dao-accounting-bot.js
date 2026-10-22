@@ -116,6 +116,8 @@ const CURATED = {
   "reports/repo-assessment.json": "Repo assessor output (read-only snapshot)",
   "reports/asset-finder.txt": "Token/contract asset inventory (asset-finder output)",
   "reports/telemetry-snapshot.json": "Telemetry snapshot (telemetry-monitor output)",
+  "reports/telemetry-snapshot.txt": "Telemetry dashboard render (telemetry-monitor output, saved as text)",
+  "reports/intel.json": "Internet intel — market prices + repo stats (intel-bot output)",
   "reports/file-accounting.json": "Machine-readable accounting inventory (this bot's output)",
   "reports/file-accounting.md": "Human-readable accounting report (this bot's output)",
   "reports/agents.json": "Dashboard agent/bot payload (registry-sync bot output)",

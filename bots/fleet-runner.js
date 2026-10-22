@@ -101,6 +101,14 @@ const FLEET = [
     cmd: () => [...PYTHON, "-m", "nexus.telemetry_monitor", "--iterations", "1"],
     captureTo: "reports/telemetry-snapshot.json",
   },
+  // internet intel — public APIs, no key, no model calls by default
+  {
+    id: "intel-bot",
+    kind: "node",
+    label: "Intel Bot (internet: public market + repo data)",
+    cmd: () => ["node", "bots/intel-bot.js"],
+    note: "Fetches public no-key APIs (Coinbase prices, GitHub repo stats). Optional thinking step only runs if NEXUS_MODEL_API_KEY is set — and that costs money per call.",
+  },
   // maintenance bots — accounting LAST so it sees every generated output
   { id: "dao-health-bot", kind: "node", label: "Health Bot", cmd: () => ["node", "bots/health-bot.js"] },
   { id: "dao-registry-sync-bot", kind: "node", label: "Registry Sync Bot", cmd: () => ["node", "bots/registry-sync-bot.js"] },

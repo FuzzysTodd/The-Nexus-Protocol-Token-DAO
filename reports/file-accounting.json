@@ -1,11 +1,11 @@
 {
   "generatedBy": "dao-accounting-bot",
-  "generatedAt": "2026-10-22T22:19:43.116Z",
+  "generatedAt": "2026-10-22T22:25:25.439Z",
   "owner": "@FuzzysTodd",
   "totals": {
-    "trackedFiles": 4080,
+    "trackedFiles": 4086,
     "looseRootFiles": 85,
-    "accounted": 4080,
+    "accounted": 4086,
     "needsReview": 0
   },
   "policy": "Every tracked file appears below with category, purpose, and disposition. 'review' items need a documented purpose before they can be marked 'keep'.",
@@ -113,7 +113,7 @@
       "category": "loose-root-file",
       "purpose": "Environment variable template (secrets never committed)",
       "disposition": "keep",
-      "bytes": 1825
+      "bytes": 2357
     },
     {
       "file": ".flake8",
@@ -18201,7 +18201,7 @@
       "category": "docs",
       "purpose": "Project entry point — links to every major surface",
       "disposition": "keep",
-      "bytes": 12531
+      "bytes": 14135
     },
     {
       "file": "README.xml",
@@ -25180,7 +25180,14 @@
       "category": "app-code",
       "purpose": "DAO File-Accounting Bot (this file)",
       "disposition": "keep",
-      "bytes": 17566
+      "bytes": 19188
+    },
+    {
+      "file": "bots/fleet-runner.js",
+      "category": "app-code",
+      "purpose": "Agent Fleet Runner — runs Todd's full bot/agent fleet locally at $0 (no Actions, no AI credits)",
+      "disposition": "keep",
+      "bytes": 10669
     },
     {
       "file": "bots/health-bot.js",
@@ -25194,7 +25201,7 @@
       "category": "app-code",
       "purpose": "DAO Registry Sync Bot — feeds dashboard agent data",
       "disposition": "keep",
-      "bytes": 6423
+      "bytes": 6869
     },
     {
       "file": "builder-fund.html",
@@ -26657,7 +26664,7 @@
       "category": "config-data",
       "purpose": "Operations runbooks",
       "disposition": "keep",
-      "bytes": 10520
+      "bytes": 10547
     },
     {
       "file": "ops/reports/financial-ops-report.md",
@@ -26790,21 +26797,42 @@
       "category": "config-data",
       "purpose": "Dashboard agent/bot payload (registry-sync bot output)",
       "disposition": "keep",
-      "bytes": 12629
+      "bytes": 14501
+    },
+    {
+      "file": "reports/asset-finder.txt",
+      "category": "known-directory",
+      "purpose": "Token/contract asset inventory (asset-finder output)",
+      "disposition": "keep",
+      "bytes": 16286
     },
     {
       "file": "reports/file-accounting.json",
       "category": "config-data",
       "purpose": "Machine-readable accounting inventory (this bot's output)",
       "disposition": "keep",
-      "bytes": 980393
+      "bytes": 981503
     },
     {
       "file": "reports/file-accounting.md",
       "category": "docs",
       "purpose": "Human-readable accounting report (this bot's output)",
       "disposition": "keep",
-      "bytes": 551131
+      "bytes": 551712
+    },
+    {
+      "file": "reports/fleet-manifest.json",
+      "category": "config-data",
+      "purpose": "Fleet classification — what runs at $0 locally vs definition-only vs human-gated",
+      "disposition": "keep",
+      "bytes": 1457
+    },
+    {
+      "file": "reports/fleet-report.json",
+      "category": "config-data",
+      "purpose": "Fleet run results (fleet-runner output)",
+      "disposition": "keep",
+      "bytes": 3205
     },
     {
       "file": "reports/health-report.json",
@@ -26812,6 +26840,20 @@
       "purpose": "Health bot output",
       "disposition": "keep",
       "bytes": 159
+    },
+    {
+      "file": "reports/repo-assessment.json",
+      "category": "config-data",
+      "purpose": "Repo assessor output (read-only snapshot)",
+      "disposition": "keep",
+      "bytes": 32819
+    },
+    {
+      "file": "reports/telemetry-snapshot.txt",
+      "category": "known-directory",
+      "purpose": "Telemetry dashboard render (telemetry-monitor output, saved as text)",
+      "disposition": "keep",
+      "bytes": 511
     },
     {
       "file": "reports/treasury/gp-22_report.md",
@@ -26888,14 +26930,14 @@
       "category": "known-directory",
       "purpose": "Daily DAO bot run without GitHub Actions (Windows Task Scheduler)",
       "disposition": "keep",
-      "bytes": 1809
+      "bytes": 3012
     },
     {
       "file": "scripts/bots-daily.sh",
       "category": "automation",
       "purpose": "Daily DAO bot run without GitHub Actions (cron / manual)",
       "disposition": "keep",
-      "bytes": 2397
+      "bytes": 3547
     },
     {
       "file": "scripts/deploy_dao.js",

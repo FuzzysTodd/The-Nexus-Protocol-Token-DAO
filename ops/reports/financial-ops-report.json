@@ -1,10 +1,10 @@
 {
-  "generatedAt": "2026-10-22T22:19:45+00:00",
+  "generatedAt": "2026-10-22T22:25:23+00:00",
   "summary": {
-    "filesScanned": 4052,
+    "filesScanned": 4053,
     "preErrorCount": 3,
     "preErrorScope": "first-party automation, docs, mcp, nexus, ops, and top-level repo files",
-    "withdrawSignalCount": 2397,
+    "withdrawSignalCount": 2398,
     "placementSignalCount": 2896,
     "successDocsGenerated": 2,
     "approvalGate": "required for any fund movement or treasury action"
@@ -210,7 +210,7 @@
     },
     {
       "file": "ops/reports/financial-ops-report.json",
-      "count": 58,
+      "count": 59,
       "matches": [
         "withdraw",
         "release(",
@@ -447,13 +447,13 @@
   ],
   "successLog": [
     {
-      "time": "2026-10-22T22:19:45+00:00",
+      "time": "2026-10-22T22:25:23+00:00",
       "title": "Financial ops scan completed",
       "details": "Static repo scan finished and refreshed markdown plus dashboard payloads.",
       "status": "success"
     },
     {
-      "time": "2026-10-22T22:19:45+00:00",
+      "time": "2026-10-22T22:25:23+00:00",
       "title": "Approval gate enforced",
       "details": "Automation remains advisory for withdrawals, treasury routing, and settlement changes.",
       "status": "success"

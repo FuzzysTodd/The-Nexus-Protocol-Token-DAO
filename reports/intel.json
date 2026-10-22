@@ -1,0 +1,19 @@
+{
+  "generatedBy": "intel-bot",
+  "generatedAt": "2026-10-22T22:25:25.031Z",
+  "owner": "@FuzzysTodd",
+  "networkStatus": "degraded (some fetches failed — recorded below)",
+  "data": {
+    "fetchedAt": "2026-10-22T22:25:25.030Z",
+    "ethUsd": "2382.075",
+    "btcUsd": "81263.745",
+    "repo": null
+  },
+  "fetchErrors": [
+    "repo stats: HTTP 403"
+  ],
+  "thinking": {
+    "enabled": false,
+    "note": "Thinking disabled — no NEXUS_MODEL_API_KEY set. Deterministic mode, $0. Set the key in .env to enable model analysis (costs per call, billed by your provider)."
+  }
+}
