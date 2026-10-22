@@ -1,6 +1,6 @@
 {
   "generatedBy": "registry-sync-bot",
-  "generatedAt": "2026-10-22T22:09:34.249Z",
+  "generatedAt": "2026-10-22T22:15:26.905Z",
   "owner": "@FuzzysTodd",
   "note": "Generated snapshot of registry definitions and duties — not live execution telemetry.",
   "agentCount": 11,
@@ -331,8 +331,8 @@
         "low-risk autofix candidates",
         "validation results"
       ],
-      "runs": "Duty defined in mcp/agents/financial-ops-bots.json — human-gated approval model; no autonomous execution",
-      "creditsUsed": "0 when run as scripted checks (approvals stay human-gated)"
+      "runs": "Duty defined in mcp/agents/financial-ops-bots.json — definition only; execution is human-gated, no autonomous runs",
+      "creditsUsed": "Not verified — definition only; whether execution uses a model depends on how it is run"
     },
     {
       "id": "mcp-fin-012",
@@ -344,8 +344,8 @@
         "placement opportunity log",
         "approval-gated recommendations"
       ],
-      "runs": "Duty defined in mcp/agents/financial-ops-bots.json — human-gated approval model; no autonomous execution",
-      "creditsUsed": "0 when run as scripted checks (approvals stay human-gated)"
+      "runs": "Duty defined in mcp/agents/financial-ops-bots.json — definition only; execution is human-gated, no autonomous runs",
+      "creditsUsed": "Not verified — definition only; whether execution uses a model depends on how it is run"
     },
     {
       "id": "mcp-fin-013",
@@ -357,8 +357,8 @@
         "dashboard JSON",
         "success journal"
       ],
-      "runs": "Duty defined in mcp/agents/financial-ops-bots.json — human-gated approval model; no autonomous execution",
-      "creditsUsed": "0 when run as scripted checks (approvals stay human-gated)"
+      "runs": "Duty defined in mcp/agents/financial-ops-bots.json — definition only; execution is human-gated, no autonomous runs",
+      "creditsUsed": "Not verified — definition only; whether execution uses a model depends on how it is run"
     }
   ]
 }

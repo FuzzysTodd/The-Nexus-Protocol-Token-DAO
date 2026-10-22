@@ -1,5 +1,12 @@
 name: DAO Bots — deterministic upkeep (zero AI credits)
 
+# DAO Bots — deterministic upkeep (zero AI credits)
+#
+# ⚠️ DORMANT while the GitHub account has a billing lock (jobs fail with
+# 'account is locked due to a billing issue'). Until the bill is paid, the
+# bots run WITHOUT Actions via local git hooks (scripts/install-hooks.sh)
+# and the daily scripts (scripts/bots-daily.sh / .cmd). This workflow stays
+# intact and resumes automatically once Actions is unlocked.
 # Todd's personal DAO bots run here automatically. No paid models are used:
 # every bot is plain Node.js, so routine repo upkeep costs $0 in AI credits.
 # Commits are authored with Todd's pre-configured identity — nothing to enter.

@@ -24,6 +24,17 @@ const ROOT = path.resolve(__dirname, "..");
 const REPORTS_DIR = path.join(ROOT, "reports");
 const ci = process.argv.includes("--ci");
 
+// Change-aware write: skip the file when only the timestamp would differ —
+// keeps local hook runs from churning reports on every commit.
+function writeIfChanged(filePath, content) {
+  let existing = null;
+  try { existing = fs.readFileSync(filePath, "utf8"); } catch { /* absent */ }
+  const strip = (s) => s.replace(/"generatedAt": "[^"]+"/, '"generatedAt": "<ts>"');
+  if (existing !== null && strip(existing) === strip(content)) return false;
+  fs.writeFileSync(filePath, content);
+  return true;
+}
+
 const errors = [];
 const warnings = [];
 
@@ -124,7 +135,7 @@ const report = {
   status: errors.length ? "FAIL" : (warnings.length ? "WARN" : "PASS"),
   errors, warnings,
 };
-fs.writeFileSync(path.join(REPORTS_DIR, "health-report.json"),
+const healthChanged = writeIfChanged(path.join(REPORTS_DIR, "health-report.json"),
   JSON.stringify(report, null, 2) + "\n");
 
 console.log(`\n${report.status === "PASS" ? "✓" : "✗"} Health: ${report.status}` +

@@ -88,8 +88,8 @@ function main() {
       status: "defined",  // duty definitions; execution stays human-gated
       role: b.role,
       outputs: b.outputs || [],
-      runs: "Duty defined in mcp/agents/financial-ops-bots.json — human-gated approval model; no autonomous execution",
-      creditsUsed: "0 when run as scripted checks (approvals stay human-gated)",
+      runs: "Duty defined in mcp/agents/financial-ops-bots.json — definition only; execution is human-gated, no autonomous runs",
+      creditsUsed: "Not verified — definition only; whether execution uses a model depends on how it is run",
     })),
   ];
 

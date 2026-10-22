@@ -100,9 +100,7 @@ pytest -q
 ## 🤖 Personal DAO Bots — Zero AI Credits
 
 The DAO now runs its own deterministic bots that handle routine repo upkeep
-with **plain Node.js — no paid models, no AI credits**. They run locally
-(`npm run bots:all`) and automatically in CI (`.github/workflows/dao-bots.yml`)
-on every push (plus a manual run button in the Actions tab):
+with **plain Node.js — no paid models, no AI credits**:
 
 | Bot | Duty | Command |
 |---|---|---|
@@ -110,8 +108,50 @@ on every push (plus a manual run button in the Actions tab):
 | **File-Accounting Bot** | Accounts for every tracked file — especially loose root files — in `reports/file-accounting.json` / `.md`; the DAO file set stays complete | `npm run bots:accounting` |
 | **Registry Sync Bot** | Feeds the dashboard's Agents & Bots tab from the MCP registries (`reports/agents.json`) | `npm run bots:sync` |
 
-The financial-ops bots (`mcp-fin-011/012/013`) keep their human-gated approval
-model — no bot can move treasury funds or sign anything on its own.
+Run all three at once with `npm run bots:all`. The financial-ops bots keep
+their human-gated approval model — no bot can move treasury funds or sign
+anything on its own.
+
+While GitHub Actions is blocked by the account's billing lock, run them
+without Actions:
+
+### Mode 1 — Automatic, via git hooks (recommended)
+
+One-time per machine: `npm run hooks:install` (or `bash scripts/install-hooks.sh`).
+After that, the bots run **on every commit and push automatically** — quiet
+on success, zero friction, zero credits:
+
+| Hook | Runs |
+|---|---|
+| `pre-commit` | Health Bot + File-Accounting Bot |
+| `pre-push` | All three bots, reports refreshed before they hit GitHub |
+
+In a hurry, bypass once with `git commit --no-verify` / `git push --no-verify`.
+Remove anytime with `git config --unset core.hooksPath`.
+
+### Mode 2 — Daily, via Task Scheduler / cron
+
+Replaces the scheduled workflow. One-time setup (Windows, elevated prompt,
+adjust the path to your clone):
+
+```
+schtasks /Create /TN "Nexus DAO Bots" /TR "C:\path\to\repo\scripts\bots-daily.cmd" /SC DAILY /ST 06:00
+```
+
+Linux/macOS cron instead:
+
+```
+0 6 * * *  cd /path/to/repo && bash scripts/bots-daily.sh >> .bots-daily.log 2>&1
+```
+
+Both run all three bots, commit updated reports under your pre-configured
+identity, and push — git push is **not** affected by the Actions billing lock.
+
+### When Actions comes back
+
+`.github/workflows/dao-bots.yml` stays in the repo and resumes automatically
+once the billing issue is resolved — no changes needed. The bots are the
+same either way.
 
 ## 🧾 One-Time Identity Setup (never re-enter your info)
 

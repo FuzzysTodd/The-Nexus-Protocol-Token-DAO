@@ -1,0 +1,22 @@
+#!/bin/sh
+# pre-push — Nexus Protocol DAO Bots (local, zero AI credits)
+#
+# Runs the full bot suite before every push: health, accounting, and
+# registry-sync (so reports are fresh when they hit the remote).
+# Quiet on success. Bypass once with:  git push --no-verify
+
+ROOT=$(git rev-parse --show-toplevel)
+
+for bot in health-bot.js dao-accounting-bot.js registry-sync-bot.js; do
+  if ! node "$ROOT/bots/$bot" --hook >/dev/null 2>&1; then
+    echo ""
+    echo "✗ $bot found problems:"
+    node "$ROOT/bots/$bot" --hook 2>&1 | grep -E '✗|error|Error' | head -5
+    echo ""
+    echo "  Fix the above, or bypass once with:  git push --no-verify"
+    exit 1
+  fi
+done
+
+echo "✓ DAO bots: all green (0 AI credits used)"
+exit 0

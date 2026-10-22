@@ -1,7 +1,7 @@
 {
   "name": "the-nexus-protocol-token-dao",
   "version": "2.0.0",
-  "description": "Nexus Protocol Token DAO — Dashboard, Governance & Personal DAO Bots (deterministic, zero-AI-credit operations)",
+  "description": "Nexus Protocol Token DAO \u2014 Dashboard, Governance & Personal DAO Bots (deterministic, zero-AI-credit operations)",
   "main": "server.js",
   "author": {
     "name": "Todd Stephens",
@@ -29,7 +29,9 @@
     "bots:health": "node bots/health-bot.js",
     "bots:accounting": "node bots/dao-accounting-bot.js",
     "bots:sync": "node bots/registry-sync-bot.js",
-    "bots:all": "node bots/health-bot.js && node bots/dao-accounting-bot.js && node bots/registry-sync-bot.js"
+    "bots:all": "node bots/health-bot.js && node bots/dao-accounting-bot.js && node bots/registry-sync-bot.js",
+    "hooks:install": "bash scripts/install-hooks.sh",
+    "bots:daily": "bash scripts/bots-daily.sh"
   },
   "engines": {
     "node": ">=18.0.0"
@@ -40,7 +42,13 @@
     "ws": "^8.22.0"
   },
   "keywords": [
-    "dao", "ethereum", "web3", "nexus", "defi", "mcp-agents", "dao-bots"
+    "dao",
+    "ethereum",
+    "web3",
+    "nexus",
+    "defi",
+    "mcp-agents",
+    "dao-bots"
   ],
   "license": "MIT"
 }

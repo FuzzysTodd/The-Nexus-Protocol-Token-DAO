@@ -1,11 +1,11 @@
 {
   "generatedBy": "dao-accounting-bot",
-  "generatedAt": "2026-10-22T22:09:39.866Z",
+  "generatedAt": "2026-10-22T22:15:26.818Z",
   "owner": "@FuzzysTodd",
   "totals": {
-    "trackedFiles": 4068,
+    "trackedFiles": 4075,
     "looseRootFiles": 85,
-    "accounted": 4068,
+    "accounted": 4075,
     "needsReview": 0
   },
   "policy": "Every tracked file appears below with category, purpose, and disposition. 'review' items need a documented purpose before they can be marked 'keep'.",
@@ -421,7 +421,7 @@
       "category": "automation",
       "purpose": "GitHub workflows, issue templates, and repo automation",
       "disposition": "keep",
-      "bytes": 1777
+      "bytes": 2196
     },
     {
       "file": ".github/workflows/dao-source-manifest-validation.yml",
@@ -18201,7 +18201,7 @@
       "category": "docs",
       "purpose": "Project entry point — links to every major surface",
       "disposition": "keep",
-      "bytes": 9615
+      "bytes": 10976
     },
     {
       "file": "README.xml",
@@ -24973,6 +24973,55 @@
       "bytes": 23394
     },
     {
+      "file": "archive/2026-revamp/KELLEre-backtick.py",
+      "category": "python-tools",
+      "purpose": "Preserved files from the 2026 revamp (see archive/2026-revamp/README.md)",
+      "disposition": "keep",
+      "bytes": 36479
+    },
+    {
+      "file": "archive/2026-revamp/README.md",
+      "category": "docs",
+      "purpose": "Preserved files from the 2026 revamp (see archive/2026-revamp/README.md)",
+      "disposition": "keep",
+      "bytes": 1199
+    },
+    {
+      "file": "archive/2026-revamp/chunking-notes.json",
+      "category": "config-data",
+      "purpose": "Preserved files from the 2026 revamp (see archive/2026-revamp/README.md)",
+      "disposition": "keep",
+      "bytes": 2430
+    },
+    {
+      "file": "archive/2026-revamp/provisioned-block-data-draft.ts",
+      "category": "app-code",
+      "purpose": "Preserved files from the 2026 revamp (see archive/2026-revamp/README.md)",
+      "disposition": "keep",
+      "bytes": 1002
+    },
+    {
+      "file": "archive/2026-revamp/scripts/expert-registry-signal.json",
+      "category": "config-data",
+      "purpose": "Preserved files from the 2026 revamp (see archive/2026-revamp/README.md)",
+      "disposition": "keep",
+      "bytes": 22
+    },
+    {
+      "file": "archive/2026-revamp/scripts/register-expert-builders.variant.js",
+      "category": "app-code",
+      "purpose": "Preserved files from the 2026 revamp (see archive/2026-revamp/README.md)",
+      "disposition": "keep",
+      "bytes": 5400
+    },
+    {
+      "file": "archive/2026-revamp/scripts/test-withdraws.variant.js",
+      "category": "app-code",
+      "purpose": "Preserved files from the 2026 revamp (see archive/2026-revamp/README.md)",
+      "disposition": "keep",
+      "bytes": 278
+    },
+    {
       "file": "automation.yaml",
       "category": "automation",
       "purpose": "Workflow / automation definition",
@@ -25131,21 +25180,21 @@
       "category": "app-code",
       "purpose": "DAO File-Accounting Bot (this file)",
       "disposition": "keep",
-      "bytes": 16326
+      "bytes": 16703
     },
     {
       "file": "bots/health-bot.js",
       "category": "app-code",
       "purpose": "DAO Health Bot — deterministic repo health checks",
       "disposition": "keep",
-      "bytes": 5848
+      "bytes": 6376
     },
     {
       "file": "bots/registry-sync-bot.js",
       "category": "app-code",
       "purpose": "DAO Registry Sync Bot — feeds dashboard agent data",
       "disposition": "keep",
-      "bytes": 4709
+      "bytes": 4750
     },
     {
       "file": "builder-fund.html",
@@ -26615,7 +26664,7 @@
       "category": "config-data",
       "purpose": "Node package manifest + bot runner scripts",
       "disposition": "keep",
-      "bytes": 1599
+      "bytes": 1728
     },
     {
       "file": "playwright-tool/.gitignore",
@@ -26734,14 +26783,14 @@
       "category": "config-data",
       "purpose": "Machine-readable accounting inventory (this bot's output)",
       "disposition": "keep",
-      "bytes": 977584
+      "bytes": 977507
     },
     {
       "file": "reports/file-accounting.md",
       "category": "docs",
       "purpose": "Human-readable accounting report (this bot's output)",
       "disposition": "keep",
-      "bytes": 549632
+      "bytes": 549505
     },
     {
       "file": "reports/health-report.json",
@@ -26839,7 +26888,7 @@
       "category": "app-code",
       "purpose": "Operational and deployment scripts",
       "disposition": "keep",
-      "bytes": 1
+      "bytes": 2666
     },
     {
       "file": "scripts/provisioned-block-data.ts",
@@ -26909,7 +26958,7 @@
       "category": "app-code",
       "purpose": "Main dashboard server (express)",
       "disposition": "keep",
-      "bytes": 5193
+      "bytes": 5585
     },
     {
       "file": "simple-nft-sale/@openzeppelin/contracts/access/Ownable.sol",
