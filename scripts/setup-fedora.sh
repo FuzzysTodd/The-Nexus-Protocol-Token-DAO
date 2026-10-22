@@ -5,6 +5,7 @@
 # Sets up the GPU machine (RTX 5060 Ti 8GB + RTX 5060 8GB) to run local-GPU thinking for the
 # DAO bot fleet at zero API-credit cost:
 #
+#   0. Node.js + npm (Fedora does not ship npm)
 #   1. RPM Fusion repos + NVIDIA driver (open kernel module — required for
 #      Blackwell / RTX 50-series) + CUDA bits
 #   2. Ollama as a systemd service on 127.0.0.1:11434
@@ -43,6 +44,15 @@ fi
 if ! have nvidia-smi; then
   log "No NVIDIA driver detected yet — normal on a fresh install."
 fi
+
+# Node.js + npm — the fleet runner needs them (Fedora does not ship npm by default)
+if ! have npm || ! have node; then
+  log "Installing Node.js + npm (required for the bot fleet)…"
+  sudoc dnf install -y nodejs npm
+fi
+have npm && have node \
+  && echo "    Node $(node --version) + npm $(npm --version) ready" \
+  || warn "npm still missing — install manually: sudo dnf install nodejs npm"
 
 # --- 1. RPM Fusion + NVIDIA driver --------------------------------------------
 log "Step 1/5: RPM Fusion repos + NVIDIA driver (open kernel module for RTX 50-series)"
