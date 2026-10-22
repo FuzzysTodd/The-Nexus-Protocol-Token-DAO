@@ -2,13 +2,13 @@
 # =============================================================================
 # setup-fedora.sh — one-time Fedora 44 GPU-machine setup for the Nexus fleet
 # =============================================================================
-# Sets up the 2× RTX 5060 Ti (16GB) machine to run local-GPU thinking for the
+# Sets up the GPU machine (RTX 5060 Ti 8GB + RTX 5060 8GB) to run local-GPU thinking for the
 # DAO bot fleet at zero API-credit cost:
 #
 #   1. RPM Fusion repos + NVIDIA driver (open kernel module — required for
 #      Blackwell / RTX 50-series) + CUDA bits
 #   2. Ollama as a systemd service on 127.0.0.1:11434
-#   3. The qwen3:14b model (sweet spot for 16GB cards)
+#   3. The qwen3:14b model (~9 GB — Ollama splits it across both cards)
 #   4. Your repo .env pointing at local thinking
 #   5. Prints the cron line for the daily fleet run
 #
@@ -90,7 +90,7 @@ else
 fi
 
 # --- 3. model -----------------------------------------------------------------
-log "Step 3/5: Pulling the ${MODEL} model (sweet spot for 16GB cards)"
+log "Step 3/5: Pulling the ${MODEL} model (splits across both 8GB cards if needed)"
 ollama pull "${MODEL}"
 
 # --- 4. repo .env -------------------------------------------------------------

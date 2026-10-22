@@ -146,21 +146,20 @@ automatically:
    [Ollama](https://ollama.com) on the GPU machine. The bot auto-detects it
    at `http://localhost:11434` and reasons on your own hardware — you pay only
    electricity. Set `NEXUS_THINK=local` explicitly; if the server is down it
-   reports UNAVAILABLE and never falls back to a paid provider. The
-   16GB RTX 5060 Ti (device ID 0x2d05) handles the 14B-class models — the
-   sweet spot for this card. Verified picks (October 2026), all one `ollama
-   pull` away:
+   reports UNAVAILABLE and never falls back to a paid provider. The fleet's
+   GPU machine has an RTX 5060 Ti 8GB + RTX 5060 8GB (device ID 0x2d05) —
+   16GB pooled across both cards. Verified picks (October 2026):
 
    | Ollama pull | VRAM | Best for |
    |---|---|---|
-   | `qwen3:14b` (Q4_K_M) | ~9 GB | all-round reasoning — the sweet spot |
-   | `gpt-oss:20b` | ~12 GB | agent work, long context, fast |
-   | `gemma3:12b` or newer Gemma | ~8 GB | quality writing, multilingual |
-   | `deepseek-r1:14b` | ~9 GB | visible chain-of-thought reasoning |
-   | `llama3.1:8b` | ~5 GB | fastest, latency-light analysis |
+   | `qwen3:14b` (Q4_K_M) | ~9 GB — splits across BOTH cards | all-round reasoning |
+   | `gpt-oss:20b` | ~12 GB — splits across both cards | agent work, long context, fast |
+   | `qwen3:8b` / `llama3.1:8b` | ~5 GB — fits on ONE card | fastest, leaves the other card free |
+   | `deepseek-r1:14b` | ~9 GB — splits across both cards | visible chain-of-thought |
 
-   With your TWO cards, Ollama can either split one model's layers across
-   both GPUs or serve two models in parallel — plenty for the fleet. A GPU
+   Ollama automatically splits a model's layers across both GPUs when it
+   doesn't fit on one — so `qwen3:14b` runs fine on this machine using both
+   cards. To keep one card free, use an 8B model instead. A GPU
    accelerates model inference speed; it does not automatically make every
    bot smarter or speed up arbitrary Python/Node/git work. "Always
    available" means the server waits and reasons when triggered — it does not
@@ -184,7 +183,7 @@ fleet plus one optional reasoning step — the 11 MCP registry agents remain
 definitions, and this is not yet an MCP-connected persistent reasoning
 service.
 
-### Fedora 44 quickstart — GPU machine (2× RTX 5060 Ti 16GB)
+### Fedora 44 quickstart — GPU machine (RTX 5060 Ti 8GB + RTX 5060 8GB)
 
 The one-command path (idempotent — safe to re-run, and it sets up your
 repo `.env` too):
@@ -212,7 +211,8 @@ curl -fsSL https://ollama.com/install.sh | sh
 #  curl -fsSL https://ollama.com/install.sh | sed s/--add-repo/addrepo/ | sh )
 sudo systemctl enable --now ollama
 
-# 3. Pull the sweet-spot model for 16GB cards
+# 3. Pull the model — qwen3:14b splits across both cards
+#    (use an 8B model like llama3.1:8b to keep one card free)
 ollama pull qwen3:14b
 
 # 4. In your repo checkout's .env (copy from .env.example):
