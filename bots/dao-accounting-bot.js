@@ -268,6 +268,31 @@ function main() {
   const loose = inventory.filter((f) => !f.file.includes("/"));
   const unaccounted = inventory.filter((f) => f.disposition === "review");
 
+  // ── Inventory-drift check: saved report must cover the same file set ───────
+  // Compares the SAVED inventory (reports/file-accounting.json) against the
+  // current tracked set — catches stale inventories loudly instead of
+  // silently. Error in write mode; warning in --check mode (hooks) so adding
+  // files doesn't block commits until the next fleet run refreshes it.
+  const currentSet = new Set(tracked);
+  let savedFiles = [];
+  try {
+    const saved = JSON.parse(fs.readFileSync(path.join(REPORTS_DIR, "file-accounting.json"), "utf8"));
+    savedFiles = (saved.files || []).map((f) => f.file);
+  } catch { /* no saved report yet — first run */ }
+  const savedSet = new Set(savedFiles);
+  const missingFromSaved = tracked.filter((f) => !savedSet.has(f));
+  const extraInSaved = savedFiles.filter((f) => !currentSet.has(f));
+  if (missingFromSaved.length || extraInSaved.length) {
+    const msg = `inventory drift: ${missingFromSaved.length} tracked file(s) missing from saved inventory` +
+      `${extraInSaved.length ? `, ${extraInSaved.length} stale entr(ies)` : ""}`;
+    if (CHECK_ONLY) {
+      console.log(`  ⚠ ${msg} — refresh with: npm run agents:run (warning, non-blocking in check mode)`);
+    } else {
+      // write mode: the fresh inventory written below heals the drift itself
+      console.log(`  ⚠ ${msg} — self-healed by this run's fresh inventory`);
+    }
+  }
+
   // Manifest cross-check
   let manifestOk = false;
   try {

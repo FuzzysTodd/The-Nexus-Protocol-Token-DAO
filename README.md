@@ -112,35 +112,45 @@ Run all three at once with `npm run bots:all`. The financial-ops bots keep
 their human-gated approval model — no bot can move treasury funds or sign
 anything on its own.
 
-## 🚀 The Full Agent Fleet — Running at $0
+## 🚀 The Agent Fleet — Running Locally at No Charge
 
-Todd's bots and agents across the file sets now operate **without the
-cloud/AI cost**. `npm run agents:run` (or `node bots/fleet-runner.js`) runs
-the whole fleet locally — every tool is deterministic code, no model calls,
-no GitHub Actions:
+`npm run agents:run` (or `node bots/fleet-runner.js`) runs **seven
+maintenance/reporting commands** from your file sets locally — no GitHub
+Actions charges and no model API calls for these commands (your hardware,
+electricity, and any on-chain gas are separate). The 4 Python tools need a
+Python interpreter (python3 / python / py -3 — auto-detected):
 
 | Fleet member | What it does | Output |
 |---|---|---|
 | Health Bot | Repo health checks | `reports/health-report.json` |
 | File-Accounting Bot | Full-tree file accounting | `reports/file-accounting.*` |
 | Registry Sync Bot | Dashboard agent data | `reports/agents.json` |
-| Financial Ops Reporter | Financial-ops report (the reporting side of the fin-ops bots) | `ops/reports/financial-ops-report.*` |
+| Financial Ops Reporter | Financial-ops REPORT — the reporting side of the fin-ops bots only | `ops/reports/financial-ops-report.*` |
 | Repo Assessor | Read-only repo assessment | `reports/repo-assessment.json` |
 | Asset Finder | Token/contract inventory | `reports/asset-finder.txt` |
-| Telemetry Monitor | Read-only telemetry snapshot | `reports/telemetry-snapshot.json` |
+| Telemetry Monitor | Read-only local hardware snapshot | `reports/telemetry-snapshot.json` |
 
 The full classification lives in `reports/fleet-manifest.json`:
 
-- **Run at $0 locally:** the 7 tools above (Node + stdlib-only Python).
+- **Run locally by the fleet runner:** the 7 tools above — deterministic code
+  (verified: local file reads, local git, local hardware queries only; no
+  external network requests).
 - **Definition-only:** the 11 MCP registry agents — they execute only when
-  wired to an engine, and cost nothing until then.
-- **Human-gated:** the 3 financial-ops bots — by design they never move
-  funds autonomously.
-- **Reference library:** the 87 skill definitions in `skills/` — no runtime
-  cost until an agent consults them.
+  wired to an engine, and incur no charges until then. This runner does NOT
+  implement their duties.
+- **Human-gated:** the 3 financial-ops bots — by design they never move funds
+  autonomously; only their reporting side runs above.
+- **Reference library:** the 87 skill definitions in `skills/` — no charges
+  until an agent consults them.
 
 The daily scripts (`scripts/bots-daily.sh` / `.cmd`) run this whole fleet on
-schedule — same zero-cost mechanism as the maintenance bots.
+schedule. They commit and push ONLY the fleet outputs (`reports/` +
+`ops/reports/`), refuse to run over your staged work or manual report edits,
+and retry any locally-committed-but-unpushed reports.
+
+Note: the git hooks (below) are READ-ONLY checks — they validate but never
+refresh reports; report generation happens in the fleet runner / daily
+scripts.
 
 While GitHub Actions is blocked by the account's billing lock, run them
 without Actions:

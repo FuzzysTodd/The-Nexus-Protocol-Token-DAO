@@ -2,27 +2,27 @@
 /**
  * fleet-runner.js — Nexus DAO Agent Fleet Runner ($0 local runtime)
  * -------------------------------------------------------------------
- * Todd's personal fleet of bots/agents, operating WITHOUT cloud cost:
- *   • No GitHub Actions (account billing lock) — runs locally instead
- *   • No AI credits — every tool below is deterministic code, no model calls
+ * Todd's personal fleet of bots/agents, operating without cloud cost:
+ *   • No GitHub Actions charges (account billing lock) — runs locally instead
+ *   • No model API calls — every tool below is deterministic code
  *
- * Fleet executed by this runner (all verified runnable, all $0):
- *   1. dao-health-bot            (Node)   repo health checks
- *   2. dao-accounting-bot         (Node)   full-tree file accounting
- *   3. dao-registry-sync-bot      (Node)   dashboard agent data
- *   4. finance-ops-reporter      (Python) financial ops report → ops/reports/
- *   5. repo-assessor             (Python) read-only repo assessment → reports/
- *   6. asset-finder              (Python) token/contract inventory → reports/
- *   7. telemetry-monitor         (Python) read-only telemetry snapshot → reports/
+ * Scope (honest): this runs SEVEN maintenance/reporting commands. The 11 MCP
+ * registry agents remain definitions (they execute only when wired to an
+ * engine), and the 3 financial-ops bots stay human-gated — this runner does
+ * NOT implement their full operational duties, only the reporting side.
  *
- * Fleet defined but NOT run here (needs wiring or human gating — see
- * reports/fleet-manifest.json for the full classification):
- *   • 11 MCP registry agents     — definitions; execute only when wired to an engine
- *   • 3 financial-ops bots        — human-gated by design; reporting side runs above
- *   • 87 skills                  — reference library for agents; no runtime cost
+ * What each executed tool actually does (verified by inspection):
+ *   • Node bots — read local files, run local git
+ *   • finance_ops_report.py / asset_finder.py — pure local file scanning
+ *   • repo_assessment.py — local file scan + local git
+ *   • telemetry_monitor.py — local hardware query (nvidia-smi) + local
+ *     network-interface listing. No external network requests.
+ *
+ * Execution order matters: generators run FIRST, the File-Accounting Bot runs
+ * LAST (after outputs exist and are staged) so its inventory is never stale.
  *
  * Usage:  node bots/fleet-runner.js           (or:  npm run agents:run)
- * Output: reports/fleet-report.json + the tools' own reports
+ * Output: reports/fleet-report.json, reports/fleet-manifest.json + tool reports
  */
 
 "use strict";
@@ -34,54 +34,77 @@ const { spawnSync } = require("child_process");
 const ROOT = path.resolve(__dirname, "..");
 const REPORTS_DIR = path.join(ROOT, "reports");
 
+// Generated-output allowlist: everything the fleet writes, and everything
+// the daily runner is allowed to stage and commit. Nothing else.
+const OUTPUT_PATHSPECS = ["reports/", "ops/reports/"];
+
+// ── Python interpreter detection (python3 / python / py -3) ───────────────────
+function detectPython() {
+  for (const cand of [["python3"], ["python"], ["py", "-3"]]) {
+    try {
+      const r = spawnSync(cand[0], [...cand.slice(1), "--version"], { encoding: "utf8", timeout: 10000 });
+      if (r.status === 0) return cand;
+    } catch { /* try next */ }
+  }
+  return null;
+}
+const PYTHON = detectPython();
+
+// ── Deterministic writes ─────────────────────────────────────────────────────
+// Strip volatile values (timestamps, durations) before comparing, so a run
+// only rewrites a file when its MEANINGFUL content changed. Prevents commit
+// churn from timestamps/execution durations.
+function normalize(s) {
+  return s
+    .replace(/"generatedAt": "[^"]*"/g, '"generatedAt": "<ts>"')
+    .replace(/"ts": "[^"]*"/g, '"ts": "<ts>"')
+    .replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})/g, "<iso-ts>")
+    .replace(/"durationMs": \d+/g, '"durationMs": <n>');
+}
+
+function writeIfChanged(filePath, content) {
+  let existing = null;
+  try { existing = fs.readFileSync(filePath, "utf8"); } catch { /* absent */ }
+  if (existing !== null && normalize(existing) === normalize(content)) return false;
+  fs.writeFileSync(filePath, content);
+  return true;
+}
+
 // ── Fleet definition ──────────────────────────────────────────────────────────
 const FLEET = [
-  {
-    id: "dao-health-bot",
-    kind: "node",
-    label: "Health Bot",
-    cmd: ["node", "bots/health-bot.js"],
-  },
-  {
-    id: "dao-accounting-bot",
-    kind: "node",
-    label: "File-Accounting Bot",
-    cmd: ["node", "bots/dao-accounting-bot.js"],
-  },
-  {
-    id: "dao-registry-sync-bot",
-    kind: "node",
-    label: "Registry Sync Bot",
-    cmd: ["node", "bots/registry-sync-bot.js"],
-  },
+  // generators first (their outputs feed the accounting inventory)
   {
     id: "finance-ops-reporter",
     kind: "python",
     label: "Financial Ops Reporter (nexus/finance_ops_report.py)",
-    cmd: ["python3", "nexus/finance_ops_report.py"],
-    note: "Writes ops/reports/financial-ops-report.{json,md} — the reporting side of the financial-ops bots, at $0.",
+    cmd: () => [...PYTHON, "nexus/finance_ops_report.py"],
+    note: "Writes ops/reports/financial-ops-report.{json,md} — the reporting side of the financial-ops bots. NOT their full operational duties.",
   },
   {
     id: "repo-assessor",
     kind: "python",
     label: "Repo Assessor (nexus/repo_assessment.py)",
-    cmd: ["python3", "nexus/repo_assessment.py", "--repo-root", ".", "--json"],
+    cmd: () => [...PYTHON, "nexus/repo_assessment.py", "--repo-root", ".", "--json"],
     captureTo: "reports/repo-assessment.json",
   },
   {
     id: "asset-finder",
     kind: "python",
     label: "Asset Finder (nexus/asset_finder.py)",
-    cmd: ["python3", "nexus/asset_finder.py", "--root", "."],
+    cmd: () => [...PYTHON, "nexus/asset_finder.py", "--root", "."],
     captureTo: "reports/asset-finder.txt",
   },
   {
     id: "telemetry-monitor",
     kind: "python",
     label: "Telemetry Monitor (nexus.telemetry_monitor)",
-    cmd: ["python3", "-m", "nexus.telemetry_monitor", "--iterations", "1"],
+    cmd: () => [...PYTHON, "-m", "nexus.telemetry_monitor", "--iterations", "1"],
     captureTo: "reports/telemetry-snapshot.json",
   },
+  // maintenance bots — accounting LAST so it sees every generated output
+  { id: "dao-health-bot", kind: "node", label: "Health Bot", cmd: () => ["node", "bots/health-bot.js"] },
+  { id: "dao-registry-sync-bot", kind: "node", label: "Registry Sync Bot", cmd: () => ["node", "bots/registry-sync-bot.js"] },
+  { id: "dao-accounting-bot", kind: "node", label: "File-Accounting Bot", cmd: () => ["node", "bots/dao-accounting-bot.js"] },
 ];
 
 // ── Fleet manifest: the full classification of Todd's agent fleet ─────────────
@@ -90,43 +113,40 @@ function buildManifest() {
     generatedBy: "fleet-runner",
     generatedAt: new Date().toISOString(),
     owner: "@FuzzysTodd",
-    policy: "Everything that runs locally is deterministic code — zero AI credits, zero cloud cost. Agents needing an execution engine or human gating are classified as such and are never run automatically.",
+    scope: "Classification of the agent/bot fleet. This runner executes only the maintenance/reporting commands; the rest are definitions that cost nothing until wired to an engine.",
     runByFleetRunner: FLEET.map((f) => f.id),
     notRun: [],
   };
 
-  // MCP registry agents — definitions
   try {
     const reg = JSON.parse(fs.readFileSync(path.join(ROOT, "mcp/nexus-agent-registry.json"), "utf8"));
     manifest.notRun.push({
       group: "MCP registry agents",
       count: (reg.agents || []).length,
       runtime: "definition-only",
-      cost: "$0 unless wired to a paid model — these are registry entries describing duties, tools, and authority; they execute only when an engine invokes them.",
+      cost: "No charges unless wired to a paid model — these are registry entries describing duties, tools, and authority; they execute only when an engine invokes them. This runner does not implement them.",
       source: "mcp/nexus-agent-registry.json",
     });
-  } catch { /* registry unreadable — health bot reports it */ }
+  } catch { /* health bot reports registry problems */ }
 
-  // Financial-ops bots — human-gated
   try {
     const botsDef = JSON.parse(fs.readFileSync(path.join(ROOT, "mcp/agents/financial-ops-bots.json"), "utf8"));
     manifest.notRun.push({
       group: "Financial-ops bots",
       count: (botsDef.financialOpsBots && botsDef.financialOpsBots.bots || []).length,
       runtime: "human-gated definitions",
-      cost: "$0 — by design they never execute autonomously; their reporting side runs via finance-ops-reporter above.",
+      cost: "By design they never execute autonomously. finance-ops-reporter above covers only their REPORTING side; their operational duties (approvals, fund movement) remain human-gated.",
       source: "mcp/agents/financial-ops-bots.json",
     });
   } catch { /* same */ }
 
-  // Skills library
   let skills = [];
   try { skills = fs.readdirSync(path.join(ROOT, "skills")).filter((d) => !d.startsWith(".")); } catch { /* none */ }
   manifest.notRun.push({
     group: "Skills library",
     count: skills.length,
     runtime: "reference definitions",
-    cost: "$0 — a library of skill definitions agents can consult; no runtime cost until used.",
+    cost: "A library of skill definitions agents can consult; no charges until used.",
     source: "skills/",
   });
 
@@ -135,12 +155,19 @@ function buildManifest() {
 
 // ── Run ───────────────────────────────────────────────────────────────────────
 function main() {
+  if (!PYTHON) {
+    console.error("✗ No Python interpreter found (tried python3, python, py -3).");
+    console.error("  The 4 nexus/ reporting tools need Python; the Node bots still work via npm run bots:all.");
+    process.exit(1);
+  }
+
   fs.mkdirSync(REPORTS_DIR, { recursive: true });
 
   const results = [];
   for (const bot of FLEET) {
     const started = Date.now();
-    const run = spawnSync(bot.cmd[0], bot.cmd.slice(1), {
+    const argv = bot.cmd();
+    const run = spawnSync(argv[0], argv.slice(1), {
       cwd: ROOT,
       encoding: "utf8",
       timeout: 120000,
@@ -149,7 +176,19 @@ function main() {
     const durationMs = Date.now() - started;
 
     if (ok && bot.captureTo) {
-      fs.writeFileSync(path.join(ROOT, bot.captureTo), run.stdout || "");
+      let out = run.stdout || "";
+      let target = bot.captureTo;
+      // Validate captured JSON — never save unparseable output as .json
+      if (target.endsWith(".json")) {
+        try {
+          JSON.parse(out);
+        } catch {
+          console.error(`  ⚠ ${bot.id}: stdout is not valid JSON — saving as .txt instead`);
+          target = target.replace(/\.json$/, ".txt");
+          out = "NOTE: captured stdout failed JSON validation on " + new Date().toISOString() + "\n\n" + out;
+        }
+      }
+      writeIfChanged(path.join(ROOT, target), out);
     }
     results.push({
       id: bot.id,
@@ -157,7 +196,6 @@ function main() {
       ok,
       exitCode: run.status,
       durationMs,
-      creditsUsed: 0,
       note: bot.note || "",
     });
     console.log(`  ${ok ? "✓" : "✗"} ${bot.label} (${durationMs}ms)`);
@@ -166,11 +204,17 @@ function main() {
     }
   }
 
+  // Stage the fleet's own outputs so the accounting inventory (run last)
+  // sees them, and so the daily runner commits exactly this allowlist.
+  try {
+    spawnSync("git", ["add", ...OUTPUT_PATHSPECS], { cwd: ROOT, encoding: "utf8" });
+  } catch { /* not a git checkout — outputs still written */ }
+
   const report = {
     generatedBy: "fleet-runner",
     generatedAt: new Date().toISOString(),
     owner: "@FuzzysTodd",
-    mode: "local $0 runtime — no GitHub Actions, no AI credits",
+    mode: "local runtime — no GitHub Actions charges, no model API calls for these commands",
     summary: {
       total: results.length,
       passed: results.filter((r) => r.ok).length,
@@ -180,12 +224,15 @@ function main() {
     manifest: buildManifest(),
   };
 
-  fs.writeFileSync(path.join(REPORTS_DIR, "fleet-report.json"),
-    JSON.stringify(report, null, 2) + "\n");
-  fs.writeFileSync(path.join(REPORTS_DIR, "fleet-manifest.json"),
-    JSON.stringify(report.manifest, null, 2) + "\n");
+  writeIfChanged(path.join(REPORTS_DIR, "fleet-report.json"), JSON.stringify(report, null, 2) + "\n");
+  writeIfChanged(path.join(REPORTS_DIR, "fleet-manifest.json"), JSON.stringify(report.manifest, null, 2) + "\n");
+  // the two files above are fleet outputs too — stage them
+  try {
+    spawnSync("git", ["add", ...OUTPUT_PATHSPECS], { cwd: ROOT, encoding: "utf8" });
+  } catch { /* ignore */ }
 
-  console.log(`\n✓ Fleet run complete: ${report.summary.passed}/${report.summary.total} tools OK — 0 AI credits, 0 cloud cost`);
+  console.log(`\n✓ Fleet run complete: ${report.summary.passed}/${report.summary.total} tools OK`);
+  console.log("  Charges for these local commands: $0 (no model APIs, no Actions).");
   if (report.summary.failed > 0) process.exit(1);
 }
 
