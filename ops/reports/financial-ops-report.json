@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-22T22:28:27+00:00",
+  "generatedAt": "2026-10-22T22:30:53+00:00",
   "summary": {
     "filesScanned": 4053,
     "preErrorCount": 3,
@@ -447,13 +447,13 @@
   ],
   "successLog": [
     {
-      "time": "2026-10-22T22:28:27+00:00",
+      "time": "2026-10-22T22:30:53+00:00",
       "title": "Financial ops scan completed",
       "details": "Static repo scan finished and refreshed markdown plus dashboard payloads.",
       "status": "success"
     },
     {
-      "time": "2026-10-22T22:28:27+00:00",
+      "time": "2026-10-22T22:30:53+00:00",
       "title": "Approval gate enforced",
       "details": "Automation remains advisory for withdrawals, treasury routing, and settlement changes.",
       "status": "success"

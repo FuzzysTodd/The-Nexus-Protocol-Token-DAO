@@ -1,23 +1,21 @@
 {
   "generatedBy": "intel-bot",
-  "generatedAt": "2026-10-22T22:28:28.340Z",
+  "generatedAt": "2026-10-22T22:30:54.919Z",
   "owner": "@FuzzysTodd",
-  "networkStatus": "online",
+  "networkStatus": "degraded (some fetches failed — recorded below)",
   "data": {
-    "fetchedAt": "2026-10-22T22:28:28.338Z",
-    "ethUsd": "2382.52",
-    "btcUsd": "81254.535",
-    "repo": {
-      "stars": 1,
-      "forks": 0,
-      "openIssues": 2,
-      "pushedAt": "2026-10-22T22:25:27Z"
-    }
+    "fetchedAt": "2026-10-22T22:30:54.906Z",
+    "ethUsd": "2381.575",
+    "btcUsd": "81243.885",
+    "repo": null
   },
-  "fetchErrors": [],
+  "fetchErrors": [
+    "repo stats: HTTP 403"
+  ],
   "thinking": {
-    "enabled": false,
-    "mode": "off",
-    "note": "Thinking off — deterministic mode, $0. To think for free on your own GPUs, run Ollama on your machine (see README); for paid cloud models set NEXUS_MODEL_API_KEY in .env."
+    "enabled": true,
+    "mode": "local-gpu",
+    "cost": "your electricity/hardware only — no API credits",
+    "analysis": "MOCK-LOCAL-ANALYSIS"
   }
 }

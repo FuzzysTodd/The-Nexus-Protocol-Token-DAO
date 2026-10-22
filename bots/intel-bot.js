@@ -42,14 +42,24 @@ loadEnv();
 const TIMEOUT_MS = 10000;
 
 // ── Thinking mode resolution ──────────────────────────────────────────────────
-// Priority: explicit remote key → local GPU (Ollama) → off.
-//   local-gpu   : free of API credits — your own hardware + electricity only
-//   remote-api  : paid — billed by your provider per call
-//   off         : deterministic, $0
+// Explicit mode via NEXUS_THINK: "off" | "local" | "remote"
+//   local  : your GPUs via Ollama — free of API credits (electricity only).
+//            If the server is unreachable, reports UNAVAILABLE — NEVER falls
+//            back to a paid provider.
+//   remote : paid cloud API — ONLY when explicitly set. Requires
+//            NEXUS_MODEL_API_KEY; a stray key alone never enables it.
+//   off    : deterministic, $0.
+// Default (NEXUS_THINK unset): local if a server answers, otherwise off.
+// A paid request can only ever happen when NEXUS_THINK=remote AND a key is set.
 async function resolveThinking() {
-  const key = process.env.NEXUS_MODEL_API_KEY;
+  const mode = (process.env.NEXUS_THINK || "auto").toLowerCase();
+  const key = process.env.NEXUS_MODEL_API_KEY || "";
   const url = process.env.NEXUS_MODEL_URL || "";
-  if (key) {
+
+  if (mode === "remote") {
+    if (!key) {
+      return { mode: "error", error: "NEXUS_THINK=remote but no NEXUS_MODEL_API_KEY set — paid calls stay disabled" };
+    }
     return {
       mode: "remote-api",
       url: url || "https://api.openai.com/v1/chat/completions",
@@ -57,22 +67,30 @@ async function resolveThinking() {
       key,
     };
   }
-  // Local GPU inference (Ollama's OpenAI-compatible endpoint). No key, no
-  // API charges — your RTX cards + electricity only. Works over the LAN too
-  // (point NEXUS_MODEL_URL at http://<gpu-machine-ip>:11434/v1/chat/completions).
+
+  if (mode === "off") return { mode: "off" };
+
+  // "auto" or "local": local GPU only — a paid fallback is never used
   const localUrl = url || "http://localhost:11434/v1/chat/completions";
+  let serverUp = false;
   try {
     const probe = await fetch(localUrl.replace("/v1/chat/completions", "/api/tags"), {
       signal: AbortSignal.timeout(2000),
     });
-    if (probe.ok) {
-      return {
-        mode: "local-gpu",
-        url: localUrl,
-        model: process.env.NEXUS_MODEL_NAME || "llama3.1:8b",
-      };
-    }
-  } catch { /* no local server — fall through to off */ }
+    serverUp = probe.ok;
+  } catch { /* not reachable */ }
+
+  if (mode === "local" && !serverUp) {
+    return { mode: "unavailable", error: "NEXUS_THINK=local but no model server at " + localUrl.replace("/v1/chat/completions", "") + " — thinking skipped, NO paid fallback" };
+  }
+  if (serverUp) {
+    return {
+      mode: "local-gpu",
+      url: localUrl,
+      model: process.env.NEXUS_MODEL_NAME || "llama3.1:8b",
+    };
+  }
+  // auto + no server + (maybe a stray key) → still off, never paid
   return { mode: "off" };
 }
 
@@ -85,13 +103,16 @@ async function fetchJson(url) {
   return resp.json();
 }
 
-// ── Thinking step (mode-resolved: local-gpu free / remote-api paid) ─────────
+// ── Thinking step (local-gpu free / remote-api paid / off) ────────────────
 async function think(intel, engine) {
+  if (engine.mode === "error" || engine.mode === "unavailable") {
+    return { enabled: false, mode: engine.mode, error: engine.error };
+  }
   if (engine.mode === "off") {
     return {
       enabled: false,
       mode: "off",
-      note: "Thinking off — deterministic mode, $0. To think for free on your own GPUs, run Ollama on your machine (see README); for paid cloud models set NEXUS_MODEL_API_KEY in .env.",
+      note: "Thinking off — deterministic mode, $0. To think on your own GPUs set NEXUS_THINK=local and run Ollama (see README). Paid cloud models require NEXUS_THINK=remote AND a key.",
     };
   }
   try {
@@ -163,7 +184,8 @@ async function main() {
   console.log(`  ${errors.length ? "⚠" : "✓"} Intel Bot: online=${!errors.length}` +
     ` ETH=$${data.ethUsd || "?"} BTC=$${data.btcUsd || "?"}` +
     ` stars=${data.repo ? data.repo.stars : "?"}` +
-    ` (thinking: ${engine.mode}${engine.mode === "local-gpu" ? " — your GPUs, no API credits" : engine.mode === "remote-api" ? " — paid API" : " — $0"})`);
+    ` (thinking: ${engine.mode}${engine.mode === "local-gpu" ? " — your GPUs, no API credits" : engine.mode === "remote-api" ? " — PAID API" : engine.mode === "unavailable" || engine.mode === "error" ? " — PROBLEM (see report)" : " — $0"})`);
+  if (thinking && thinking.error) console.log(`    ⚠ ${thinking.error}`);
   if (errors.length) errors.forEach((e) => console.log(`    ⚠ ${e}`));
   // Network failures are recorded, never fatal — a daily run must not die
   // just because the internet was down.

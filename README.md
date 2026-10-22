@@ -142,26 +142,35 @@ failures gracefully — a daily run never dies because the internet was down.
 The Intel Bot has an optional thinking step with three modes, resolved
 automatically:
 
-1. **Local GPU (recommended — free of API credits).** Run
+1. **Local GPU (`NEXUS_THINK=local` — free of API credits).** Run
    [Ollama](https://ollama.com) on the GPU machine. The bot auto-detects it
    at `http://localhost:11434` and reasons on your own hardware — you pay only
-   electricity. With your 2× RTX 5060 Ti, quantized 7–9B-parameter models run
-   comfortably on one card; Ollama can use both cards for bigger models or
-   parallel requests. "Always available" here means the server waits for
-   events and reasons when needed — it does not burn GPU cycles continuously.
+   electricity. Set `NEXUS_THINK=local` explicitly; if the server is down it
+   reports UNAVAILABLE and never falls back to a paid provider. Which models
+   fit depends on your cards' VRAM (the RTX 5060 Ti comes in 8GB and 16GB
+   variants) — pick from Ollama's model library accordingly, and note that a
+   GPU accelerates model inference speed; it does not automatically make
+   every bot smarter or speed up arbitrary Python/Node/git work. "Always
+   available" means the server waits and reasons when triggered — it does not
+   burn GPU cycles continuously.
 
-2. **Remote hooks (your GPU box serving the whole fleet).** Start Ollama
-   listening on the LAN (`OLLAMA_HOST=0.0.0.0`), then on each other machine
-   set `NEXUS_MODEL_URL=http://<gpu-machine-ip>:11434/v1/chat/completions`.
-   Keep it LAN-only — never expose an unauthenticated model server to the
-   internet.
+2. **Remote hooks (your GPU box serving the whole fleet).** Start with
+   loopback only. To serve other machines on your network, run Ollama bound to
+   the LAN behind a firewall that blocks internet exposure, and point each
+   fleet machine's `NEXUS_MODEL_URL` at
+   `http://<gpu-machine-ip>:11434/v1/chat/completions`. An unauthenticated
+   model server must never be reachable from the internet.
 
-3. **Paid remote API.** Only if you set `NEXUS_MODEL_API_KEY` — that call is
-   billed by your provider, every time. Off by default.
+3. **Paid remote API (`NEXUS_THINK=remote`).** Requires BOTH
+   `NEXUS_THINK=remote` AND `NEXUS_MODEL_API_KEY` — a stray key alone can
+   never trigger a paid call. Billed by your provider per call.
 
 The honest bottom line: thinking on your own GPUs costs electricity, not API
-credits; paid APIs cost per call; "continuously thinking around the clock"
-has no free version in any form.
+credits; paid APIs cost per call; continuous around-the-clock inference has
+no free version in any form. Also note: this is the maintenance/reporting
+fleet plus one optional reasoning step — the 11 MCP registry agents remain
+definitions, and this is not yet an MCP-connected persistent reasoning
+service.
 
 The full classification lives in `reports/fleet-manifest.json`:
 

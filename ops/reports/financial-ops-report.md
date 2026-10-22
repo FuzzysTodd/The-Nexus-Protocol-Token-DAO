@@ -1,6 +1,6 @@
 # Financial Ops Automation Report
 
-- Generated at: 2026-10-22T22:28:27+00:00
+- Generated at: 2026-10-22T22:30:53+00:00
 - Files scanned: 4053
 - Pre-error findings: 3
 - Pre-error scope: first-party automation, docs, mcp, nexus, ops, and top-level repo files

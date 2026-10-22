@@ -262,6 +262,8 @@ function main() {
     console.log("  Thinking: LOCAL GPU (your hardware + electricity — no API credits, no Actions).");
   } else if (mode === "remote-api") {
     console.log("  Thinking: PAID remote API — charges apply per call, billed by your provider.");
+  } else if (mode === "unavailable" || mode === "error") {
+    console.log(`  ⚠ Thinking problem (${mode}) — no model call was made; see reports/intel.json.`);
   } else {
     console.log("  No model API calls, no Actions charges for these commands ($0).");
   }

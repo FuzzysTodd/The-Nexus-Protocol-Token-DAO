@@ -1,6 +1,6 @@
 {
   "generatedBy": "dao-accounting-bot",
-  "generatedAt": "2026-10-22T22:28:28.753Z",
+  "generatedAt": "2026-10-22T22:30:55.352Z",
   "owner": "@FuzzysTodd",
   "totals": {
     "trackedFiles": 4088,
@@ -113,7 +113,7 @@
       "category": "loose-root-file",
       "purpose": "Environment variable template (secrets never committed)",
       "disposition": "keep",
-      "bytes": 3014
+      "bytes": 3444
     },
     {
       "file": ".flake8",
@@ -18201,7 +18201,7 @@
       "category": "docs",
       "purpose": "Project entry point — links to every major surface",
       "disposition": "keep",
-      "bytes": 14877
+      "bytes": 15492
     },
     {
       "file": "README.xml",
@@ -25187,7 +25187,7 @@
       "category": "app-code",
       "purpose": "Agent Fleet Runner — runs Todd's full bot/agent fleet locally at $0 (no Actions, no AI credits)",
       "disposition": "keep",
-      "bytes": 11734
+      "bytes": 11898
     },
     {
       "file": "bots/health-bot.js",
@@ -25201,7 +25201,7 @@
       "category": "app-code",
       "purpose": "Personal DAO bots — deterministic, zero AI credits",
       "disposition": "keep",
-      "bytes": 7156
+      "bytes": 8234
     },
     {
       "file": "bots/registry-sync-bot.js",
@@ -26818,14 +26818,14 @@
       "category": "config-data",
       "purpose": "Machine-readable accounting inventory (this bot's output)",
       "disposition": "keep",
-      "bytes": 981738
+      "bytes": 982153
     },
     {
       "file": "reports/file-accounting.md",
       "category": "docs",
       "purpose": "Human-readable accounting report (this bot's output)",
       "disposition": "keep",
-      "bytes": 551843
+      "bytes": 552049
     },
     {
       "file": "reports/fleet-manifest.json",
@@ -26853,7 +26853,7 @@
       "category": "config-data",
       "purpose": "Internet intel — market prices + repo stats (intel-bot output)",
       "disposition": "keep",
-      "bytes": 637
+      "bytes": 529
     },
     {
       "file": "reports/repo-assessment.json",
