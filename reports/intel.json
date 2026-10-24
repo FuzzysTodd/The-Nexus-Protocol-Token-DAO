@@ -1,0 +1,23 @@
+{
+  "generatedBy": "intel-bot",
+  "generatedAt": "2026-10-22T22:37:38.987Z",
+  "owner": "@FuzzysTodd",
+  "networkStatus": "online",
+  "data": {
+    "fetchedAt": "2026-10-22T22:37:38.984Z",
+    "ethUsd": "2383.82",
+    "btcUsd": "81331.16",
+    "repo": {
+      "stars": 1,
+      "forks": 0,
+      "openIssues": 2,
+      "pushedAt": "2026-10-22T22:31:03Z"
+    }
+  },
+  "fetchErrors": [],
+  "thinking": {
+    "enabled": false,
+    "mode": "off",
+    "note": "Thinking off — deterministic mode, $0. To think on your own GPUs set NEXUS_THINK=local and run Ollama (see README). Paid cloud models require NEXUS_THINK=remote AND a key."
+  }
+}

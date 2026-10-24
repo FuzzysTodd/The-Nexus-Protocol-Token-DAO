@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Nexus Protocol Token DAO - MCP Metrics Schema",
+  "description": "Performance, reliability, safety, and throughput metrics for the MCP gateway. Ensures zero silent failure, measurable success, GPU-aware processing, and continuous improvement.",
+  "type": "object",
+
+  "properties": {
+    "mcp_instance_id": {
+      "type": "string",
+      "description": "Unique identifier for the MCP gateway instance."
+    },
+
+    "server_id": {
+      "type": "string",
+      "description": "Identifier for the server hosting this MCP instance."
+    },
+
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp of the metrics snapshot."
+    },
+
+    "uptime_ms": {
+      "type": "number",
+      "description": "Total uptime of the MCP instance in milliseconds."
+    },
+
+    "tool_calls": {
+      "type": "object",
+      "description": "Metrics for MCP tool usage.",
+      "properties": {
+        "total_calls": { "type": "integer" },
+        "successful_calls": { "type": "integer" },
+        "failed_calls": { "type": "integer" },
+        "avg_latency_ms": { "type": "number" },
+        "max_latency_ms": { "type": "number" },
+        "min_latency_ms": { "type": "number" }
+      }
+    },
+
+    "contract_interactions": {
+      "type": "object",
+      "description": "Metrics for on-chain read-only calls routed through MCP.",
+      "properties": {
+        "total_calls": { "type": "integer" },
+        "successful_calls": { "type": "integer" },
+        "failed_calls": { "type": "integer" },
+        "avg_gas_estimate": { "type": "number" },
+        "avg_latency_ms": { "type": "number" }
+      }
+    },
+
+    "error_events": {
+      "type": "object",
+      "description": "Error and failure telemetry.",
+      "properties": {
+        "total_errors": { "type": "integer" },
+        "critical_errors": { "type": "integer" },
+        "last_error_message": { "type": "string", "nullable": true },
+        "last_error_time": { "type": "string", "format": "date-time", "nullable": true }
+      }
+    },
+
+    "safety": {
+      "type": "object",
+      "description": "Safety and policy compliance metrics.",
+      "properties": {
+        "policy_compliant": { "type": "boolean" },
+        "violations": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "rate_limit_triggers": { "type": "integer" },
+        "blocked_actions": { "type": "integer" }
+      }
+    },
+
+    "throughput": {
+      "type": "object",
+      "description": "MCP throughput metrics.",
+      "properties": {
+        "requests_per_second": { "type": "number" },
+        "avg_queue_depth": { "type": "number" },
+        "max_queue_depth": { "type": "number" }
+      }
+    },
+
+    "gpu_usage": {
+      "type": "object",
+      "description": "GPU resource usage for MCP-related compute tasks.",
+      "properties": {
+        "gpu_id": { "type": "string" },
+        "cuda_utilization_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+        "vram_used_mb": { "type": "number" },
+        "vulkan_compute_ms": { "type": "number" },
+        "opencl_compute_ms": { "type": "number" }
+      }
+    },
+
+    "llm_usage": {
+      "type": "object",
+      "description": "LLM usage metrics for MCP-driven reasoning tasks.",
+      "properties": {
+        "model": { "type": "string" },
+        "tokens_in": { "type": "number" },
+        "tokens_out": { "type": "number" },
+        "latency_ms": { "type": "number" }
+      }
+    },
+
+    "agent_interactions": {
+      "type": "object",
+      "description": "Metrics for MCP interactions with agents.",
+      "properties": {
+        "agents_connected": { "type": "integer" },
+        "messages_sent": { "type": "integer" },
+        "messages_received": { "type": "integer" },
+        "avg_agent_latency_ms": { "type": "number" }
+      }
+    },
+
+    "mcp_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Final computed score for MCP reliability, throughput, safety, and performance."
+    }
+  },
+
+  "required": [
+    "mcp_instance_id",
+    "server_id",
+    "timestamp",
+    "uptime_ms",
+    "tool_calls",
+    "contract_interactions",
+    "error_events",
+    "safety",
+    "throughput",
+    "gpu_usage",
+    "llm_usage",
+    "agent_interactions",
+    "mcp_score"
+  ]
+}

@@ -285,6 +285,26 @@
         .signal-name { color: var(--warning); flex-shrink: 0; }
         .signal-data { color: var(--text); word-break: break-all; }
 
+        /* ── Agent / bot cards ── */
+        .agent-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+        }
+        .agent-card {
+            background: var(--panel-alt);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 18px;
+        }
+        .agent-card h3 { margin: 0 0 4px; font-size: 1rem; }
+        .agent-card .agent-domain { color: var(--accent); font-size: 0.8rem; margin: 0 0 10px; font-weight: 600; }
+        .agent-card ul { margin: 0 0 10px; padding-left: 18px; font-size: 0.82rem; color: var(--text); }
+        .agent-card .agent-meta { font-size: 0.75rem; color: var(--muted); }
+        .agent-card .agent-meta span { display: inline-block; margin-right: 12px; }
+        .agent-card .agent-meta .authority { color: var(--warning); }
+        .agent-card .credits { color: var(--success); font-weight: 700; }
+
         /* ── Stat grid ── */
         .stat-grid {
             display: grid;
@@ -377,10 +397,21 @@
         <button class="tab-btn" data-tab="properties" aria-label="Properties tab">🏠 Properties</button>
         <button class="tab-btn" data-tab="signals" aria-label="Live Signals tab">📡 Live Signals</button>
         <button class="tab-btn" data-tab="config" aria-label="Contract configuration tab">⚙️ Config</button>
+        <button class="tab-btn" data-tab="agents" aria-label="Agents and bots tab">🤖 Agents & Bots</button>
     </nav>
 
     <!-- Tab: Overview -->
     <div class="tab-panel active" id="tab-overview">
+        <section class="panel" id="purpose-section">
+            <h2>🎯 Our Purpose</h2>
+            <p style="margin:0 0 10px;font-size:0.95rem;">The Nexus Protocol Token DAO exists to <strong>re-modernize money mechanics</strong> with a self-sustaining Ethereum ecosystem: the NGTT token, human-gated treasury governance, and a family of deterministic DAO bots that run the routine work with <strong>zero AI credits</strong>.</p>
+            <ul style="margin:0;padding-left:20px;font-size:0.88rem;">
+                <li><strong>Governance:</strong> owner-authoritative proposals with quorum bounds, timelocks, and human-gated approvals.</li>
+                <li><strong>Treasury:</strong> transparent on-chain funds with withdrawal paths and streaming payroll.</li>
+                <li><strong>Automation:</strong> personal DAO bots (health, accounting, registry sync) handle repo upkeep deterministically — no paid models required.</li>
+                <li><strong>Community:</strong> games, revenue streams, and DeFi education that bring participants into the DAO.</li>
+            </ul>
+        </section>
         <section class="panel" id="github-section">
             <h2>🐙 GitHub Profile</h2>
             <div class="gh-card" id="gh-card-content">
@@ -576,6 +607,20 @@
         </section>
     </div>
 
+    <!-- Tab: Agents & Bots -->
+    <div class="tab-panel" id="tab-agents">
+        <section class="panel">
+            <h2>🤖 MCP Agents & Their Duties</h2>
+            <p style="color:var(--muted);font-size:0.88rem;">Generated snapshot from <code>mcp/nexus-agent-registry.json</code> via the registry-sync bot — each agent's domain, duties, tools, and authority level. <em>Defined specialists: their registry entry describes duties and scope; implementation is separate.</em></p>
+            <div id="agent-cards" class="agent-grid"><p style="color:var(--muted);">Loading agents…</p></div>
+        </section>
+        <section class="panel">
+            <h2>⚙️ Personal DAO Bots — Zero AI Credits</h2>
+            <p style="color:var(--muted);font-size:0.88rem;">Deterministic bots that do the routine work so no paid model (or human) has to. Treasury actions remain human-gated.</p>
+            <div id="bot-cards" class="agent-grid"><p style="color:var(--muted);">Loading bots…</p></div>
+        </section>
+    </div>
+
 </main>
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@coinbase/wallet-sdk@4.3.0/dist/index.global.js"></script>
@@ -628,6 +673,50 @@
             if (panel) panel.classList.add("active");
         });
     });
+
+    // Agents & Bots panel — fed by the registry-sync bot (reports/agents.json)
+    async function loadAgentsAndBots() {
+        var agentBox = document.getElementById("agent-cards");
+        var botBox = document.getElementById("bot-cards");
+        if (!agentBox || !botBox) return;
+        try {
+            var resp = await fetch("reports/agents.json", { cache: "no-store" });
+            if (!resp.ok) throw new Error("HTTP " + resp.status);
+            var data = await resp.json();
+            renderAgents(data.agents || []);
+            renderBots(data.bots || []);
+        } catch (err) {
+            agentBox.innerHTML = "<p style='color:var(--danger);'>Could not load agents.json — run <code>npm run bots:sync</code> or check reports/.</p>";
+            botBox.innerHTML = "";
+        }
+    }
+
+    function renderAgents(agents) {
+        var box = document.getElementById("agent-cards");
+        box.innerHTML = agents.map(function (a) {
+            var duties = (a.duties || []).map(function (d) { return "<li>" + escapeHtml(d) + "</li>"; }).join("");
+            var notes = a.notes ? "<p style='font-size:0.8rem;margin:0 0 8px;color:var(--text);'>" + escapeHtml(a.notes) + "</p>" : "";
+            return "<div class='agent-card'><h3>" + escapeHtml(a.id) + "</h3>" +
+                "<p class='agent-domain'>" + escapeHtml(a.domain || "") + " · " + escapeHtml(a.status || "defined") + "</p>" +
+                "<ul>" + duties + "</ul>" + notes +
+                "<p class='agent-meta'><span class='authority'>Authority: " + escapeHtml(a.authority || "") + "</span>" +
+                "<span>Tools: " + escapeHtml((a.tools || []).join(", ")) + "</span></p></div>";
+        }).join("");
+    }
+
+    function renderBots(bots) {
+        var box = document.getElementById("bot-cards");
+        box.innerHTML = bots.map(function (b) {
+            var outs = (b.outputs || []).map(function (o) { return "<li>" + escapeHtml(o) + "</li>"; }).join("");
+            return "<div class='agent-card'><h3>" + escapeHtml(b.name || b.id) + "</h3>" +
+                "<p class='agent-domain'>" + escapeHtml(b.id) + " · " + escapeHtml(b.status || "") + "</p>" +
+                "<p style='font-size:0.85rem;margin:0 0 8px;'>" + escapeHtml(b.role || "") + "</p>" +
+                (outs ? "<ul>" + outs + "</ul>" : "") +
+                "<p class='agent-meta'><span>Runs: " + escapeHtml(b.runs || "—") + "</span>" +
+                "<span class='credits'>Model API calls: " + escapeHtml(b.creditsUsed || "0") + "</span></p></div>";
+        }).join("");
+    }
+    loadAgentsAndBots();
 
     // GitHub Profile
     async function loadGitHubProfile() {

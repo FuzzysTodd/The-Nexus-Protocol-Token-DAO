@@ -1,0 +1,55 @@
+name: On-Chain Execution Trigger (Tier-4)
+
+on:
+  push:
+    paths:
+      - "governance/decisions/gp-22-tier4.json"
+
+jobs:
+  execute-onchain:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Read Tier-4 decision artifact
+        id: decision
+        run: |
+          echo "Reading Tier-4 decision..."
+          cat governance/decisions/gp-22-tier4.json
+
+      - name: Parse approval status
+        id: parse
+        run: |
+          STATUS=$(jq -r '.status' governance/decisions/gp-22-tier4.json)
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+
+      - name: Stop if not approved
+        if: steps.parse.outputs.status != 'approved'
+        run: |
+          echo "Tier-4 decision not approved. Exiting."
+          exit 1
+
+      - name: Load routing file
+        id: routing
+        run: |
+          echo "Loading Tier-4 routing file..."
+          cat governance/mcp/routing/gp22_tier4_execution.json
+
+      - name: Trigger ChainOpsAgent
+        run: |
+          echo "Triggering ChainOpsAgent for on-chain payload preparation..."
+          echo "This step would call your internal MCP Router."
+
+      - name: Trigger TreasuryMultisigAgent
+        run: |
+          echo "Triggering TreasuryMultisigAgent for multisig signing..."
+
+      - name: Trigger ChainOpsAgent broadcast
+        run: |
+          echo "Broadcasting transaction to Ethereum..."
+
+      - name: Log event with OrbitAgent
+        run: |
+          echo "Logging on-chain execution event via OrbitAgent..."

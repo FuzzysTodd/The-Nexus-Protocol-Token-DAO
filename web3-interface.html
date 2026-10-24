@@ -1,3 +1,21 @@
+// DEX Router addresses and ABIs for Uniswap (Ethereum/Base) and PancakeSwap (BSC)
+const DEX_ROUTERS = {
+    uniswap: {
+        1:    { address: "0xE592427A0AEce92De3Edee1F18E0157C05861564" }, // Uniswap V3 Router (Ethereum)
+        8453: { address: "0x327Df1E6de05895d2ab08513aaDD9313Fe505d86" }, // Uniswap V3 Router (Base)
+    },
+    pancakeswap: {
+        56:   { address: "0x10ED43C718714eb63d5aA57B78B54704E256024E" }, // PancakeSwap V2 Router (BSC)
+    }
+};
+
+// Minimal ABI for swapExactETHForTokens and swapExactTokensForETH (V2)
+const UNISWAP_V2_ROUTER_ABI = [
+    "function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) payable returns (uint[] memory amounts)",
+    "function swapExactTokensForETH(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) returns (uint[] memory amounts)",
+    "function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) returns (uint[] memory amounts)",
+    "function getAmountsOut(uint amountIn, address[] calldata path) view returns (uint[] memory amounts)"
+];
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -592,6 +610,38 @@
         <span>›</span>
         <span>Web3 Interface</span>
     </nav>
+
+    <!-- ═══════════════════════════════════════════════════════════════
+         DEX TRADE PANEL — Uniswap/PancakeSwap
+    ════════════════════════════════════════════════════════════════════ -->
+    <section class="panel workflow-stage" data-stage="0">
+        <div class="panel-title">🔄 DEX Trade (Uniswap/PancakeSwap)</div>
+        <div class="form-group">
+            <label class="form-label" for="dex-from-token">From Token</label>
+            <select class="form-select" id="dex-from-token"></select>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="dex-to-token">To Token</label>
+            <select class="form-select" id="dex-to-token"></select>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="dex-amount">Amount</label>
+            <input type="text" class="form-input" id="dex-amount" placeholder="Amount to swap">
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="dex-dex">DEX</label>
+            <select class="form-select" id="dex-dex">
+                <option value="uniswap">Uniswap</option>
+                <option value="pancakeswap">PancakeSwap</option>
+            </select>
+        </div>
+        <div class="form-actions">
+            <button class="btn btn-primary" id="dex-quote-btn" onclick="getDexQuote()">Get Quote</button>
+            <button class="btn btn-accent" id="dex-swap-btn" onclick="executeDexSwap()">Swap</button>
+        </div>
+        <div class="tx-result" id="dex-quote-result"></div>
+        <div class="tx-result" id="dex-swap-result"></div>
+    </section>
 
     <section class="panel mode-bar" aria-label="Workflow mode controls">
         <div class="panel-title" style="margin-bottom:12px;">🧭 Workflow Control</div>
@@ -1303,6 +1353,7 @@ const REGISTRY = {
                 WETH: { symbol: "WETH", name: "Wrapped Ether",       address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", decimals: 18 },
                 DAI:  { symbol: "DAI",  name: "Dai Stablecoin",      address: "0x6B175474E89094C44Da98b954EedeAC495271d0F", decimals: 18 },
                 NGTT: { symbol: "NGTT", name: "Nexus Game Theory Token", address: "0xeCE999c86452c573Adfdd7F0C9226e673477973a", decimals: 18 }
+                WBTC: { symbol: "WBTC", name: "Wrapped Bitcoin", address: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", decimals: 8 }
             }
         },
         8453: {
@@ -1329,6 +1380,7 @@ const REGISTRY = {
                 BNB:  { symbol: "BNB",  name: "BNB",           address: "0x0000000000000000000000000000000000000000", decimals: 18, native: true },
                 WBNB: { symbol: "WBNB", name: "Wrapped BNB",   address: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c", decimals: 18 },
                 USDT: { symbol: "USDT", name: "Tether USD",    address: "0x55d398326f99059fF775485246999027B3197955", decimals: 18 },
+                    BTCB: { symbol: "BTCB", name: "Bitcoin BEP2", address: "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c", decimals: 18 }
                 USDC: { symbol: "USDC", name: "USD Coin",      address: "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d", decimals: 18 },
                 BUSD: { symbol: "BUSD", name: "Binance USD",   address: "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56", decimals: 18 }
             }
@@ -2659,6 +2711,146 @@ function toggleAccordion(id) {
     if (handlePill) handlePill.textContent = "🔵 " + CB_HANDLE;
     const receiveHandle = document.getElementById("receive-handle");
     if (receiveHandle) receiveHandle.textContent = CB_HANDLE;
+
+    // DEX token lists
+    function populateDexTokenLists() {
+        const chain = getActiveChainId();
+        const tokenMap = getResolvedTokenMap(chain);
+        const fromSel = document.getElementById("dex-from-token");
+        const toSel = document.getElementById("dex-to-token");
+        if (!fromSel || !toSel) return;
+        fromSel.innerHTML = "";
+        toSel.innerHTML = "";
+        Object.entries(tokenMap).forEach(([sym, tok]) => {
+            const opt1 = document.createElement("option");
+            opt1.value = sym;
+            opt1.textContent = sym + " — " + tok.name;
+            fromSel.appendChild(opt1);
+            const opt2 = document.createElement("option");
+            opt2.value = sym;
+            opt2.textContent = sym + " — " + tok.name;
+            toSel.appendChild(opt2);
+        });
+        toSel.selectedIndex = 1;
+    }
+    populateDexTokenLists();
+    const fromSel = document.getElementById("dex-from-token");
+    const toSel = document.getElementById("dex-to-token");
+    if (fromSel) fromSel.onchange = populateDexTokenLists;
+    if (toSel) toSel.onchange = populateDexTokenLists;
+
+    window.getDexQuote = async function() {
+        const fromSym = document.getElementById("dex-from-token").value;
+        const toSym = document.getElementById("dex-to-token").value;
+        const amountStr = document.getElementById("dex-amount").value.trim();
+        const dex = document.getElementById("dex-dex").value;
+        const chain = getActiveChainId();
+        const fromTok = getResolvedToken(chain, fromSym);
+        const toTok = getResolvedToken(chain, toSym);
+        const resultEl = document.getElementById("dex-quote-result");
+        resultEl.className = "tx-result info";
+        resultEl.style.display = "block";
+        if (!fromTok || !toTok || !amountStr || isNaN(Number(amountStr)) || Number(amountStr) <= 0) {
+            resultEl.textContent = "⚠ Enter valid tokens and amount.";
+            return;
+        }
+        resultEl.textContent = "⏳ Fetching quote...";
+        try {
+            let routerInfo = DEX_ROUTERS[dex]?.[chain];
+            if (!routerInfo) throw new Error("DEX not supported on this network");
+            const router = new ethers.Contract(routerInfo.address, UNISWAP_V2_ROUTER_ABI, provider);
+            let amountIn, path;
+            if (fromTok.native) {
+                amountIn = ethers.utils.parseEther(amountStr);
+                path = [fromTok.address, toTok.address];
+            } else {
+                amountIn = ethers.utils.parseUnits(amountStr, fromTok.decimals);
+                path = [fromTok.address, toTok.address];
+            }
+            const amounts = await router.getAmountsOut(amountIn, path);
+            const outAmount = ethers.utils.formatUnits(amounts[amounts.length - 1], toTok.decimals);
+            resultEl.textContent = `Quote: ${amountStr} ${fromSym} → ~${outAmount} ${toSym} via ${dex.toUpperCase()}`;
+        } catch (err) {
+            resultEl.className = "tx-result error";
+            resultEl.textContent = "❌ " + (err.message || String(err));
+        }
+    };
+
+    window.executeDexSwap = async function() {
+        const fromSym = document.getElementById("dex-from-token").value;
+        const toSym = document.getElementById("dex-to-token").value;
+        const amountStr = document.getElementById("dex-amount").value.trim();
+        const dex = document.getElementById("dex-dex").value;
+        const chain = getActiveChainId();
+        const fromTok = getResolvedToken(chain, fromSym);
+        const toTok = getResolvedToken(chain, toSym);
+        const resultEl = document.getElementById("dex-swap-result");
+        resultEl.className = "tx-result info";
+        resultEl.style.display = "block";
+        if (!signer || !fromTok || !toTok || !amountStr || isNaN(Number(amountStr)) || Number(amountStr) <= 0) {
+            resultEl.textContent = "⚠ Connect wallet and enter valid tokens/amount.";
+            return;
+        }
+        resultEl.textContent = "⏳ Submitting swap...";
+        try {
+            let routerInfo = DEX_ROUTERS[dex]?.[chain];
+            if (!routerInfo) throw new Error("DEX not supported on this network");
+            const router = new ethers.Contract(routerInfo.address, UNISWAP_V2_ROUTER_ABI, signer);
+            let tx;
+            let deadline = Math.floor(Date.now() / 1000) + 1800; // 30 min
+            let amountIn, path;
+            if (fromTok.native) {
+                amountIn = ethers.utils.parseEther(amountStr);
+                path = [fromTok.address, toTok.address];
+                tx = await router.swapExactETHForTokens(
+                    0, // amountOutMin (no slippage protection for demo)
+                    path,
+                    account,
+                    deadline,
+                    { value: amountIn }
+                );
+            } else if (toTok.native) {
+                amountIn = ethers.utils.parseUnits(amountStr, fromTok.decimals);
+                path = [fromTok.address, toTok.address];
+                // Approve first if needed
+                const tokenContract = new ethers.Contract(fromTok.address, ERC20_ABI, signer);
+                const allowance = await tokenContract.allowance(account, routerInfo.address);
+                if (allowance.lt(amountIn)) {
+                    const approveTx = await tokenContract.approve(routerInfo.address, amountIn);
+                    await approveTx.wait();
+                }
+                tx = await router.swapExactTokensForETH(
+                    amountIn,
+                    0,
+                    path,
+                    account,
+                    deadline
+                );
+            } else {
+                amountIn = ethers.utils.parseUnits(amountStr, fromTok.decimals);
+                path = [fromTok.address, toTok.address];
+                // Approve first if needed
+                const tokenContract = new ethers.Contract(fromTok.address, ERC20_ABI, signer);
+                const allowance = await tokenContract.allowance(account, routerInfo.address);
+                if (allowance.lt(amountIn)) {
+                    const approveTx = await tokenContract.approve(routerInfo.address, amountIn);
+                    await approveTx.wait();
+                }
+                tx = await router.swapExactTokensForTokens(
+                    amountIn,
+                    0,
+                    path,
+                    account,
+                    deadline
+                );
+            }
+            resultEl.className = "tx-result success";
+            resultEl.textContent = `✔ Swap submitted! Tx hash: ${tx.hash}`;
+        } catch (err) {
+            resultEl.className = "tx-result error";
+            resultEl.textContent = "❌ " + (err.message || String(err));
+        }
+    };
 
     setEncoding("packed");
     selectNetworkView(1);

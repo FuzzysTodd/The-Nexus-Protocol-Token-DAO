@@ -1,0 +1,207 @@
+╔══════════════════════════════════════════════════════════╗
+║  NEXUS PROTOCOL — TOKEN & CONTRACT ASSET FINDER          ║
+║  @FuzzysTodd  |  All token contracts located             ║
+╚══════════════════════════════════════════════════════════╝
+
+  Repo root              : /home/user/workspace/nexus-dao
+  Solidity files scanned : 3616
+
+  ── Token Standard Breakdown ──
+  ERC-20     : 84
+  ERC-721    : 43
+  ERC-1155   : 8
+  Governance : 17
+
+  ── Owner / First-Party Token Contracts (16) ──
+  [ERC-20]  AntiBotERC20  →  AntiBot-ERC20/contracts/AntiBotERC20.sol
+  [Governance]  NGTTGovernanceToken  →  contracts/NGTTGovernanceToken.sol
+  [ERC-20]  NexusFractionalize  →  contracts/NexusFractionalize.sol
+  [ERC-20]  NexusGameTheoryToken  →  contracts/NexusGameTheoryToken.sol
+  [ERC-721]  NexusRWA  →  contracts/NexusRWA.sol
+  [ERC-20]  VIRAL  →  dividend-paying-token-with-buy-sell-fee/contracts/VIRAL.sol
+  [ERC-20]  DividendPayingToken  →  dividend-paying-token-with-buy-sell-fee/contracts/interfaces/DividendPayingToken.sol
+  [ERC-20]  ERC20  →  dividend-paying-token-with-buy-sell-fee/contracts/interfaces/ERC20.sol
+  [ERC-20]  AuroxToken  →  erc20-token-with-automatic-vesting/contracts/Token/AuroxToken.sol
+  [ERC-721]  LimitedNFT  →  flagship-cookbook-nft/contracts/flagship-cookbook-nft.sol
+  [ERC-20]  MintableToken  →  mintable-token/mintable-token.sol
+  [ERC-20]  Context  →  reflection-token-supporting-3-wallets/contracts/MediTokenV2.sol
+  [ERC-721]  StandardNFT  →  simple-nft-sale/simple-nft-sale.sol
+  [ERC-721]  SoulboundNFT  →  soulbound-nft/soulbound-nft.sol
+  [ERC-721]  SoulboundNFT  →  soulbound-nft(copy)/soulbound-nft.sol
+  [ERC-20, Governance]  VotingToken  →  voting-token/voting-token.sol
+
+  ── Protocol / Third-Party Token Contracts (135) ──
+  [0x]
+    [Governance]  Governor  →  0x/@openzeppelin/contracts/governance/Governor.sol
+    [Governance]  IGovernor  →  0x/@openzeppelin/contracts/governance/IGovernor.sol
+    [Governance]  GovernorCountingSimple  →  0x/@openzeppelin/contracts/governance/extensions/GovernorCountingSimple.sol
+    [Governance]  GovernorSettings  →  0x/@openzeppelin/contracts/governance/extensions/GovernorSettings.sol
+    [Governance]  GovernorTimelockControl  →  0x/@openzeppelin/contracts/governance/extensions/GovernorTimelockControl.sol
+    [Governance]  GovernorVotes  →  0x/@openzeppelin/contracts/governance/extensions/GovernorVotes.sol
+    [Governance]  GovernorVotesQuorumFraction  →  0x/@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol
+    [Governance]  IGovernorTimelock  →  0x/@openzeppelin/contracts/governance/extensions/IGovernorTimelock.sol
+    [ERC-20]  ERC20  →  0x/@openzeppelin/contracts/token/ERC20/ERC20.sol
+    [ERC-20]  ERC20Wrapper  →  0x/@openzeppelin/contracts/token/ERC20/extensions/ERC20Wrapper.sol
+    [ERC-20]  ERC20Permit  →  0x/@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol
+    [Governance]  IZeroExGovernor  →  0x/contracts/governance/src/IZeroExGovernor.sol
+    [ERC-20]  ZRXWrappedToken  →  0x/contracts/governance/src/ZRXWrappedToken.sol
+  [Aave-V3]
+    [ERC-20]  ERC20  →  Aave-V3/dependencies/openzeppelin/contracts/ERC20.sol
+    [ERC-20]  Context  →  Aave-V3/dependencies/openzeppelin/contracts/ERC20_flattened.sol
+    [ERC-20]  MintableDelegationERC20  →  Aave-V3/mocks/tokens/MintableDelegationERC20.sol
+    [ERC-20]  MintableERC20  →  Aave-V3/mocks/tokens/MintableERC20.sol
+  [AntiBot-ERC20]
+    [ERC-20]  ERC20  →  AntiBot-ERC20/@openzeppelin/contracts/token/ERC20/ERC20.sol
+    [ERC-20]  ERC20Burnable  →  AntiBot-ERC20/@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol
+    [ERC-20]  ERC20Permit  →  AntiBot-ERC20/@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol
+  [ApeCoin]
+    [ERC-20]  ERC20  →  ApeCoin/@openzeppelin/contracts/token/ERC20/ERC20.sol
+    [ERC-721]  ERC721  →  ApeCoin/@openzeppelin/contracts/token/ERC721/ERC721.sol
+    [ERC-721]  ERC721Enumerable  →  ApeCoin/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol
+    [ERC-20]  SimpleERC20  →  ApeCoin/contracts/ERC20/SimpleERC20.sol
+  [Azuki-ERC721A-NFT-Sale]
+    [ERC-721]  ERC721  →  Azuki-ERC721A-NFT-Sale/@openzeppelin/contracts/token/ERC721/ERC721.sol
+    [ERC-721]  ERC721Enumerable  →  Azuki-ERC721A-NFT-Sale/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol
+  [Azuki-ERC721A-NFT-Sale-basic]
+    [ERC-721]  ERC721  →  Azuki-ERC721A-NFT-Sale-basic/@openzeppelin/contracts/token/ERC721/ERC721.sol
+    [ERC-721]  ERC721Enumerable  →  Azuki-ERC721A-NFT-Sale-basic/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol
+  [ChainLink]
+    [ERC-20]  ERC20  →  ChainLink/src/v0.4/interfaces/ERC20.sol
+  [Circle-USDC-FiatTokenV2]
+    [ERC-20]  AbstractFiatTokenV1  →  Circle-USDC-FiatTokenV2/contracts/v1/AbstractFiatTokenV1.sol
+  [ERC20-NFT-Sale-with-Distributed-Royalties]
+    [ERC-20]  ERC20  →  ERC20-NFT-Sale-with-Distributed-Royalties/@openzeppelin/contracts/token/ERC20/ERC20.sol
+    [ERC-721]  ERC721  →  ERC20-NFT-Sale-with-Distributed-Royalties/@openzeppelin/contracts/token/ERC721/ERC721.sol
+    [ERC-721]  ERC721Burnable  →  ERC20-NFT-Sale-with-Distributed-Royalties/@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol
+    [ERC-721]  ERC721Enumerable  →  ERC20-NFT-Sale-with-Distributed-Royalties/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol
+  [ERC20-NFT-Sale-with-Distributed-Royalties(copy)]
+    [ERC-20]  ERC20  →  ERC20-NFT-Sale-with-Distributed-Royalties(copy)/@openzeppelin/contracts/token/ERC20/ERC20.sol
+    [ERC-721]  ERC721  →  ERC20-NFT-Sale-with-Distributed-Royalties(copy)/@openzeppelin/contracts/token/ERC721/ERC721.sol
+    [ERC-721]  ERC721Burnable  →  ERC20-NFT-Sale-with-Distributed-Royalties(copy)/@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol
+    [ERC-721]  ERC721Enumerable  →  ERC20-NFT-Sale-with-Distributed-Royalties(copy)/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol
+  [ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)]
+    [ERC-20]  ERC20  →  ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC20/ERC20.sol
+    [ERC-721]  ERC721  →  ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC721/ERC721.sol
+    [ERC-721]  ERC721Burnable  →  ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol
+    [ERC-721]  ERC721Enumerable  →  ERC20-NFT-Sale-with-Distributed-Royalties(copy)(copy)/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol
+  [Ethereum-Name-Service]
+    [ERC-20]  ERC20  →  Ethereum-Name-Service/@openzeppelin/contracts/token/ERC20/ERC20.sol
+    [ERC-721]  ERC721  →  Ethereum-Name-Service/@openzeppelin/contracts/token/ERC721/ERC721.sol
+    [ERC-721]  BaseRegistrarImplementation  →  Ethereum-Name-Service/contracts/ethregistrar/BaseRegistrarImplementation.sol
+    [ERC-1155]  ERC1155Fuse  →  Ethereum-Name-Service/contracts/wrapper/ERC1155Fuse.sol
+    [ERC-20]  MockERC20  →  Ethereum-Name-Service/test/utils/mocks/MockERC20.sol
+  [FlashloanAttacker]
+    [ERC-20]  ERC20  →  FlashloanAttacker/contracts/dependencies/openzeppelin/contracts/ERC20.sol
+    [ERC-20]  MintableERC20  →  FlashloanAttacker/contracts/mocks/tokens/MintableERC20.sol
+  [GMX.io]
+    [ERC-20]  GMT  →  GMX.io/gambit-token/GMT.sol
+    [ERC-20]  GmxIou  →  GMX.io/gmx/GmxIou.sol
+    [ERC-20]  ERC20  →  GMX.io/libraries/token/ERC20.sol
+    [ERC-721]  ERC721  →  GMX.io/libraries/token/ERC721/ERC721.sol
+    [ERC-20]  RewardTracker  →  GMX.io/staking/RewardTracker.sol
+    [ERC-20]  Vester  →  GMX.io/staking/Vester.sol
+    [ERC-20]  BaseToken  →  GMX.io/tokens/BaseToken.sol
+    [ERC-20]  FaucetToken  →  GMX.io/tokens/FaucetToken.sol
+    [ERC-20]  Token  →  GMX.io/tokens/Token.sol
+    [ERC-20]  WETH  →  GMX.io/tokens/WETH.sol
+    [ERC-20]  YieldToken  →  GMX.io/tokens/YieldToken.sol
+  [Lens-Protocol]
+    [ERC-20]  ERC20  →  Lens-Protocol/@openzeppelin/contracts/token/ERC20/ERC20.sol
+    [ERC-20]  Currency  →  Lens-Protocol/mocks/Currency.sol
+  [Lyra-Finance]
+    [ERC-20]  LiquidityToken  →  Lyra-Finance/contracts/LiquidityToken.sol
+    [ERC-20]  TestERC20  →  Lyra-Finance/contracts/test-helpers/TestERC20.sol
+    [ERC-20]  TestERC20SetDecimals  →  Lyra-Finance/contracts/test-helpers/TestERC20SetDecimals.sol
+    [ERC-20]  TestERC20SetDecimalsFail  →  Lyra-Finance/contracts/test-helpers/TestERC20SetDecimalsFail.sol
+    [ERC-20]  Token  →  Lyra-Finance/gmx/contracts/tokens/Token.sol
+    [ERC-20]  YieldToken  →  Lyra-Finance/gmx/contracts/tokens/YieldToken.sol
+    [ERC-20]  ERC20  →  Lyra-Finance/openzeppelin-contracts-4.4.1/token/ERC20/ERC20.sol
+    [ERC-721]  ERC721  →  Lyra-Finance/openzeppelin-contracts-4.4.1/token/ERC721/ERC721.sol
+    [ERC-721]  ERC721Enumerable  →  Lyra-Finance/openzeppelin-contracts-4.4.1/token/ERC721/extensions/ERC721Enumerable.sol
+  [Nouns-DAO]
+    [ERC-721]  ERC721  →  Nouns-DAO/contracts/base/ERC721.sol
+    [ERC-721]  ERC721Enumerable  →  Nouns-DAO/contracts/base/ERC721Enumerable.sol
+  [Olympus-DAO]
+    [ERC-20]  ERC20  →  Olympus-DAO/@openzeppelin/contracts/token/ERC20/ERC20.sol
+    [ERC-20]  MockSOHM  →  Olympus-DAO/contracts/mocks/MockSOHM.sol
+  [OpenSea-Seaport]
+    [ERC-1155]  TestERC1155  →  OpenSea-Seaport/contracts/test/TestERC1155.sol
+    [ERC-20]  TestERC20  →  OpenSea-Seaport/contracts/test/TestERC20.sol
+    [ERC-20]  TestERC20NotOk  →  OpenSea-Seaport/contracts/test/TestERC20NotOk.sol
+    [ERC-20]  TestERC20Panic  →  OpenSea-Seaport/contracts/test/TestERC20Panic.sol
+    [ERC-20]  TestERC20Revert  →  OpenSea-Seaport/contracts/test/TestERC20Revert.sol
+    [ERC-721]  TestERC721  →  OpenSea-Seaport/contracts/test/TestERC721.sol
+    [ERC-721]  TestERC721Fee  →  OpenSea-Seaport/contracts/test/TestERC721Fee.sol
+    [ERC-721]  TestERC721Funky  →  OpenSea-Seaport/contracts/test/TestERC721Funky.sol
+  [POAP]
+    [ERC-721]  Poap  →  POAP/Poap.sol
+    [ERC-721]  XPoap  →  POAP/XPoap.sol
+    [ERC-721]  ERC721  →  POAP/openzeppelin-eth/contracts/token/ERC721/ERC721.sol
+    [ERC-721]  ERC721Enumerable  →  POAP/openzeppelin-eth/contracts/token/ERC721/ERC721Enumerable.sol
+    [ERC-721]  IERC721Receiver  →  POAP/openzeppelin-eth/contracts/token/ERC721/IERC721Receiver.sol
+  [SuperFluid]
+    [ERC-20]  ERC20  →  SuperFluid/@openzeppelin/contracts/token/ERC20/ERC20.sol
+    [ERC-20]  ERC20Permit  →  SuperFluid/@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol
+  [Synthetix]
+    [ERC-20]  BaseSynthetix  →  Synthetix/contracts/BaseSynthetix.sol
+    [ERC-20]  ProxyERC20  →  Synthetix/contracts/ProxyERC20.sol
+    [ERC-20]  Synth  →  Synthetix/contracts/Synth.sol
+    [ERC-20]  VirtualSynth  →  Synthetix/contracts/VirtualSynth.sol
+    [ERC-20]  MockToken  →  Synthetix/contracts/test-helpers/MockToken.sol
+    [ERC-20]  MockWETH  →  Synthetix/contracts/test-helpers/MockWETH.sol
+    [ERC-20]  WETH  →  Synthetix/contracts/test-helpers/WETH.sol
+    [ERC-20]  ERC20  →  Synthetix/openzeppelin-solidity-2.3.0/contracts/token/ERC20/ERC20.sol
+    [ERC-20]  ERC20Detailed  →  Synthetix/openzeppelin-solidity-2.3.0/contracts/token/ERC20/ERC20Detailed.sol
+  [Umbra-Cash]
+    [ERC-20]  ERC20  →  Umbra-Cash/@openzeppelin/contracts/token/ERC20/ERC20.sol
+    [ERC-20]  TestToken  →  Umbra-Cash/contracts/TestToken.sol
+  [Uniswap-V2]
+    [ERC-20]  ERC20  →  Uniswap-V2/test/ERC20.sol
+  [Uniswap-V4]
+    [ERC-20]  MockERC20  →  Uniswap-V4/lib/forge-std/src/mocks/MockERC20.sol
+    [ERC-20]  ERC20  →  Uniswap-V4/lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol
+    [ERC-20]  ERC20Burnable  →  Uniswap-V4/lib/openzeppelin-contracts/contracts/token/ERC20/extensions/ERC20Burnable.sol
+    [ERC-20]  MockERC20  →  Uniswap-V4/lib/solmate/src/test/utils/mocks/MockERC20.sol
+  [basic-dao]
+    [Governance]  Governor  →  basic-dao/@openzeppelin/contracts/governance/Governor.sol
+    [Governance]  IGovernor  →  basic-dao/@openzeppelin/contracts/governance/IGovernor.sol
+    [Governance]  GovernorCountingSimple  →  basic-dao/@openzeppelin/contracts/governance/extensions/GovernorCountingSimple.sol
+    [Governance]  GovernorVotes  →  basic-dao/@openzeppelin/contracts/governance/extensions/GovernorVotes.sol
+    [Governance]  GovernorVotesQuorumFraction  →  basic-dao/@openzeppelin/contracts/governance/extensions/GovernorVotesQuorumFraction.sol
+  [burnable-token]
+    [ERC-20]  ERC20  →  burnable-token/@openzeppelin/contracts/token/ERC20/ERC20.sol
+    [ERC-20]  ERC20Burnable  →  burnable-token/@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol
+  [erc20-token-with-automatic-vesting]
+    [ERC-20]  ERC20  →  erc20-token-with-automatic-vesting/openzeppelin-solidity/contracts/token/ERC20/ERC20.sol
+  [flagship-cookbook-nft]
+    [ERC-721]  ERC721  →  flagship-cookbook-nft/@openzeppelin/contracts/token/ERC721/ERC721.sol
+    [ERC-721]  ERC721Enumerable  →  flagship-cookbook-nft/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol
+  [mintable-token]
+    [ERC-20]  ERC20  →  mintable-token/@openzeppelin/contracts/token/ERC20/ERC20.sol
+  [multi-collection-nft-with-burnable-nfts-and-pausable-transfers]
+    [ERC-1155]  ERC1155  →  multi-collection-nft-with-burnable-nfts-and-pausable-transfers/@openzeppelin/contracts/token/ERC1155/ERC1155.sol
+    [ERC-1155]  ERC1155Burnable  →  multi-collection-nft-with-burnable-nfts-and-pausable-transfers/@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol
+    [ERC-1155]  ERC1155Supply  →  multi-collection-nft-with-burnable-nfts-and-pausable-transfers/@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol
+  [multi-collection-nft-with-burnable-nfts-and-pausable-transfers(copy)]
+    [ERC-1155]  ERC1155  →  multi-collection-nft-with-burnable-nfts-and-pausable-transfers(copy)/@openzeppelin/contracts/token/ERC1155/ERC1155.sol
+    [ERC-1155]  ERC1155Burnable  →  multi-collection-nft-with-burnable-nfts-and-pausable-transfers(copy)/@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol
+    [ERC-1155]  ERC1155Supply  →  multi-collection-nft-with-burnable-nfts-and-pausable-transfers(copy)/@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Supply.sol
+  [simple-nft-sale]
+    [ERC-721]  ERC721  →  simple-nft-sale/@openzeppelin/contracts/token/ERC721/ERC721.sol
+    [ERC-721]  ERC721Enumerable  →  simple-nft-sale/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol
+  [soulbound-nft]
+    [ERC-721]  ERC721  →  soulbound-nft/@openzeppelin/contracts/token/ERC721/ERC721.sol
+    [ERC-721]  ERC721Enumerable  →  soulbound-nft/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol
+  [soulbound-nft(copy)]
+    [ERC-721]  ERC721  →  soulbound-nft(copy)/@openzeppelin/contracts/token/ERC721/ERC721.sol
+    [ERC-721]  ERC721Enumerable  →  soulbound-nft(copy)/@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol
+  [tether-usdt]
+    [ERC-20]  DummyERC20  →  tether-usdt/@openzeppelin/contracts/token/ERC20/ERC20.sol
+    [ERC-20]  DummyERC20  →  tether-usdt/openzeppelin-solidity/contracts/token/ERC20/ERC20.sol
+    [ERC-20]  ERC20Pausable  →  tether-usdt/openzeppelin-solidity/contracts/token/ERC20/extensions/ERC20Pausable.sol
+  [voting-token]
+    [ERC-20]  ERC20  →  voting-token/@openzeppelin/contracts/token/ERC20/ERC20.sol
+    [Governance]  ERC20Votes  →  voting-token/@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol
+    [ERC-20]  ERC20Permit  →  voting-token/@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol
+
+═══════════════════════════════════════════════════════════
