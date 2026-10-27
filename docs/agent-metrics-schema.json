@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Nexus Protocol Token DAO - Agent Metrics Schema",
+  "description": "Unified scoring, benchmarking, and telemetry schema for all DAO agents (MNP network). Ensures clocked success rates, zero silent failure, GPU-aware scoring, and continuous improvement.",
+  "type": "object",
+
+  "properties": {
+    "agent_id": {
+      "type": "string",
+      "description": "Unique identifier for the agent instance."
+    },
+
+    "parent_id": {
+      "type": "string",
+      "description": "ID of the agent that spawned this one (for replication tracking).",
+      "nullable": true
+    },
+
+    "agent_class": {
+      "type": "string",
+      "enum": [
+        "governance",
+        "treasury",
+        "telemetry",
+        "science",
+        "devops",
+        "llm_orchestrator",
+        "replication_manager"
+      ],
+      "description": "Functional class of the agent."
+    },
+
+    "task": {
+      "type": "object",
+      "description": "Clocked task metrics.",
+      "properties": {
+        "task_id": { "type": "string" },
+        "task_type": { "type": "string" },
+        "start_time": { "type": "string", "format": "date-time" },
+        "end_time": { "type": "string", "format": "date-time" },
+        "duration_ms": { "type": "number" },
+        "success": { "type": "boolean" },
+        "error_message": { "type": "string", "nullable": true },
+        "retry_count": { "type": "integer", "minimum": 0 }
+      },
+      "required": [
+        "task_id",
+        "task_type",
+        "start_time",
+        "end_time",
+        "duration_ms",
+        "success"
+      ]
+    },
+
+    "completion_method": {
+      "type": "string",
+      "enum": [
+        "llama_only",
+        "llama_mix",
+        "llama+science_api",
+        "cuda_preprocess+llama",
+        "vulkan_pipeline+llama",
+        "replicated_agents+llama",
+        "simple_rules"
+      ],
+      "description": "How the agent completed the task."
+    },
+
+    "quality_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "LLM or rule-based evaluation of task quality."
+    },
+
+    "self_healing": {
+      "type": "object",
+      "description": "Self-healing behavior metrics.",
+      "properties": {
+        "attempted": { "type": "boolean" },
+        "success": { "type": "boolean" },
+        "recovery_time_ms": { "type": "number", "nullable": true }
+      }
+    },
+
+    "replication": {
+      "type": "object",
+      "description": "Agent replication metrics.",
+      "properties": {
+        "requested": { "type": "boolean" },
+        "reason": { "type": "string", "nullable": true },
+        "spawned_agent_id": { "type": "string", "nullable": true }
+      }
+    },
+
+    "gpu_usage": {
+      "type": "object",
+      "description": "GPU resource usage metrics (CUDA/Vulkan).",
+      "properties": {
+        "server_id": { "type": "string" },
+        "gpu_id": { "type": "string" },
+        "cuda_utilization_pct": { "type": "number", "minimum": 0, "maximum": 100 },
+        "vram_used_mb": { "type": "number" },
+        "vulkan_compute_ms": { "type": "number" },
+        "opencl_compute_ms": { "type": "number" }
+      }
+    },
+
+    "llm_usage": {
+      "type": "object",
+      "description": "LLM inference metrics.",
+      "properties": {
+        "model": { "type": "string" },
+        "tokens_in": { "type": "number" },
+        "tokens_out": { "type": "number" },
+        "latency_ms": { "type": "number" }
+      }
+    },
+
+    "mcp_calls": {
+      "type": "object",
+      "description": "MCP tool usage metrics.",
+      "properties": {
+        "total_calls": { "type": "integer" },
+        "successful_calls": { "type": "integer" },
+        "failed_calls": { "type": "integer" },
+        "avg_latency_ms": { "type": "number" }
+      }
+    },
+
+    "policy_compliance": {
+      "type": "object",
+      "description": "Policy compliance metrics.",
+      "properties": {
+        "compliant": { "type": "boolean" },
+        "violations": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+
+    "agent_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Final computed score for the agent."
+    }
+  },
+
+  "required": [
+    "agent_id",
+    "agent_class",
+    "task",
+    "completion_method",
+    "quality_score",
+    "gpu_usage",
+    "llm_usage",
+    "mcp_calls",
+    "policy_compliance",
+    "agent_score"
+  ]
+}

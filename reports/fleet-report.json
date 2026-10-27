@@ -1,0 +1,116 @@
+{
+  "generatedBy": "fleet-runner",
+  "generatedAt": "2026-10-22T22:25:25.504Z",
+  "owner": "@FuzzysTodd",
+  "mode": "local runtime — no GitHub Actions charges, no model API calls for these commands",
+  "summary": {
+    "total": 8,
+    "passed": 8,
+    "failed": 0
+  },
+  "results": [
+    {
+      "id": "finance-ops-reporter",
+      "label": "Financial Ops Reporter (nexus/finance_ops_report.py)",
+      "ok": true,
+      "exitCode": 0,
+      "durationMs": 2309,
+      "note": "Writes ops/reports/financial-ops-report.{json,md} — the reporting side of the financial-ops bots. NOT their full operational duties."
+    },
+    {
+      "id": "repo-assessor",
+      "label": "Repo Assessor (nexus/repo_assessment.py)",
+      "ok": true,
+      "exitCode": 0,
+      "durationMs": 188,
+      "note": ""
+    },
+    {
+      "id": "asset-finder",
+      "label": "Asset Finder (nexus/asset_finder.py)",
+      "ok": true,
+      "exitCode": 0,
+      "durationMs": 615,
+      "note": ""
+    },
+    {
+      "id": "telemetry-monitor",
+      "label": "Telemetry Monitor (nexus.telemetry_monitor)",
+      "ok": true,
+      "exitCode": 0,
+      "durationMs": 103,
+      "note": ""
+    },
+    {
+      "id": "intel-bot",
+      "label": "Intel Bot (internet: public market + repo data)",
+      "ok": true,
+      "exitCode": 0,
+      "durationMs": 222,
+      "note": "Fetches public no-key APIs (Coinbase prices, GitHub repo stats). Optional thinking step only runs if NEXUS_MODEL_API_KEY is set — and that costs money per call."
+    },
+    {
+      "id": "dao-health-bot",
+      "label": "Health Bot",
+      "ok": true,
+      "exitCode": 0,
+      "durationMs": 137,
+      "note": ""
+    },
+    {
+      "id": "dao-registry-sync-bot",
+      "label": "Registry Sync Bot",
+      "ok": true,
+      "exitCode": 0,
+      "durationMs": 79,
+      "note": ""
+    },
+    {
+      "id": "dao-accounting-bot",
+      "label": "File-Accounting Bot",
+      "ok": true,
+      "exitCode": 0,
+      "durationMs": 175,
+      "note": ""
+    }
+  ],
+  "manifest": {
+    "generatedBy": "fleet-runner",
+    "generatedAt": "2026-10-22T22:25:25.504Z",
+    "owner": "@FuzzysTodd",
+    "scope": "Classification of the agent/bot fleet. This runner executes only the maintenance/reporting commands; the rest are definitions that cost nothing until wired to an engine.",
+    "runByFleetRunner": [
+      "finance-ops-reporter",
+      "repo-assessor",
+      "asset-finder",
+      "telemetry-monitor",
+      "intel-bot",
+      "dao-health-bot",
+      "dao-registry-sync-bot",
+      "dao-accounting-bot"
+    ],
+    "notRun": [
+      {
+        "group": "MCP registry agents",
+        "count": 11,
+        "runtime": "definition-only",
+        "cost": "No charges unless wired to a paid model — these are registry entries describing duties, tools, and authority; they execute only when an engine invokes them. This runner does not implement them.",
+        "source": "mcp/nexus-agent-registry.json"
+      },
+      {
+        "group": "Financial-ops bots",
+        "count": 3,
+        "runtime": "human-gated definitions",
+        "cost": "By design they never execute autonomously. finance-ops-reporter above covers only their REPORTING side; their operational duties (approvals, fund movement) remain human-gated.",
+        "source": "mcp/agents/financial-ops-bots.json"
+      },
+      {
+        "group": "Skills library",
+        "count": 87,
+        "runtime": "reference definitions",
+        "cost": "A library of skill definitions agents can consult; no charges until used.",
+        "source": "skills/"
+      }
+    ]
+  }
+}

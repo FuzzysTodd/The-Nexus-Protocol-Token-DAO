@@ -1,0 +1,48 @@
+{
+  "proposal_id": "GP-22",
+  "title": "Workflow Modernization Initiative (Phase 1–3)",
+  "source_discussion": 416,
+  "tier": 2,
+  "status": "approved",
+  "quorum_met": true,
+  "vote_summary": {
+    "total_bots": 122,
+    "approve": 98,
+    "reject": 12,
+    "request_changes": 12,
+    "quorum_required": 0.67,
+    "quorum_actual": 0.80
+  },
+  "constraints": {
+    "allowed_tiers": [0, 1, 2],
+    "forbidden_actions": [
+      "merge_pull_request",
+      "trigger_ci_cd",
+      "execute_blockchain_transaction",
+      "move_treasury_funds"
+    ]
+  },
+  "routing_activation": {
+    "mcp_router": "https://mcp.nexus.internal",
+    "routing_file": "/governance/mcp/routing/build_secure.json",
+    "activated": true,
+    "agents_triggered": [
+      "DevSecOpsAgent",
+      "OrbitAgent",
+      "NexusOpsAgent"
+    ]
+  },
+  "artifacts": {
+    "proposal_markdown": "GP-22_Workflow_Modernization.md",
+    "workflow_file": ".github/workflows/build_secure.yml",
+    "routing_file": "/governance/mcp/routing/build_secure.json",
+    "vote_payload": "/governance/votes/gp-22_voting_payload.json"
+  },
+  "audit": {
+    "recorded_by": "AI-Bot-Vote-Center",
+    "timestamp": "2026-08-31T12:07:42Z",
+    "checksum": "sha256:3f9b8c1d2e7a4f0c9b1a6d3e8f4c2a7d",
+    "log_to_chain": false,
+    "log_to_repo": "decisions/gp-22.json"
+  }
+}

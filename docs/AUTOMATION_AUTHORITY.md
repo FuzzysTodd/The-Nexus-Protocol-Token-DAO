@@ -6,7 +6,7 @@ This document records the repository automation authority granted for The Nexus 
 
 - code changes inside the repository
 - documentation generation and updates
-- repository scans for pre-errors, withdrawal paths, and placement opportunities
+- repository scans for pre-errors, withdrawal paths, and placement opportunities with the owners former owner and users' coders and embers of the DAO
 - generation of markdown and JSON reports
 - web interface updates for operator visibility
 - local git preparation work for code review and commit-ready changes
