@@ -1,0 +1,27 @@
+{
+  "proposal_id": "GP-22-EXEC",
+  "parent": "GP-22",
+  "title": "Workflow Modernization Execution Phase (Tier-3)",
+  "source_discussion": 416,
+  "tier": 3,
+  "quorum": 0.67,
+  "options": [
+    "approve",
+    "reject",
+    "request_changes"
+  ],
+  "metadata": {
+    "risk": "medium",
+    "agents": ["NexusOps", "DevSecOps", "Orbit"],
+    "category": "workflow-modernization"
+  },
+  "artifacts": {
+    "proposal_markdown": "governance/proposals/GP-22-execution.md",
+    "workflow_files": [
+      ".github/workflows/build_secure.yml",
+      ".github/workflows/deploy_secure.yml"
+    ],
+    "routing_file": "governance/mcp/routing/build_secure_execution.json"
+  },
+  "timestamp": "2026-08-31T12:00:00Z"
+}

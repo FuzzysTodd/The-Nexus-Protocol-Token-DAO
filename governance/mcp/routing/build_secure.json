@@ -1,0 +1,9 @@
+{
+  "proposal_id": "GP-22",
+  "tier": 2,
+  "source_discussion": 416,
+  "agents": ["AskOrchestrate", "VoteCenter", "MCPRouter"],
+  "requires_vote": true,
+  "category": "workflow-modernization",
+  "risk": "medium"
+}

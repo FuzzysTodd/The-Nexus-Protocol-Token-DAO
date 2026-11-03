@@ -313,7 +313,7 @@
                 <a class="chip-link" href="./withdraw.html">Open Withdraw Interface</a>
                 <a class="chip-link" href="./builder-fund.html">Builder Fund Dashboard</a>
               <a class="chip-link" href="http://127.0.0.1:8788/" target="_blank" rel="noopener noreferrer">Open REST Adapter</a>
-               <a class="chip-link" href="http://localhost:8787/approval-service.html">Open Approval Service</a>
+               <a class="chip-link" href="./approval-service.html">Open Approval Service</a>
                <button class="chip-link" id="refresh-report" type="button">Refresh now</button>
             </div>
         </div>
@@ -567,27 +567,37 @@ function render(report) {
   actionList.innerHTML = '';
 
   report.bots.forEach((bot) => {
-    renderItem(botList, `<span class="pill success">${bot.id}</span><h3>${bot.name}</h3><p>${bot.role}</p>`);
+    renderItem(botList, `<span class="pill success">${escapeHtml(bot.id)}</span><h3>${escapeHtml(bot.name)}</h3><p>${escapeHtml(bot.role)}</p>`);
   });
 
   (report.preErrorFindings.length ? report.preErrorFindings : [{ severity: 'success', file: 'none', message: 'No pre-error findings.' }]).forEach((finding) => {
     const pillClass = finding.severity === 'high' ? 'danger' : finding.severity === 'medium' ? 'warn' : 'success';
-    renderItem(findingList, `<span class="pill ${pillClass}">${finding.severity}</span><h3>${finding.file}</h3><p>${finding.message}</p>`);
+    renderItem(findingList, `<span class="pill ${pillClass}">${escapeHtml(finding.severity)}</span><h3>${escapeHtml(finding.file)}</h3><p>${escapeHtml(finding.message)}</p>`);
   });
 
   [...report.withdrawSignals, ...report.placementSignals].slice(0, 6).forEach((signal) => {
-    renderItem(signalList, `<span class="pill warn">${signal.count} hits</span><h3>${signal.file}</h3><small>${signal.matches.join(', ')}</small>`);
+    renderItem(signalList, `<span class="pill warn">${escapeHtml(signal.count)} hits</span><h3>${escapeHtml(signal.file)}</h3><small>${escapeHtml((signal.matches || []).join(', '))}</small>`);
   });
 
   report.successLog.forEach((entry) => {
-    renderItem(logList, `<span class="pill success">${entry.status}</span><h3>${entry.title}</h3><small>${entry.time}</small><p>${entry.details}</p>`);
+    renderItem(logList, `<span class="pill success">${escapeHtml(entry.status)}</span><h3>${escapeHtml(entry.title)}</h3><small>${escapeHtml(entry.time)}</small><p>${escapeHtml(entry.details)}</p>`);
   });
 
   report.recommendedActions.forEach((action) => {
-    renderItem(actionList, `<h3>Operator action</h3><p>${action}</p>`);
+    renderItem(actionList, `<h3>Operator action</h3><p>${escapeHtml(action)}</p>`);
   });
 
   latestRenderedTimestamp = report.generatedAt || null;
+}
+
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
 function setLiveStatus(message, detail) {

@@ -76,7 +76,7 @@
       "id": "nexus-frontend-ux",
       "domain": "Web3 User Interface",
       "primaryExpertise": ["ethers.js v5", "MetaMask integration", "EIP-1193 provider interface", "accessible HTML/CSS", "responsive design", "WebSocket real-time feeds"],
-      "scope": ["*.html", "*.js (root-level)", "dashboard.html", "governance.html"],
+      "scope": ["*.html", "*.js", "dashboard.html", "governance.html"],
       "authorityLevel": "analysis-and-draft",
       "tools": ["playwright", "eslint", "axe-accessibility"],
       "academicAlignment": ["Nielsen Norman Group UX Research", "W3C WCAG 2.1 AA"],
@@ -116,7 +116,7 @@
       ],
       "scope": [
         "contracts/NexusBuilderFund.sol",
-        "financial-ops-rest-server.js (/api/v1/builder-fund/*)",
+        "financial-ops-rest-server.js",
         "docs/BUILDER_FUND.md"
       ],
       "authorityLevel": "analysis-and-draft",
