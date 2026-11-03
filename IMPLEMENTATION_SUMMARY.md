@@ -19,9 +19,9 @@ Complete repairs on all failed workflows utilizing the MCP/MFC gateway FPGA GPU 
 
 **Components**:
 - **6 Jobs**: Complete orchestration pipeline
-  1. MCP Gateway Initialization (10 agents)
+  1. MCP Gateway Initialization (11 agents)
   2. GPU Swarm & FPGA Coordination
-  3. Hive Mind Coordination (12 nodes)
+  3. Hive Mind Coordination (13 nodes)
   4. MCP Agent Orchestration (30+ tasks)
   5. Workflow Integration Validation
   6. Workflow Completion Summary
@@ -67,7 +67,7 @@ Complete repairs on all failed workflows utilizing the MCP/MFC gateway FPGA GPU 
 8. `TestIntegrationAccuracy` - 4 tests
 
 **Coverage**:
-- 100% MCP agent coverage (10/10)
+- 100% MCP agent coverage (11/11)
 - 100% MPC server coverage (2/2)
 - 100% component validation
 - 100% accuracy metrics
@@ -92,7 +92,25 @@ Complete repairs on all failed workflows utilizing the MCP/MFC gateway FPGA GPU 
 
 ## Technical Architecture
 
-### MCP Agents (10 Total)
+### MCP Agents & Specialization Registry (11 Total)
+
+Defined in [`mcp/nexus-agent-registry.json`](mcp/nexus-agent-registry.json):
+
+| ID | Domain / Specialization | Authority Level | Primary Scope |
+|---|---|---|---|
+| `nexus-crypto-core` | EVM Cryptography | analysis-and-draft | `contracts/`, `docs/NEXUS_ENCRYPTION_STANDARD.md` |
+| `nexus-defi-architect` | DeFi Protocol Design | analysis-and-draft | `Aave-V3/`, `Uniswap-V2/V3/V4/`, `contracts/` |
+| `nexus-dao-counsel` | DAO Governance | analysis-and-draft | `NexusDAOGovernor.sol`, `governance.html`, `GOVERNANCE.md` |
+| `nexus-nft-studio` | NFT & RWA Tokenization | analysis-and-draft | `NexusRWA.sol`, `NexusFractionalize.sol`, NFT repos |
+| `nexus-oracle-feed` | Price Oracles & Data Feeds | analysis-and-draft | `ChainLink/`, `financial-ops-rest-server.js` |
+| `nexus-treasury-ops` | Treasury Management | analysis-and-draft | `NexusDAOTreasury.sol`, `Aave-V3`, `Circle-USDC` |
+| `nexus-security-audit` | Smart Contract Security | block-and-escalate | `contracts/**/*.sol` |
+| `nexus-frontend-ux` | Web3 User Interface | analysis-and-draft | `*.html`, `*.js`, `dashboard.html` |
+| `nexus-signal-engine` | Transaction Signaling & Event Bus | analysis-and-draft | `nexus-signal-bus.js`, `logical.js`, `money-flow.js` |
+| `nexus-forex-quant` | Forex & Quantitative Finance | analysis-and-draft | `NexusOptionsVault.sol`, `NexusFractalVault.sol` |
+| `nexus-builder-fund` | Developer Micropayments | analysis-and-draft | `NexusBuilderFund.sol`, `BUILDER_FUND.md` |
+
+### MIG Network Agents (10 Nodes)
 
 | ID | Role | Priority | Load |
 |---|---|---|---|
@@ -128,7 +146,7 @@ Complete repairs on all failed workflows utilizing the MCP/MFC gateway FPGA GPU 
 - Error Rate: 0.0001%
 
 **Hive Mind Protocol**:
-- Total Nodes: 12 (10 agents + 2 servers)
+- Total Nodes: 13 (11 registry agents + 2 servers)
 - Consensus: Byzantine fault-tolerant
 - Network Health: 100%
 

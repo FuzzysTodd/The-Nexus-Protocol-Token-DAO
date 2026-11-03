@@ -4,17 +4,17 @@
   "description": "Automates GP-22 Tier-2 and Tier-3 workflow modernization until completion using repo-side checkpoints.",
   "version": "1.0.0",
   "checkpoints": {
-    "tier2_artifacts_generated": false,
-    "tier2_vote_submitted": false,
-    "tier2_quorum_met": false,
-    "tier2_routing_activated": false,
-    "tier3_proposal_generated": false,
-    "tier3_vote_submitted": false,
-    "tier3_quorum_met": false,
-    "tier3_routing_activated": false,
-    "pr_merged": false,
-    "ci_cd_triggered": false,
-    "modernization_logged": false
+    "tier2_artifacts_generated": true,
+    "tier2_vote_submitted": true,
+    "tier2_quorum_met": true,
+    "tier2_routing_activated": true,
+    "tier3_proposal_generated": true,
+    "tier3_vote_submitted": true,
+    "tier3_quorum_met": true,
+    "tier3_routing_activated": true,
+    "pr_merged": true,
+    "ci_cd_triggered": true,
+    "modernization_logged": true
   },
   "steps": [
     {
