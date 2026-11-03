@@ -2,7 +2,7 @@
 # bots-daily.sh — Daily agent-fleet run WITHOUT GitHub Actions
 #
 # GitHub Actions is blocked while the account has a billing lock. This script
-# does what the 'DAO Bots' workflow did, from any machine with this repo:
+# does what the 'DAO Bots' workflow did, froam any machine with this repo:
 #   1. Preflight guards:
 #      • refuses to run if you have staged changes OUTSIDE the fleet's output
 #        paths (never commits your work-in-progress),
