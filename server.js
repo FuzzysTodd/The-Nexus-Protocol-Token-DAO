@@ -106,6 +106,35 @@ PUBLIC_HTML.forEach((file) => {
   }
 });
 
+// ── Bot-generated reports (public JSON payloads — no secrets) ────────────────
+const PUBLIC_REPORTS = [
+  "reports/agents.json",
+  "reports/file-accounting.json",
+  "reports/health-report.json",
+];
+
+PUBLIC_REPORTS.forEach((rel) => {
+  const filePath = path.join(ROOT, rel);
+  if (fs.existsSync(filePath)) {
+    app.get(`/${rel}`, (_req, res) => res.sendFile(filePath));
+  }
+});
+
+// ── Static JS assets referenced by the served dashboards ────────────────────
+const PUBLIC_JS = [
+  "money-flow.js",
+  "games.js",
+  "withdraw.js",
+  "logical.js",
+];
+
+PUBLIC_JS.forEach((file) => {
+  const filePath = path.join(ROOT, file);
+  if (fs.existsSync(filePath)) {
+    app.get(`/${file}`, (_req, res) => res.sendFile(filePath));
+  }
+});
+
 // ── Root → dashboard ─────────────────────────────────────────────────────────
 app.get("/", (_req, res) => {
   const dashPath = path.join(ROOT, "dashboard.html");

@@ -1,0 +1,1284 @@
+{
+  "repo_root": "/home/user/workspace/nexus-dao",
+  "current_branch": "MASTER",
+  "branches": [
+    {
+      "name": "MASTER",
+      "remote": false,
+      "current": true
+    },
+    {
+      "name": "remotes/origin/FuzzysTodd-patch-1",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/FuzzysTodd-patch-2",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/HEAD -> origin/MASTER",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/MASTER",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/add-advanced-ai-bots",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/add-funding-and-web3-interfaces",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/add-funding-yml",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/add-smart-ml-driven-withdrawals",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-contracts-for-treasury",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-experts-in-crypto-algorithms",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-hub-html-web3-navigation-hub",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-marketing-strategy",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-ml-bot-for-predictive-repair",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-pr-instructions",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-private-project-interface",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-restful-token-monitoring",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-resting-mcp-cleanup",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-sub-issue-for-338",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-super-mcp-gpu-dpu-virtualization",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-super-mcp-virtualization",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-token-issuance-contracts",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-token-issuance-contracts-again",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-token-issuance-contracts-another-one",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-token-issuance-contracts-yet-again",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-total-web-presentation",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-twitter-account-token",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-web-interface-for-games",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-web3-error-dashboard",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-web3-error-handling-interface",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-web3-interface-files",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-web3-interface-github-app-token",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/create-yaml-config-nexus-agent",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/crypto-expert-deep-dive",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/customize-mcpc-and-mcp-functionality",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/demonstrate-genai-impact",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/demonstrate-genai-impact-again",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/deploy-hive-mind-architecture",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/determine-expert-codespaces",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/discuss-marketing-strategy-dao",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/e4-incorporate-rpc-into-web-interface",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/enable-unrestricted-file-access",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/encode-approval-policy-into-repo",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/enterprise-github-setup",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/exchange-access-token",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/expand-committee-scope",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/explain-repository-structure",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/explore-codebase-and-create-plan",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/figure-out-pull-request-process",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/finalize-first-party-preerror-cleanup",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/find-all-token-contracts",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-157565446-1050140398-65a10a0e-7bf9-4fb5-9aa1-10011ede10a5",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-157565446-1050140398-7a04956b-7792-4100-aa71-fe463e826602",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-157565446-1050140398-7bbe6f7a-5034-4448-934a-de3f68e40073",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-157565446-1050140398-c0bd42cf-b953-4d6d-bbbe-c232e630485d",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-action-setup-python-version",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-advanced-ai-bots-issue",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-agent-file-structure",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-all-workflows-and-actions",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-all-workflows-for-dao",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-analyze-actions-job",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-analyze-actions-job-9d20dd60-b1f9-4b01-a22c-e380c61d2a57",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-analyze-actions-job-again",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-analyze-actions-job-another-one",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-analyze-actions-job-b1aa27b3-ad6a-4e40-bacc-44e820cc70fd",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-analyze-actions-job-b8a430e8-f720-4b13-a533-fb300b2a1cb1",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-analyze-actions-job-one-more-time",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-analyze-actions-job-please-work",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-analyze-actions-job-yet-again",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-and-monitor-items",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-billable-issues",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-block-issue",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-bug-in-protocol-token",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-checkout-action-permission-error",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-ci-errors-add-withdraw-page",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-codeql-analyze-failures",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-conflict-php-conda",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-cve-issues-high-severity",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-dashboard-networking-issues",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-dashboard-problems",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-dependabot-error",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-distroless-issue-1870",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-factory-keyla-issue",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-fasctory-keyla-issue",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-github-actions-analyze-job",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-github-actions-job-73308099285",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-github-actions-setup-python",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-github-actions-startup-issues",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-github-actions-workflow",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-github-actions-workflow-startup-issues",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-happybirthday-scorpio",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-important-error",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-issue-35848e183f3e3303c8cfeacbea831cab",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-issue-4bafbed5c",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-issue-with-token-validation",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-issues-and-wips",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-kmbod-issue",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-main-east-issue",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-markdown-and-code-cells",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-misspelled-words",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-mpc-server-configuration",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-ngtt-token-value-issue",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-ngtt-token-value-issue-again",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-payable-fallback-function",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-pinning-failing-workflows",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-prebuild-github-actions-job",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-qwee-issue",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-raw-directives-issue",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-rebase-issue",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-smart-contract-reentrancy",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-toke-issue",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-token-creation-error",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-token-creation-error-again",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-workflow-integration-validation",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/fix-workflows-pr-795",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/gather-information-for-reavangelizing",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/grant-agents-access-authority",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/grant-full-authority-ai",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/grant-read-write-permissions",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/grant-repo-access",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/help-last-task",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/implement-5th-api-protocol",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/implement-ai-agents-for-leadership",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/implement-aik-blockchain-dao",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/implement-aik-blockchain-dao-again",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/implement-dashboard-and-web-interface",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/implement-evolutionary-algorithm",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/implement-factory-process",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/implement-factory-process-again",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/implement-mcp-computed-ideas",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/implement-mcp-ideas",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/implement-multiple-token-features",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/implement-nexus-protocol-token-doa",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/implement-open-commits",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/implement-share-feature",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/implement-tokens-to-fiat",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/implement-transfer-with-coinbase",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/implement-withdraw-manager-ui",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/improve-dashboard-ui-and-error-workflow",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/improve-token-governance",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/integrate-nft-dao-for-ethereum",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/label-new-encryption-standard",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/label-new-encryption-standard-again",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/label-new-encryption-standard-another-one",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/make-new-device-bot",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/make-nexus-token-protocol-live",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/match-degrees-network-web-answers",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/merge-advanced-ai-bots",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/merge-pull-request-23",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/merge-pull-request-82",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/merge-pull-request-94",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/migrate-mpc-server-to-cloud",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/optimize-algorithmic-synergies",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/organize-and-reduce-branches",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/place-bot-per-item-and-repair",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/prepare-withdraw-dashboard-deployment",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/process-dao-web3-implementation",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/remove-parsed-constigents",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/rename-doa-to-dao",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/repair-and-setup",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/repair-workflows-to-be-tested",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/resolve-bus-issues",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/resolve-dev-issue",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/resolve-fas-issue",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/resolve-issue-o0",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/resolve-issues-in-favor",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/resolve-merge-issue-54",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/resolve-merge-pull-request-53",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/resolve-ther-issue",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/restore-lost-screen",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/retry-all-prior-widthdraws",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/review-and-fix-pull-request",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/review-feedback",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/review-repo-requirements",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/review-repository-overview",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/review-session-feedback",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/review-task-documentation",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/rewrite-ethereum-contracts-cnexuz",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/set-up-copilot-instructions",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/set-up-copilot-instructions-80bfd5f5-0545-478e-9c4c-fbf178dea25e",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/set-up-copilot-instructions-again",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/set-up-copilot-instructions-another-one",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/set-up-copilot-instructions-one-more-time",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/set-up-copilot-instructions-please-work",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/set-up-copilot-instructions-yet-again",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/setup-codespace-integration",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/setup-copilot-instructions",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/setup-copilot-instructions-again",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/setup-copilot-instructions-another-one",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/start-mcp-server-monitor-commits",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/sub-pr-489",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/task-157565446-1050140398-0c73ee25-a26e-448d-b46d-30d7543bf180",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/task-157565446-1050140398-3064bfb9-0af4-4901-b1c0-f19207de99fa",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/task-157565446-1050140398-5980e198-bcf3-4cd0-b673-697ed241b1d6",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/task-157565446-1050140398-ea38ef1d-1a97-4d58-aa02-d2148a921140",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/ui-update-real-time-view",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/un-basis-eye",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/understanding-codebase-structure",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-all-web3-sites",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-failing-workflows-list",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-failing-workflows-list-again",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-git-ignore-settings",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-github-actions-workflow",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-governance-owner-fuzzystodd",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-nexus-protocol-token",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-readme-file",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-repo-documentation",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-reporting-and-dao",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-step-options-format",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-sub-agents-for-financial-data",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-token-creation-position",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-token-creation-position-again",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-token-creation-position-another-one",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-token-creation-position-yet-again",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-token-machine-ai-voting",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-user-interface-components",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-visual-stuff-reflection",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-web-dashboard-workflows",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/update-weblink-query",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/upgrade-nodejs-to-v22",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/uuc-2026-improve-predictive-repair",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/what-else-query",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/work-on-commit-55364d2",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/copilot/work-on-key-dao-research",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/dependabot/github_actions/all-actions-08b3065b60",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/dependabot/github_actions/all-actions-401be76d56",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/dependabot/github_actions/all-actions-8e68877847",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/dependabot/github_actions/all-actions-b20c340672",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/dependabot/github_actions/dependabot/fetch-metadata-3.1.0",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/dependabot/npm_and_yarn/dot-deps/npm/delegate3.2.0/npm_and_yarn-1dc217bc5b",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/dependabot/npm_and_yarn/ethers-6.17.0",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/dependabot/npm_and_yarn/express-5.2.1",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/dependabot/npm_and_yarn/minor-and-patch-f8e16edbe3",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/dependabot/npm_and_yarn/vercel/analytics-2.0.1",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/dependabot/pip/flake8-gte-7.4.1-and-lt-8",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/dependabot/pip/minor-and-patch-19f1f3e67a",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/dependabot/pip/minor-and-patch-89e4b3a62f",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/evill-illegal-rightious",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/main",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/mcp-agents-implementation",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/revert-291-copilot/rename-doa-to-dao",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/revert-340-copilot/gather-information-for-reavangelizing",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/revert-648-copilot/implement-open-commits",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/revert-651-copilot/implement-mcp-ideas",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/revert-939-main",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/revert-952-main",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/test-coverage-improvements",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/vercel/install-and-configure-vercel-s-ojpzyb",
+      "remote": true,
+      "current": false
+    },
+    {
+      "name": "remotes/origin/vercel/install-vercel-web-analytics-givaaj",
+      "remote": true,
+      "current": false
+    }
+  ],
+  "web3_protocol_count": 21,
+  "web3_protocols": [
+    "Aave-V3",
+    "ChainLink",
+    "Compound",
+    "Eigenlayer",
+    "Ethereum-Name-Service",
+    "GMX.io",
+    "Gnosis-Safe",
+    "Lens-Protocol",
+    "Nouns-DAO",
+    "Olympus-DAO",
+    "OpenSea-Seaport",
+    "PancakeSwap-V3",
+    "SuperFluid",
+    "SushiSwap-V3",
+    "Synthetix",
+    "Uniswap-V2",
+    "Uniswap-V3",
+    "Uniswap-V4",
+    "WorldCoin-Core",
+    "basic-dao",
+    "voting-token"
+  ],
+  "solidity_contract_count": 3616,
+  "documentation_file_count": 381,
+  "governance_asset_count": 4,
+  "custom_mcp_agent_count": 10,
+  "custom_mpc_server_count": 2,
+  "dao_improvement_priorities": [
+    "Maintain the current MCP/MPC coverage by reviewing repository branches, governance artifacts, and web3 protocol references together."
+  ],
+  "warnings": []
+}

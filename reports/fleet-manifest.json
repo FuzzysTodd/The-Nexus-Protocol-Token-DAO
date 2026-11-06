@@ -1,0 +1,39 @@
+{
+  "generatedBy": "fleet-runner",
+  "generatedAt": "2026-10-22T22:25:25.504Z",
+  "owner": "@FuzzysTodd",
+  "scope": "Classification of the agent/bot fleet. This runner executes only the maintenance/reporting commands; the rest are definitions that cost nothing until wired to an engine.",
+  "runByFleetRunner": [
+    "finance-ops-reporter",
+    "repo-assessor",
+    "asset-finder",
+    "telemetry-monitor",
+    "intel-bot",
+    "dao-health-bot",
+    "dao-registry-sync-bot",
+    "dao-accounting-bot"
+  ],
+  "notRun": [
+    {
+      "group": "MCP registry agents",
+      "count": 11,
+      "runtime": "definition-only",
+      "cost": "No charges unless wired to a paid model — these are registry entries describing duties, tools, and authority; they execute only when an engine invokes them. This runner does not implement them.",
+      "source": "mcp/nexus-agent-registry.json"
+    },
+    {
+      "group": "Financial-ops bots",
+      "count": 3,
+      "runtime": "human-gated definitions",
+      "cost": "By design they never execute autonomously. finance-ops-reporter above covers only their REPORTING side; their operational duties (approvals, fund movement) remain human-gated.",
+      "source": "mcp/agents/financial-ops-bots.json"
+    },
+    {
+      "group": "Skills library",
+      "count": 87,
+      "runtime": "reference definitions",
+      "cost": "A library of skill definitions agents can consult; no charges until used.",
+      "source": "skills/"
+    }
+  ]
+}
