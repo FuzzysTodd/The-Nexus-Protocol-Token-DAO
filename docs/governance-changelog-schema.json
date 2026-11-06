@@ -1,0 +1,157 @@
+{
+  "governance_changelog": {
+    "version": "v0.1.6-governance",
+    "last_updated": "2025-05-18",
+    "entries": [
+      {
+        "version": "v0.1.0-governance",
+        "status": "active",
+        "effective_date": "2025-05-18",
+        "scope": "Authority Model",
+        "impact": "high",
+        "linked_proposals": [],
+        "changes": {
+          "authority_stack": {
+            "owner": "ultimate_control",
+            "mpc": "execution_layer",
+            "super_delegates": "extended_powers",
+            "delegates": "delegated_voting",
+            "token_holders": "base_voting_power"
+          },
+          "execution_paths": {
+            "normal": ["proposal", "vote", "timelock", "mpc_execute"],
+            "emergency": ["super_delegate_approval", "mpc_fast_track"]
+          },
+          "governance_scope": [
+            "parameters",
+            "treasury",
+            "roles",
+            "upgrades",
+            "strategic_initiatives"
+          ]
+        }
+      },
+      {
+        "version": "v0.1.1-governance",
+        "status": "active",
+        "effective_date": "2025-05-18",
+        "scope": "Proposal Lifecycle",
+        "impact": "medium",
+        "linked_proposals": [],
+        "changes": {
+          "proposal_types": ["GIP", "PIP", "TIP", "OIP"],
+          "lifecycle": ["draft", "review", "vote", "queued", "finalized"],
+          "requirements": [
+            "title",
+            "summary",
+            "motivation",
+            "specification",
+            "risks",
+            "implementation_plan",
+            "monitoring_plan",
+            "execution_path"
+          ]
+        }
+      },
+      {
+        "version": "v0.1.2-governance",
+        "status": "active",
+        "effective_date": "2025-05-18",
+        "scope": "Voting & Delegation",
+        "impact": "high",
+        "linked_proposals": [],
+        "changes": {
+          "voting_mechanism": "token_weighted",
+          "delegation": {
+            "revocable": true,
+            "delegate_profile_required": true
+          },
+          "quorum_rules": {
+            "standard": {
+              "quorum_percent": null,
+              "pass_threshold_percent": null
+            },
+            "high_impact": {
+              "quorum_percent": null,
+              "pass_threshold_percent": null,
+              "dual_chamber": true
+            }
+          }
+        }
+      },
+      {
+        "version": "v0.1.3-governance",
+        "status": "active",
+        "effective_date": "2025-05-18",
+        "scope": "Treasury Policy",
+        "impact": "high",
+        "linked_proposals": [],
+        "changes": {
+          "treasury_control": "governance_plus_mpc",
+          "spending_classes": {
+            "class_a": "routine_ops",
+            "class_b": "strategic",
+            "class_c": "emergency"
+          },
+          "transparency": {
+            "treasury_dashboard": true,
+            "monthly_reports": true
+          }
+        }
+      },
+      {
+        "version": "v0.1.4-governance",
+        "status": "active",
+        "effective_date": "2025-05-18",
+        "scope": "Governance Logging",
+        "impact": "medium",
+        "linked_proposals": [],
+        "changes": {
+          "single_source_of_truth": "GOVERNANCE_CHANGELOG",
+          "entry_requirements": [
+            "version",
+            "status",
+            "effective_date",
+            "scope",
+            "impact",
+            "linked_proposals"
+          ],
+          "public_surfacing": {
+            "dashboard_version_display": true,
+            "diff_view": true,
+            "deprecated_rules_visible": true
+          }
+        }
+      },
+      {
+        "version": "v0.1.5-governance",
+        "status": "active",
+        "effective_date": "2025-05-18",
+        "scope": "Compliance & Risk",
+        "impact": "high",
+        "linked_proposals": [],
+        "changes": {
+          "emergency_powers": {
+            "trigger": ["exploit", "critical_bug", "legal_mandate"],
+            "sunset": true,
+            "logging_required": true
+          },
+          "rollback_paths": true,
+          "risk_register": true
+        }
+      },
+      {
+        "version": "v0.1.6-governance",
+        "status": "draft",
+        "effective_date": null,
+        "scope": "Meta-Governance",
+        "impact": "medium",
+        "linked_proposals": [],
+        "changes": {
+          "meta_governance_mandate": true,
+          "external_vote_logging": true
+        }
+      }
+    ]
+  }
+}
