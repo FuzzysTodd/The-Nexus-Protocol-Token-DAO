@@ -1,0 +1,467 @@
+{
+  "generatedAt": "2026-10-22T22:30:53+00:00",
+  "summary": {
+    "filesScanned": 4053,
+    "preErrorCount": 3,
+    "preErrorScope": "first-party automation, docs, mcp, nexus, ops, and top-level repo files",
+    "withdrawSignalCount": 2398,
+    "placementSignalCount": 2896,
+    "successDocsGenerated": 2,
+    "approvalGate": "required for any fund movement or treasury action"
+  },
+  "bots": [
+    {
+      "id": "mcp-fin-011",
+      "name": "Pre-Error Remediation Bot",
+      "role": "Detect early failures, malformed configs, syntax drift, and low-risk workflow regressions before they become blocking incidents.",
+      "outputs": [
+        "pre-error queue",
+        "low-risk autofix candidates",
+        "validation results"
+      ]
+    },
+    {
+      "id": "mcp-fin-012",
+      "name": "Withdrawal Placement Scanner",
+      "role": "Track withdrawal paths, payout logic, capital-allocation opportunities, and financial automation gaps across the repository.",
+      "outputs": [
+        "withdrawal inventory",
+        "placement opportunity log",
+        "approval-gated recommendations"
+      ]
+    },
+    {
+      "id": "mcp-fin-013",
+      "name": "Success Documentation Reporter",
+      "role": "Convert successful scans and fixes into markdown reports, dashboard payloads, and operator-ready documentation.",
+      "outputs": [
+        "markdown summary",
+        "dashboard JSON",
+        "success journal"
+      ]
+    }
+  ],
+  "preErrorFindings": [
+    {
+      "severity": "high",
+      "category": "python-syntax",
+      "file": "dashwall.py",
+      "message": "Syntax error at line 2: unexpected indent"
+    },
+    {
+      "severity": "medium",
+      "category": "agent-frontmatter",
+      "file": ".github/agents/samy-agent.agent.md",
+      "message": "Missing YAML frontmatter start delimiter."
+    },
+    {
+      "severity": "medium",
+      "category": "json-parse",
+      "file": "DAO_BOT_TOKEN.json",
+      "message": "JSON parse error at line 1: Expecting value"
+    }
+  ],
+  "withdrawSignals": [
+    {
+      "file": "Eigenlayer/src/contracts/core/StrategyManager.sol",
+      "count": 312,
+      "matches": [
+        "withdraw"
+      ]
+    },
+    {
+      "file": "Eigenlayer/src/contracts/pods/DelayedWithdrawalRouter.sol",
+      "count": 240,
+      "matches": [
+        "withdraw",
+        "claim"
+      ]
+    },
+    {
+      "file": "mcp-fin-011.sol",
+      "count": 235,
+      "matches": [
+        "withdraw",
+        "claim",
+        "redeem"
+      ]
+    },
+    {
+      "file": "Eigenlayer/src/contracts/pods/EigenPod.sol",
+      "count": 197,
+      "matches": [
+        "withdraw",
+        "claim",
+        "redeem"
+      ]
+    },
+    {
+      "file": "ApeCoin/contracts/ApeCoinStaking.sol",
+      "count": 152,
+      "matches": [
+        "withdraw",
+        "claim"
+      ]
+    },
+    {
+      "file": "dashwall.py",
+      "count": 127,
+      "matches": [
+        "withdraw"
+      ]
+    },
+    {
+      "file": "Lyra-Finance/contracts/LiquidityPool.sol",
+      "count": 114,
+      "matches": [
+        "withdraw",
+        "claim"
+      ]
+    },
+    {
+      "file": "Synthetix/contracts/FeePool.sol",
+      "count": 114,
+      "matches": [
+        "withdraw",
+        "claim"
+      ]
+    },
+    {
+      "file": "withdraw.js",
+      "count": 106,
+      "matches": [
+        "withdraw",
+        "release(",
+        "claim",
+        "collectproceeds"
+      ]
+    },
+    {
+      "file": "nexus/test_withdraw_dashboard.py",
+      "count": 105,
+      "matches": [
+        "withdraw",
+        "release(",
+        "claim"
+      ]
+    },
+    {
+      "file": "Eigenlayer/src/contracts/interfaces/IStrategyManager.sol",
+      "count": 99,
+      "matches": [
+        "withdraw"
+      ]
+    },
+    {
+      "file": "Compound/contracts/CToken.sol",
+      "count": 87,
+      "matches": [
+        "redeem"
+      ]
+    },
+    {
+      "file": "Compound/contracts/Comptroller.sol",
+      "count": 70,
+      "matches": [
+        "claim",
+        "redeem"
+      ]
+    },
+    {
+      "file": "Moonbirds-Core/@divergencetech/ethier/contracts/erc721/ERC721Redeemer.sol",
+      "count": 70,
+      "matches": [
+        "claim",
+        "redeem"
+      ]
+    },
+    {
+      "file": "Compound/contracts/ComptrollerG7.sol",
+      "count": 69,
+      "matches": [
+        "claim",
+        "redeem"
+      ]
+    },
+    {
+      "file": "Eigenlayer/src/contracts/libraries/BeaconChainProofs.sol",
+      "count": 65,
+      "matches": [
+        "withdraw",
+        "claim"
+      ]
+    },
+    {
+      "file": "Eigenlayer/src/contracts/interfaces/IDelayedWithdrawalRouter.sol",
+      "count": 62,
+      "matches": [
+        "withdraw",
+        "claim"
+      ]
+    },
+    {
+      "file": "Eigenlayer/src/contracts/interfaces/IEigenPod.sol",
+      "count": 59,
+      "matches": [
+        "withdraw",
+        "claim",
+        "redeem"
+      ]
+    },
+    {
+      "file": "ops/reports/financial-ops-report.json",
+      "count": 59,
+      "matches": [
+        "withdraw",
+        "release(",
+        "claim",
+        "redeem",
+        "collectproceeds",
+        "payout"
+      ]
+    },
+    {
+      "file": "Umbra-Cash/contracts/Umbra.sol",
+      "count": 56,
+      "matches": [
+        "withdraw"
+      ]
+    }
+  ],
+  "placementSignals": [
+    {
+      "file": "Uniswap-V4/test/libraries/Hooks.t.sol",
+      "count": 323,
+      "matches": [
+        "liquidity"
+      ]
+    },
+    {
+      "file": "Uniswap-V4/test/PoolManager.t.sol",
+      "count": 313,
+      "matches": [
+        "liquidity"
+      ]
+    },
+    {
+      "file": "Uniswap-V4/test/libraries/StateLibrary.t.sol",
+      "count": 277,
+      "matches": [
+        "liquidity"
+      ]
+    },
+    {
+      "file": "Lyra-Finance/contracts/LiquidityPool.sol",
+      "count": 236,
+      "matches": [
+        "liquidity",
+        "profit"
+      ]
+    },
+    {
+      "file": "Uniswap-V4/test/pool-cl/CLPoolManager.t.sol",
+      "count": 168,
+      "matches": [
+        "liquidity"
+      ]
+    },
+    {
+      "file": "Uniswap-V4/test/Tick.t.sol",
+      "count": 150,
+      "matches": [
+        "liquidity"
+      ]
+    },
+    {
+      "file": "Uniswap-V4/src/libraries/Pool.sol",
+      "count": 137,
+      "matches": [
+        "liquidity"
+      ]
+    },
+    {
+      "file": "Uniswap-V4/test/pool-cl/libraries/Tick.t.sol",
+      "count": 118,
+      "matches": [
+        "liquidity"
+      ]
+    },
+    {
+      "file": "Uniswap-V4/test/ModifyLiquidity.t.sol",
+      "count": 116,
+      "matches": [
+        "liquidity"
+      ]
+    },
+    {
+      "file": "CRYPTO_REVENUE_GUIDE.md",
+      "count": 112,
+      "matches": [
+        "treasury",
+        "yield",
+        "apy",
+        "liquidity",
+        "staking",
+        "rebalance"
+      ]
+    },
+    {
+      "file": "money-flow.js",
+      "count": 105,
+      "matches": [
+        "treasury",
+        "yield",
+        "apy",
+        "liquidity",
+        "staking",
+        "revenue"
+      ]
+    },
+    {
+      "file": "0xSplits/SplitMain.sol",
+      "count": 101,
+      "matches": [
+        "allocation"
+      ]
+    },
+    {
+      "file": "on-chain-income-splitter-and-distributor/contracts/SplitMain.sol",
+      "count": 101,
+      "matches": [
+        "allocation"
+      ]
+    },
+    {
+      "file": "nexus/test_dao_governance.py",
+      "count": 100,
+      "matches": [
+        "treasury",
+        "profit"
+      ]
+    },
+    {
+      "file": "PancakeSwap-V3/contracts/PancakeV3Pool.sol",
+      "count": 95,
+      "matches": [
+        "liquidity"
+      ]
+    },
+    {
+      "file": "SushiSwap-V3/UniswapV3Pool.sol",
+      "count": 94,
+      "matches": [
+        "liquidity"
+      ]
+    },
+    {
+      "file": "Uniswap-V3/UniswapV3Pool.sol",
+      "count": 94,
+      "matches": [
+        "liquidity"
+      ]
+    },
+    {
+      "file": "Lyra-Finance/contracts/governance-wrapper/modules/LiquidityPoolGovernanceWrapper.sol",
+      "count": 90,
+      "matches": [
+        "liquidity"
+      ]
+    },
+    {
+      "file": "MARKETING_PATH.md",
+      "count": 89,
+      "matches": [
+        "treasury",
+        "yield",
+        "apy",
+        "liquidity",
+        "staking",
+        "revenue"
+      ]
+    },
+    {
+      "file": "Uniswap-V4/src/test/Fuzzers.sol",
+      "count": 77,
+      "matches": [
+        "liquidity"
+      ]
+    }
+  ],
+  "riskPatterns": [
+    {
+      "pattern": "approve",
+      "count": 319,
+      "sampleFiles": [
+        "web3-interface.html",
+        "Gnosis-Safe/Safe.sol",
+        "SushiSwap-V3/UniswapV3Pool.sol",
+        "SushiSwap-V3/NoDelegateCall.sol",
+        "SushiSwap-V3/UniswapV3Factory.sol",
+        "docs/IERC721A.md",
+        "docs/ERC20.md",
+        "docs/ERC721ABurnable.md"
+      ]
+    },
+    {
+      "pattern": "delegatecall",
+      "count": 172,
+      "sampleFiles": [
+        "web3-interface.html",
+        "Gnosis-Safe/Safe.sol",
+        "SushiSwap-V3/UniswapV3Pool.sol",
+        "SushiSwap-V3/NoDelegateCall.sol",
+        "SushiSwap-V3/UniswapV3Factory.sol",
+        "docs/IERC721A.md",
+        "docs/ERC20.md",
+        "docs/ERC721ABurnable.md"
+      ]
+    },
+    {
+      "pattern": "tx.origin",
+      "count": 49,
+      "sampleFiles": [
+        "web3-interface.html",
+        "Gnosis-Safe/Safe.sol",
+        "SushiSwap-V3/UniswapV3Pool.sol",
+        "SushiSwap-V3/NoDelegateCall.sol",
+        "SushiSwap-V3/UniswapV3Factory.sol",
+        "docs/IERC721A.md",
+        "docs/ERC20.md",
+        "docs/ERC721ABurnable.md"
+      ]
+    },
+    {
+      "pattern": "selfdestruct",
+      "count": 26,
+      "sampleFiles": [
+        "web3-interface.html",
+        "Gnosis-Safe/Safe.sol",
+        "SushiSwap-V3/UniswapV3Pool.sol",
+        "SushiSwap-V3/NoDelegateCall.sol",
+        "SushiSwap-V3/UniswapV3Factory.sol",
+        "docs/IERC721A.md",
+        "docs/ERC20.md",
+        "docs/ERC721ABurnable.md"
+      ]
+    }
+  ],
+  "successLog": [
+    {
+      "time": "2026-10-22T22:30:53+00:00",
+      "title": "Financial ops scan completed",
+      "details": "Static repo scan finished and refreshed markdown plus dashboard payloads.",
+      "status": "success"
+    },
+    {
+      "time": "2026-10-22T22:30:53+00:00",
+      "title": "Approval gate enforced",
+      "details": "Automation remains advisory for withdrawals, treasury routing, and settlement changes.",
+      "status": "success"
+    }
+  ],
+  "recommendedActions": [
+    "Review the pre-error queue and clear malformed or duplicate repository-owned files first.",
+    "Use the Withdrawal Placement Scanner findings to rank payout and treasury code for human review.",
+    "Treat Ethereum and Base connectivity assumptions as separate operational checks before extending automation."
+  ]
+}
