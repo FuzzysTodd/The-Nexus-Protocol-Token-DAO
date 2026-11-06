@@ -1,0 +1,5 @@
+env:
+  PROJECT_ID: "PVT_xxxxxxxxx"
+  COLUMN_REVIEW: "PVTSSFO_xxxxx_review"
+  COLUMN_READY: "PVTSSFO_xxxxx_ready"
+  COLUMN_DONE: "PVTSSFO_xxxxx_done"

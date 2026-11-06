@@ -1,0 +1,78 @@
+name: Auto-assign Priority based on labels
+
+on:
+  pull_request:
+    types:
+      - labeled
+      - unlabeled
+      - opened
+      - reopened
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  project: write
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  PROJECT_ID: "<YOUR_PROJECT_ID>"
+  PRIORITY_FIELD_ID: "<PRIORITY_FIELD_ID>"
+
+  PRIORITY_LOW: "<OPTION_ID_LOW>"
+  PRIORITY_MEDIUM: "<OPTION_ID_MEDIUM>"
+  PRIORITY_HIGH: "<OPTION_ID_HIGH>"
+
+jobs:
+  assign-priority:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get PR labels
+        id: labels
+        run: |
+          LABELS=$(gh pr view ${{ github.event.pull_request.number }} --json labels --jq '.labels[].name')
+          echo "labels=$LABELS" >> $GITHUB_OUTPUT
+
+      - name: Determine priority
+        id: detect
+        run: |
+          LABELS="${{ steps.labels.outputs.labels }}"
+
+          if echo "$LABELS" | grep -qi "priority:high"; then
+            echo "priority=$PRIORITY_HIGH" >> $GITHUB_OUTPUT
+          elif echo "$LABELS" | grep -qi "priority:medium"; then
+            echo "priority=$PRIORITY_MEDIUM" >> $GITHUB_OUTPUT
+          elif echo "$LABELS" | grep -qi "priority:low"; then
+            echo "priority=$PRIORITY_LOW" >> $GITHUB_OUTPUT
+          else
+            echo "priority=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Apply priority to project item
+        if: steps.detect.outputs.priority != ''
+        run: |
+          ITEM_ID=$(gh api graphql -f query="
+            query {
+              node(id: \"${{ github.event.pull_request.node_id }}\") {
+                ... on PullRequest {
+                  projectItems(first: 10) {
+                    nodes { id }
+                  }
+                }
+              }
+            }
+          " --jq '.data.node.projectItems.nodes[0].id')
+
+          gh api graphql -f query="
+            mutation {
+              updateProjectV2ItemFieldValue(input: {
+                projectId: \"$PROJECT_ID\",
+                itemId: \"$ITEM_ID\",
+                fieldId: \"$PRIORITY_FIELD_ID\",
+                value: { singleSelectOptionId: \"${{ steps.detect.outputs.priority }}\" }
+              }) {
+                projectV2Item { id }
+              }
+            }
+          "

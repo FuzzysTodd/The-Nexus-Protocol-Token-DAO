@@ -1,0 +1,65 @@
+# Nexus Protocol — Docker Compose
+#
+# Usage:
+#   docker-compose up -d          # start all services
+#   docker-compose logs -f        # follow logs
+#   docker-compose down           # stop and remove containers
+#
+# Copy .env.example to .env and fill in your values before running.
+
+version: "3.9"
+
+services:
+  dashboard:
+    build: .
+    command: node server.js
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXUS_ENV=remote
+      - PORT=3000
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - ./.approval-service-state.json:/app/.approval-service-state.json
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/status', r => process.exit(r.statusCode === 200 ? 0 : 1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  approval:
+    build: .
+    command: node approval-service-server.js
+    ports:
+      - "${APPROVAL_SERVICE_PORT:-8787}:8787"
+    environment:
+      - NEXUS_ENV=remote
+      - APPROVAL_SERVICE_PORT=8787
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - ./.approval-service-state.json:/app/.approval-service-state.json
+
+  financial:
+    build: .
+    command: node financial-ops-rest-server.js
+    ports:
+      - "${FINANCIAL_OPS_REST_PORT:-8788}:8788"
+    environment:
+      - NEXUS_ENV=remote
+      - FINANCIAL_OPS_REST_PORT=8788
+    env_file: .env
+    restart: unless-stopped
+
+  signal-bus:
+    build: .
+    command: node nexus-signal-bus.js
+    ports:
+      - "${NEXUS_SIGNAL_BUS_PORT:-8790}:8790"
+    environment:
+      - NEXUS_ENV=remote
+      - NEXUS_SIGNAL_BUS_PORT=8790
+    env_file: .env
+    restart: unless-stopped
