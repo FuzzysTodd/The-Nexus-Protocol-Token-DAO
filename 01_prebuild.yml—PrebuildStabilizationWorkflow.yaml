@@ -1,0 +1,9 @@
+tests:
+  - name: Generate a load test script
+    command: "@testing /generateLoadTest"
+  - name: Run a load test in Azure
+    command: "@testing /runLoadTestInAzure"
+  - name: Run a load test locally
+    command: "@testing /runLoadTestLocally"
+  - name: Validate your load test configuration
+    command: "@testing /validateLoadTestConfig"
