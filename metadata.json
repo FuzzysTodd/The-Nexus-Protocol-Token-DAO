@@ -1,0 +1,8 @@
+{
+  "name": "Remix The Nexus Protocol DAO",
+  "description": "Official operational command center, governance engine, treasury manager, contract workbench, and chunked contract post manager for The Nexus Protocol and NGTT.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
