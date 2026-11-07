@@ -83,6 +83,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({ activeTab, setActiveTab })
   const navItems = [
     { id: 'governance', label: 'Governance & Timelock', icon: Shield },
     { id: 'treasury', label: 'Treasury & Multisig', icon: Wallet },
+    { id: 'compliance-cap', label: 'ISO / IEEE Compliance CAP', icon: CheckCircle2 },
     { id: 'forex-trader', label: 'Forex & Fiat Trader', icon: DollarSign },
     { id: 'withdrawals', label: 'Withdrawal Center', icon: ArrowDownToLine },
     { id: 'financial-ops', label: 'Financial Ops & Approvals', icon: FileCheck2 },

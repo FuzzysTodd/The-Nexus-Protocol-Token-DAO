@@ -41,6 +41,10 @@ import {
   generateProofHash,
   computeExpectedTransmittal,
   generateSignalProofFuzz,
+  getInitialCorrectiveActions,
+  getISOQualityMetrics,
+  getRepositoryMappedStructure,
+  evaluateDAOComplianceScore,
   type MCPGroupState,
   type ContractChunk,
   type GP22Checkpoints,
@@ -705,6 +709,76 @@ test('generateSignalProofFuzz generates perturbation vectors and verifies resili
   assert.equal(posJitter.isValid, true);
   assert.equal(negJitter.isValid, true);
 });
+
+test('getInitialCorrectiveActions returns ISO 9001 and IEEE 1012 compliant CAR items with cryptographic digests', () => {
+  const cars = getInitialCorrectiveActions();
+  assert.equal(cars.length >= 5, true);
+
+  for (const car of cars) {
+    assert.equal(car.id.startsWith('CAR-'), true, `CAR ID must start with CAR- prefix: ${car.id}`);
+    assert.equal(typeof car.title, 'string');
+    assert.equal(typeof car.standardReference, 'string');
+    assert.equal(car.cryptographicDigest.startsWith('0x'), true, `Cryptographic digest must be hex: ${car.id}`);
+    assert.equal(car.cryptographicDigest.length, 66, `Cryptographic digest must be 32-byte (66 chars): ${car.id}`);
+    assert.equal(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'].includes(car.severity), true);
+    assert.equal(['IMPLEMENTED', 'VERIFIED', 'IN_PROGRESS', 'SCHEDULED'].includes(car.status), true);
+  }
+
+  const isoOracleCar = cars.find((c) => c.id === 'CAR-ISO-01')!;
+  assert.equal(isoOracleCar.standardReference.includes('ISO 9001:2015'), true);
+  assert.equal(isoOracleCar.status, 'VERIFIED');
+
+  const ieeeFuzzCar = cars.find((c) => c.id === 'CAR-IEEE-02')!;
+  assert.equal(ieeeFuzzCar.standardReference.includes('IEEE 1012-2016'), true);
+  assert.equal(ieeeFuzzCar.status, 'VERIFIED');
+});
+
+test('getISOQualityMetrics provides institutional audit benchmarks across ISO 9001, IEEE, and SOC 2', () => {
+  const metrics = getISOQualityMetrics();
+  assert.equal(metrics.length >= 4, true);
+
+  for (const m of metrics) {
+    assert.equal(m.metricId.startsWith('QM-'), true);
+    assert.equal(m.score >= m.target, true, `Score ${m.score} should meet target ${m.target} for ${m.metricId}`);
+    assert.equal(m.score <= 100, true);
+    assert.equal(['COMPLIANT', 'EXEMPLARY', 'MONITORING'].includes(m.status), true);
+  }
+
+  const ieeeMetric = metrics.find((m) => m.metricId === 'QM-IEEE-02')!;
+  assert.equal(ieeeMetric.standard, 'IEEE 1012');
+  assert.equal(ieeeMetric.score >= 95, true);
+});
+
+test('getRepositoryMappedStructure maps all core DAO architectural modules with test coverage', () => {
+  const modules = getRepositoryMappedStructure();
+  assert.equal(modules.length >= 7, true);
+
+  for (const mod of modules) {
+    assert.equal(mod.id.startsWith('mod-'), true);
+    assert.equal(mod.linesOfCode > 0, true);
+    assert.equal(mod.testCoveragePercent >= 90.0, true, `Module ${mod.id} test coverage below 90% threshold`);
+    assert.equal(['TIER_1_CONSENSUS', 'TIER_2_ORCHESTRATION', 'TIER_3_INTERFACE'].includes(mod.securityTier), true);
+    assert.equal(mod.complianceTags.length > 0, true);
+  }
+
+  const coreLogic = modules.find((m) => m.id === 'mod-core-logic')!;
+  assert.equal(coreLogic.securityTier, 'TIER_1_CONSENSUS');
+  assert.equal(coreLogic.path, 'src/dao/logic.ts');
+});
+
+test('evaluateDAOComplianceScore calculates overall institutional rating and verification ratio', () => {
+  const cars = getInitialCorrectiveActions();
+  const metrics = getISOQualityMetrics();
+
+  const evaluation = evaluateDAOComplianceScore(cars, metrics);
+  assert.equal(evaluation.overallScore >= 95.0, true);
+  assert.equal(evaluation.rating, 'AAA_INSTITUTIONAL');
+  assert.equal(evaluation.verifiedRatio, 100);
+  assert.equal(evaluation.pendingCount, 0);
+  assert.equal(evaluation.summary.includes('ISO 9001:2015'), true);
+  assert.equal(evaluation.summary.includes('IEEE 1012-2016'), true);
+});
+
 
 
 

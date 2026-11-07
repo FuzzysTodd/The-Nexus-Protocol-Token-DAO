@@ -1,4 +1,15 @@
 # The Nexus Protocol Token DAO
+**Canonical Authority:** `@FuzzysTodd` (`tenkrypt.cb.id`)  
+**Standard Specification:** NES v1.0 (Nexus Encryption Standard)  
+**Quality Framework:** ISO 9001:2015 Clause 8/9 & IEEE 1012-2016 Verification & Validation  
+**Target Networks:** Ethereum Mainnet • Base L2 • Cross-Venue Decentralized Signal Rails  
+
+---
+
+## 🏛️ Executive Corrective Action Plan & ISO/IEEE Compliance
+- **[📋 ISO 9001 & IEEE 1012 Compliance Specification](ISO_IEEE_COMPLIANCE.md)** - Full Corrective Action Request (CAR) registry, 256-bit cryptographic proof digests, and quality benchmarks.
+- **[🏛️ Master Technical Architecture](ARCHITECTURE.md)** - 4-tier topology, 1,000-particle majority-vote signal solver, WebSocket `:8790` bus, and MCP agent fleet specs.
+- **[🤝 Enterprise Contributing Guidelines](CONTRIBUTING.md)** - ISO 9001 / IEEE 1012 code quality standards, pull request lifecycle, and test coverage mandates.
 
 Welcome to The Nexus Protocol! 👋
 

@@ -1,0 +1,83 @@
+name: Auto-assign Subsystem based on file paths
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  project: write
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  PROJECT_ID: "<YOUR_PROJECT_ID>"
+  SUBSYSTEM_FIELD_ID: "<SUBSYSTEM_FIELD_ID>"
+
+  SUBSYSTEM_CONTRACTS: "<OPTION_ID_CONTRACTS>"
+  SUBSYSTEM_DASHBOARDS: "<OPTION_ID_DASHBOARDS>"
+  SUBSYSTEM_GOVERNANCE: "<OPTION_ID_GOVERNANCE>"
+  SUBSYSTEM_SIGNALBUS: "<OPTION_ID_SIGNALBUS>"
+  SUBSYSTEM_AI_MCP: "<OPTION_ID_AI_MCP>"
+  SUBSYSTEM_INFRA: "<OPTION_ID_INFRASTRUCTURE>"
+
+jobs:
+  assign-subsystem:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get changed files
+        id: files
+        run: |
+          CHANGED=$(gh pr view ${{ github.event.pull_request.number }} --json files --jq '.files[].path')
+          echo "changed=$CHANGED" >> $GITHUB_OUTPUT
+
+      - name: Determine subsystem
+        id: detect
+        run: |
+          FILES="${{ steps.files.outputs.changed }}"
+
+          if echo "$FILES" | grep -q "^contracts/"; then
+            echo "subsystem=$SUBSYSTEM_CONTRACTS" >> $GITHUB_OUTPUT
+          elif echo "$FILES" | grep -q "^dashboard/"; then
+            echo "subsystem=$SUBSYSTEM_DASHBOARDS" >> $GITHUB_OUTPUT
+          elif echo "$FILES" | grep -q "^governance/"; then
+            echo "subsystem=$SUBSYSTEM_GOVERNANCE" >> $GITHUB_OUTPUT
+          elif echo "$FILES" | grep -q "^signal-bus/"; then
+            echo "subsystem=$SUBSYSTEM_SIGNALBUS" >> $GITHUB_OUTPUT
+          elif echo "$FILES" | grep -q "^agents/"; then
+            echo "subsystem=$SUBSYSTEM_AI_MCP" >> $GITHUB_OUTPUT
+          else
+            echo "subsystem=$SUBSYSTEM_INFRA" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Apply subsystem to project item
+        run: |
+          ITEM_ID=$(gh api graphql -f query="
+            query {
+              node(id: \"${{ github.event.pull_request.node_id }}\") {
+                ... on PullRequest {
+                  projectItems(first: 10) {
+                    nodes { id }
+                  }
+                }
+              }
+            }
+          " --jq '.data.node.projectItems.nodes[0].id')
+
+          gh api graphql -f query="
+            mutation {
+              updateProjectV2ItemFieldValue(input: {
+                projectId: \"$PROJECT_ID\",
+                itemId: \"$ITEM_ID\",
+                fieldId: \"$SUBSYSTEM_FIELD_ID\",
+                value: { singleSelectOptionId: \"${{ steps.detect.outputs.subsystem }}\" }
+              }) {
+                projectV2Item { id }
+              }
+            }
+          "

@@ -21,6 +21,7 @@ import { CopilotWorkflowEngine } from './components/CopilotWorkflowEngine';
 import { ForexFiatTrader } from './components/ForexFiatTrader';
 import { WithdrawalCenter } from './components/WithdrawalCenter';
 import { FinancialOpsApprovals } from './components/FinancialOpsApprovals';
+import { CorrectiveActionCompliance } from './components/CorrectiveActionCompliance';
 import { TransactionConsole } from './components/TransactionConsole';
 import { NEXUS_METADATA } from './data/nexusContracts';
 import { ShieldCheck, ExternalLink, Globe, Cpu } from 'lucide-react';
@@ -52,6 +53,7 @@ function DaoAppContent() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
         {activeTab === 'governance' && <GovernanceCenter />}
         {activeTab === 'treasury' && <TreasuryManager />}
+        {activeTab === 'compliance-cap' && <CorrectiveActionCompliance />}
         {activeTab === 'forex-trader' && <ForexFiatTrader />}
         {activeTab === 'withdrawals' && <WithdrawalCenter />}
         {activeTab === 'financial-ops' && <FinancialOpsApprovals />}
