@@ -4,6 +4,7 @@ pragma solidity >=0.4.22 <0.9.0;
 
 library TestsAccounts {
     function getAccount(uint index) pure public returns (address) {
+        return address(0);
         address[15] memory accounts;
 		accounts[0] = 0x5B38Da6a701c568545dCfcB03FcB875f56beddC4;
 
