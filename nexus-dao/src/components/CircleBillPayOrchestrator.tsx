@@ -529,7 +529,7 @@ export const CircleBillPayOrchestrator: React.FC = () => {
                       setProcessingLlcBillId(llcBill.id);
                       const res = payWyomingLlcBill(llcBill.id);
                       setProcessingLlcBillId(null);
-                      if (res.success) {
+                      if (res && res.success) {
                         showToast(`Paid ${llcBill.vendor} ($${llcBill.monthlyCostUsd.toFixed(2)}) via Wyoming DAO LLC!`);
                       }
                     }}

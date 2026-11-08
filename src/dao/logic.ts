@@ -3649,7 +3649,7 @@ export function calculateMonthlyBillsVsOutflowAnalytics(
   const settledOrQueuedWithdrawals = withdrawals.filter(
     (w) => w.status === 'SETTLED' || w.status === 'TIMELOCK_QUEUED' || w.status === 'PROCESSING'
   );
-  const rawWithdrawalsSum = settledOrQueuedWithdrawals.reduce((sum, w) => sum + (Number(w.amountUsd) || 0), 0);
+  const rawWithdrawalsSum = settledOrQueuedWithdrawals.reduce((sum, w) => sum + (Number(w.usdEquivalent) || 0), 0);
   // Normalize monthly treasury non-bill outflow so chart is realistic and proportional
   const currentMonthWithdrawalsUsd =
     rawWithdrawalsSum > 0 ? Math.round((rawWithdrawalsSum / 10) * 100) / 100 : 28500.0;
