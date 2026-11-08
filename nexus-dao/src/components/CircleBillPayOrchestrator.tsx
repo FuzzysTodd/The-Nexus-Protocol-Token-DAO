@@ -30,6 +30,9 @@ import {
   Receipt,
   Radio,
   Sparkles,
+  Building2,
+  Globe,
+  FileText,
 } from 'lucide-react';
 
 export const CircleBillPayOrchestrator: React.FC = () => {
@@ -44,10 +47,15 @@ export const CircleBillPayOrchestrator: React.FC = () => {
     payDaoBill,
     payAllDaoBillsAutonomous,
     createCustomBill,
+    wyomingLlcProfile,
+    wyomingLlcBills,
+    payWyomingLlcBill,
+    payAllPendingWyomingLlcBills,
   } = useNexusDao();
 
   const [isProcessingAll, setIsProcessingAll] = useState(false);
   const [processingBillId, setProcessingBillId] = useState<string | null>(null);
+  const [processingLlcBillId, setProcessingLlcBillId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [copiedAddr, setCopiedAddr] = useState<string | null>(null);
@@ -453,6 +461,93 @@ export const CircleBillPayOrchestrator: React.FC = () => {
               ))}
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Wyoming DAO LLC Digital Bill & Subscription Payment Desk Integration */}
+      <div className="bg-slate-900/80 border border-indigo-500/30 rounded-xl p-5 space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+          <div>
+            <div className="flex items-center gap-2 text-sm font-bold text-slate-100">
+              <Building2 className="w-4 h-4 text-indigo-400" />
+              <span>Wyoming DAO LLC Digital Subscription & Google Cloud Billing Rail</span>
+              <span className="text-[10px] font-mono bg-indigo-950/90 text-indigo-300 px-2 py-0.5 rounded border border-indigo-800/60">
+                {wyomingLlcProfile.statutoryAuthority}
+              </span>
+            </div>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Legal Entity: <strong className="text-slate-200">{wyomingLlcProfile.legalName}</strong> ({wyomingLlcProfile.filingId}) • Settle Google Cloud, Google Workspace, Gemini API, and SaaS cost subscriptions directly through the Wyoming DAO LLC banking & USDC bridge.
+            </p>
+          </div>
+          <button
+            onClick={() => {
+              const settled = payAllPendingWyomingLlcBills();
+              showToast(
+                settled > 0
+                  ? `Settled ${settled} digital subscription bills via ${wyomingLlcProfile.legalName}!`
+                  : 'All Wyoming DAO LLC digital subscription bills are already settled.'
+              );
+            }}
+            className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-mono text-xs font-semibold rounded-lg flex items-center gap-1.5 transition self-start md:self-auto"
+          >
+            <CheckCircle2 className="w-3.5 h-3.5" />
+            Settle All Pending LLC Subscriptions
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          {wyomingLlcBills.map((llcBill) => (
+            <div
+              key={llcBill.id}
+              className="bg-slate-950/80 border border-slate-800 rounded-lg p-3.5 flex flex-col justify-between gap-2.5"
+            >
+              <div className="space-y-1">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[10px] font-mono text-indigo-400 font-bold">{llcBill.invoiceNumber}</span>
+                  <span
+                    className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-bold ${
+                      llcBill.status === 'PAID_CURRENT_CYCLE'
+                        ? 'bg-emerald-950 text-emerald-400 border border-emerald-800/60'
+                        : 'bg-amber-950 text-amber-300 border border-amber-800/60'
+                    }`}
+                  >
+                    {llcBill.status.replace(/_/g, ' ')}
+                  </span>
+                </div>
+                <div className="text-xs font-bold text-slate-100">{llcBill.vendor}</div>
+                <div className="text-[11px] text-slate-400 line-clamp-2">{llcBill.description}</div>
+              </div>
+
+              <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 text-[11px] font-mono">
+                <div>
+                  <span className="text-emerald-400 font-bold">${llcBill.monthlyCostUsd.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                  <span className="text-slate-500 text-[10px] ml-1">({llcBill.billingCycle})</span>
+                </div>
+                {llcBill.status !== 'PAID_CURRENT_CYCLE' ? (
+                  <button
+                    onClick={() => {
+                      setProcessingLlcBillId(llcBill.id);
+                      const res = payWyomingLlcBill(llcBill.id);
+                      setProcessingLlcBillId(null);
+                      if (res.success) {
+                        showToast(`Paid ${llcBill.vendor} ($${llcBill.monthlyCostUsd.toFixed(2)}) via Wyoming DAO LLC!`);
+                      }
+                    }}
+                    disabled={processingLlcBillId === llcBill.id}
+                    aria-label={`Pay ${llcBill.vendor} via WY LLC`}
+                    className="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[10px] font-semibold transition"
+                  >
+                    Pay via WY LLC
+                  </button>
+                ) : (
+                  <span className="text-[10px] text-emerald-400 flex items-center gap-1">
+                    <FileText className="w-3 h-3" />
+                    Settled
+                  </span>
+                )}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

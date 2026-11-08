@@ -58,6 +58,12 @@ import {
   evaluateWithdrawalTier,
   FinancialApprovalItem,
   getInitialFinancialApprovals,
+  WyomingLlcEntityProfile,
+  WyomingLlcDigitalBill,
+  WyomingBillSettlementResult,
+  getWyomingLlcEntityProfile,
+  getInitialWyomingLlcBills,
+  settleWyomingLlcDigitalBill,
 } from '../dao/logic';
 export interface Proposal {
   id: number;
@@ -290,6 +296,18 @@ interface NexusDaoContextType {
   signFinancialApproval: (id: string) => void;
   executeFinancialApproval: (id: string) => void;
   vetoFinancialApproval: (id: string) => void;
+
+  // Wyoming DAO LLC Digital Bill & Subscription Desk
+  wyomingLlcProfile: WyomingLlcEntityProfile;
+  wyomingLlcBills: WyomingLlcDigitalBill[];
+  payWyomingLlcBill: (billId: string) => WyomingBillSettlementResult | null;
+  payAllPendingWyomingLlcBills: () => number;
+  createWyomingLlcBill: (
+    billInput: Omit<
+      WyomingLlcDigitalBill,
+      'id' | 'invoiceNumber' | 'wyomingEntityName' | 'wyomingFilingId' | 'status'
+    >
+  ) => WyomingLlcDigitalBill;
 
   // System Stats
   totalProposalsCount: number;
@@ -2311,6 +2329,102 @@ export const NexusDaoProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     );
   };
 
+  // Wyoming DAO LLC Digital Bill & Subscription State
+  const [wyomingLlcProfile] = useState<WyomingLlcEntityProfile>(() => getWyomingLlcEntityProfile());
+  const [wyomingLlcBills, setWyomingLlcBills] = useState<WyomingLlcDigitalBill[]>(() =>
+    getInitialWyomingLlcBills()
+  );
+
+  const payWyomingLlcBill = (billId: string): WyomingBillSettlementResult | null => {
+    const targetBill = wyomingLlcBills.find((b) => b.id === billId);
+    if (!targetBill) return null;
+
+    const result = settleWyomingLlcDigitalBill(targetBill, account, 10000.0);
+    setWyomingLlcBills((prev) =>
+      prev.map((b) => (b.id === billId ? result.updatedBill : b))
+    );
+
+    const logItem = {
+      id: `tx-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      timestamp: result.settledAt || new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC',
+      method: `WyomingDAOLLC.settleDigitalBill("${targetBill.invoiceNumber}", "${targetBill.vendor}")`,
+      target: 'NexusDAOTreasury (WY-DAO-LLC)',
+      status: (result.success ? 'Success' : 'Failed') as 'Success' | 'Failed',
+      txHash: result.success
+        ? `${result.receiptHash.slice(0, 10)}...${result.receiptHash.slice(-6)}`
+        : '0x0000...0000',
+      details: result.success
+        ? `Settled $${targetBill.monthlyCostUsd.toFixed(2)} USD subscription for ${targetBill.vendor} via ${targetBill.paymentRail}. Attestation: ${result.llcAttestationId}`
+        : result.error || 'Failed to settle Wyoming LLC digital bill.',
+    };
+    setExecutionLogs((logs) => [logItem, ...logs]);
+
+    return result;
+  };
+
+  const payAllPendingWyomingLlcBills = (): number => {
+    let settledCount = 0;
+    const updated = wyomingLlcBills.map((bill) => {
+      if (bill.status === 'PENDING_DISBURSEMENT' || bill.status === 'ACTIVE_AUTOPAY') {
+        const res = settleWyomingLlcDigitalBill(bill, account, 10000.0);
+        if (res.success) {
+          settledCount++;
+          return res.updatedBill;
+        }
+        return res.updatedBill;
+      }
+      return bill;
+    });
+
+    if (settledCount > 0) {
+      setWyomingLlcBills(updated);
+      const logItem = {
+        id: `tx-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC',
+        method: `WyomingDAOLLC.batchSettleSubscriptions(${settledCount})`,
+        target: 'NexusDAOTreasury (WY-DAO-LLC)',
+        status: 'Success' as const,
+        txHash: '0x' + Math.random().toString(16).slice(2, 10) + '...' + Math.random().toString(16).slice(2, 6),
+        details: `Batch settled ${settledCount} Wyoming DAO LLC digital subscriptions (including Google Cloud/Workspace & SaaS) under Wyo. Stat. § 17-31-101.`,
+      };
+      setExecutionLogs((logs) => [logItem, ...logs]);
+    }
+
+    return settledCount;
+  };
+
+  const createWyomingLlcBill = (
+    billInput: Omit<
+      WyomingLlcDigitalBill,
+      'id' | 'invoiceNumber' | 'wyomingEntityName' | 'wyomingFilingId' | 'status'
+    >
+  ): WyomingLlcDigitalBill => {
+    const nextNum = 100 + wyomingLlcBills.length + 1;
+    const newBill: WyomingLlcDigitalBill = {
+      ...billInput,
+      id: `wy-bill-custom-${Date.now()}`,
+      invoiceNumber: `WY-LLC-INV-2026-${nextNum}`,
+      wyomingEntityName: wyomingLlcProfile.legalName,
+      wyomingFilingId: wyomingLlcProfile.filingId,
+      status: 'PENDING_DISBURSEMENT',
+    };
+
+    setWyomingLlcBills((prev) => [newBill, ...prev]);
+
+    const logItem = {
+      id: `tx-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      timestamp: new Date().toISOString().replace('T', ' ').slice(0, 19) + ' UTC',
+      method: `WyomingDAOLLC.registerSubscription("${newBill.invoiceNumber}", "${newBill.vendor}")`,
+      target: 'NexusDAOTreasury (WY-DAO-LLC)',
+      status: 'Success' as const,
+      txHash: '0x' + Math.random().toString(16).slice(2, 10) + '...' + Math.random().toString(16).slice(2, 6),
+      details: `Registered new Wyoming DAO LLC digital subscription bill ${newBill.invoiceNumber} for ${newBill.vendor} ($${newBill.monthlyCostUsd.toFixed(2)}/mo via ${newBill.paymentRail}).`,
+    };
+    setExecutionLogs((logs) => [logItem, ...logs]);
+
+    return newBill;
+  };
+
   return (
     <NexusDaoContext.Provider
       value={{
@@ -2410,6 +2524,11 @@ export const NexusDaoProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         signFinancialApproval,
         executeFinancialApproval,
         vetoFinancialApproval,
+        wyomingLlcProfile,
+        wyomingLlcBills,
+        payWyomingLlcBill,
+        payAllPendingWyomingLlcBills,
+        createWyomingLlcBill,
         totalProposalsCount: proposals.length,
         activeVotersCount: 384,
       }}

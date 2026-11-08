@@ -45,6 +45,10 @@ import {
   getISOQualityMetrics,
   getRepositoryMappedStructure,
   evaluateDAOComplianceScore,
+  getWyomingLlcEntityProfile,
+  getInitialWyomingLlcBills,
+  settleWyomingLlcDigitalBill,
+  calculateMonthlyBillsVsOutflowAnalytics,
   type MCPGroupState,
   type ContractChunk,
   type GP22Checkpoints,
@@ -778,6 +782,71 @@ test('evaluateDAOComplianceScore calculates overall institutional rating and ver
   assert.equal(evaluation.summary.includes('ISO 9001:2015'), true);
   assert.equal(evaluation.summary.includes('IEEE 1012-2016'), true);
 });
+
+test('getWyomingLlcEntityProfile and getInitialWyomingLlcBills provide Google & SaaS subscriptions under Wyoming DAO LLC', () => {
+  const profile = getWyomingLlcEntityProfile();
+  assert.equal(profile.legalName, 'The Nexus Protocol Token DAO LLC');
+  assert.equal(profile.jurisdiction.includes('Wyoming'), true);
+  assert.equal(profile.filingId, 'WY-DAO-2026-001489210');
+  assert.equal(profile.standingStatus, 'ACTIVE_GOOD_STANDING');
+
+  const wyBills = getInitialWyomingLlcBills();
+  assert.equal(wyBills.length >= 6, true);
+
+  const googleCloudBill = wyBills.find((b) => b.id === 'wy-bill-google-cloud-001')!;
+  assert.equal(googleCloudBill.vendor.includes('Google Cloud'), true);
+  assert.equal(googleCloudBill.wyomingEntityName, 'The Nexus Protocol Token DAO LLC');
+  assert.equal(googleCloudBill.monthlyCostUsd, 1850.0);
+
+  const googleWorkspaceBill = wyBills.find((b) => b.id === 'wy-bill-google-workspace-002')!;
+  assert.equal(googleWorkspaceBill.vendor.includes('Google Workspace'), true);
+  assert.equal(googleWorkspaceBill.monthlyCostUsd, 640.0);
+});
+
+test('settleWyomingLlcDigitalBill settles Google/SaaS subscription via Wyoming LLC and generates cryptographic receipt', () => {
+  const wyBills = getInitialWyomingLlcBills();
+  const pendingBill = wyBills.find((b) => b.id === 'wy-bill-google-workspace-002')!;
+
+  const result = settleWyomingLlcDigitalBill(
+    pendingBill,
+    '0x33ffc3080A4eC3dBf2355A224fF941864ff495f2',
+    10000.0
+  );
+
+  assert.equal(result.success, true);
+  assert.equal(result.updatedBill.status, 'PAID_CURRENT_CYCLE');
+  assert.equal(result.receiptHash.startsWith('0x'), true);
+  assert.equal(result.receiptHash.length, 66);
+  assert.equal(result.llcAttestationId.startsWith('WY-ATTEST-'), true);
+
+  // Exceeding policy limit queues for Guardian co-sign
+  const overLimitResult = settleWyomingLlcDigitalBill(
+    { ...pendingBill, monthlyCostUsd: 25000.0 },
+    '0x33ffc3080A4eC3dBf2355A224fF941864ff495f2',
+    10000.0
+  );
+  assert.equal(overLimitResult.success, false);
+  assert.equal(overLimitResult.updatedBill.status, 'REQUIRES_GUARDIAN');
+});
+
+test('calculateMonthlyBillsVsOutflowAnalytics computes monthly bill & subscription costs compared to DAO treasury outflow', () => {
+  const daoBills = getPredefinedDaoBills(); // $3,535.00 USDC
+  const wyBills = getInitialWyomingLlcBills(); // $5,930.00 USD
+  const withdrawals = getInitialWithdrawalRequests();
+
+  const analytics6M = calculateMonthlyBillsVsOutflowAnalytics(daoBills, wyBills, withdrawals, 6);
+  assert.equal(analytics6M.points.length, 6);
+  assert.equal(analytics6M.currentMonthBillsUsd, 3535.0);
+  assert.equal(analytics6M.currentMonthSubscriptionsUsd, 5930.0);
+  assert.equal(analytics6M.currentMonthCombinedBillsSubsUsd, 9465.0);
+  assert.equal(analytics6M.currentMonthGoogleSpendUsd >= 2490.0, true);
+  assert.equal(analytics6M.currentMonthTotalOutflowUsd > analytics6M.currentMonthCombinedBillsSubsUsd, true);
+  assert.equal(analytics6M.billShareOfOutflowPct > 0 && analytics6M.billShareOfOutflowPct < 100, true);
+
+  const analytics12M = calculateMonthlyBillsVsOutflowAnalytics(daoBills, wyBills, withdrawals, 12);
+  assert.equal(analytics12M.points.length, 12);
+});
+
 
 
 
