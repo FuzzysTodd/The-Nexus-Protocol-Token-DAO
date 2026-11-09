@@ -224,6 +224,17 @@ def test_ngtt_uses_nonreentrant_on_distribute_profits():
     assert "nonReentrant" in snippet
 
 
+def test_ngtt_profit_pool_is_backed_by_token_deposit():
+    src = read_sol("NGTTGovernanceToken.sol")
+    add_idx = src.find("function addProfitPool")
+    claim_idx = src.find("function claimProfits")
+    assert add_idx != -1
+    assert claim_idx != -1
+    assert "safeTransferFrom(msg.sender, address(this), _amount)" in src[add_idx: add_idx + 400]
+    assert "safeTransfer(msg.sender, amount)" in src[claim_idx: claim_idx + 300]
+    assert "_mint(msg.sender, amount)" not in src[claim_idx: claim_idx + 300]
+
+
 def test_ngtt_no_private_key_literals():
     src = read_sol("NGTTGovernanceToken.sol")
     assert "PRIVATE_KEY" not in src
