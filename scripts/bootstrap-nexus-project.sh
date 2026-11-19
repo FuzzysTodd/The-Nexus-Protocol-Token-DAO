@@ -42,7 +42,7 @@ STATUS_FIELD_ID=$(gh api graphql -f query="
       projectV2Field { id }
     }
   }
-" --jq '.data.createProjectV2Field.projectV2Field.id')
+" --jq '.data.createProjectV2Field.projectV2Field.id')a
 
 echo "Status Field ID: $STATUS_FIELD_ID"
 echo

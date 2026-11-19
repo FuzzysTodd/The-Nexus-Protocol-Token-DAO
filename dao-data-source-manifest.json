@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "canonicalRepo": "FuzzysTodd/The-Nexus-Protocol-Token-DOA",
+  "canonicalRepo": "FuzzysTodd/The-Nexus-Protocol-Token-DAO",
   "owner": "@FuzzysTodd",
   "policy": {
     "sourceOfTruth": "repository-authored content in canonical repo",
@@ -10,7 +10,7 @@
   "sources": [
     {
       "type": "canonical-repo",
-      "locator": "https://github.com/FuzzysTodd/The-Nexus-Protocol-Token-DOA",
+      "locator": "https://github.com/FuzzysTodd/The-Nexus-Protocol-Token-DAO",
       "trust": "owner-authoritative",
       "scope": "full-system",
       "notes": "Primary governance, contracts, docs, and dashboard source",
@@ -60,5 +60,12 @@
         "provenanceHash": ""
       }
     }
-  ]
+  ],
+  "fileAccounting": {
+    "policy": "Every tracked file in the repository \u2014 including all loose root-level files \u2014 must appear in the accounting inventory with a category, purpose, and disposition.",
+    "inventory": "reports/file-accounting.json",
+    "humanReadable": "reports/file-accounting.md",
+    "generatedBy": "dao-accounting-bot (deterministic, zero AI credits)",
+    "validatedBy": ".github/workflows/dao-bots.yml"
+  }
 }

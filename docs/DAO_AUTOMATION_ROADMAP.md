@@ -1,6 +1,6 @@
 # DAO Automation Roadmap
 
-This document summarizes the repository surfaces that already support automation, then identifies the missing pieces needed to make the DAO more public-facing and more self-operating.
+This document summarizes the repository surfaces that already support automation, then identifies the missing pieces needed to make the DAO more public-facing and more self-operating. benchmarking through described agents in docs and doc folders ! [{REDTEAM}]
 
 ## Existing Automation Surfaces
 

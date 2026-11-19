@@ -1,0 +1,62 @@
+name: Nexus Project Routing (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      project_id:
+        required: true
+        type: string
+      status_field_id:
+        required: true
+        type: string
+      status_backlog_id:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  project: write
+
+jobs:
+  route-pr-into-project:
+    runs-on: ubuntu-latest
+
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      PROJECT_ID: ${{ inputs.project_id }}
+      STATUS_FIELD_ID: ${{ inputs.status_field_id }}
+      STATUS_BACKLOG: ${{ inputs.status_backlog_id }}
+
+    steps:
+      - name: Create project item for PR
+        id: create_item
+        run: |
+          ITEM_ID=$(gh api graphql -f query="
+            mutation {
+              addProjectV2ItemById(input: {
+                projectId: \"$PROJECT_ID\",
+                contentId: \"${{ github.event.pull_request.node_id }}\"
+              }) {
+                item { id }
+              }
+            }
+          " --jq '.data.addProjectV2ItemById.item.id')
+
+          echo "item_id=$ITEM_ID" >> $GITHUB_OUTPUT
+
+      - name: Set initial Status to Backlog
+        run: |
+          gh api graphql -f query="
+            mutation {
+              updateProjectV2ItemFieldValue(input: {
+                projectId: \"$PROJECT_ID\",
+                itemId: \"${{ steps.create_item.outputs.item_id }}\",
+                fieldId: \"$STATUS_FIELD_ID\",
+                value: { singleSelectOptionId: \"$STATUS_BACKLOG\" }
+              }) {
+                projectV2Item { id }
+              }
+            }
+          "

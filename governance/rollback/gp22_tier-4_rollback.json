@@ -1,0 +1,78 @@
+{
+  "rollback_id": "GP-22-TIER4-ROLLBACK",
+  "proposal_id": "GP-22-TIER4",
+  "parent_proposal": "GP-22-EXEC",
+  "tier": 4,
+  "description": "Rollback plan for GP-22 Tier-4 on-chain modernization execution.",
+  "triggers": {
+    "on_failure": true,
+    "on_partial_execution": true,
+    "on_manual_invoke": true
+  },
+  "conditions": {
+    "transaction_status": [
+      "failed",
+      "reverted",
+      "timeout"
+    ],
+    "multisig_status": [
+      "insufficient_signatures",
+      "revoked",
+      "expired"
+    ]
+  },
+  "steps": [
+    {
+      "id": "record_failure",
+      "agent": "OrbitAgent",
+      "action": "record_onchain_failure",
+      "inputs": {
+        "proposal_id": "GP-22-TIER4",
+        "network": "ethereum"
+      },
+      "gp14_tier": 2
+    },
+    {
+      "id": "flag_modernization_state",
+      "agent": "ChainOpsAgent",
+      "action": "set_modernization_state",
+      "inputs": {
+        "state": "rollback-required",
+        "version": "1.0.0"
+      },
+      "gp14_tier": 4
+    },
+    {
+      "id": "notify_treasury",
+      "agent": "TreasuryMultisigAgent",
+      "action": "notify_signers",
+      "inputs": {
+        "reason": "GP-22-TIER4 rollback triggered",
+        "channel": "email"
+      },
+      "gp14_tier": 2
+    },
+    {
+      "id": "generate_human_runbook",
+      "agent": "DevSecOpsAgent",
+      "action": "generate_runbook",
+      "inputs": {
+        "template": "rollback/gp22_tier4_runbook.md",
+        "context": "onchain-modernization"
+      },
+      "gp14_tier": 2
+    }
+  ],
+  "constraints": {
+    "allowed_tiers": [2, 4],
+    "forbidden_actions": [
+      "move_treasury_funds",
+      "execute_new_blockchain_transaction"
+    ]
+  },
+  "audit": {
+    "log_to_chain": true,
+    "log_to_repo": "rollback/gp22_tier4_rollback.json",
+    "timestamp": "pending"
+  }
+}

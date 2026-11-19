@@ -3,6 +3,8 @@ pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Votes.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
@@ -17,6 +19,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 ///      Third-party imports retain their original licensing and ownership terms.
 contract NGTTGovernanceToken is ERC20Votes, Ownable, ReentrancyGuard {
     using Counters for Counters.Counter;
+    using SafeERC20 for IERC20;
 
     // -------------------------------------------------------------------------
     // Constants
@@ -199,23 +202,22 @@ contract NGTTGovernanceToken is ERC20Votes, Ownable, ReentrancyGuard {
         }
     }
 
-    /// @notice Lets a member claim their allocated profits by minting the owed tokens.
+    /// @notice Lets a member claim their allocated profits from the deposited reserve.
     function claimProfits() external nonReentrant {
         uint256 amount = userProfits[msg.sender];
         require(amount > 0, "NGTT: no profits to claim");
 
         userProfits[msg.sender] = 0;
-        _mint(msg.sender, amount);
+        IERC20(address(this)).safeTransfer(msg.sender, amount);
 
         emit ProfitDistributed(msg.sender, amount);
     }
 
-    /// @notice Increases the profit pool by the specified amount (accounting unit only;
-    ///         no token transfer occurs here — caller is responsible for ensuring
-    ///         backing tokens have been transferred to the treasury).
+    /// @notice Deposits NGTT into the contract and makes it available for distribution.
     /// @param _amount Amount to add to the profit pool.
     function addProfitPool(uint256 _amount) external onlyOwner {
         require(_amount > 0, "NGTT: amount must be positive");
+        IERC20(address(this)).safeTransferFrom(msg.sender, address(this), _amount);
         profitPool += _amount;
         emit ProfitPoolIncreased(_amount, profitPool);
     }

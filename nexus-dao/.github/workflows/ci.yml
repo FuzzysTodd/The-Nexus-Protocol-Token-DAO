@@ -1,0 +1,32 @@
+name: Institutional CI & IEEE 1012 V&V Pipeline
+
+on:
+  push:
+    branches: [ MASTER, main ]
+  pull_request:
+    branches: [ MASTER, main ]
+
+jobs:
+  verify-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Execute IEEE 1012 Pure Logic Unit Tests (36 Suites)
+        run: npx tsx --test src/dao/logic.test.ts
+
+      - name: Execute ISO 9001 Lint & Static Analysis
+        run: npm run lint
+
+      - name: Execute Production Applet Build
+        run: npm run build

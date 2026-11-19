@@ -1,0 +1,55 @@
+name: Auto-create Nexus DAO Project Card
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  project: write
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  PROJECT_ID: "<YOUR_PROJECT_ID>"
+  STATUS_FIELD_ID: "<STATUS_FIELD_ID>"
+  STATUS_BACKLOG: "<BACKLOG_OPTION_ID>"   # or STATUS_REVIEW if you prefer
+
+jobs:
+  create-card:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create project item for PR
+        id: create_item
+        run: |
+          ITEM_ID=$(gh api graphql -f query="
+            mutation {
+              addProjectV2ItemById(input: {
+                projectId: \"$PROJECT_ID\",
+                contentId: \"${{ github.event.pull_request.node_id }}\"
+              }) {
+                item { id }
+              }
+            }
+          " --jq '.data.addProjectV2ItemById.item.id')
+
+          echo "item_id=$ITEM_ID" >> $GITHUB_OUTPUT
+
+      - name: Set initial Status field
+        run: |
+          gh api graphql -f query="
+            mutation {
+              updateProjectV2ItemFieldValue(input: {
+                projectId: \"$PROJECT_ID\",
+                itemId: \"${{ steps.create_item.outputs.item_id }}\",
+                fieldId: \"$STATUS_FIELD_ID\",
+                value: { singleSelectOptionId: \"$STATUS_BACKLOG\" }
+              }) {
+                projectV2Item { id }
+              }
+            }
+          "

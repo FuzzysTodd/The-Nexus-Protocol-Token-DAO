@@ -1,0 +1,59 @@
+name: DAO Bots — deterministic upkeep (zero AI credits)
+
+# DAO Bots — deterministic upkeep (zero AI credits)
+#
+# ⚠️ DORMANT while the GitHub account has a billing lock (jobs fail with
+# 'account is locked due to a billing issue'). Until the bill is paid, the
+# bots run WITHOUT Actions via local git hooks (scripts/install-hooks.sh)
+# and the daily scripts (scripts/bots-daily.sh / .cmd). This workflow stays
+# intact and resumes automatically once Actions is unlocked.
+# Todd's personal DAO bots run here automatically. No paid models are used:
+# every bot is plain Node.js, so routine repo upkeep costs $0 in AI credits.
+# Commits are authored with Todd's pre-configured identity — nothing to enter.
+
+on:
+  push:
+    branches: [MASTER, master, main]
+  workflow_dispatch:      # manual run button in the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  run-dao-bots:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Configure identity BEFORE the health bot runs — it verifies identity.
+      - name: Configure Todd's git identity (prevents commit prompts)
+        run: |
+          git config user.name  "Todd Stephens"
+          git config user.email "157565446+FuzzysTodd@users.noreply.github.com"
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Health Bot — validate configs, scripts, junk, git identity
+        run: node bots/health-bot.js
+
+      - name: Accounting Bot — account for every tracked file
+        run: node bots/dao-accounting-bot.js
+
+      - name: Registry Sync Bot — feed the dashboard agent data
+        run: node bots/registry-sync-bot.js
+
+      # Reports are written change-aware: unchanged content (ignoring the
+      # generatedAt timestamp) does not produce a commit.
+      - name: Commit reports only if content changed
+        run: |
+          git add reports/ || true
+          if git diff --cached --quiet; then
+            echo "No report changes — bots already up to date."
+          else
+            git commit -m "🤖 DAO bots: deterministic upkeep report (zero AI credits)"
+            git push
+          fi
